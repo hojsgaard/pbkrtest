@@ -12,6 +12,10 @@ deploy:
   provider: releases
   api_key:
     secure: q4IVniOQCAVEBltCI5UFFGplSXVoy0E9f9MPdExwkugtUr5JS94yCCkKlFJ1uMHo+NCNsQvAZc3ZWiaO/62b/J6+KHBfglQ/iQNCc6cBgfdFAIWOVnExjqUeg16jMDP9ocjZU8lQJFd22PX5Ygl+CVJbUUgco7trCioTYYUHBr3MdwCQ3GmaxoCB8zwkgxJ/9Le4Z/Z6qtYtZ1FD6h1DkMlzKIAWcAEcwNt3nc174/374rSP74zIrDG7rem/ei4qANlIfTD4CfciEzrIhf4Qvto0OkHuisuDiv02CB9nb7lxmzA39UPHmbJcV9aSTLCBMIYPN2r2TmuUerBy8/LPElqRnlv0yqlRVn09JeYD3UJAN0X+Qda7Gn7z7ovAeY9cX4SjUyarVHcd0AAq1eTo+yy70D+CwESUDPIB+InNaPB5arOSQ6SgMPRPGXRsWTY9I28Leg8QozCrjrziq4I4K44iDaw+afvWplBgXCwWP7VnoDNHFmovCJH9+dTg+gM24ssKnTDkZXyqf88D0bcVwwqjMPcPIBIB8/EJvWxD87JqRFoL+gOG7Vl3AoT80jaKgBK8Cpc9T7MTJdy807Nr0lyR8Zrs6lWeuBhOv7jEfhcrX0ozfvvBiCsYlXywGBNaFCV1qEhzRt/fqGrV5C6SzPYMFg4NQ5gYlEBh91uf3cM=
+  skip_cleanup: true
+  file_glob: true
   file: pbkrtest_*.t*gz
   on:
     repo: hojsgaard/pbkrtest
+    tags: true
+    condition: "$TRAVIS_OS_NAME == osx"
