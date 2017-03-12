@@ -1,10 +1,12 @@
-2016-12-27 Søren Højsgaard <sorenh@math.aau.dk>
+2017-03-12 Søren Højsgaard <sorenh@math.aau.dk>
 
 	* Converted to roxygen format
 
 	* Put on github
 
-	* Version 0.4-7 NOT UPLOADED
+	* Certain internal computations reverted to earlier implementation.
+	
+	* Version 0.4-7 uploaded
 
 2016-01-27 Søren Højsgaard <sorenh@math.aau.dk>
 
