@@ -6,8 +6,9 @@ os:
 - osx
 before_install:
 - if [ "$TRAVIS_OS_NAME" == "linux" ]; then tlmgr install boxedminipage; fi
-- if [ "$TRAVIS_OS_NAME" == "osx" ]; then sudo tlmgr install a4wide boxedminipage;
-  fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then sudo tlmgr install a4wide framed boxedminipage; fi
+after_success:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then R CMD INSTALL --build $PKG_TARBALL; fi
 deploy:
   provider: releases
   api_key:
