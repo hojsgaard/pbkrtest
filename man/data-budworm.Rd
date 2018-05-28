@@ -2,8 +2,8 @@
 % Please edit documentation in R/data-budworm.R
 \docType{data}
 \name{data-budworm}
-\alias{budworm}
 \alias{data-budworm}
+\alias{budworm}
 \title{budworm data}
 \format{This data frame contains 12 rows and 4 columns:
 \describe{
@@ -63,4 +63,3 @@ Venables, W.N; Ripley, B.D.(1999) Modern Applied Statistics with
 S-Plus, Heidelberg, Springer, 3rd edition, chapter 7.2
 }
 \keyword{datasets}
-

@@ -10,6 +10,11 @@
 \alias{restrictionMatrix2model.lm}
 \alias{restrictionMatrix2model.mer}
 \alias{restrictionMatrix2model.merMod}
+\alias{model2restrictionMatrix.merMod}
+\alias{model2restrictionMatrix.lm}
+\alias{restrictionMatrix2model}
+\alias{restrictionMatrix2model.merMod}
+\alias{restrictionMatrix2model.lm}
 \title{Conversion between a model object and a restriction matrix}
 \usage{
 model2restrictionMatrix(largeModel, smallModel)
@@ -71,10 +76,6 @@ logLik(mod.s)
 logLik(sug.s)
 
 }
-\author{
-Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
-    \email{sorenh@math.aau.dk}
-}
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
@@ -85,5 +86,8 @@ Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
 \code{\link{PBmodcomp}}, \code{\link{PBrefdist}},
     \code{\link{KRmodcomp}}
 }
+\author{
+Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
+    \email{sorenh@math.aau.dk}
+}
 \keyword{utilities}
-

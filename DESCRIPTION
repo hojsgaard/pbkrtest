@@ -1,5 +1,5 @@
 Package: pbkrtest
-Version: 0.4-7
+Version: 0.4-7.1
 Title: Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model
     Comparison
 Author: Ulrich Halekoh <uhalekoh@health.sdu.dk> Søren Højsgaard
@@ -17,9 +17,10 @@ Depends:
 Imports:
     Matrix (>= 1.2.3),
     parallel,
+    magrittr,
     MASS,
     methods
 Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

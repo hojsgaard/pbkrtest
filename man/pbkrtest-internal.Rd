@@ -8,6 +8,14 @@
 \alias{summary.KRmodcomp}
 \alias{print.KRmodcomp}
 
+\alias{as.data.frame.PBmodcomp}
+\alias{as.data.frame.summaryPB}
+
+\alias{\%>\%}
+\alias{detectCores}
+\alias{makeCluster}
+%\alias{}
+
 %\alias{get_ddf_Lb}
 %\alias{get_ddf_Lb.lmerMod}
 %\alias{ddf_Lb}

@@ -3,19 +3,21 @@ exportPattern("^[^\\.]")
 import(lme4)
 importFrom(MASS, ginv)
 
-importFrom(parallel, clusterCall, clusterExport, clusterSetRNGStream)
+importFrom(magrittr, "%>%")
+export("%>%")
+
+importFrom(parallel, clusterCall, clusterExport, clusterSetRNGStream, mclapply, detectCores, makeCluster)
+## export("detectCores", "makeCluster")
 
 importClassesFrom(Matrix, Matrix)
 importFrom(Matrix, Matrix, sparseMatrix, rankMatrix)
 importMethodsFrom(Matrix, t, isSymmetric, "%*%", solve, diag, chol, chol2inv, forceSymmetric, "*")
-
-
 importFrom("graphics", "abline", "legend", "lines", "plot")
 importFrom("methods", "as", "is")
 importFrom("stats", "as.formula", "family", "formula", "getCall",
-             "logLik", "model.matrix", "pchisq", "pf", "pgamma",
-             "printCoefmat", "quantile", "simulate", "terms",
-             "update", "update.formula", "var", "vcov")
+           "logLik", "model.matrix", "pchisq", "pf", "pgamma",
+           "printCoefmat", "quantile", "simulate", "terms",
+           "update", "update.formula", "var", "vcov")
 
 if(getRversion() >= "3.3.0") importFrom("stats", "sigma")
 
@@ -26,8 +28,8 @@ S3method( get_SigmaG, mer                      )
 S3method( KRmodcomp_init, mer                  )
 S3method( KRmodcomp, mer                       )
 S3method( model2restrictionMatrix, mer         )
-S3method( PBmodcomp, mer                       )
-S3method( PBrefdist, mer                       )
+#S3method( PBmodcomp, mer                       )
+#S3method( PBrefdist, mer                       )
 S3method( restrictionMatrix2model, mer         )
 S3method( vcovAdj, mer                         )
 
@@ -46,11 +48,18 @@ S3method( model2restrictionMatrix, lm          )
 
 S3method( model2restrictionMatrix, merMod      )
 S3method( PBmodcomp, lm                        )
-
-S3method( PBmodcomp, merMod                    )
 S3method( PBrefdist, lm                        )
 
-S3method( PBrefdist, merMod                    )
+#S3method( PBmodcomp, merMod                    )
+#S3method( PBrefdist, merMod                    )
+
+#S3method( PBmodcomp, lmerMod                    )
+#S3method( PBrefdist, lmerMod                    )
+
+S3method( as.data.frame, PBmodcomp )
+S3method( as.data.frame, summaryPB )
+
+
 S3method( plot, PBmodcomp                      )
 S3method( print, KRmodcomp                     )
 S3method( print, PBmodcomp                     )

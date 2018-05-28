@@ -183,8 +183,8 @@ PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl
 }
 
 #' @rdname pb-modcomp
-PBmodcomp.merMod <-
-PBmodcomp.mer <-
+PBmodcomp.lmerMod <-
+##PBmodcomp.mer <-
     function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
         
         ##cat("PBmodcomp.lmerMod\n")
