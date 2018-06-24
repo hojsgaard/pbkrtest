@@ -180,14 +180,14 @@
 
 #' @rdname pb-modcomp
 seqPBmodcomp <-
-    function(largeModel, smallModel, h = 20, nsim = 1000) {
+    function(largeModel, smallModel, h = 20, nsim = 1000, cl=NULL) {
         t.start <- proc.time()
         chunk.size <- 50
         nchunk <- nsim %/% chunk.size
         LRTstat <- getLRT(largeModel, smallModel)
         ref <- NULL
         for (ii in 1:nchunk) {
-            ref <- c(ref, PBrefdist(largeModel, smallModel, nsim = chunk.size))
+            ref <- c(ref, PBrefdist(largeModel, smallModel, nsim = chunk.size, cl=cl))
             n.extreme <- sum(ref > LRTstat["tobs"])
             if (n.extreme >= h)
                 break

@@ -17,7 +17,7 @@
 \alias{PBmodcomp.lm}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
-seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000)
+seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = NULL)
 
 PBmodcomp(largeModel, smallModel, nsim = 1000, ref = NULL, seed = NULL,
   cl = NULL, details = 0)
@@ -40,13 +40,13 @@ restriction matrix.}
 
 \item{nsim}{The number of simulations to form the reference distribution.}
 
+\item{cl}{A vector identifying a cluster; used for calculating the reference
+distribution using several cores. See examples below.}
+
 \item{ref}{Vector containing samples from the reference distribution. If
 NULL, this vector will be generated using PBrefdist().}
 
 \item{seed}{A seed that will be passed to the simulation of new datasets.}
-
-\item{cl}{A vector identifying a cluster; used for calculating the reference
-distribution using several cores. See examples below.}
 
 \item{details}{The amount of output produced. Mainly relevant for debugging
 purposes.}
