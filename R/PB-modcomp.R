@@ -177,13 +177,34 @@
 #' 
 #' @export PBmodcomp
 
+
+#' @rdname pb-modcomp
+seqPBmodcomp <-
+    function(largeModel, smallModel, h = 20, nsim = 1000) {
+        t.start <- proc.time()
+        chunk.size <- 50
+        nchunk <- nsim %/% chunk.size
+        LRTstat <- getLRT(largeModel, smallModel)
+        ref <- NULL
+        for (ii in 1:nchunk) {
+            ref <- c(ref, PBrefdist(largeModel, smallModel, nsim = chunk.size))
+            n.extreme <- sum(ref > LRTstat["tobs"])
+            if (n.extreme >= h)
+                break
+        }
+        ans <- PBmodcomp(largeModel, smallModel, ref = ref)
+        ans$ctime <- (proc.time() - t.start)[3]
+        ans
+    }
+
+
 #' @rdname pb-modcomp
 PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
   UseMethod("PBmodcomp")
 }
 
 #' @rdname pb-modcomp
-PBmodcomp.lmerMod <-
+PBmodcomp.merMod <-
 ##PBmodcomp.mer <-
     function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
         
@@ -224,6 +245,7 @@ PBmodcomp.lmerMod <-
     ans$f.small <- f.small
     ans
 }
+
 
 #' @rdname pb-modcomp
 PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
@@ -350,14 +372,12 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
   #' cat(sprintf("PB: EE=%f, ndf=%f VV=%f, ddf=%f\n", EE, ndf, VV, ddf))
 
 
-
-
-  test = list(
-    PBtest   = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.PB),
-    Gamma    = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.Ga),
-    Bartlett = c(stat=BCstat,  df=ndf, ddf=NA,   p.value=p.BC),
-    F        = c(stat=Fobs,    df=ndf, ddf=ddf,  p.value=p.FF),
-    LRT      = c(stat=tobs,    df=ndf, ddf=NA,   p.value=p.chi)
+    test = list(
+        LRT      = c(stat=tobs,    df=ndf, ddf=NA,   p.value=p.chi),
+        PBtest   = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.PB),
+        Gamma    = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.Ga),
+        Bartlett = c(stat=BCstat,  df=ndf, ddf=NA,   p.value=p.BC),
+        F        = c(stat=Fobs,    df=ndf, ddf=ddf,  p.value=p.FF)
     )
     ##          PBkd     = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.KD),
 
@@ -410,20 +430,20 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 
     cat(sprintf("Parametric bootstrap test; "))
     if (!is.null((zz<- x$ctime))){
-        cat(sprintf("time: %.2f sec; ", round(zz,2)))
+        cat(sprintf("time: %.2f sec\n", round(zz,2)))
     }
     if (!is.null((sam <- x$samples))){
         cat(sprintf("samples: %d extremes: %d;", sam[1], x$n.extreme))
     }
     cat("\n")
-    
-    
+        
     if (!is.null((sam <- x$samples))){
-        if (sam[2]<sam[1]){
+        if (sam[2] < sam[1]){
             cat(sprintf("Requested samples: %d Used samples: %d Extremes: %d\n",
                         sam[1], sam[2], x$n.extreme))
         }
     }
+
     if(!is.null(x$f.large)){
         cat("large : "); print(x$f.large)
         cat("small : "); print(x$f.small)

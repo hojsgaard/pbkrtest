@@ -3,7 +3,7 @@
 \name{pb-refdist}
 \alias{pb-refdist}
 \alias{PBrefdist}
-\alias{PBrefdist.lmerMod}
+\alias{PBrefdist.merMod}
 \alias{PBrefdist.lm}
 \alias{PBrefdist.lm}
 \alias{PBrefdist.merMod}
