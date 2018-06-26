@@ -182,7 +182,7 @@
 seqPBmodcomp <-
     function(largeModel, smallModel, h = 20, nsim = 1000, cl=NULL) {
         t.start <- proc.time()
-        chunk.size <- 50
+        chunk.size <- 200
         nchunk <- nsim %/% chunk.size
         LRTstat <- getLRT(largeModel, smallModel)
         ref <- NULL
@@ -196,6 +196,37 @@ seqPBmodcomp <-
         ans$ctime <- (proc.time() - t.start)[3]
         ans
     }
+
+## seqPBmodcomp2 <-
+##     function(largeModel, smallModel, h = 20, nsim = 1000, seed=NULL, cl=NULL) {
+##         t.start <- proc.time()
+
+##         simdata=simulate(smallModel, nsim=nsim, seed=seed)
+##         ref <- rep(NA, nsim)
+##         LRTstat <- getLRT(largeModel, smallModel)
+##         t.obs <- LRTstat["tobs"]
+
+##         count <- 0
+##         n.extreme <- 0
+##         for (i in 1:nsim){
+##             count <- i
+##             yyy <- simdata[,i]
+##             sm2  <- refit(smallModel, newresp=yyy)
+##             lg2  <- refit(largeModel, newresp=yyy)
+##             t.sim <- 2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
+##             ref[i] <- t.sim
+##             if (t.sim >= t.obs)
+##                 n.extreme <- n.extreme + 1
+##             if (n.extreme >= h)
+##                 break
+##         }
+##         ref <- ref[1:count]
+        
+
+##         ans <- PBmodcomp(largeModel, smallModel, ref = ref)
+##         ans$ctime <- (proc.time() - t.start)[3]
+##         ans
+##     }
 
 
 #' @rdname pb-modcomp
@@ -428,12 +459,12 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 
 .PBcommon <- function(x){
 
-    cat(sprintf("Parametric bootstrap test; "))
+    cat(sprintf("Bootstrap test; "))
     if (!is.null((zz<- x$ctime))){
-        cat(sprintf("time: %.2f sec\n", round(zz,2)))
+        cat(sprintf("time: %.2f sec;", round(zz,2)))
     }
     if (!is.null((sam <- x$samples))){
-        cat(sprintf("samples: %d extremes: %d;", sam[1], x$n.extreme))
+        cat(sprintf("samples: %d; extremes: %d;", sam[1], x$n.extreme))
     }
     cat("\n")
         
