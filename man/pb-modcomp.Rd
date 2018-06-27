@@ -17,7 +17,7 @@
 \alias{PBmodcomp.lm}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
-seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = NULL)
+seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = 1)
 
 PBmodcomp(largeModel, smallModel, nsim = 1000, ref = NULL, seed = NULL,
   cl = NULL, details = 0)
@@ -29,27 +29,35 @@ PBmodcomp(largeModel, smallModel, nsim = 1000, ref = NULL, seed = NULL,
   seed = NULL, cl = NULL, details = 0)
 }
 \arguments{
-\item{largeModel}{A model object. Can be a linear mixed effects model or
-generalized linear mixed effects model (as fitted with \code{lmer()} and
-\code{glmer()} function in the \pkg{lme4} package) or a linear normal
-model or a generalized linear model. The \code{largeModel} must be larger
-than \code{smallModel} (see below).}
+\item{largeModel}{A model object. Can be a linear mixed effects
+model or generalized linear mixed effects model (as fitted with
+\code{lmer()} and \code{glmer()} function in the \pkg{lme4}
+package) or a linear normal model or a generalized linear
+model. The \code{largeModel} must be larger than
+\code{smallModel} (see below).}
 
-\item{smallModel}{A model of the same type as \code{largeModel} or a
-restriction matrix.}
+\item{smallModel}{A model of the same type as \code{largeModel} or
+a restriction matrix.}
 
-\item{nsim}{The number of simulations to form the reference distribution.}
+\item{h}{For sequential computing for bootstrap p-values: The
+number of extreme cases needed to generate before the sampling
+proces stops.}
 
-\item{cl}{A vector identifying a cluster; used for calculating the reference
-distribution using several cores. See examples below.}
+\item{nsim}{The number of simulations to form the reference
+distribution.}
 
-\item{ref}{Vector containing samples from the reference distribution. If
-NULL, this vector will be generated using PBrefdist().}
+\item{cl}{A vector identifying a cluster; used for calculating the
+reference distribution using several cores. See examples below.}
 
-\item{seed}{A seed that will be passed to the simulation of new datasets.}
+\item{ref}{Vector containing samples from the reference
+distribution. If NULL, this vector will be generated using
+PBrefdist().}
 
-\item{details}{The amount of output produced. Mainly relevant for debugging
-purposes.}
+\item{seed}{A seed that will be passed to the simulation of new
+datasets.}
+
+\item{details}{The amount of output produced. Mainly relevant for
+debugging purposes.}
 }
 \description{
 Model comparison of nested models using parametric bootstrap
@@ -84,10 +92,11 @@ F-distributed, where the denominator degrees of freedom are determined by
 matching the first moment of the reference distribution.
 }
 \note{
-It can happen that some values of the LRT statistic in the reference
-    distribution are negative. When this happens one will see that the number
-    of used samples (those where the LRT is positive) are reported (this
-    number is smaller than the requested number of samples).
+It can happen that some values of the LRT statistic in the
+    reference distribution are negative. When this happens one will
+    see that the number of used samples (those where the LRT is
+    positive) are reported (this number is smaller than the
+    requested number of samples).
 
 In theory one can not have a negative value of the LRT statistic but in
 practice on can: We speculate that the reason is as follows: We simulate data

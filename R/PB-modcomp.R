@@ -40,25 +40,33 @@
 #' 
 #' @aliases PBmodcomp PBmodcomp.lm PBmodcomp.merMod getLRT getLRT.lm
 #'     getLRT.merMod plot.XXmodcomp PBmodcomp.mer getLRT.mer
-#' @param largeModel A model object. Can be a linear mixed effects model or
-#'     generalized linear mixed effects model (as fitted with \code{lmer()} and
-#'     \code{glmer()} function in the \pkg{lme4} package) or a linear normal
-#'     model or a generalized linear model. The \code{largeModel} must be larger
-#'     than \code{smallModel} (see below).
-#' @param smallModel A model of the same type as \code{largeModel} or a
-#'     restriction matrix.
-#' @param nsim The number of simulations to form the reference distribution.
-#' @param ref Vector containing samples from the reference distribution. If
-#'     NULL, this vector will be generated using PBrefdist().
-#' @param seed A seed that will be passed to the simulation of new datasets.
-#' @param cl A vector identifying a cluster; used for calculating the reference
-#'     distribution using several cores. See examples below.
-#' @param details The amount of output produced. Mainly relevant for debugging
-#'     purposes.
-#' @note It can happen that some values of the LRT statistic in the reference
-#'     distribution are negative. When this happens one will see that the number
-#'     of used samples (those where the LRT is positive) are reported (this
-#'     number is smaller than the requested number of samples).
+#' @param largeModel A model object. Can be a linear mixed effects
+#'     model or generalized linear mixed effects model (as fitted with
+#'     \code{lmer()} and \code{glmer()} function in the \pkg{lme4}
+#'     package) or a linear normal model or a generalized linear
+#'     model. The \code{largeModel} must be larger than
+#'     \code{smallModel} (see below).
+#' @param smallModel A model of the same type as \code{largeModel} or
+#'     a restriction matrix.
+#' @param nsim The number of simulations to form the reference
+#'     distribution.
+#' @param ref Vector containing samples from the reference
+#'     distribution. If NULL, this vector will be generated using
+#'     PBrefdist().
+#' @param seed A seed that will be passed to the simulation of new
+#'     datasets.
+#' @param h For sequential computing for bootstrap p-values: The
+#'     number of extreme cases needed to generate before the sampling
+#'     proces stops.
+#' @param cl A vector identifying a cluster; used for calculating the
+#'     reference distribution using several cores. See examples below.
+#' @param details The amount of output produced. Mainly relevant for
+#'     debugging purposes.
+#' @note It can happen that some values of the LRT statistic in the
+#'     reference distribution are negative. When this happens one will
+#'     see that the number of used samples (those where the LRT is
+#'     positive) are reported (this number is smaller than the
+#'     requested number of samples).
 #' 
 #' In theory one can not have a negative value of the LRT statistic but in
 #' practice on can: We speculate that the reason is as follows: We simulate data
@@ -180,7 +188,7 @@
 
 #' @rdname pb-modcomp
 seqPBmodcomp <-
-    function(largeModel, smallModel, h = 20, nsim = 1000, cl=NULL) {
+    function(largeModel, smallModel, h = 20, nsim = 1000, cl=1) {
         t.start <- proc.time()
         chunk.size <- 200
         nchunk <- nsim %/% chunk.size
