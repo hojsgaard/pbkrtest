@@ -88,6 +88,27 @@ vcovAdj.lmerMod <-
     vcovAdj16_internal( Phi, SigmaG, X, details=details)
 }
 
+#' @rdname kr-vcov
+vcovAdj.lme <-function(object, details=0){
+    if (!(getME(object, "is_REML"))) {
+        object <- update(object, . ~ ., REML = TRUE)
+    }
+    Phi      <- vcov(object)
+    SigmaG   <- get_SigmaG( object, details )
+    X        <- getME(object,"X")
+    vcovAdj16_internal( Phi, SigmaG, X, details=details)
+}
+
+#' @rdname kr-vcov
+vcovAdj.gls <-function(object, details=0){
+    if (!(getME(object, "is_REML"))) {
+        object <- update(object, . ~ ., REML = TRUE)
+    }
+    Phi      <- vcov(object)
+    SigmaG   <- get_SigmaG( object, details )
+    X_star        <- getME(object, "X_star")     
+    vcovAdj16_internal( Phi, SigmaG, X_star, details=details)
+}
 
 .vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
 

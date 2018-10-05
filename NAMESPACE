@@ -33,6 +33,15 @@ S3method( model2restrictionMatrix, mer         )
 S3method( restrictionMatrix2model, mer         )
 S3method( vcovAdj, mer                         )
 
+S3method( get_SigmaG, lme                      )
+S3method( KRmodcomp_init, lme                  )
+S3method( KRmodcomp, lme                       )
+S3method( vcovAdj, lme                         )
+
+S3method( get_SigmaG, gls                      )
+S3method( KRmodcomp_init, gls                  )
+S3method( KRmodcomp, gls                       )
+S3method( vcovAdj, gls                         )
 
 S3method( as.data.frame, XXmodcomp             )
 S3method( get_ddf_Lb, lmerMod                  )

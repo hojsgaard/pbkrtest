@@ -138,6 +138,103 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
 #' @rdname kr-modcomp
 KRmodcomp.mer <- KRmodcomp.lmerMod
 
+#' @rdname kr-modcomp
+KRmodcomp.lme <- function(largeModel, smallModel, betaH=0, details=0) {
+    ## 'smallModel' can either be an lmerMod (linear mixed) model or a restriction matrix L.
+    w <- KRmodcomp_init.lme(largeModel, smallModel, matrixOK = TRUE)
+    if (w == -1) {
+        stop('Models have either equal fixed mean stucture or are not nested')
+    } else {
+        if (w == 0){
+            ##stop('First given model is submodel of second; exchange the models\n')
+            tmp <- largeModel
+            largeModel <- smallModel
+            smallModel <- tmp
+        }
+    }
+    
+    ## Refit large model with REML if necessary
+    if (!(getME(largeModel, "is_REML"))){
+        largeModel <- update(largeModel,.~.,REML=TRUE)
+    }
+    
+    ## All computations are based on 'largeModel' and the restriction matrix 'L'
+    ## -------------------------------------------------------------------------
+    t0    <- proc.time()
+    L     <- .model2restrictionMatrix(largeModel, smallModel)
+    
+    PhiA  <- vcovAdj(largeModel, details)
+    stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=fixef(largeModel), betaH)
+    stats <- lapply(stats, c) ## To get rid of all sorts of attributes
+    ans   <- .finalizeKR(stats)
+    
+    f.small <-
+        if (.is.lmm(smallModel)){
+            .zzz <- formula(smallModel)
+            attributes(.zzz) <- NULL
+            .zzz
+        } else {
+            list(L=L, betaH=betaH)
+        }
+    f.large <- formula(largeModel)
+    attributes(f.large) <- NULL
+    
+    ans$f.large <- f.large
+    ans$f.small <- f.small
+    ans$ctime   <- (proc.time()-t0)[1]
+    ans$L       <- L
+    ans
+}
+
+#' @rdname kr-modcomp
+KRmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0) {
+    ## 'smallModel' can either be an lmerMod (linear mixed) model or a restriction matrix L.
+    warning("KRmodcomp.gls requires that the data is sorted with respect to 
+      the variance/covariance structure (e.g. subject and time)")
+    w <- KRmodcomp_init.gls(largeModel, smallModel, matrixOK = TRUE)
+    if (w == -1) {
+        stop('Models have either equal fixed mean stucture or are not nested')
+    } else {
+        if (w == 0){
+            ##stop('First given model is submodel of second; exchange the models\n')
+            tmp <- largeModel
+            largeModel <- smallModel
+            smallModel <- tmp
+        }
+    }
+    
+    ## Refit large model with REML if necessary
+    if (!(getME(largeModel, "is_REML"))){
+        largeModel <- update(largeModel,.~.,REML=TRUE)
+    }
+    
+    ## All computations are based on 'largeModel' and the restriction matrix 'L'
+    ## -------------------------------------------------------------------------
+    t0    <- proc.time()
+    L     <- .model2restrictionMatrix(largeModel, smallModel)
+    
+    PhiA  <- vcovAdj(largeModel, details)
+    stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=coef(largeModel), betaH)
+    stats <- lapply(stats, c) ## To get rid of all sorts of attributes
+    ans   <- .finalizeKR(stats)
+    
+    f.small <-
+        if (.is.lmm(smallModel)){
+            .zzz <- formula(smallModel)
+            attributes(.zzz) <- NULL
+            .zzz
+        } else {
+            list(L=L, betaH=betaH)
+        }
+    f.large <- formula(largeModel)
+    attributes(f.large) <- NULL
+    
+    ans$f.large <- f.large
+    ans$f.small <- f.small
+    ans$ctime   <- (proc.time()-t0)[1]
+    ans$L       <- L
+    ans
+}
 
 .finalizeKR <- function(stats){
     
@@ -256,7 +353,7 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
 
 
 .KRcommon <- function(x){
-  cat(sprintf("F-test with Kenward-Roger approximation; time: %.2f sec\n",
+  cat(sprintf("F-test with Kenward-Roger approximation; computing time: %.2f sec.\n",
               x$ctime))
   cat("large : ")
   print(x$f.large)

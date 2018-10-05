@@ -51,11 +51,15 @@
     if (class(object) %in% c("matrix","Matrix")){
         FALSE
     } else {
-        lme4::isLMM(object)
+        class(object) %in% c('lme', 'lmerMod', 'gls')
     }
 }
 
-
+.sqrtMat <- function(A){
+  e <- eigen(A)
+  V <- e$vectors
+  V %*% diag(sqrt(e$values)) %*% t(V)
+}
 
 ## .is.lmm <- function(object) {
 ##   ##checks whether  object is
