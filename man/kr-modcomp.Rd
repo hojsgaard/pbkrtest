@@ -6,15 +6,20 @@
 \alias{KRmodcomp.lmerMod}
 \alias{KRmodcomp_internal}
 \alias{KRmodcomp.mer}
-\alias{KRmodcomp.lmerMod}
-\alias{KRmodcomp.mer}
+\alias{KRmodcomp.lme}
+\alias{KRmodcomp.gls}
 \title{Ftest and degrees of freedom based on Kenward-Roger approximation}
 \usage{
 KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
 
-\method{KRmodcomp}{lmerMod}(largeModel, smallModel, betaH = 0, details = 0)
+\method{KRmodcomp}{lmerMod}(largeModel, smallModel, betaH = 0,
+  details = 0)
 
 \method{KRmodcomp}{mer}(largeModel, smallModel, betaH = 0, details = 0)
+
+\method{KRmodcomp}{lme}(largeModel, smallModel, betaH = 0, details = 0)
+
+\method{KRmodcomp}{gls}(largeModel, smallModel, betaH = 0, details = 0)
 }
 \arguments{
 \item{largeModel}{An \code{lmer} model}

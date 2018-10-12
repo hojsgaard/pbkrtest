@@ -189,8 +189,6 @@ KRmodcomp.lme <- function(largeModel, smallModel, betaH=0, details=0) {
 #' @rdname kr-modcomp
 KRmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0) {
     ## 'smallModel' can either be an lmerMod (linear mixed) model or a restriction matrix L.
-    warning("KRmodcomp.gls requires that the data is sorted with respect to 
-      the variance/covariance structure (e.g. subject and time)")
     w <- KRmodcomp_init.gls(largeModel, smallModel, matrixOK = TRUE)
     if (w == -1) {
         stop('Models have either equal fixed mean stucture or are not nested')

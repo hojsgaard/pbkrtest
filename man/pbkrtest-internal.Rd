@@ -22,6 +22,11 @@
 
 \alias{KRmodcomp_init}
 \alias{KRmodcomp_init.lmerMod}
+\alias{KRmodcomp_init.lme}
+\alias{KRmodcomp_init.gls}
+
+\alias{getME.lme}
+\alias{getME.gls}
 
 %% \alias{vcovAdj15}
 %% \alias{vcovAdj15_internal}

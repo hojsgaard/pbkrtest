@@ -15,6 +15,7 @@
 #' 
 #' @aliases vcovAdj vcovAdj.lmerMod vcovAdj_internal vcovAdj0 vcovAdj2
 #'     vcovAdj.mer LMM_Sigma_G get_SigmaG get_SigmaG.lmerMod get_SigmaG.mer
+#'     get_SigmaG.lme get_SigmaG.gls
 #'
 #' @param object An \code{lmer} model
 #' @param details If larger than 0 some timing details are printed.

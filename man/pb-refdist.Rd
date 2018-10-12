@@ -5,18 +5,16 @@
 \alias{PBrefdist}
 \alias{PBrefdist.merMod}
 \alias{PBrefdist.lm}
-\alias{PBrefdist.lm}
-\alias{PBrefdist.merMod}
 \title{Calculate reference distribution using parametric bootstrap}
 \usage{
-PBrefdist(largeModel, smallModel, nsim = 1000, seed = NULL, cl = NULL,
-  details = 0)
-
-\method{PBrefdist}{lm}(largeModel, smallModel, nsim = 1000, seed = NULL,
+PBrefdist(largeModel, smallModel, nsim = 1000, seed = NULL,
   cl = NULL, details = 0)
 
-\method{PBrefdist}{merMod}(largeModel, smallModel, nsim = 1000, seed = NULL,
-  cl = NULL, details = 0)
+\method{PBrefdist}{lm}(largeModel, smallModel, nsim = 1000,
+  seed = NULL, cl = NULL, details = 0)
+
+\method{PBrefdist}{merMod}(largeModel, smallModel, nsim = 1000,
+  seed = NULL, cl = NULL, details = 0)
 }
 \arguments{
 \item{largeModel}{A linear mixed effects model as fitted with the

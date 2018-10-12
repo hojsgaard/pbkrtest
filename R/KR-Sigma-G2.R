@@ -89,12 +89,7 @@ get_SigmaG.gls  <- function(object, details=0) {
   ## Find G_r:
   G  <- NULL
   groups <- object$groups
-  if(!all(groups == sort(groups))){
-    stop('KRmodcomp.gls requires that the data is sorted with respect to 
-      the variance/covariance structure (e.g. subject and time). 
-      Data is not sorted with respect to group.')
-  }
-  ugroups <- unique(groups)
+  ugroups <- sort(unique(groups))
   Zt_star        <- getME(object,"Zt_star")
   for (ss in 1) {
     ZZ    <- .shget_Zt_group( ss, Zt_star, c(0,length(ugroups)) )

@@ -12,18 +12,15 @@
 \alias{plot.XXmodcomp}
 \alias{PBmodcomp.mer}
 \alias{getLRT.mer}
-\alias{PBmodcomp}
-\alias{PBmodcomp.merMod}
-\alias{PBmodcomp.lm}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
 seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = 1)
 
-PBmodcomp(largeModel, smallModel, nsim = 1000, ref = NULL, seed = NULL,
-  cl = NULL, details = 0)
-
-\method{PBmodcomp}{merMod}(largeModel, smallModel, nsim = 1000, ref = NULL,
+PBmodcomp(largeModel, smallModel, nsim = 1000, ref = NULL,
   seed = NULL, cl = NULL, details = 0)
+
+\method{PBmodcomp}{merMod}(largeModel, smallModel, nsim = 1000,
+  ref = NULL, seed = NULL, cl = NULL, details = 0)
 
 \method{PBmodcomp}{lm}(largeModel, smallModel, nsim = 1000, ref = NULL,
   seed = NULL, cl = NULL, details = 0)

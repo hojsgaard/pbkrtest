@@ -1,6 +1,7 @@
 exportPattern("^[^\\.]")
 
 import(lme4)
+import(nlme)
 importFrom(MASS, ginv)
 
 importFrom(magrittr, "%>%")
@@ -17,7 +18,8 @@ importFrom("methods", "as", "is")
 importFrom("stats", "as.formula", "family", "formula", "getCall",
            "logLik", "model.matrix", "pchisq", "pf", "pgamma",
            "printCoefmat", "quantile", "simulate", "terms",
-           "update", "update.formula", "var", "vcov")
+           "update", "update.formula", "var", "vcov", 
+           "coef", "model.frame")
 
 if(getRversion() >= "3.3.0") importFrom("stats", "sigma")
 
@@ -37,11 +39,13 @@ S3method( get_SigmaG, lme                      )
 S3method( KRmodcomp_init, lme                  )
 S3method( KRmodcomp, lme                       )
 S3method( vcovAdj, lme                         )
+S3method( getME, lme                           )
 
 S3method( get_SigmaG, gls                      )
 S3method( KRmodcomp_init, gls                  )
 S3method( KRmodcomp, gls                       )
 S3method( vcovAdj, gls                         )
+S3method( getME, gls                           )
 
 S3method( as.data.frame, XXmodcomp             )
 S3method( get_ddf_Lb, lmerMod                  )
@@ -59,8 +63,8 @@ S3method( model2restrictionMatrix, merMod      )
 S3method( PBmodcomp, lm                        )
 S3method( PBrefdist, lm                        )
 
-#S3method( PBmodcomp, merMod                    )
-#S3method( PBrefdist, merMod                    )
+S3method( PBmodcomp, merMod                    )
+S3method( PBrefdist, merMod                    )
 
 #S3method( PBmodcomp, lmerMod                    )
 #S3method( PBrefdist, lmerMod                    )

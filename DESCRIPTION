@@ -13,14 +13,16 @@ Description: Test in mixed effects models. Attention is on mixed effects models
 URL: http://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
     R (>= 3.2.3),
-    lme4 (>= 1.1.10)
+    lme4 (>= 1.1.10),
+    nlme
 Imports:
     Matrix (>= 1.2.3),
     parallel,
     magrittr,
     MASS,
+    testthat,
     methods
 Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

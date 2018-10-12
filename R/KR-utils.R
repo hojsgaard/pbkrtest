@@ -58,7 +58,12 @@
 .sqrtMat <- function(A){
   e <- eigen(A)
   V <- e$vectors
-  V %*% diag(sqrt(e$values)) %*% t(V)
+  if(length(e$values)==1){
+    S <- sqrt(e$values)
+  }else{
+    S <- diag(sqrt(e$values))
+  }
+  V %*% S %*% t(V)
 }
 
 ## .is.lmm <- function(object) {

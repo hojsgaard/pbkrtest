@@ -10,11 +10,6 @@
 \alias{restrictionMatrix2model.lm}
 \alias{restrictionMatrix2model.mer}
 \alias{restrictionMatrix2model.merMod}
-\alias{model2restrictionMatrix.merMod}
-\alias{model2restrictionMatrix.lm}
-\alias{restrictionMatrix2model}
-\alias{restrictionMatrix2model.merMod}
-\alias{restrictionMatrix2model.lm}
 \title{Conversion between a model object and a restriction matrix}
 \usage{
 model2restrictionMatrix(largeModel, smallModel)
