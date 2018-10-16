@@ -1,7 +1,7 @@
 exportPattern("^[^\\.]")
 
 import(lme4)
-import(nlme)
+importFrom(nlme, asOneFormula, getData, getVarCov)
 importFrom(MASS, ginv)
 
 importFrom(magrittr, "%>%")
