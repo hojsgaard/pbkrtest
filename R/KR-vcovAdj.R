@@ -79,18 +79,8 @@ vcovAdj <- function(object, details=0){
 #' @rdname kr-vcov
 vcovAdj.lmerMod <-
     vcovAdj.mer <-
+    vcovAdj.lme <-
         function(object, details=0){
-    if (!(getME(object, "is_REML"))) {
-        object <- update(object, . ~ ., REML = TRUE)
-    }
-    Phi      <- vcov(object)
-    SigmaG   <- get_SigmaG( object, details )
-    X        <- getME(object,"X")
-    vcovAdj16_internal( Phi, SigmaG, X, details=details)
-}
-
-#' @rdname kr-vcov
-vcovAdj.lme <-function(object, details=0){
     if (!(getME(object, "is_REML"))) {
         object <- update(object, . ~ ., REML = TRUE)
     }
