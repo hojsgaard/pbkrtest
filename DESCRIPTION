@@ -20,8 +20,9 @@ Imports:
     magrittr,
     MASS,
     methods,
-    testthat,
     nlme
+Suggests:
+    testthat
 Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)

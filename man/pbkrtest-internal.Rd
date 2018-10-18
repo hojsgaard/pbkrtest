@@ -28,6 +28,8 @@
 \alias{getME.lme}
 \alias{getME.gls}
 
+\alias{fixef.gls}
+
 %% \alias{vcovAdj15}
 %% \alias{vcovAdj15_internal}
 %% \alias{vcovAdj16}
