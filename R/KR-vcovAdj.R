@@ -15,6 +15,7 @@
 #' 
 #' @aliases vcovAdj vcovAdj.lmerMod vcovAdj_internal vcovAdj0 vcovAdj2
 #'     vcovAdj.mer LMM_Sigma_G get_SigmaG get_SigmaG.lmerMod get_SigmaG.mer
+#'     get_SigmaG.lme get_SigmaG.gls
 #'
 #' @param object An \code{lmer} model
 #' @param details If larger than 0 some timing details are printed.
@@ -78,6 +79,7 @@ vcovAdj <- function(object, details=0){
 #' @rdname kr-vcov
 vcovAdj.lmerMod <-
     vcovAdj.mer <-
+    vcovAdj.lme <-
         function(object, details=0){
     if (!(getME(object, "is_REML"))) {
         object <- update(object, . ~ ., REML = TRUE)
@@ -88,6 +90,16 @@ vcovAdj.lmerMod <-
     vcovAdj16_internal( Phi, SigmaG, X, details=details)
 }
 
+#' @rdname kr-vcov
+vcovAdj.gls <-function(object, details=0){
+    if (!(getME(object, "is_REML"))) {
+        object <- update(object, . ~ ., REML = TRUE)
+    }
+    Phi      <- vcov(object)
+    SigmaG   <- get_SigmaG( object, details )
+    X_star        <- getME(object, "X_star")     
+    vcovAdj16_internal( Phi, SigmaG, X_star, details=details)
+}
 
 .vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
 

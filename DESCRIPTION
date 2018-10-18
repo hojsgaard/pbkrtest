@@ -19,8 +19,11 @@ Imports:
     parallel,
     magrittr,
     MASS,
-    methods
+    methods,
+    nlme
+Suggests:
+    testthat
 Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

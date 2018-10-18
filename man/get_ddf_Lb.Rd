@@ -5,9 +5,6 @@
 \alias{get_Lb_ddf}
 \alias{get_Lb_ddf.lmerMod}
 \alias{Lb_ddf}
-\alias{get_Lb_ddf.lmerMod}
-\alias{Lb_ddf}
-\alias{get_ddf_Lb}
 \alias{get_ddf_Lb.lmerMod}
 \alias{ddf_Lb}
 \title{Adjusted denomintor degress freedom for linear estimate for linear

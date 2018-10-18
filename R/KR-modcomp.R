@@ -136,8 +136,7 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
 }
 
 #' @rdname kr-modcomp
-KRmodcomp.mer <- KRmodcomp.lmerMod
-
+KRmodcomp.gls <- KRmodcomp.lme <- KRmodcomp.mer <- KRmodcomp.lmerMod 
 
 .finalizeKR <- function(stats){
     
@@ -256,7 +255,7 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
 
 
 .KRcommon <- function(x){
-  cat(sprintf("F-test with Kenward-Roger approximation; time: %.2f sec\n",
+  cat(sprintf("F-test with Kenward-Roger approximation; computing time: %.2f sec.\n",
               x$ctime))
   cat("large : ")
   print(x$f.large)
