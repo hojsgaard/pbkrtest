@@ -144,8 +144,8 @@ PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, det
 .get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL, simdata=simulate(sm, nsim=nsim, seed=seed)){
                                         #simdata <- simulate(sm, nsim=nsim, seed=seed)
     unname(unlist(lapply(simdata, function(yyy){
-        sm2  <- refit(sm, newresp=yyy)
-        lg2  <- refit(lg, newresp=yyy)
+        sm2  <- refit(sm, newresp=yyy, control=list(verbose=0))
+        lg2  <- refit(lg, newresp=yyy, control=list(verbose=0))
         2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
     })))
 }
