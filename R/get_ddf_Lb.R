@@ -43,16 +43,19 @@
 #' L
 #' 
 
+#' @export
 #' @rdname get_ddf_Lb
 get_Lb_ddf <- function(object, L){
     UseMethod("get_Lb_ddf")
 }
 
+#' @export
 #' @rdname get_ddf_Lb
 get_Lb_ddf.lmerMod <- function(object, L){
     Lb_ddf(L, vcov(object), vcovAdj(object))
 }
 
+#' @export
 #' @rdname get_ddf_Lb
 Lb_ddf <- function(L, V0, Vadj) {
     if (!is.matrix(L))

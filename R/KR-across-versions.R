@@ -8,13 +8,14 @@
 
 .get.RT.dim.by.RT <- function(object) {
   ## output: dimension (no of columns) of covariance matrix for random term ii
-  .cc <- class(object)
+  ##  .cc <- class(object)
   qq <-
-    if (.cc %in% "mer") {
-      sapply(object@ST,function(X) nrow(X)) 
-    } else {
-      sapply(object@cnms, length)  ## FIXME: use getME()
-    }
-  qq
+      ##if (.cc %in% "mer") {
+      if (inherits(object, "mer")){
+          sapply(object@ST,function(X) nrow(X)) 
+      } else {
+          sapply(object@cnms, length)  ## FIXME: use getME()
+      }
+    qq
 }
 

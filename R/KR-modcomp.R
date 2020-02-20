@@ -1,6 +1,6 @@
 ## ##########################################################################
 ##
-#' @title Ftest and degrees of freedom based on Kenward-Roger approximation
+#' @title F-test and degrees of freedom based on Kenward-Roger approximation
 #' 
 #' @description An approximate F-test based on the Kenward-Roger approach.
 #'
@@ -43,10 +43,11 @@
 #' @param betaH A number or a vector of the beta of the hypothesis, e.g. L
 #'     beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.
 #' @param details If larger than 0 some timing details are printed.
-#' @param \dots Additional arguments to print function
+#' @param \dots Additional arguments to print method; currently not used.
 #' @note This functionality is not thoroughly tested and should be used with
 #'     care. Please do report bugs etc.
-#' @author Ulrich Halekoh \email{ulrich.halekoh@@agrsci.dk}, Søren Højsgaard
+#'
+#' @author Ulrich Halekoh \email{uhalekoh@@health.sdu.dk}, Søren Højsgaard
 #'     \email{sorenh@@math.aau.dk}
 #' 
 #' @seealso \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
@@ -81,12 +82,14 @@
 #' 
 #' 
 
+#' @export
 #' @rdname kr-modcomp
 KRmodcomp <- function(largeModel, smallModel,betaH=0, details=0){
     UseMethod("KRmodcomp")
 }
 
 
+#' @export
 #' @rdname kr-modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     ## 'smallModel' can either be an lmerMod (linear mixed) model or a restriction matrix L.
@@ -275,8 +278,8 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
 
 }
 
-
-print.KRmodcomp <- function(x,...){
+#' @export
+print.KRmodcomp <- function(x, ...){
 
   .KRcommon(x)
   FF.thresh <- 0.2
@@ -292,7 +295,8 @@ print.KRmodcomp <- function(x,...){
 }
 
 
-summary.KRmodcomp <- function(object,...){
+#' @export
+summary.KRmodcomp <- function(object, ...){
 
   .KRcommon(object)
   FF.thresh <- 0.2

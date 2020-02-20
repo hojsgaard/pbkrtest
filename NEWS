@@ -1,0 +1,12 @@
+pbkrtest v0.4-8 (Release date: 2020-02-20)
+==========================================
+
+Bug fixes:
+
+  * Issue related to class() versus inherits() fixed.
+
+Changes:
+
+  * NEWS file added
+  * NAMESPACE file is now generated automatically
+

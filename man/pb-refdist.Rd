@@ -5,18 +5,34 @@
 \alias{PBrefdist}
 \alias{PBrefdist.merMod}
 \alias{PBrefdist.lm}
-\alias{PBrefdist.lm}
-\alias{PBrefdist.merMod}
 \title{Calculate reference distribution using parametric bootstrap}
 \usage{
-PBrefdist(largeModel, smallModel, nsim = 1000, seed = NULL, cl = NULL,
-  details = 0)
+PBrefdist(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
 
-\method{PBrefdist}{lm}(largeModel, smallModel, nsim = 1000, seed = NULL,
-  cl = NULL, details = 0)
+\method{PBrefdist}{lm}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
 
-\method{PBrefdist}{merMod}(largeModel, smallModel, nsim = 1000, seed = NULL,
-  cl = NULL, details = 0)
+\method{PBrefdist}{merMod}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
 }
 \arguments{
 \item{largeModel}{A linear mixed effects model as fitted with the
@@ -76,8 +92,9 @@ data(beets)
 head(beets)
 beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=FALSE)
 beet_no.harv <- update(beet0, . ~ . -harvest)
-rd <- PBrefdist(beet0, beet_no.harv, nsim=20)
+rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=1)
 rd
+\dontrun{
 ## Note: Many more simulations must be made in practice.
 
 # Computations can be made in parallel using several processors:
@@ -119,7 +136,7 @@ rd <- PBrefdist(beet0, beet_no.harv, nsim=20)
 # Just once:
 rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=clus)
 stopCluster(clus)
-
+}
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger

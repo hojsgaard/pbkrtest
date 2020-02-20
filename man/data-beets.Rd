@@ -4,8 +4,8 @@
 \name{data-beets}
 \alias{data-beets}
 \alias{beets}
-\title{beets data}
-\format{The format is: chr "beets"}
+\title{Sugar beets data}
+\format{A dataframe with 5 columns and 30 rows.}
 \usage{
 beets
 }

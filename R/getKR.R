@@ -23,11 +23,12 @@
 #' lg <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), 
 #'               data=beets, REML=FALSE)
 #' sm <- update(lg, .~. - harvest)
-#' xx <- KRmodcomp(lg, sm)
-#' getKR(xx, "ddf") # get denominator degrees of freedom.
+#' modcomp <- KRmodcomp(lg, sm)
+#' getKR(modcomp, "ddf") # get denominator degrees of freedom.
 #' 
 #' 
 
+#' @export
 #' @rdname getkr
 getKR <- function (object, name = c("ndf", "ddf", "Fstat", "p.value", "F.scaling", "FstatU", "p.valueU", "aux")) 
 {	

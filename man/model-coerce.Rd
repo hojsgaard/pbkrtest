@@ -10,24 +10,11 @@
 \alias{restrictionMatrix2model.lm}
 \alias{restrictionMatrix2model.mer}
 \alias{restrictionMatrix2model.merMod}
-\alias{model2restrictionMatrix.merMod}
-\alias{model2restrictionMatrix.lm}
-\alias{restrictionMatrix2model}
-\alias{restrictionMatrix2model.merMod}
-\alias{restrictionMatrix2model.lm}
 \title{Conversion between a model object and a restriction matrix}
 \usage{
 model2restrictionMatrix(largeModel, smallModel)
 
-\method{model2restrictionMatrix}{merMod}(largeModel, smallModel)
-
-\method{model2restrictionMatrix}{lm}(largeModel, smallModel)
-
 restrictionMatrix2model(largeModel, LL)
-
-\method{restrictionMatrix2model}{merMod}(largeModel, LL)
-
-\method{restrictionMatrix2model}{lm}(largeModel, LL)
 }
 \arguments{
 \item{largeModel, smallModel}{Model objects of the same "type". Possible types
@@ -41,17 +28,17 @@ linear models)}
     \code{restrictionMatrix2model}: A model object.
 }
 \description{
-Testing a small model under a large model corresponds imposing
-    restrictions on the model matrix of the larger model and these
-    restrictions come in the form of a restriction matrix. These functions
-    converts a model to a restriction matrix and vice versa.
+Testing a small model under a large model corresponds
+    imposing restrictions on the model matrix of the larger model
+    and these restrictions come in the form of a restriction
+    matrix. These functions converts a model to a restriction
+    matrix and vice versa.
 }
 \note{
 That these functions are visible is a recent addition; minor changes
     may occur.
 }
 \examples{
-
 library(pbkrtest)
 data("beets", package = "pbkrtest")
 sug <- lm(sugpct ~ block + sow + harvest, data=beets)

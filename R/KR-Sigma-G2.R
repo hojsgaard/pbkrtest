@@ -6,14 +6,17 @@
 ##
 ## ##############################################################################
 
+#' @export
 get_SigmaG <- function(object, details=0) {
   UseMethod("get_SigmaG")
 }
 
+#' @export
 get_SigmaG.lmerMod  <- function(object, details=0) {
   .get_SigmaG( object, details )
 }
 
+#' @export
 get_SigmaG.mer  <- function(object, details=0) {
   LMM_Sigma_G( object, details )
 }

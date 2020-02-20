@@ -6,9 +6,7 @@
 \alias{KRmodcomp.lmerMod}
 \alias{KRmodcomp_internal}
 \alias{KRmodcomp.mer}
-\alias{KRmodcomp.lmerMod}
-\alias{KRmodcomp.mer}
-\title{Ftest and degrees of freedom based on Kenward-Roger approximation}
+\title{F-test and degrees of freedom based on Kenward-Roger approximation}
 \usage{
 KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
 
@@ -26,7 +24,7 @@ beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.}
 
 \item{details}{If larger than 0 some timing details are printed.}
 
-\item{\dots}{Additional arguments to print function}
+\item{\dots}{Additional arguments to print method; currently not used.}
 }
 \description{
 An approximate F-test based on the Kenward-Roger approach.
@@ -100,7 +98,7 @@ Fixed Effects from Restricted Maximum Likelihood}, Biometrics 53: 983-997.
     \code{\link{PBmodcomp}}
 }
 \author{
-Ulrich Halekoh \email{ulrich.halekoh@agrsci.dk}, Søren Højsgaard
+Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
     \email{sorenh@math.aau.dk}
 }
 \keyword{inference}

@@ -5,8 +5,10 @@
 \alias{getKR}
 \title{Extract (or "get") components from a \code{KRmodcomp} object.}
 \usage{
-getKR(object, name = c("ndf", "ddf", "Fstat", "p.value", "F.scaling",
-  "FstatU", "p.valueU", "aux"))
+getKR(
+  object,
+  name = c("ndf", "ddf", "Fstat", "p.value", "F.scaling", "FstatU", "p.valueU", "aux")
+)
 }
 \arguments{
 \item{object}{A \code{KRmodcomp} object, which is the result of the
@@ -25,8 +27,8 @@ data(beets, package='pbkrtest')
 lg <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), 
               data=beets, REML=FALSE)
 sm <- update(lg, .~. - harvest)
-xx <- KRmodcomp(lg, sm)
-getKR(xx, "ddf") # get denominator degrees of freedom.
+modcomp <- KRmodcomp(lg, sm)
+getKR(modcomp, "ddf") # get denominator degrees of freedom.
 
 
 }

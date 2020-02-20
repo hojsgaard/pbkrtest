@@ -68,8 +68,9 @@
 #' head(beets)
 #' beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=FALSE)
 #' beet_no.harv <- update(beet0, . ~ . -harvest)
-#' rd <- PBrefdist(beet0, beet_no.harv, nsim=20)
+#' rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=1)
 #' rd
+#' \dontrun{
 #' ## Note: Many more simulations must be made in practice.
 #' 
 #' # Computations can be made in parallel using several processors:
@@ -111,9 +112,10 @@
 #' # Just once:
 #' rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=clus)
 #' stopCluster(clus)
-#' 
+#' }
 
 #' @rdname pb-refdist
+#' @export
 PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
     UseMethod("PBrefdist")
 }
@@ -144,8 +146,8 @@ PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, det
 .get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL, simdata=simulate(sm, nsim=nsim, seed=seed)){
                                         #simdata <- simulate(sm, nsim=nsim, seed=seed)
     unname(unlist(lapply(simdata, function(yyy){
-        sm2  <- refit(sm, newresp=yyy, control=list(verbose=0))
-        lg2  <- refit(lg, newresp=yyy, control=list(verbose=0))
+        sm2  <- suppressMessages(refit(sm, newresp=yyy))
+        lg2  <- suppressMessages(refit(lg, newresp=yyy))
         2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
     })))
 }
@@ -204,6 +206,7 @@ PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, det
 
 
 #' @rdname pb-refdist
+#' @export
 PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
   t0 <- proc.time()
   
@@ -228,6 +231,7 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
 }
 
 #' @rdname pb-refdist
+#' @export
 PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
 
     t0 <- proc.time()

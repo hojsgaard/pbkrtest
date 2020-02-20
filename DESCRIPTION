@@ -12,7 +12,7 @@ Description: Test in mixed effects models. Attention is on mixed effects models
     models.
 URL: http://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
-    R (>= 3.2.3),
+    R (>= 3.3.0),
     lme4 (>= 1.1.10)
 Imports:
     Matrix (>= 1.2.3),
@@ -23,4 +23,5 @@ Imports:
 Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
+LazyData: true

@@ -1,6 +1,6 @@
-#' @title beets data
-#'
-#' @description Yield and sugar percentage in sugar beets from a split plot
+#' Sugar beets data
+#' 
+#' Yield and sugar percentage in sugar beets from a split plot
 #'     experiment.  Data is obtained from a split plot experiment. There are 3
 #'     blocks and in each of these the harvest time defines the "whole plot" and
 #'     the sowing time defines the "split plot". Each plot was \eqn{25 m^2} and
@@ -8,7 +8,7 @@
 #'
 #' @name data-beets
 #' @docType data
-#' @format The format is: chr "beets"
+#' @format A dataframe with 5 columns and 30 rows. 
 #'
 #' @details
 #' \preformatted{  

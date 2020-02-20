@@ -12,21 +12,39 @@
 \alias{plot.XXmodcomp}
 \alias{PBmodcomp.mer}
 \alias{getLRT.mer}
-\alias{PBmodcomp}
-\alias{PBmodcomp.merMod}
-\alias{PBmodcomp.lm}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
 seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = 1)
 
-PBmodcomp(largeModel, smallModel, nsim = 1000, ref = NULL, seed = NULL,
-  cl = NULL, details = 0)
+PBmodcomp(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  ref = NULL,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
 
-\method{PBmodcomp}{merMod}(largeModel, smallModel, nsim = 1000, ref = NULL,
-  seed = NULL, cl = NULL, details = 0)
+\method{PBmodcomp}{merMod}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  ref = NULL,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
 
-\method{PBmodcomp}{lm}(largeModel, smallModel, nsim = 1000, ref = NULL,
-  seed = NULL, cl = NULL, details = 0)
+\method{PBmodcomp}{lm}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  ref = NULL,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
 }
 \arguments{
 \item{largeModel}{A model object. Can be a linear mixed effects
@@ -124,14 +142,15 @@ data(beets, package="pbkrtest")
 head(beets)
 
 ## Linear mixed effects model:
-sug   <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=FALSE)
+sug   <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
+              data=beets, REML=FALSE)
 sug.h <- update(sug, .~. -harvest)
 sug.s <- update(sug, .~. -sow)
 
 anova(sug, sug.h)
-PBmodcomp(sug, sug.h, nsim=50)
+PBmodcomp(sug, sug.h, nsim=50, cl=1)
 anova(sug, sug.h)
-PBmodcomp(sug, sug.s, nsim=50)
+PBmodcomp(sug, sug.s, nsim=50, cl=1)
 
 ## Linear normal model:
 sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -139,9 +158,9 @@ sug.h <- update(sug, .~. -harvest)
 sug.s <- update(sug, .~. -sow)
 
 anova(sug, sug.h)
-PBmodcomp(sug, sug.h, nsim=50)
+PBmodcomp(sug, sug.h, nsim=50, cl=1)
 anova(sug, sug.s)
-PBmodcomp(sug, sug.s, nsim=50)
+PBmodcomp(sug, sug.s, nsim=50, cl=1)
 
 ## Generalized linear model
 counts    <- c(18,17,15,20,10,20,25,13,12)
@@ -154,9 +173,9 @@ glm.D93.o <- update(glm.D93, .~. -outcome)
 glm.D93.t <- update(glm.D93, .~. -treatment)
 
 anova(glm.D93, glm.D93.o, test="Chisq")
-PBmodcomp(glm.D93, glm.D93.o, nsim=50)
+PBmodcomp(glm.D93, glm.D93.o, nsim=50, cl=1)
 anova(glm.D93, glm.D93.t, test="Chisq")
-PBmodcomp(glm.D93, glm.D93.t, nsim=50)
+PBmodcomp(glm.D93, glm.D93.t, nsim=50, cl=1)
 
 ## Generalized linear mixed model (it takes a while to fit these)
 \dontrun{
@@ -164,7 +183,7 @@ PBmodcomp(glm.D93, glm.D93.t, nsim=50)
               data = cbpp, family = binomial))
 (gm2 <- update(gm1, .~.-period))
 anova(gm1, gm2)
-PBmodcomp(gm1, gm2)
+PBmodcomp(gm1, gm2, cl=2)
 }
 
 
@@ -173,18 +192,18 @@ PBmodcomp(gm1, gm2)
 ## removing Days
 (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
 anova(fmLarge, fmSmall)
-PBmodcomp(fmLarge, fmSmall)
+PBmodcomp(fmLarge, fmSmall, cl=1)
 
 ## The same test using a restriction matrix
 L <- cbind(0,1)
-PBmodcomp(fmLarge, L)
+PBmodcomp(fmLarge, L, cl=1)
 
 ## Vanilla
-PBmodcomp(beet0, beet_no.harv, nsim=1000)
+PBmodcomp(beet0, beet_no.harv, nsim=1000, cl=1)
 
 ## Simulate reference distribution separately:
 refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000)
-PBmodcomp(beet0, beet_no.harv, ref=refdist)
+PBmodcomp(beet0, beet_no.harv, ref=refdist, cl=1)
 
 ## Do computations with multiple processors:
 ## Number of cores:

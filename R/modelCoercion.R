@@ -1,15 +1,17 @@
 ## FIXME: model2restrictionMatrix -> m2rm
 ## FIXME: restrictionMatrix2model -> rm2m
 
+################################################################################
 #' @title Conversion between a model object and a restriction matrix
 #' 
-#' @description Testing a small model under a large model corresponds imposing
-#'     restrictions on the model matrix of the larger model and these
-#'     restrictions come in the form of a restriction matrix. These functions
-#'     converts a model to a restriction matrix and vice versa. 
+#' @description Testing a small model under a large model corresponds
+#'     imposing restrictions on the model matrix of the larger model
+#'     and these restrictions come in the form of a restriction
+#'     matrix. These functions converts a model to a restriction
+#'     matrix and vice versa.
 #' 
 #' @name model-coerce
-#' 
+################################################################################
 #' @aliases model2restrictionMatrix model2restrictionMatrix.lm
 #'     model2restrictionMatrix.mer model2restrictionMatrix.merMod
 #'     restrictionMatrix2model restrictionMatrix2model.lm
@@ -34,7 +36,6 @@
 #' @keywords utilities
 #' 
 #' @examples
-#' 
 #' library(pbkrtest)
 #' data("beets", package = "pbkrtest")
 #' sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -64,7 +65,8 @@ model2restrictionMatrix <- function (largeModel, smallModel) {
     UseMethod("model2restrictionMatrix")
 }
 
-#' @rdname model-coerce
+#' @method model2restrictionMatrix merMod
+#' @export
 model2restrictionMatrix.merMod <-
     model2restrictionMatrix.mer <-
         function (largeModel, smallModel) {
@@ -84,7 +86,8 @@ model2restrictionMatrix.merMod <-
         L
     }
 
-#' @rdname model-coerce
+#' @method model2restrictionMatrix lm
+#' @export
 model2restrictionMatrix.lm <- function (largeModel, smallModel) {
   L <- if(is.matrix(smallModel)) {
     ## ensures  that L is of full row rank:
@@ -134,11 +137,13 @@ model2restrictionMatrix.lm <- function (largeModel, smallModel) {
 }
 
 #' @rdname model-coerce
+#' @export
 restrictionMatrix2model <- function(largeModel, LL){
   UseMethod("restrictionMatrix2model")
 }
 
-#' @rdname model-coerce
+## #' @rdname model-coerce
+#' @export
 restrictionMatrix2model.merMod <-
     restrictionMatrix2model.mer <-
   function(largeModel, LL){
@@ -163,7 +168,8 @@ restrictionMatrix2model.merMod <-
   ans
 }
 
-#' @rdname model-coerce
+## #' @rdname model-coerce
+#' @export
 restrictionMatrix2model.lm <- function(largeModel, LL){
 
   form <- as.formula(formula(largeModel))

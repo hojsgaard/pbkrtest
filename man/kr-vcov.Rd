@@ -12,13 +12,14 @@
 \alias{get_SigmaG}
 \alias{get_SigmaG.lmerMod}
 \alias{get_SigmaG.mer}
-\alias{vcovAdj.lmerMod}
-\title{Ajusted covariance matrix for linear mixed models according to Kenward
-    and Roger}
+\title{Ajusted covariance matrix for linear mixed models according
+    to Kenward and Roger}
 \usage{
 vcovAdj(object, details = 0)
 
 \method{vcovAdj}{lmerMod}(object, details = 0)
+
+\method{vcovAdj}{mer}(object, details = 0)
 }
 \arguments{
 \item{object}{An \code{lmer} model}
@@ -35,9 +36,9 @@ sum up to Sigma; n.ggamma: the number (called M in the article) of G
 matrices) }
 }
 \description{
-Kenward and Roger (1997) describbe an improved small sample
-    approximation to the covariance matrix estimate of the fixed parameters
-    in a linear mixed model.
+Kenward and Roger (1997) describbe an improved small
+    sample approximation to the covariance matrix estimate of the
+    fixed parameters in a linear mixed model.
 }
 \note{
 If $N$ is the number of observations, then the \code{vcovAdj()}
@@ -47,11 +48,13 @@ If $N$ is the number of observations, then the \code{vcovAdj()}
 \examples{
 
 fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+class(fm1)
 
 ## Here the adjusted and unadjusted covariance matrices are identical,
-## but that is not generally the case
+## but that is not generally the case:
+
 v1 <- vcov(fm1)
-v2 <- vcovAdj(fm1,detail=0)
+v2 <- vcovAdj(fm1, details=0)
 v2 / v1
 
 ## For comparison, an alternative estimate of the variance-covariance

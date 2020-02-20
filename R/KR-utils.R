@@ -48,7 +48,8 @@
 }
 
 .is.lmm <- function(object) {
-    if (class(object) %in% c("matrix","Matrix")){
+    ##if (class(object) %in% c("matrix","Matrix")){
+    if (inherits(object, c("matrix", "Matrix"))){
         FALSE
     } else {
         lme4::isLMM(object)

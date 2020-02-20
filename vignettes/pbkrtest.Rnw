@@ -189,7 +189,7 @@ can be made en parallel, see the documentation):
 
 @
 <<>>=
-( pb.b <- PBmodcomp(lmm1.b, lmm0.b, nsim=500) )
+( pb.b <- PBmodcomp(lmm1.b, lmm0.b, nsim=500, cl=2) )
 @ %def
 
 @
@@ -203,7 +203,7 @@ paired $t$ test.
 
 @
 <<>>=
-( pb.i<-PBmodcomp(lmm1.i, lmm0.i, nsim=500) )
+( pb.i<-PBmodcomp(lmm1.i, lmm0.i, nsim=500, cl=2) )
 @ %def
 
 @

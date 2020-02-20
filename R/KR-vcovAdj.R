@@ -1,18 +1,15 @@
-## --------------------------------------------------------------------
-## Calculate the adjusted covariance matrix for a mixed model
-##
-## Implemented in Banff, august 2013; Søren Højsgaard
-## --------------------------------------------------------------------
-
-#' @title Ajusted covariance matrix for linear mixed models according to Kenward
-#'     and Roger
-#' 
-#' @description Kenward and Roger (1997) describbe an improved small sample
-#'     approximation to the covariance matrix estimate of the fixed parameters
-#'     in a linear mixed model.
+################################################################################
 #'
+#' @title Ajusted covariance matrix for linear mixed models according
+#'     to Kenward and Roger
+#' @description Kenward and Roger (1997) describbe an improved small
+#'     sample approximation to the covariance matrix estimate of the
+#'     fixed parameters in a linear mixed model.
 #' @name kr-vcov
-#' 
+#'
+################################################################################
+## Implemented in Banff, august 2013; Søren Højsgaard
+
 #' @aliases vcovAdj vcovAdj.lmerMod vcovAdj_internal vcovAdj0 vcovAdj2
 #'     vcovAdj.mer LMM_Sigma_G get_SigmaG get_SigmaG.lmerMod get_SigmaG.mer
 #'
@@ -45,11 +42,13 @@
 #' @examples
 #' 
 #' fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+#' class(fm1)
 #' 
 #' ## Here the adjusted and unadjusted covariance matrices are identical,
-#' ## but that is not generally the case
+#' ## but that is not generally the case:
+#' 
 #' v1 <- vcov(fm1)
-#' v2 <- vcovAdj(fm1,detail=0)
+#' v2 <- vcovAdj(fm1, details=0)
 #' v2 / v1
 #' 
 #' ## For comparison, an alternative estimate of the variance-covariance
@@ -75,18 +74,24 @@ vcovAdj <- function(object, details=0){
   UseMethod("vcovAdj")
 }
 
+#' @method vcovAdj lmerMod
 #' @rdname kr-vcov
-vcovAdj.lmerMod <-
-    vcovAdj.mer <-
-        function(object, details=0){
+#' @export
+vcovAdj.lmerMod <- function(object, details=0){
     if (!(getME(object, "is_REML"))) {
         object <- update(object, . ~ ., REML = TRUE)
     }
     Phi      <- vcov(object)
-    SigmaG   <- get_SigmaG( object, details )
-    X        <- getME(object,"X")
-    vcovAdj16_internal( Phi, SigmaG, X, details=details)
+    SigmaG   <- get_SigmaG(object, details)
+    X        <- getME(object, "X")
+    vcovAdj16_internal(Phi, SigmaG, X, details=details)
 }
+
+#' @method vcovAdj mer
+#' @rdname kr-vcov
+#' @export
+vcovAdj.mer <- vcovAdj.lmerMod
+
 
 
 .vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
