@@ -1,5 +1,4 @@
 
-
 #' @import lme4
 #' @importFrom MASS ginv
 
@@ -21,7 +20,13 @@
 #'     terms update update.formula var vcov sigma
 #'
 
-
-
 .dumfunction_afterimportFrom <- function(){}
+
+
+#' @title pbkrtest internal
+#' @description pbkrtest internal
+#' @name internal-pbkrtest
+#'
+#' @aliases "%>%"
+NULL
 

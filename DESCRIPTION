@@ -1,5 +1,5 @@
 Package: pbkrtest
-Version: 0.4-8
+Version: 0.4-8.6
 Title: Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model
     Comparison
 Author: Ulrich Halekoh <uhalekoh@health.sdu.dk> Søren Højsgaard
@@ -12,7 +12,7 @@ Description: Test in mixed effects models. Attention is on mixed effects models
     models.
 URL: http://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
-    R (>= 3.3.0),
+    R (>= 3.6.0),
     lme4 (>= 1.1.10)
 Imports:
     Matrix (>= 1.2.3),

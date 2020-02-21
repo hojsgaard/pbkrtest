@@ -76,7 +76,7 @@ vcovAdj <- function(object, details=0){
 
 #' @method vcovAdj lmerMod
 #' @rdname kr-vcov
-#' @export
+#' @export vcovAdj.lmerMod
 vcovAdj.lmerMod <- function(object, details=0){
     if (!(getME(object, "is_REML"))) {
         object <- update(object, . ~ ., REML = TRUE)
@@ -87,10 +87,40 @@ vcovAdj.lmerMod <- function(object, details=0){
     vcovAdj16_internal(Phi, SigmaG, X, details=details)
 }
 
+## Needed to avoid emmeans choking.
+
+#' @export
+vcovAdj.lmerMod <- vcovAdj.lmerMod
+
+
 #' @method vcovAdj mer
 #' @rdname kr-vcov
 #' @export
 vcovAdj.mer <- vcovAdj.lmerMod
+
+
+
+
+
+## ## For backward compatibility with bnlearn who calls methods and not generic functions...
+## ## #' @method grain CPTspec
+
+## #' @export grain.CPTspec
+## grain.CPTspec <- grain.cpt_spec
+
+## #' @rdname grain-main
+## #' @export
+## grain.CPTspec <- grain.cpt_spec
+
+
+
+
+
+
+
+
+
+
 
 
 

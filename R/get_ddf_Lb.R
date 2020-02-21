@@ -109,6 +109,7 @@ get_ddf_Lb.lmerMod <- function(object, Lcoef){
 #' @rdname get_ddf_Lb
 #' @param VVa Adjusted covariance matrix
 #' @param VV0 Unadjusted covariance matrix
+#' @export
 ddf_Lb <- function(VVa, Lcoef, VV0=VVa){
 
     .spur = function(U){
@@ -191,7 +192,7 @@ ddf_Lb <- function(VVa, Lcoef, VV0=VVa){
 # VV is vcov(object) ## May not now be needed
 # lcoefs is contrast of interest
 # varlb is my already-computed value of lcoef' VV lcoef = est variance of lcoef'betahat
-
+ 
 ## .get_ddf <- function(VVa, VV0, Lcoef, varlb) {
 
 ##     ## print(VVa); print(VV0)

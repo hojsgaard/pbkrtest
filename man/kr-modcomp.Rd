@@ -23,8 +23,6 @@ KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
 beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.}
 
 \item{details}{If larger than 0 some timing details are printed.}
-
-\item{\dots}{Additional arguments to print method; currently not used.}
 }
 \description{
 An approximate F-test based on the Kenward-Roger approach.

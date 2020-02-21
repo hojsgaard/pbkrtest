@@ -78,7 +78,7 @@ Special care must be taken
 
     The recommended way of controlling cl is to specify the
     component \code{pbcl} in options() with
-    e.g. \code{options("pbcl"=4)}. 
+    e.g. \code{options("pbcl"=4)}.
 
     If cl is NULL, the function will look at if the pbcl has been set
     in the options list with \code{getOption("pbcl")}
@@ -111,7 +111,7 @@ if (Sys.info()["sysname"] != "Windows"){
 
 # N cores used just in one specific call (when cl is set,
 # options("mc.cores") is ignored):
-  rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=N) 
+  rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=N)
 }
 
 # In fact, on Windows, the approach above also work but only when setting the

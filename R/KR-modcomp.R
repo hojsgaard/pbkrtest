@@ -43,7 +43,6 @@
 #' @param betaH A number or a vector of the beta of the hypothesis, e.g. L
 #'     beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.
 #' @param details If larger than 0 some timing details are printed.
-#' @param \dots Additional arguments to print method; currently not used.
 #' @note This functionality is not thoroughly tested and should be used with
 #'     care. Please do report bugs etc.
 #'
