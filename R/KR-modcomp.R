@@ -112,7 +112,7 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
     t0    <- proc.time()
-    L     <- .model2restrictionMatrix(largeModel, smallModel)
+    L     <- model2remat(largeModel, smallModel)
     
     PhiA  <- vcovAdj(largeModel, details)
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=fixef(largeModel), betaH)

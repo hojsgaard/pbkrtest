@@ -223,7 +223,7 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
         
         if (inherits(smallModel, c("Matrix", "matrix"))){
             f.small <- smallModel
-            smallModel <- restrictionMatrix2model(largeModel, smallModel)
+            smallModel <- remat2model(largeModel, smallModel)
         } else {
             f.small <- formula(smallModel)
             attributes(f.small) <- NULL
@@ -262,7 +262,7 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 
   if (inherits(smallModel, c("Matrix", "matrix"))){
     f.small <- smallModel
-    smallModel <- restrictionMatrix2model(largeModel, smallModel)
+    smallModel <- remat2model(largeModel, smallModel)
   } else {
     f.small <- formula(smallModel)
     attributes(f.small) <- NULL

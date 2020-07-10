@@ -58,7 +58,7 @@ get_Lb_ddf(fmLarge, c(0,1))  ## 17 denominator df's
 
 # Notice: The restriction matrix L corresponding to the test above
 # can be found with
-L <- model2restrictionMatrix(fmLarge, fmSmall)
+L <- model2remat(fmLarge, fmSmall)
 L
 
 }
@@ -70,8 +70,8 @@ Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
 }
 \seealso{
 \code{\link{KRmodcomp}}, \code{\link{vcovAdj}},
-    \code{\link{model2restrictionMatrix}},
-    \code{\link{restrictionMatrix2model}}
+    \code{\link{model2remat}},
+    \code{\link{remat2model}}
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}
