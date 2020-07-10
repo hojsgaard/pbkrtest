@@ -14,11 +14,11 @@ get_Lb_ddf(object, L)
 
 \method{get_Lb_ddf}{lmerMod}(object, L)
 
-Lb_ddf(L, V0, Vadj)
-
 get_ddf_Lb(object, Lcoef)
 
 \method{get_ddf_Lb}{lmerMod}(object, Lcoef)
+
+Lb_ddf(L, V0, Vadj)
 
 ddf_Lb(VVa, Lcoef, VV0 = VVa)
 }
@@ -28,11 +28,11 @@ ddf_Lb(VVa, Lcoef, VV0 = VVa)
 \item{L}{A vector with the same length as \code{fixef(object)} or a matrix
 with the same number of columns as the length of \code{fixef(object)}}
 
+\item{Lcoef}{Linear contrast matrix}
+
 \item{V0, Vadj}{Unadjusted and adjusted covariance matrix for the fixed
 effects parameters. Undjusted covariance matrix is obtained with
 \code{vcov()} and adjusted with \code{vcovAdj()}.}
-
-\item{Lcoef}{Linear contrast matrix}
 
 \item{VVa}{Adjusted covariance matrix}
 
@@ -54,7 +54,7 @@ Get adjusted denomintor degress freedom for testing Lb=0 in a
 anova(fmLarge,fmSmall)
 
 KRmodcomp(fmLarge, fmSmall)  ## 17 denominator df's
-get_Lb_ddf(fmLarge, c(0,1)) ## 17 denominator df's
+get_Lb_ddf(fmLarge, c(0,1))  ## 17 denominator df's
 
 # Notice: The restriction matrix L corresponding to the test above
 # can be found with

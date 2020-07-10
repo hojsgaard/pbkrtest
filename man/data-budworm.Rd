@@ -5,13 +5,15 @@
 \alias{data-budworm}
 \alias{budworm}
 \title{budworm data}
-\format{This data frame contains 12 rows and 4 columns:
+\format{
+This data frame contains 12 rows and 4 columns:
 \describe{
 \item{sex:}{sex of the budworm}
 \item{dose:}{dose of the insecticide trans-cypermethrin in [\eqn{\mu}{mu}g]}
 \item{ndead:}{budworms killed in a trial}
 \item{ntotal:}{total number of budworms exposed per trial }
-}}
+}
+}
 \source{
 Collet, D. (1991) Modelling Binary Data, Chapman & Hall, London,
 Example 3.7

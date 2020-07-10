@@ -328,50 +328,49 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
   tobs <- unname(LRTstat[1])
   ndf  <- unname(LRTstat[2])
 
-  refpos   <- ref[ref>0]
+  refpos   <- ref[ref > 0]
   nsim <- length(ref)
   npos <- length(refpos)
-
 
   EE      <- mean(refpos)
   VV      <- var(refpos)
 
   ##cat(sprintf("EE=%f VV=%f\n", EE, VV))
-  p.chi <- 1-pchisq(tobs, df=ndf)
+  p.chi <- 1 - pchisq(tobs, df=ndf)
 
   ## Direct computation of tail probability
   n.extreme <- sum(tobs < refpos)
   ##p.PB  <- n.extreme / npos
-  p.PB  <- (1+n.extreme) / (1+npos)
+  p.PB  <- (1 + n.extreme) / (1 + npos)
 
-  p.PB.all  <- (1+n.extreme) / (1+nsim)
+  p.PB.all  <- (1 + n.extreme) / (1 + nsim)
 
 
-  se <- round(sqrt(p.PB*(1-p.PB)/npos),4)
-  ci <- round(c(-1.96, 1.96)*se + p.PB,4)
+  se <- round(sqrt(p.PB * (1 - p.PB) / npos), 4)
+  ci <- round(c(-1.96, 1.96) * se + p.PB, 4)
 
   ## Kernel density estimate
   ##dd <- density(ref)
   ##p.KD <- sum(dd$y[dd$x>=tobs])/sum(dd$y)
 
   ## Bartlett correction - X2 distribution
-  BCstat  <- ndf * tobs/EE
+  BCstat  <- ndf * tobs / EE
   ##cat(sprintf("BCval=%f\n", ndf/EE))
-  p.BC    <- 1-pchisq(BCstat,df=ndf)
+  p.BC    <- 1 - pchisq(BCstat,df=ndf)
 
   ## Fit to gamma distribution
-  scale   <- VV/EE
-  shape   <- EE^2/VV
-  p.Ga    <- 1-pgamma(tobs, shape=shape, scale=scale)
+  scale   <- VV / EE
+  shape   <- EE^2 / VV
+  p.Ga    <- 1 - pgamma(tobs, shape=shape, scale=scale)
 
   ## Fit T/d to F-distribution (1. moment)
 
   ## FIXME: Think the formula is 2*EE/(EE-1)
   ##ddf  <- 2*EE/(EE-ndf)
-  ddf  <- 2*EE/(EE-1)
+  ddf  <- 2 * EE / (EE - 1)
   Fobs <- tobs/ndf
-  if (ddf>0)
-      p.FF <- 1-pf(Fobs, df1=ndf, df2=ddf)
+  if (ddf > 0)
+      p.FF <- 1 - pf(Fobs, df1=ndf, df2=ddf)
   else
       p.FF <- NA
 
@@ -518,27 +517,27 @@ plot.PBmodcomp <- function(x, ...){
 
   EE   <- mean(ref)
   VV   <- var(ref)
-  sc   <- var(ref)/mean(ref)
-  sh   <- mean(ref)^2/var(ref)
-  sc   <- VV/EE
-  sh   <- EE^2/VV
-  B    <- ndf/EE # if ref is the null distr, so should A*ref follow a chisq(df=ndf) distribution
+  sc   <- var(ref) / mean(ref)
+  sh   <- mean(ref)^2 / var(ref)
+  sc   <- VV / EE
+  sh   <- EE^2 / VV
+  B    <- ndf / EE # if ref is the null distr, so should A*ref follow a chisq(df=ndf) distribution
 
   upper <- 0.20
   #tail.prob <- c(0.0001, 0.001, 0.01, 0.05, 0.10, 0.20, 0.5)
   tail.prob <-seq(0.001, upper, length.out = 1111)
-  PBquant   <- quantile(ref,1-tail.prob) ## tail prob for PB dist
+  PBquant   <- quantile(ref, 1 - tail.prob) ## tail prob for PB dist
 
-  pLR       <- pchisq(PBquant,df=ndf,           lower.tail=FALSE)
-  pF        <- pf(PBquant/ndf,df1=ndf,df2=ddf,  lower.tail=FALSE)
-  pGamma    <- pgamma(PBquant,scale=sc,shape=sh,lower.tail=FALSE)
-  pBart     <- pchisq(B*PBquant,df=ndf,         lower.tail=FALSE)
+  pLR       <- pchisq(PBquant, df=ndf,             lower.tail=FALSE)
+  pF        <- pf(PBquant / ndf, df1=ndf, df2=ddf, lower.tail=FALSE)
+  pGamma    <- pgamma(PBquant, scale=sc, shape=sh, lower.tail=FALSE)
+  pBart     <- pchisq(B * PBquant, df=ndf,         lower.tail=FALSE)
 
   sym.vec <- c(2,4,5,6)
   lwd     <- 2
   plot(pLR~tail.prob,type='l', lwd=lwd, #log="xy",
-       xlab='Nominal p-value',ylab='True p-value',
-       xlim=c(1e-3, upper),ylim=c(1e-3, upper),
+       xlab='Nominal p-value', ylab='True p-value',
+       xlim=c(1e-3, upper), ylim=c(1e-3, upper),
        col=sym.vec[1], lty=sym.vec[1])
   lines(pF~tail.prob,lwd=lwd,     col=sym.vec[2], lty=sym.vec[2])
   lines(pBart~tail.prob,lwd=lwd,  col=sym.vec[3], lty=sym.vec[3])
@@ -550,7 +549,7 @@ plot.PBmodcomp <- function(x, ...){
   ZLRT   <-bquote(paste(chi[.(ndf)]^2))
   ZBart  <-bquote(paste("Bartlett scaled ", chi[.(ndf)]^2))
 
-  legend(0.001,upper,legend=as.expression(c(ZLRT,ZF,ZBart,Zgamma)),
+  legend(0.001,upper,legend=as.expression(c(ZLRT, ZF, ZBart, Zgamma)),
          lty=sym.vec,col=sym.vec,lwd=lwd)
 }
 

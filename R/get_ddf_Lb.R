@@ -35,7 +35,7 @@
 #' anova(fmLarge,fmSmall)
 #' 
 #' KRmodcomp(fmLarge, fmSmall)  ## 17 denominator df's
-#' get_Lb_ddf(fmLarge, c(0,1)) ## 17 denominator df's
+#' get_Lb_ddf(fmLarge, c(0,1))  ## 17 denominator df's
 #' 
 #' # Notice: The restriction matrix L corresponding to the test above
 #' # can be found with
@@ -55,12 +55,27 @@ get_Lb_ddf.lmerMod <- function(object, L){
     Lb_ddf(L, vcov(object), vcovAdj(object))
 }
 
+
+## COMES FROM RUSS LENTHS LSMEANS PACKAGE (he took it from pbkrtest)
+#' @rdname get_ddf_Lb
+#' @param Lcoef Linear contrast matrix
+get_ddf_Lb <- function(object, Lcoef){
+    UseMethod("get_ddf_Lb")
+}
+
+## COMES FROM RUSS LENTHS LSMEANS PACKAGE (he took it from pbkrtest)
+#' @rdname get_ddf_Lb
+get_ddf_Lb.lmerMod <- function(object, Lcoef){
+    ddf_Lb(vcovAdj(object), Lcoef, vcov(object))
+}
+
 #' @export
 #' @rdname get_ddf_Lb
 Lb_ddf <- function(L, V0, Vadj) {
     if (!is.matrix(L))
         L = matrix(L, nrow = 1)
     Theta <- t(L) %*% solve(L %*% V0 %*% t(L), L)
+   
     P <- attr(Vadj, "P")
     W <- attr(Vadj, "W")
     A1 <- A2 <- 0
@@ -75,6 +90,7 @@ Lb_ddf <- function(L, V0, Vadj) {
             A2 <- A2 + e * W[ii, jj] * sum(ui * t(uj))
         }
     }
+    
     q <- nrow(L)        # instead of finding rank
     B <- (1/(2 * q)) * (A1 + 6 * A2)
     g <- ((q + 1) * A1 - (q + 4) * A2)/((q + 2) * A2)
@@ -94,38 +110,19 @@ Lb_ddf <- function(L, V0, Vadj) {
     df2
 }
 
-#' @rdname get_ddf_Lb
-#' @param Lcoef Linear contrast matrix
-get_ddf_Lb <- function(object, Lcoef){
-    UseMethod("get_ddf_Lb")
-}
-
-#' @rdname get_ddf_Lb
-get_ddf_Lb.lmerMod <- function(object, Lcoef){
-    ddf_Lb(vcovAdj(object), Lcoef, vcov(object))
-}
-
-
+## COMES FROM RUSS LENTHS LSMEANS PACKAGE (he took it from pbkrtest)
 #' @rdname get_ddf_Lb
 #' @param VVa Adjusted covariance matrix
 #' @param VV0 Unadjusted covariance matrix
 #' @export
 ddf_Lb <- function(VVa, Lcoef, VV0=VVa){
 
-    .spur = function(U){
-        sum(diag(U))
-    }
-    .divZero = function(x,y,tol=1e-14){
-        ## ratio x/y is set to 1 if both |x| and |y| are below tol
-        x.y  =  if( abs(x)<tol & abs(y)<tol) {1} else x/y
-        x.y
-    }
-
     if (!is.matrix(Lcoef))
         Lcoef = matrix(Lcoef, ncol = 1)
 
     vlb = sum(Lcoef * (VV0 %*% Lcoef))
     Theta = Matrix(as.numeric(outer(Lcoef, Lcoef) / vlb), nrow=length(Lcoef))
+    
     P = attr(VVa, "P")
     W = attr(VVa, "W")
 
@@ -163,6 +160,15 @@ ddf_Lb <- function(VVa, Lcoef, VV0=VVa){
 }
 
 
+
+    ## .spur = function(U){
+    ##     sum(diag(U))
+    ## }
+    ## .divZero = function(x,y,tol=1e-14){
+    ##     ## ratio x/y is set to 1 if both |x| and |y| are below tol
+    ##     x.y  =  if( abs(x)<tol & abs(y)<tol) {1} else x/y
+    ##     x.y
+    ## }
 
 
 

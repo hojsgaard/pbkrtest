@@ -5,7 +5,9 @@
 \alias{data-beets}
 \alias{beets}
 \title{Sugar beets data}
-\format{A dataframe with 5 columns and 30 rows.}
+\format{
+A dataframe with 5 columns and 30 rows.
+}
 \usage{
 beets
 }

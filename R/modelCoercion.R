@@ -1,5 +1,23 @@
-## FIXME: model2restrictionMatrix -> m2rm
-## FIXME: restrictionMatrix2model -> rm2m
+## FIXME: modelCoercion: Shorter names needed
+
+## model2restrictionMatrix -> m2rm
+## restrictionMatrix2model -> rm2m
+
+## model2Rmatrix
+## Rmatrix2model
+
+## model2rMatrix
+## rMatrix2model
+
+## rest_mat2model
+## model2rest_mat
+
+## rest_matrix2model
+## model2rest_matrix
+
+## RM2model
+## model2RM
+
 
 ################################################################################
 #' @title Conversion between a model object and a restriction matrix
@@ -99,18 +117,11 @@ model2restrictionMatrix.lm <- function (largeModel, smallModel) {
       smallModel
     }
   } else  { #smallModel is mer model
-    .restrictionMatrixBA(model.matrix( largeModel ),  model.matrix( smallModel ))
+    .restrictionMatrixBA(model.matrix(largeModel), model.matrix(smallModel))
   }
-  L<-.makeSparse(L)
+  L <-.makeSparse(L)
   L
 }
-
-
-
-
-
-
-
 
 .formula2list <- function(form){
   lhs <- form[[2]]
@@ -175,7 +186,7 @@ restrictionMatrix2model.lm <- function(largeModel, LL){
   form <- as.formula(formula(largeModel))
   XX.lg 	 <- model.matrix(largeModel)
   attributes(XX.lg)[-1] <- NULL
-  XX.sm <- zapsmall( .restrictedModelMatrix(XX.lg, LL) )
+  XX.sm <- zapsmall(.restrictedModelMatrix(XX.lg, LL))
 
   ncX.sm  <- ncol(XX.sm)
   colnames(XX.sm) <- paste(".X", 1:ncX.sm, sep='')
@@ -190,7 +201,13 @@ restrictionMatrix2model.lm <- function(largeModel, LL){
 }
 
 
-.restrictedModelMatrix<-function(B,L) {
+## B is model matrix for large model; L is a restriction matrix;
+## output is the corresponding model matrix for the corresponding
+## smaller model.
+
+## FIXME: .restrictedModelMatrix should be exported?
+
+.restrictedModelMatrix <- function(B, L) {
     ##cat("B:\n"); print(B); cat("L:\n"); print(L)
     ## find A such that <A>={Bb| b in Lb=0}
 
@@ -208,38 +225,39 @@ restrictionMatrix2model.lm <- function(largeModel, LL){
     A
 }
 
-.restrictionMatrixBA<-function(B,A) {
-  ## <A> in <B>
-  ## determine L such that  <A>={Bb| b in Lb=0}
-  d <- rankMatrix(cbind(A,B)) - rankMatrix(B)
-  if (d > 0) {
-    stop('Error:  <A> not subspace of <B> \n')
-  }
-  Q  <- qr.Q(qr(cbind(A,B)))
-  Q2 <- Q[,(rankMatrix(A)+1):rankMatrix(B)]
-  L  <- t(Q2)  %*% B
-  ##make rows of L2 orthogonal
-  L <-t(qr.Q(qr(t(L))))
-  L
-}
 
+## Used in KRmodcomp
 .model2restrictionMatrix <- function (largeModel, smallModel) {
   L <- if(is.matrix(smallModel)) {
     ## ensures  that L is of full row rank:
     LL <- smallModel
     q  <- rankMatrix(LL)
     if (q < nrow(LL) ){
-      t(qr.Q(qr(t(LL)))[,1:qr(LL)$rank])
+      t(qr.Q(qr(t(LL)))[, 1 : qr(LL)$rank])
     } else {
       smallModel
     }
   } else  { #smallModel is mer model
-    .restrictionMatrixBA(getME(largeModel,'X'),  getME(smallModel,'X'))
+    .restrictionMatrixBA(getME(largeModel, 'X'), getME(smallModel, 'X'))
   }
-  L<-.makeSparse(L)
+  L <- .makeSparse(L)
   L
 }
 
+.restrictionMatrixBA <- function(B,A) {
+  ## <A> in <B>
+  ## determine L such that  <A>={Bb| b in Lb=0}
+  d <- rankMatrix(cbind(A,B)) - rankMatrix(B)
+  if (d > 0) {
+    stop('Error:  <A> not subspace of <B> \n')
+  }
+  Q  <- qr.Q(qr(cbind(A, B)))
+  Q2 <- Q[, (rankMatrix(A) + 1) : rankMatrix(B)]
+  L  <- t(Q2) %*% B
+  ##make rows of L2 orthogonal
+  L <- t(qr.Q(qr(t(L))))
+  L
+}
 
 
 
