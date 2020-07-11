@@ -31,5 +31,6 @@ Imports:
 Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)
+ByteCompile: Yes
 RoxygenNote: 7.1.1
 LazyData: true

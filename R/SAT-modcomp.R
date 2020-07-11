@@ -1,0 +1,312 @@
+## ##########################################################################
+##
+#' @title F-test and degrees of freedom based on Satterthwaite approximation
+#' 
+#' @description An approximate F-test based on the Satterthwaite approach.
+#'
+#' @name sat-modcomp
+#' 
+## ##########################################################################
+
+## ' @details The model \code{object} must be fitted with restricted maximum
+## '     likelihood (i.e. with \code{REML=TRUE}). If the object is fitted with
+## '     maximum likelihood (i.e. with \code{REML=FALSE}) then the model is
+## '     refitted with \code{REML=TRUE} before the p-values are calculated. Put
+## '     differently, the user needs not worry about this issue.
+## ' 
+## ' An F test is calculated according to the approach of Kenward and Roger
+## ' (1997).  The function works for linear mixed models fitted with the
+## ' \code{lmer} function of the \pkg{lme4} package. Only models where the
+## ' covariance structure is a sum of known matrices can be compared.
+## ' 
+## ' The \code{largeModel} may be a model fitted with \code{lmer} either using
+## ' \code{REML=TRUE} or \code{REML=FALSE}.  The \code{smallModel} can be a model
+## ' fitted with \code{lmer}. It must have the same covariance structure as
+## ' \code{largeModel}. Furthermore, its linear space of expectation must be a
+## ' subspace of the space for \code{largeModel}.  The model \code{smallModel}
+## ' can also be a restriction matrix \code{L} specifying the hypothesis \eqn{L
+## ' \beta = L \beta_H}, where \eqn{L} is a \eqn{k \times p}{k X p} matrix and
+## ' \eqn{\beta} is a \eqn{p} column vector the same length as
+## ' \code{fixef(largeModel)}.
+## ' 
+## ' The \eqn{\beta_H} is a \eqn{p} column vector.
+## ' 
+## ' Notice: if you want to test a hypothesis \eqn{L \beta = c} with a \eqn{k}
+## ' vector \eqn{c}, a suitable \eqn{\beta_H} is obtained via \eqn{\beta_H=L c}
+## ' where \eqn{L_n} is a g-inverse of \eqn{L}.
+## ' 
+## ' Notice: It cannot be guaranteed that the results agree with other
+## ' implementations of the Kenward-Roger approach!
+## ' 
+## ' @aliases KRmodcomp KRmodcomp.lmerMod KRmodcomp_internal KRmodcomp.mer
+
+#' @param largeModel An \code{lmer} model
+#' @param smallModel An \code{lmer} model or a restriction matrix
+#' @param betaH A number or a vector of the beta of the hypothesis, e.g. L
+#'     beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.
+#' @param eps A small number.
+#' @param details If larger than 0 some timing details are printed.
+#'
+#' @note This code is greatly inspired by code in the lmerTest package.
+#'
+#' @author Søren Højsgaard
+#'     \email{sorenh@@math.aau.dk}
+#' 
+#' @seealso \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
+#'     \code{\link{PBmodcomp}}
+#' 
+#' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
+#'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+#'     Models - The R Package pbkrtest., Journal of Statistical Software,
+#'     58(10), 1-30., \url{http://www.jstatsoft.org/v59/i09/}
+#' 
+#' @keywords models inference
+#' @examples
+#'
+## #' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+## #' L1 <- cbind(0,1)
+## #' SATmodcomp(fm1, L1)
+#'
+#' (fm2 <- lmer(Reaction ~ Days + + I(Days^2) + (Days|Subject), sleepstudy))
+#' ## Define 2-df contrast - since L has 2 (linearly independent) rows
+#' ## the F-test is on 2 (numerator) df:
+#' L2 <- rbind(c(0, 1, 0), # Note: ncol(L) == length(fixef(fm))
+#'             c(0, 0, 1))
+#'
+#' SATmodcomp(fm2, L2)
+
+#' @export
+#' @rdname sat-modcomp
+SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
+    UseMethod("SATmodcomp")
+}
+
+#' @export
+#' @rdname sat-modcomp
+SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
+    SATmodcomp_internal(model=largeModel, L=smallModel, eps=eps)
+}
+
+SATmodcomp_internal <- function(model, L, eps=sqrt(.Machine$double.eps)){
+
+    #beta <- model@beta
+    beta <- getME(model, "beta")
+    aux  <- compute_auxillary(model)
+    VLbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
+
+    eig_VLbeta <- eigen(VLbeta)
+    P   <- eig_VLbeta$vectors
+    d   <- eig_VLbeta$values
+    tol <- max(eps * d[1], 0)
+    pos <- d > tol
+    q   <- sum(pos) # rank(VLbeta)
+    
+    ##print(q)
+    
+    PtL <- crossprod(P, L)[1:q,, drop=FALSE]
+    ## print(PtL)
+    
+    t2 <- drop(PtL %*% beta)^2 / d[1:q]
+    Fvalue <- sum(t2) / q
+
+    ##tmp <<- list(q=q, P=P, L=L,  PtL=PtL, aux=aux, d=d)
+
+    grad_PLcov <- lapply(1:q, function(m) {
+        vapply(aux$Jac_list, function(J)
+            qform(PtL[m, ], J), numeric(1L))
+    })
+
+    nu_m <- vapply(1:q, function(m) {
+        2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
+    }, numeric(1L)) # 2D_m^2 / g'Ag
+                                        # Compute ddf for the F-value:
+    ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
+    out <- list(Fvalue=Fvalue, ndf=q, ddf=ddf, sigma=getME(model, "sigma"))
+    class(out) <- "SATmodcomp"
+    out
+} 
+
+
+
+## compute_auxillary is greatly inspired by code from the lmerTest package.
+
+compute_auxillary <- function(model, tol=1e-6){
+    if (!inherits(model, "lmerMod")) stop("'model' not an 'lmerMod'")
+
+    ## From lmer (in package)
+    mc <- model@call
+    model <- eval.parent(mc)
+    ## if(devFunOnly) return(model)
+    ## Make an lmerModLmerTest object:
+    args <- as.list(mc)
+    args$devFunOnly <- TRUE
+    Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
+    devfun <- eval.parent(Call)
+
+    out <- list()
+    ## Fra as_lmerModLT
+
+    is_reml <- getME(model, "is_REML")
+    
+    ## Set relevant slots of the new model object:
+    ##res@sigma <- sigma(model)                                     ##     
+    ##res@vcov_beta <- as.matrix(vcov(model))                       ##    
+
+    out$sigma <- sigma(model)
+    out$vcov_beta <- as.matrix(vcov(model))                       ##
+
+    ##varpar_opt <- unname(c(res@theta, res@sigma))
+    varpar_opt <- unname(c(getME(model, "theta"), getME(model, "sigma")))
+
+    ## Compute Hessian:
+    h <- numDeriv::hessian(func=devfun_vp, x=varpar_opt, devfun=devfun,
+                           reml=is_reml)
+    ## Eigen decompose the Hessian:
+    eig_h <- eigen(h, symmetric=TRUE)
+    evals <- eig_h$values
+    neg <- evals < -tol
+    pos <- evals > tol
+    zero <- evals > -tol & evals < tol
+    if(sum(neg) > 0) { # negative eigenvalues
+        eval_chr <- if(sum(neg) > 1) "eigenvalues" else "eigenvalue"
+        evals_num <- paste(sprintf("%1.1e", evals[neg]), collapse = " ")
+        warning(sprintf("Model failed to converge with %d negative %s: %s",
+                        sum(neg), eval_chr, evals_num), call.=FALSE)
+    }
+    ## Note: we warn about negative AND zero eigenvalues:
+    if(sum(zero) > 0) { # some eigenvalues are zero
+        eval_chr <- if(sum(zero) > 1) "eigenvalues" else "eigenvalue"
+        evals_num <- paste(sprintf("%1.1e", evals[zero]), collapse = " ")
+        warning(sprintf("Model may not have converged with %d %s close to zero: %s",
+                        sum(zero), eval_chr, evals_num))
+    }
+    ## Compute vcov(varpar):
+    pos <- eig_h$values > tol
+    q <- sum(pos)
+    ## Using the Moore-Penrose generalized inverse for h:
+    h_inv <- with(eig_h, {
+        vectors[, pos, drop=FALSE] %*% diag(1/values[pos], nrow=q) %*%
+            t(vectors[, pos, drop=FALSE]) })
+
+    ## res@vcov_varpar <- 2 * h_inv # vcov(varpar)
+    out$vcov_varpar <- 2 * h_inv # vcov(varpar)
+    ## Compute Jacobian of cov(beta) for each varpar and save in list:
+    Jac <- numDeriv::jacobian(func=get_covbeta, x=varpar_opt, devfun=devfun)
+
+    ## res@Jac_list <- lapply(1:ncol(Jac), function(i)
+    ##     array(Jac[, i], dim=rep(length(res@beta), 2))) 
+
+    ## k-list of jacobian matrices ##
+    out$Jac_list <- lapply(1:ncol(Jac), function(i)
+        array(Jac[, i], dim=rep(length(getME(model, "beta")), 2)))
+    out
+}
+
+
+
+qform <- function(x, A) {
+  sum(x * (A %*% x)) # quadratic form: x'Ax
+}
+
+## ##############################################
+## ######## get_Fstat_ddf()
+## ##############################################
+## ' Compute denominator df for F-test
+## '
+## ' From a vector of denominator df from independent t-statistics (\code{nu}),
+## ' the denominator df for the corresponding F-test is computed.
+## '
+## ' Note that if any \code{nu <= 2} then \code{2} is returned. Also, if all nu
+## ' are within tol of each other the simple average of the nu-vector is returned.
+## ' This is to avoid downward bias.
+## '
+## ' @param nu vector of denominator df for the t-statistics
+## ' @param tol tolerance on the consequtive differences between elements of nu to
+##  determine if mean(nu) should be returned
+## '
+## ' @author Rune Haubo B. Christensen
+## '
+## ' @return the denominator df; a numerical scalar
+## ' @keywords internal
+
+get_Fstat_ddf <- function(nu, tol=1e-8) {
+  # Computes denominator df for an F-statistic that is derived from a sum of
+  # squared t-statistics each with nu_m degrees of freedom.
+  #
+  # nu : vector of denominator df for the t-statistics
+  # tol: tolerance on the consequtive differences between elements of nu to
+  #      determine if mean(nu) should be returned.
+  #
+  # Result: a numeric scalar
+  #
+  # Returns nu if length(nu) == 1. Returns mean(nu) if all(abs(diff(nu)) < tol;
+  # otherwise ddf appears to be downward biased.
+  fun <- function(nu) {
+    if(any(nu <= 2)) 2 else {
+      E <- sum(nu / (nu - 2))
+      2 * E / (E - (length(nu))) # q = length(nu) : number of t-statistics
+    }
+  }
+  stopifnot(length(nu) >= 1,
+            # all(nu > 0), # returns 2 if any(nu < 2)
+            all(sapply(nu, is.numeric)))
+  if(length(nu) == 1L) return(nu)
+  if(all(abs(diff(nu)) < tol)) return(mean(nu))
+  if(!is.list(nu)) fun(nu) else vapply(nu, fun, numeric(1L))
+}
+
+
+##############################################
+######## devfun_vp()
+##############################################
+#' Compute Deviance of an LMM as a Function of Variance Parameters
+#'
+#' This function is used for extracting the asymptotic variance-covariance matrix
+#'   of the variance parameters.
+#'
+#' @param varpar variance parameters; \code{varpar = c(theta, sigma)}.
+#' @param devfun deviance function as a function of theta only.
+#' @param reml if \code{TRUE} the REML deviance is computed;
+#'   if \code{FALSE}, the ML deviance is computed.
+#'
+#' @return the REML or ML deviance.
+#' @author Rune Haubo B. Christensen
+#' @keywords internal
+devfun_vp <- function(varpar, devfun, reml) {
+  nvarpar <- length(varpar)
+  sigma2 <- varpar[nvarpar]^2
+  theta <- varpar[-nvarpar]
+  df_envir <- environment(devfun)
+  devfun(theta) # Evaluate deviance function at varpar
+  n <- nrow(df_envir$pp$V)
+  # Compute deviance for ML:
+  dev <- df_envir$pp$ldL2() + (df_envir$resp$wrss() + df_envir$pp$sqrL(1))/sigma2 +
+    n * log(2 * pi * sigma2)
+  if(!reml) return(dev)
+  # Adjust if REML is used:
+  RX <- df_envir$pp$RX() # X'V^{-1}X ~ crossprod(RX^{-1}) = cov(beta)^{-1} / sigma^2
+  dev + 2*c(determinant(RX)$modulus) - ncol(RX) * log(2 * pi * sigma2)
+}
+
+
+##############################################
+######## get_covbeta()
+##############################################
+#' Compute cov(beta) as a Function of varpar of an LMM
+#'
+#' At the optimum cov(beta) is available as vcov(lmer-model). This function
+#' computes cov(beta) at non (RE)ML estimates of \code{varpar}.
+#'
+#' @inheritParams devfun_vp
+#'
+#' @return cov(beta) at supplied varpar values.
+#' @author Rune Haubo B. Christensen
+#' @keywords internal
+get_covbeta <- function(varpar, devfun) {
+  nvarpar <- length(varpar)
+  sigma <- varpar[nvarpar] # residual std.dev.
+  theta <- varpar[-nvarpar] # ranef var-par
+  devfun(theta) # evaluate REML or ML deviance 'criterion'
+  df_envir <- environment(devfun) # extract model environment
+  sigma^2 * tcrossprod(df_envir$pp$RXi()) # vcov(beta)
+}
