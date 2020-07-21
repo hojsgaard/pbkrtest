@@ -135,7 +135,7 @@ compute_auxillary <- function(model, tol=1e-6){
 
     ## From lmer (in package)
     mc <- model@call
-    model <- eval.parent(mc)
+    ## model <- eval.parent(mc) ## NOTE Is this really needed??
     ## if(devFunOnly) return(model)
     ## Make an lmerModLmerTest object:
     args <- as.list(mc)
@@ -143,6 +143,9 @@ compute_auxillary <- function(model, tol=1e-6){
     Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
     devfun <- eval.parent(Call)
 
+    ## tmp <- list(Call=Call, devfun=devfun) ## SH
+    ## assign("tmp", tmp, envir=.GlobalEnv)
+    
     out <- list()
     ## Fra as_lmerModLT
 
