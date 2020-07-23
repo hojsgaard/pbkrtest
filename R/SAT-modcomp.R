@@ -92,40 +92,55 @@ SATmodcomp_internal <- function(model, L, eps=sqrt(.Machine$double.eps)){
     #beta <- model@beta
     beta <- getME(model, "beta")
     aux  <- compute_auxillary(model)
-    VLbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
+    vcov_Lbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
 
-    eig_VLbeta <- eigen(VLbeta)
-    P   <- eig_VLbeta$vectors
-    d   <- eig_VLbeta$values
+    eig_vcov_Lbeta <- eigen(vcov_Lbeta)
+    P   <- eig_vcov_Lbeta$vectors
+    d   <- eig_vcov_Lbeta$values
     tol <- max(eps * d[1], 0)
     pos <- d > tol
-    q   <- sum(pos) # rank(VLbeta)
+    qq  <- sum(pos) # rank(vcov_Lbeta)
     
-    ##print(q)
-    
-    PtL <- crossprod(P, L)[1:q,, drop=FALSE]
+    PtL <- crossprod(P, L)[1:qq,, drop=FALSE]
     ## print(PtL)
     
-    t2 <- drop(PtL %*% beta)^2 / d[1:q]
-    Fvalue <- sum(t2) / q
+    t2     <- drop(PtL %*% beta)^2 / d[1:qq]
+    Fvalue <- sum(t2) / qq
 
-    ##tmp <<- list(q=q, P=P, L=L,  PtL=PtL, aux=aux, d=d)
+    ##tmp <<- list(qq=qq, P=P, L=L,  PtL=PtL, aux=aux, d=d)
 
-    grad_PLcov <- lapply(1:q, function(m) {
+    grad_PLcov <- lapply(1:qq, function(m) {
         vapply(aux$Jac_list, function(J)
             qform(PtL[m, ], J), numeric(1L))
     })
 
-    nu_m <- vapply(1:q, function(m) {
+
+    ## 2D_m^2 / g'Ag
+    nu_m <- vapply(1:qq, function(m) {
         2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
-    }, numeric(1L)) # 2D_m^2 / g'Ag
-                                        # Compute ddf for the F-value:
+    }, numeric(1L)) 
+
+    ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
-    out <- list(Fvalue=Fvalue, ndf=q, ddf=ddf, sigma=getME(model, "sigma"))
+
+    out <- list(Fvalue=Fvalue, ndf=qq, ddf=ddf, sigma=getME(model, "sigma"))
     class(out) <- "SATmodcomp"
     out
 } 
 
+
+get_devfun <- function(model){
+   mc <- model@call
+   ## model <- eval.parent(mc) ## NOTE Is this really needed??
+   ## if(devFunOnly) return(model)
+   ## Make an lmerModLmerTest object:
+   args <- as.list(mc)
+   args$devFunOnly <- TRUE
+   Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
+   devfun <- eval.parent(Call)
+   devfun
+
+}
 
 
 ## compute_auxillary is greatly inspired by code from the lmerTest package.
@@ -133,20 +148,23 @@ SATmodcomp_internal <- function(model, L, eps=sqrt(.Machine$double.eps)){
 compute_auxillary <- function(model, tol=1e-6){
     if (!inherits(model, "lmerMod")) stop("'model' not an 'lmerMod'")
 
-    ## From lmer (in package)
-    mc <- model@call
-    ## model <- eval.parent(mc) ## NOTE Is this really needed??
-    ## if(devFunOnly) return(model)
-    ## Make an lmerModLmerTest object:
-    args <- as.list(mc)
-    args$devFunOnly <- TRUE
-    Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
-    devfun <- eval.parent(Call)
+    ## ## From lmer (in package)
+    ## mc <- model@call
+    ## ## model <- eval.parent(mc) ## NOTE Is this really needed??
+    ## ## if(devFunOnly) return(model)
+    ## ## Make an lmerModLmerTest object:
+    ## args <- as.list(mc)
+    ## args$devFunOnly <- TRUE
+    ## Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
+    ## devfun <- eval.parent(Call)
 
+    devfun <- get_devfun(model)
+
+    
     ## tmp <- list(Call=Call, devfun=devfun) ## SH
     ## assign("tmp", tmp, envir=.GlobalEnv)
     
-    out <- list()
+    out <- list(sigma=NULL, vcov_beta=NULL)
     ## Fra as_lmerModLT
 
     is_reml <- getME(model, "is_REML")
@@ -154,7 +172,7 @@ compute_auxillary <- function(model, tol=1e-6){
     ## Set relevant slots of the new model object:
     ##res@sigma <- sigma(model)                                     ##     
     ##res@vcov_beta <- as.matrix(vcov(model))                       ##    
-
+ 
     out$sigma <- sigma(model)
     out$vcov_beta <- as.matrix(vcov(model))                       ##
 
@@ -204,8 +222,6 @@ compute_auxillary <- function(model, tol=1e-6){
         array(Jac[, i], dim=rep(length(getME(model, "beta")), 2)))
     out
 }
-
-
 
 qform <- function(x, A) {
   sum(x * (A %*% x)) # quadratic form: x'Ax
@@ -280,13 +296,19 @@ devfun_vp <- function(varpar, devfun, reml) {
   sigma2 <- varpar[nvarpar]^2
   theta <- varpar[-nvarpar]
   df_envir <- environment(devfun)
+
+  ## SH: call below not stored anywhere. Is it being used?
   devfun(theta) # Evaluate deviance function at varpar
+
+  
   n <- nrow(df_envir$pp$V)
   # Compute deviance for ML:
-  dev <- df_envir$pp$ldL2() + (df_envir$resp$wrss() + df_envir$pp$sqrL(1))/sigma2 +
-    n * log(2 * pi * sigma2)
-  if(!reml) return(dev)
-  # Adjust if REML is used:
+  dev <- df_envir$pp$ldL2() + (df_envir$resp$wrss() + df_envir$pp$sqrL(1)) / sigma2 +
+      n * log(2 * pi * sigma2)
+
+  if (!reml) return(dev)
+
+  ## Adjust if REML is used:
   RX <- df_envir$pp$RX() # X'V^{-1}X ~ crossprod(RX^{-1}) = cov(beta)^{-1} / sigma^2
   dev + 2*c(determinant(RX)$modulus) - ncol(RX) * log(2 * pi * sigma2)
 }
