@@ -2,7 +2,6 @@
 % Please edit documentation in R/PB-modcomp.R
 \name{pb-modcomp}
 \alias{pb-modcomp}
-\alias{seqPBmodcomp}
 \alias{PBmodcomp}
 \alias{PBmodcomp.lm}
 \alias{PBmodcomp.merMod}
@@ -12,10 +11,9 @@
 \alias{plot.XXmodcomp}
 \alias{PBmodcomp.mer}
 \alias{getLRT.mer}
+\alias{seqPBmodcomp}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
-seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = 1)
-
 PBmodcomp(
   largeModel,
   smallModel,
@@ -45,6 +43,8 @@ PBmodcomp(
   cl = NULL,
   details = 0
 )
+
+seqPBmodcomp(largeModel, smallModel, h = 20, nsim = 1000, cl = 1)
 }
 \arguments{
 \item{largeModel}{A model object. Can be a linear mixed effects
@@ -57,15 +57,8 @@ model. The \code{largeModel} must be larger than
 \item{smallModel}{A model of the same type as \code{largeModel} or
 a restriction matrix.}
 
-\item{h}{For sequential computing for bootstrap p-values: The
-number of extreme cases needed to generate before the sampling
-proces stops.}
-
 \item{nsim}{The number of simulations to form the reference
 distribution.}
-
-\item{cl}{A vector identifying a cluster; used for calculating the
-reference distribution using several cores. See examples below.}
 
 \item{ref}{Vector containing samples from the reference
 distribution. If NULL, this vector will be generated using
@@ -74,8 +67,15 @@ PBrefdist().}
 \item{seed}{A seed that will be passed to the simulation of new
 datasets.}
 
+\item{cl}{A vector identifying a cluster; used for calculating the
+reference distribution using several cores. See examples below.}
+
 \item{details}{The amount of output produced. Mainly relevant for
 debugging purposes.}
+
+\item{h}{For sequential computing for bootstrap p-values: The
+number of extreme cases needed to generate before the sampling
+proces stops.}
 }
 \description{
 Model comparison of nested models using parametric bootstrap

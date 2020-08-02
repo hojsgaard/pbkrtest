@@ -11,8 +11,6 @@
 KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
 
 \method{KRmodcomp}{lmerMod}(largeModel, smallModel, betaH = 0, details = 0)
-
-\method{KRmodcomp}{mer}(largeModel, smallModel, betaH = 0, details = 0)
 }
 \arguments{
 \item{largeModel}{An \code{lmer} model}

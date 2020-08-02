@@ -4,7 +4,9 @@
 
 #' @importFrom magrittr "%>%"
 #' @export  "%>%"
-
+#'
+#' @importFrom utils head
+#' 
 #' @importFrom parallel clusterCall clusterExport clusterSetRNGStream
 #'     mclapply detectCores makeCluster
 #'

@@ -42,8 +42,11 @@ This code is greatly inspired by code in the lmerTest package.
 }
 \examples{
 
+(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+L1 <- cbind(0,1)
+SATmodcomp(fm1, L1)
 
-(fm2 <- lmer(Reaction ~ Days + + I(Days^2) + (Days|Subject), sleepstudy))
+(fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 ## Define 2-df contrast - since L has 2 (linearly independent) rows
 ## the F-test is on 2 (numerator) df:
 L2 <- rbind(c(0, 1, 0), # Note: ncol(L) == length(fixef(fm))

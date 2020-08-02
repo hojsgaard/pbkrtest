@@ -63,11 +63,11 @@
 #' @keywords models inference
 #' @examples
 #'
-## #' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-## #' L1 <- cbind(0,1)
-## #' SATmodcomp(fm1, L1)
+#' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#' L1 <- cbind(0,1)
+#' SATmodcomp(fm1, L1)
 #'
-#' (fm2 <- lmer(Reaction ~ Days + + I(Days^2) + (Days|Subject), sleepstudy))
+#' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #' ## Define 2-df contrast - since L has 2 (linearly independent) rows
 #' ## the F-test is on 2 (numerator) df:
 #' L2 <- rbind(c(0, 1, 0), # Note: ncol(L) == length(fixef(fm))
@@ -84,12 +84,25 @@ SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Mac
 #' @export
 #' @rdname sat-modcomp
 SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
-    SATmodcomp_internal(model=largeModel, L=smallModel, eps=eps)
+    SATmodcomp_internal(model=largeModel, smallModel=smallModel, eps=eps)
 }
 
-SATmodcomp_internal <- function(model, L, eps=sqrt(.Machine$double.eps)){
+SATmodcomp_internal <- function(model, smallModel, eps=sqrt(.Machine$double.eps)){
 
-    #beta <- model@beta
+    if (inherits(smallModel, "formula"))
+        smallModel  <- update(model, smallModel)
+
+    w <- modcomp_init(model, smallModel, matrixOK = TRUE)
+
+    if (w == -1) stop('Models have equal mean stucture or are not nested')
+    if (w == 0){
+        ## First given model is submodel of second; exchange the models
+        tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
+    }
+
+    t0    <- proc.time()    
+    L     <- model2remat(model, smallModel)
+     
     beta <- getME(model, "beta")
     aux  <- compute_auxillary(model)
     vcov_Lbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
@@ -110,7 +123,7 @@ SATmodcomp_internal <- function(model, L, eps=sqrt(.Machine$double.eps)){
     ##tmp <<- list(qq=qq, P=P, L=L,  PtL=PtL, aux=aux, d=d)
 
     grad_PLcov <- lapply(1:qq, function(m) {
-        vapply(aux$Jac_list, function(J)
+        vapply(aux$jacobian_list, function(J)
             qform(PtL[m, ], J), numeric(1L))
     })
 
@@ -123,10 +136,25 @@ SATmodcomp_internal <- function(model, L, eps=sqrt(.Machine$double.eps)){
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
 
-    out <- list(Fvalue=Fvalue, ndf=qq, ddf=ddf, sigma=getME(model, "sigma"))
+    out <- list(Fvalue=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf),
+                sigma=getME(model, "sigma"),
+                formula.large=formula(model)
+                )
+    out$ctime   <- (proc.time() - t0)[3]
+    out$L       <- L
     class(out) <- "SATmodcomp"
     out
-} 
+}
+
+print.SATmodcomp <- function(x, ...){
+    print(x$formula.large)
+    dd <- as.data.frame(x[c("Fvalue", "ndf", "ddf", "p.value")])
+    printCoefmat(dd, has.Pvalue=TRUE)
+    invisible(x)
+}
+
+
+
 
 
 get_devfun <- function(model){
@@ -146,42 +174,28 @@ get_devfun <- function(model){
 ## compute_auxillary is greatly inspired by code from the lmerTest package.
 
 compute_auxillary <- function(model, tol=1e-6){
+    
     if (!inherits(model, "lmerMod")) stop("'model' not an 'lmerMod'")
 
-    ## ## From lmer (in package)
-    ## mc <- model@call
-    ## ## model <- eval.parent(mc) ## NOTE Is this really needed??
-    ## ## if(devFunOnly) return(model)
-    ## ## Make an lmerModLmerTest object:
-    ## args <- as.list(mc)
-    ## args$devFunOnly <- TRUE
-    ## Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
-    ## devfun <- eval.parent(Call)
-
     devfun <- get_devfun(model)
-
     
     ## tmp <- list(Call=Call, devfun=devfun) ## SH
     ## assign("tmp", tmp, envir=.GlobalEnv)
     
-    out <- list(sigma=NULL, vcov_beta=NULL)
-    ## Fra as_lmerModLT
-
-    is_reml <- getME(model, "is_REML")
-    
-    ## Set relevant slots of the new model object:
-    ##res@sigma <- sigma(model)                                     ##     
-    ##res@vcov_beta <- as.matrix(vcov(model))                       ##    
+    out <- list(sigma=NULL, vcov_beta=NULL, vcov_varpar=NULL, jacobian_list=NULL)
  
     out$sigma <- sigma(model)
-    out$vcov_beta <- as.matrix(vcov(model))                       ##
+    out$vcov_beta <- as.matrix(vcov(model))                       
 
-    ##varpar_opt <- unname(c(res@theta, res@sigma))
+    ## The optimized variance parameters (theta, sigma)
     varpar_opt <- unname(c(getME(model, "theta"), getME(model, "sigma")))
 
     ## Compute Hessian:
-    h <- numDeriv::hessian(func=devfun_vp, x=varpar_opt, devfun=devfun,
-                           reml=is_reml)
+    ## ----------------
+    is_reml <- getME(model, "is_REML")
+    h <- numDeriv::hessian(func=devfun_vp, x=varpar_opt,
+                           devfun=devfun, reml=is_reml)
+    
     ## Eigen decompose the Hessian:
     eig_h <- eigen(h, symmetric=TRUE)
     evals <- eig_h$values
@@ -189,39 +203,46 @@ compute_auxillary <- function(model, tol=1e-6){
     pos <- evals > tol
     zero <- evals > -tol & evals < tol
     if(sum(neg) > 0) { # negative eigenvalues
-        eval_chr <- if(sum(neg) > 1) "eigenvalues" else "eigenvalue"
+        ##eval_chr <- if(sum(neg) > 1) "eigenvalues" else "eigenvalue"
         evals_num <- paste(sprintf("%1.1e", evals[neg]), collapse = " ")
-        warning(sprintf("Model failed to converge with %d negative %s: %s",
-                        sum(neg), eval_chr, evals_num), call.=FALSE)
+        warning(sprintf("Model failed to converge with %d negative eigenvalue(s): %s",
+                        sum(neg), evals_num), call.=FALSE)
     }
     ## Note: we warn about negative AND zero eigenvalues:
     if(sum(zero) > 0) { # some eigenvalues are zero
-        eval_chr <- if(sum(zero) > 1) "eigenvalues" else "eigenvalue"
+        ##eval_chr <- if(sum(zero) > 1) "eigenvalues" else "eigenvalue"
         evals_num <- paste(sprintf("%1.1e", evals[zero]), collapse = " ")
-        warning(sprintf("Model may not have converged with %d %s close to zero: %s",
-                        sum(zero), eval_chr, evals_num))
+        warning(sprintf("Model may not have converged with %d eigenvalue(s) close to zero: %s",
+                        sum(zero), evals_num))
     }
+    
     ## Compute vcov(varpar):
+    ## ---------------------
     pos <- eig_h$values > tol
     q <- sum(pos)
-    ## Using the Moore-Penrose generalized inverse for h:
+
+    ## Moore-Penrose generalized inverse for h:
     h_inv <- with(eig_h, {
         vectors[, pos, drop=FALSE] %*% diag(1/values[pos], nrow=q) %*%
             t(vectors[, pos, drop=FALSE]) })
 
-    ## res@vcov_varpar <- 2 * h_inv # vcov(varpar)
     out$vcov_varpar <- 2 * h_inv # vcov(varpar)
-    ## Compute Jacobian of cov(beta) for each varpar and save in list:
-    Jac <- numDeriv::jacobian(func=get_covbeta, x=varpar_opt, devfun=devfun)
 
-    ## res@Jac_list <- lapply(1:ncol(Jac), function(i)
-    ##     array(Jac[, i], dim=rep(length(res@beta), 2))) 
+    
+    ## Compute Jacobian of cov(beta)
+    ## -----------------------------
 
-    ## k-list of jacobian matrices ##
-    out$Jac_list <- lapply(1:ncol(Jac), function(i)
-        array(Jac[, i], dim=rep(length(getME(model, "beta")), 2)))
+    ## Compute Jacobian for each varpar and save in list:
+    jac <- numDeriv::jacobian(func=get_covbeta, x=varpar_opt, devfun=devfun)
+
+    ## List of jacobian matrices
+    out$jacobian_list <- lapply(1:ncol(jac), function(i)
+        array(jac[, i], dim=rep(length(getME(model, "beta")), 2)))
+
     out
 }
+
+
 
 qform <- function(x, A) {
   sum(x * (A %*% x)) # quadratic form: x'Ax
@@ -293,14 +314,13 @@ get_Fstat_ddf <- function(nu, tol=1e-8) {
 #' @keywords internal
 devfun_vp <- function(varpar, devfun, reml) {
   nvarpar <- length(varpar)
-  sigma2 <- varpar[nvarpar]^2
-  theta <- varpar[-nvarpar]
+  sigma2  <- varpar[nvarpar]^2
+  theta   <- varpar[-nvarpar]
   df_envir <- environment(devfun)
 
   ## SH: call below not stored anywhere. Is it being used?
   devfun(theta) # Evaluate deviance function at varpar
 
-  
   n <- nrow(df_envir$pp$V)
   # Compute deviance for ML:
   dev <- df_envir$pp$ldL2() + (df_envir$resp$wrss() + df_envir$pp$sqrL(1)) / sigma2 +
@@ -329,9 +349,34 @@ devfun_vp <- function(varpar, devfun, reml) {
 #' @keywords internal
 get_covbeta <- function(varpar, devfun) {
   nvarpar <- length(varpar)
-  sigma <- varpar[nvarpar] # residual std.dev.
-  theta <- varpar[-nvarpar] # ranef var-par
-  devfun(theta) # evaluate REML or ML deviance 'criterion'
+  sigma <- varpar[nvarpar]        # residual std.dev.
+  theta <- varpar[-nvarpar]       # ranef var-par
+  devfun(theta)                   # evaluate REML or ML deviance 'criterion'
   df_envir <- environment(devfun) # extract model environment
   sigma^2 * tcrossprod(df_envir$pp$RXi()) # vcov(beta)
 }
+
+
+
+
+    ## res@Jac_list <- lapply(1:ncol(Jac), function(i)
+    ##     array(Jac[, i], dim=rep(length(res@beta), 2))) 
+
+    ## res@vcov_varpar <- 2 * h_inv # vcov(varpar)
+
+    ## ## From lmer (in package)
+    ## mc <- model@call
+    ## ## model <- eval.parent(mc) ## NOTE Is this really needed??
+    ## ## if(devFunOnly) return(model)
+    ## ## Make an lmerModLmerTest object:
+    ## args <- as.list(mc)
+    ## args$devFunOnly <- TRUE
+    ## Call <- as.call(c(list(quote(lme4::lmer)), args[-1]))
+    ## devfun <- eval.parent(Call)
+
+    ## Fra as_lmerModLT
+
+    
+    ## Set relevant slots of the new model object:
+    ##res@sigma <- sigma(model)                                     ##     
+    ##res@vcov_beta <- as.matrix(vcov(model))                       ##    

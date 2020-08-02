@@ -8,7 +8,7 @@
 \usage{
 model2remat(largeModel, smallModel, sparse = FALSE)
 
-remat2model(largeModel, LL)
+remat2model(largeModel, LL, REML = TRUE, ...)
 }
 \arguments{
 \item{largeModel, smallModel}{Model objects of the same "type". Possible types
@@ -18,6 +18,10 @@ linear models)}
 \item{sparse}{Should the restriction matrix be sparse or dense?}
 
 \item{LL}{A restriction matrix.}
+
+\item{REML}{Controls if new model object should be fitted with REML or ML.}
+
+\item{...}{Additional arguments; not used.}
 }
 \value{
 \code{model2remat}: A restriction matrix.
