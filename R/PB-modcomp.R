@@ -183,6 +183,23 @@
 #' stopCluster(cl)
 #' }
 #' 
+#' ## Linear and generalized linear models:
+#' 
+#' m11 <- lm(dist ~ speed + I(speed^2), data=cars)
+#' m10 <- update(m11, ~.-I(speed^2))
+#' anova(m11, m10)
+#' 
+#' PBmodcomp(m11, m10, cl=1)
+#' PBmodcomp(m11, ~.-I(speed^2), cl=1)
+#' PBmodcomp(m11, c(0, 0, 1), cl=1)
+#' 
+#' m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
+#' m20 <- update(m21, ~.-I(speed^2))
+#' anova(m21, m20, test="Chisq")
+#' 
+#' PBmodcomp(m21, m20, cl=1)
+#' PBmodcomp(m21, ~.-I(speed^2), cl=1)
+#' PBmodcomp(m21, c(0, 0, 1), cl=1)
 #' 
 #' @export PBmodcomp
 
@@ -197,6 +214,7 @@ PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl
 #' @export
 #' @rdname pb-modcomp
 PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+
 
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
@@ -224,6 +242,8 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     formula.large <- formula(largeModel)
     attributes(formula.large) <- NULL
     
+    ## All computations are based on 'largeModel' and 'smallModel'
+    ## -----------------------------------------------------------
     
     if (is.null(ref)){
         ref <- PBrefdist(largeModel, smallModel, nsim=nsim,
@@ -244,30 +264,39 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 #' @rdname pb-modcomp
 PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
-  ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
-  formula.large <- formula(largeModel)
-  attributes(formula.large) <- NULL
+    ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
 
-  if (inherits(smallModel, c("Matrix", "matrix"))){
-    formula.small <- smallModel
-    smallModel <- remat2model(largeModel, smallModel)
-  } else {
-    formula.small <- formula(smallModel)
-    attributes(formula.small) <- NULL
-  }
+    if (inherits(smallModel, "formula"))
+        smallModel  <- update(largeModel, smallModel)
 
-  if (!all.equal((fam.l <- family(largeModel)), (fam.s <- family(smallModel))))
-    stop("Models do not have identical identical family\n")
-  if (!(fam.l$family %in% ok.fam)){
-    stop(sprintf("family must be of type %s", toString(ok.fam)))
-  }
+    if (is.numeric(smallModel) && !is.matrix(smallModel))
+        smallModel <- matrix(smallModel, nrow=1)
+    
+    formula.large <- formula(largeModel)
+    attributes(formula.large) <- NULL
+    
+    if (inherits(smallModel, c("Matrix", "matrix"))){
+        formula.small <- smallModel
+        smallModel <- remat2model(largeModel, smallModel)
+    } else {
+        formula.small <- formula(smallModel)
+        attributes(formula.small) <- NULL
+    }
 
-  if (is.null(ref)){
-    ref <- PBrefdist(largeModel, smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
-  }
+    ## ss <<- smallModel
+    ## print(smallModel)
+    if (!all.equal((fam.l <- family(largeModel)), (fam.s <- family(smallModel))))
+        stop("Models do not have identical identical family\n")
 
-  LRTstat     <- getLRT(largeModel, smallModel)
-  ans         <- .finalizePB(LRTstat, ref)
+    if (!(fam.l$family %in% ok.fam))
+        stop(sprintf("family must be of type %s", toString(ok.fam)))
+        
+    if (is.null(ref)){
+        ref <- PBrefdist(largeModel, smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
+    }
+    
+    LRTstat     <- getLRT(largeModel, smallModel)
+    ans         <- .finalizePB(LRTstat, ref)
     .padPB( ans, LRTstat, ref, formula.large, formula.small)    
 }
 
@@ -462,7 +491,7 @@ seqPBmodcomp <-
         cat(sprintf("time: %.2f sec;", round(zz,2)))
     }
     if (!is.null((sam <- x$samples))){
-        cat(sprintf("samples: %d; extremes: %d;", sam[1], x$n.extreme))
+        cat(sprintf(" samples: %d; extremes: %d;", sam[1], x$n.extreme))
     }
     cat("\n")
         
@@ -473,10 +502,16 @@ seqPBmodcomp <-
         }
     }
 
-    if(!is.null(x$formula.large)){
+    if (!is.null(x$formula.large)){
         cat("large : "); print(x$formula.large)
-        cat("small : "); print(x$formula.small)
     }
+    
+    if (!is.null(x$formula.small)){
+        if (inherits(x$formula.small, "formula")) cat("small : ")
+        else if (inherits(x$formula.small, "matrix")) cat("small : \n"); 
+        print(x$formula.small)
+    }
+    
 }
 
 

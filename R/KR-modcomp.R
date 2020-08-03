@@ -91,12 +91,10 @@ KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
 #' @export
 #' @rdname kr-modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
-    ## 'smallModel' can either be an lmerMod (linear mixed) model or a restriction matrix L.
 
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
-    
-        
+            
     w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
 
     if (w == -1) stop('Models have equal mean stucture or are not nested')
@@ -270,17 +268,15 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
 #' @export
 print.KRmodcomp <- function(x, ...){
 
-  .KRcommon(x)
-  FF.thresh <- 0.2
-  F.scale <- x$aux['F.scaling']
-  tab <- x$test
+    .KRcommon(x)
+    FF.thresh <- 0.2
+    F.scale <- x$aux['F.scaling']
+    tab <- x$test
 
-  if (max(F.scale) > FF.thresh){
-    printCoefmat(tab[1,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
-  } else {
-    printCoefmat(tab[2,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
-  }
-  invisible(x)
+    if (max(F.scale) > FF.thresh) i <- 1 else i <- 2
+    printCoefmat(tab[i,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+    
+    invisible(x)
 }
 
 
@@ -291,7 +287,7 @@ summary.KRmodcomp <- function(object, ...){
                 object$ctime))
     
     .KRcommon(object)
-  FF.thresh <- 0.2
+    FF.thresh <- 0.2
     
     F.scale <- object$aux['F.scaling']
     tab <- object$test
@@ -308,26 +304,6 @@ summary.KRmodcomp <- function(object, ...){
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   #stats <- .KRmodcompPrimitive(largeModel, L, betaH, details)

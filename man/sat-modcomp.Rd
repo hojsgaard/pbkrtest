@@ -9,7 +9,6 @@
 SATmodcomp(
   largeModel,
   smallModel,
-  betaH = 0,
   details = 0,
   eps = sqrt(.Machine$double.eps)
 )
@@ -17,18 +16,15 @@ SATmodcomp(
 \method{SATmodcomp}{lmerMod}(
   largeModel,
   smallModel,
-  betaH = 0,
   details = 0,
   eps = sqrt(.Machine$double.eps)
 )
 }
 \arguments{
-\item{largeModel}{An \code{lmer} model}
+\item{largeModel}{An \code{lmerMod} model.}
 
-\item{smallModel}{An \code{lmer} model or a restriction matrix}
-
-\item{betaH}{A number or a vector of the beta of the hypothesis, e.g. L
-beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.}
+\item{smallModel}{An \code{lmerMod} model, a restriction matrix or
+a model formula. See example section.}
 
 \item{details}{If larger than 0 some timing details are printed.}
 
@@ -36,6 +32,10 @@ beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.}
 }
 \description{
 An approximate F-test based on the Satterthwaite approach.
+}
+\details{
+Notice: It cannot be guaranteed that the results agree with other
+implementations of the Satterthwaite approach!
 }
 \note{
 This code is greatly inspired by code in the lmerTest package.
@@ -47,12 +47,20 @@ L1 <- cbind(0,1)
 SATmodcomp(fm1, L1)
 
 (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
-## Define 2-df contrast - since L has 2 (linearly independent) rows
-## the F-test is on 2 (numerator) df:
-L2 <- rbind(c(0, 1, 0), # Note: ncol(L) == length(fixef(fm))
-            c(0, 0, 1))
 
+## Test for no effect of Days. There are three ways of using the function:
+
+## 1) Define 2-df contrast - since L has 2 (linearly independent) rows
+## the F-test is on 2 (numerator) df:
+L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
 SATmodcomp(fm2, L2)
+
+## 2) Use two model objects 
+fm3 <- update(fm2, ~. - Days - I(Days^2))
+SATmodcomp(fm2, fm3)
+
+## 3) Specify restriction as formula
+SATmodcomp(fm2, ~. - Days - I(Days^2))
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
@@ -65,8 +73,7 @@ Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
     \code{\link{PBmodcomp}}
 }
 \author{
-Søren Højsgaard
-    \email{sorenh@math.aau.dk}
+Søren Højsgaard, \email{sorenh@math.aau.dk}
 }
 \keyword{inference}
 \keyword{models}

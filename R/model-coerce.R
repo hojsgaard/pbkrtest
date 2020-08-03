@@ -13,7 +13,7 @@
 #' @param largeModel,smallModel Model objects of the same "type". Possible types
 #'     are linear mixed effects models and linear models (including generalized
 #'     linear models)
-#' @param LL A restriction matrix.
+#' @param L A restriction matrix.
 #' @param sparse Should the restriction matrix be sparse or dense?
 #' @param REML Controls if new model object should be fitted with REML or ML.
 #' @param ... Additional arguments; not used.
@@ -51,10 +51,9 @@
 #' mod.h <- remat2model(sug, L.h); mod.h
 #' mod.s <- remat2model(sug, L.s); mod.s
 #' 
-#' ## The models have the same fitted values
+#' ## Sanity check: The models have the same fitted values and log likelihood
 #' plot(fitted(mod.h), fitted(sug.h))
 #' plot(fitted(mod.s), fitted(sug.s))
-#' ## and the same log likelihood
 #' logLik(mod.h)
 #' logLik(sug.h)
 #' logLik(mod.s)
@@ -96,25 +95,21 @@ model2remat.lm <- function (largeModel, smallModel, sparse=FALSE) {
 }
 
 
-
-
-
-
 #' @rdname model-coerce
 #' @export
-remat2model <- function(largeModel, LL, REML=TRUE, ...){
+remat2model <- function(largeModel, L, REML=TRUE, ...){
   UseMethod("remat2model")
 }
 
 #' @export
-remat2model.default <- function(largeModel, LL, REML=TRUE, ...){
+remat2model.default <- function(largeModel, L, REML=TRUE, ...){
     stop("No useful default method for 'remat2model'")
 }
 
-remat2model_internal <- function(largeModel, LL, XX.lg){
+remat2model_internal <- function(largeModel, L, XX.lg){
     form <- as.formula(formula(largeModel))    
     attributes(XX.lg)[-1] <- NULL
-    XX.sm <- make_modelmat(XX.lg, LL)
+    XX.sm <- make_modelmat(XX.lg, L)
     
     ncX.sm  <- ncol(XX.sm)
     colnames(XX.sm) <- paste(".X", 1:ncX.sm, sep='')
@@ -129,9 +124,9 @@ remat2model_internal <- function(largeModel, LL, XX.lg){
 
 ## #' @rdname model-coerce
 #' @export
-remat2model.merMod <- function(largeModel, LL, REML=TRUE, ...){
+remat2model.merMod <- function(largeModel, L, REML=TRUE, ...){
 
-    zzz  <- remat2model_internal(largeModel, LL, getME(largeModel, "X"))
+    zzz  <- remat2model_internal(largeModel, L, getME(largeModel, "X"))
     
     new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
                                     "+", zzz$new_form$rhs.ran))
@@ -143,14 +138,19 @@ remat2model.merMod <- function(largeModel, LL, REML=TRUE, ...){
 
 ## #' @rdname model-coerce
 #' @export
-remat2model.lm <- function(largeModel, LL, ...){
+remat2model.lm <- function(largeModel, L, ...){
     
-    zzz  <- remat2model_internal(largeModel, LL, model.matrix(largeModel))
+    zzz  <- remat2model_internal(largeModel, L, model.matrix(largeModel))
     
     new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2))
     new.data    <- as.data.frame(cbind(zzz$XX.sm, eval(largeModel$model)))
     ans <- update(largeModel, eval(new.formula), data=new.data)
-    ans
+    ## Ugly below, but seems to be needed to store new.data in model
+    ## object (rather than reference to new data)½
+    cl <- getCall(ans)
+    cl$data <- eval(new.data)
+    out <- eval(cl)
+    out
 }
 
 
@@ -162,8 +162,9 @@ remat2model.lm <- function(largeModel, LL, ...){
 ## Output X2 is the corresponding model matrix for the corresponding
 ## smaller model.
 
-## FIXME: make_modelmat should be exported?
-
+#' @rdname model-coerce
+#' @param L A restriction matrix; a full rank matrix with as many columns as `X` has.
+#' @export
 make_modelmat <- function(X, L) {
     ##cat("X:\n"); print(X); cat("L:\n"); print(L)
     ## find A such that <A>={X b| b in Lb=0}
@@ -184,8 +185,12 @@ make_modelmat <- function(X, L) {
 ## X is model matrix for large model; X2 is model matrix for small
 ## model. Output is restriction matrix L
 
-## FIXME: make_remat should be exported?
-
+#' @rdname model-coerce
+#' @param X,X2 Model matrices. Must have same numer of rows.
+#' @details `make_remat` Make a restriction matrix. If span(X2) is in
+#'     span(X) then the corresponding restriction matrix `L` is
+#'     returned.
+#' @export
 make_remat <- function(X, X2) {
   ## <X2> in <X>
   ## determine L such that  <X2>={Xb| b in Lb=0}
@@ -200,10 +205,6 @@ make_remat <- function(X, X2) {
   L <- t(qr.Q(qr(t(L))))
   L
 }
-
-
-
-
 
 
 force_full_rank <- function(L){

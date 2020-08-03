@@ -4,11 +4,17 @@
 \alias{model-coerce}
 \alias{model2remat}
 \alias{remat2model}
+\alias{make_modelmat}
+\alias{make_remat}
 \title{Conversion between a model object and a restriction matrix}
 \usage{
 model2remat(largeModel, smallModel, sparse = FALSE)
 
-remat2model(largeModel, LL, REML = TRUE, ...)
+remat2model(largeModel, L, REML = TRUE, ...)
+
+make_modelmat(X, L)
+
+make_remat(X, X2)
 }
 \arguments{
 \item{largeModel, smallModel}{Model objects of the same "type". Possible types
@@ -17,11 +23,13 @@ linear models)}
 
 \item{sparse}{Should the restriction matrix be sparse or dense?}
 
-\item{LL}{A restriction matrix.}
+\item{L}{A restriction matrix; a full rank matrix with as many columns as `X` has.}
 
 \item{REML}{Controls if new model object should be fitted with REML or ML.}
 
 \item{...}{Additional arguments; not used.}
+
+\item{X, X2}{Model matrices. Must have same numer of rows.}
 }
 \value{
 \code{model2remat}: A restriction matrix.
@@ -33,6 +41,11 @@ Testing a small model under a large model corresponds
     and these restrictions come in the form of a restriction
     matrix. These functions converts a model to a restriction
     matrix and vice versa.
+}
+\details{
+`make_remat` Make a restriction matrix. If span(X2) is in
+    span(X) then the corresponding restriction matrix `L` is
+    returned.
 }
 \note{
 That these functions are visible is a recent addition; minor changes
@@ -53,10 +66,9 @@ L.s <- model2remat(sug, sug.s); L.s
 mod.h <- remat2model(sug, L.h); mod.h
 mod.s <- remat2model(sug, L.s); mod.s
 
-## The models have the same fitted values
+## Sanity check: The models have the same fitted values and log likelihood
 plot(fitted(mod.h), fitted(sug.h))
 plot(fitted(mod.s), fitted(sug.s))
-## and the same log likelihood
 logLik(mod.h)
 logLik(sug.h)
 logLik(mod.s)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/SAT-modcomp.R
 \name{get_covbeta}
 \alias{get_covbeta}
-\title{Compute cov(beta) as a Function of varpar of an LMM}
+\title{Compute cov(beta) as a function of varpar of an LMM}
 \usage{
 get_covbeta(varpar, devfun)
 }
@@ -19,6 +19,6 @@ At the optimum cov(beta) is available as vcov(lmer-model). This function
 computes cov(beta) at non (RE)ML estimates of \code{varpar}.
 }
 \author{
-Rune Haubo B. Christensen
+Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.
 }
 \keyword{internal}

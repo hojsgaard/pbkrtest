@@ -126,8 +126,7 @@ PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, det
 PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
   t0 <- proc.time()
 
-  get_fun <- .get_refdist_lm
-  ref <- .do_sampling(largeModel, smallModel, nsim, cl, get_fun, details)
+  ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
   
   ## ref <- ref[ref > 0]
 
@@ -172,9 +171,7 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
 
     t0 <- proc.time()
 
-    get_fun <- .get_refdist_merMod
-    ##ref <- .do_sampling(largeModel, smallModel, nsim, cl, get_fun, details)
-    ref <- .do_sampling(largeModel, smallModel, nsim, cl, get_refdist(largeModel), details)
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
     
     LRTstat     <- getLRT(largeModel, smallModel)
 
@@ -212,7 +209,6 @@ get_refdist.lm <- function(lg){
     .get_refdist_lm
 }
 
-
 .get_refdist_lm <- function(lg, sm, nsim=20, seed=NULL,
                             simdata=simulate(sm, nsim=nsim, seed=seed)){
     ##simdata <- simulate(sm, nsim, seed=seed)
@@ -228,6 +224,11 @@ get_refdist.lm <- function(lg){
 
     cl.lg$formula <- ff.lg
     cl.sm$formula <- ff.sm
+
+    if (inherits(lg, "glm")){
+        cl.lg$start <- coef(lg)
+        cl.sm$start <- coef(sm)
+    }
 
     ref <- rep.int(NA, nsim)
     for (ii in 1:nsim){
@@ -247,17 +248,18 @@ get_refdist.lm <- function(lg){
 }
 
 
-.do_sampling <- function(largeModel, smallModel, nsim, cl, get_fun, details=0){
 
-    t0  <- proc.time()
+get_cl <- function(cl){
+
+
     .cat <- function(b, ...) {if (b) cat(...)}
-    dd <- details
-
+    dd <- 2
+    
     if (Sys.info()["sysname"] == "Windows"){
         ##cat("We are on windows; setting cl=1\n")
         cl <- 1
     }
-
+    
     if (!is.null(cl)){
         if (inherits(cl, "cluster") || (is.numeric(cl) && length(cl) == 1 && cl >= 1)){
             .cat(dd>3, "valid 'cl' specified in call \n")
@@ -271,7 +273,7 @@ get_refdist.lm <- function(lg){
                 stop("option 'cl' set but is not a list of clusters\n")
             .cat(dd>3,"  got 'cl' from options; length(cl) = ", length(cl), "\n")
         }
-
+        
         if (is.null(cl)){
             .cat(dd>3, "trying to retrieve 'cl' from options('mc.cores')... \n")
             cl <- getOption("mc.cores")
@@ -279,19 +281,35 @@ get_refdist.lm <- function(lg){
                 .cat(dd>3,"  got 'cl' from options(mc.cores); cl = ", cl, "\n")
         }
     }
-
+    
     if (is.null(cl)){
         .cat(dd > 3, "cl can not be retrieved anywhere; setting cl=1\n")
         cl <- 1
     }
 
+    cl
+    
+}
+
+do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
+
+    t0  <- proc.time()
+    .cat <- function(b, ...) {if (b) cat(...)}
+    dd <- details
+
+    get_fun <- get_refdist(largeModel)
+    
+    cl <- get_cl(cl)
+        
     if (is.numeric(cl)){
         if (!(length(cl) == 1 && cl >= 1)) stop("Invalid numeric cl\n")
+
         .cat(dd>3, "doing mclapply, cl = ", cl, "\n")
         nsim.cl <- nsim %/% cl
         ref <- unlist(mclapply(1:cl,
-                               function(i) {get_fun(largeModel,
-                                                    smallModel, nsim=nsim.cl)}, mc.cores=cl))
+                               function(i) {
+                                   get_fun(largeModel, smallModel, nsim=nsim.cl)},
+                               mc.cores=cl))
 
     } else
         if (inherits(cl, "cluster")){
@@ -301,8 +319,7 @@ get_refdist.lm <- function(lg){
             ref <- unlist(clusterCall(cl, fun=get_fun,
                                       largeModel, smallModel, nsim=nsim.cl))
         }
-    else
-        stop("Invalid 'cl'\n")
+    else stop("Invalid 'cl'\n")
 
     attr(ref, "cl")  <- cl
     attr(ref, "ctime") <- (proc.time() - t0)[3]

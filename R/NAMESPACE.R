@@ -6,6 +6,7 @@
 #' @export  "%>%"
 #'
 #' @importFrom utils head
+#' @importFrom stats coef
 #' 
 #' @importFrom parallel clusterCall clusterExport clusterSetRNGStream
 #'     mclapply detectCores makeCluster
