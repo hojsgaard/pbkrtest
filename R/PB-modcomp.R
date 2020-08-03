@@ -1,6 +1,6 @@
 ##########################################################
 ###
-### Bartlett corrected LRT
+### 
 ###
 ##########################################################
 
@@ -11,11 +11,14 @@
 #'
 #' @name pb-modcomp
 #' 
-#' @details The model \code{object} must be fitted with maximum likelihood
-#'     (i.e. with \code{REML=FALSE}). If the object is fitted with restricted
-#'     maximum likelihood (i.e. with \code{REML=TRUE}) then the model is
-#'     refitted with \code{REML=FALSE} before the p-values are calculated. Put
-#'     differently, the user needs not worry about this issue.
+#' @details
+#'
+#' The model \code{object} must be fitted with maximum likelihood
+#'     (i.e. with \code{REML=FALSE}). If the object is fitted with
+#'     restricted maximum likelihood (i.e. with \code{REML=TRUE}) then
+#'     the model is refitted with \code{REML=FALSE} before the
+#'     p-values are calculated. Put differently, the user needs not
+#'     worry about this issue.
 #' 
 #' Under the fitted hypothesis (i.e. under the fitted small model) \code{nsim}
 #' samples of the likelihood ratio test statistic (LRT) are generetated.
@@ -160,7 +163,7 @@
 #' PBmodcomp(fmLarge, L, cl=1)
 #' 
 #' ## Vanilla
-#' PBmodcomp(beet0, beet_no.harv, nsim=1000, cl=1)
+#' PBmodcomp(beet0, beet_no.harv, nsim=499, cl=1)
 #' 
 #' ## Simulate reference distribution separately:
 #' refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000)
@@ -176,7 +179,7 @@
 #' PBmodcomp(beet0, beet_no.harv, cl=cl)
 #' 
 #' ## Or in two steps:
-#' refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000, cl=cl)
+#' refdist <- PBrefdist(beet0, beet_no.harv, nsim=499, cl=cl)
 #' PBmodcomp(beet0, beet_no.harv, ref=refdist)
 #' 
 #' ## It is recommended to stop the clusters before quitting R:
@@ -189,17 +192,17 @@
 #' m10 <- update(m11, ~.-I(speed^2))
 #' anova(m11, m10)
 #' 
-#' PBmodcomp(m11, m10, cl=1)
-#' PBmodcomp(m11, ~.-I(speed^2), cl=1)
-#' PBmodcomp(m11, c(0, 0, 1), cl=1)
+#' PBmodcomp(m11, m10, cl=1, nsim=499)
+#' PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=499)
+#' PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=499)
 #' 
 #' m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
 #' m20 <- update(m21, ~.-I(speed^2))
 #' anova(m21, m20, test="Chisq")
 #' 
-#' PBmodcomp(m21, m20, cl=1)
-#' PBmodcomp(m21, ~.-I(speed^2), cl=1)
-#' PBmodcomp(m21, c(0, 0, 1), cl=1)
+#' PBmodcomp(m21, m20, cl=1, nsim=499)
+#' PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=499)
+#' PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=499)
 #' 
 #' @export PBmodcomp
 

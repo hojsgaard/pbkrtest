@@ -199,7 +199,7 @@ L <- cbind(0,1)
 PBmodcomp(fmLarge, L, cl=1)
 
 ## Vanilla
-PBmodcomp(beet0, beet_no.harv, nsim=1000, cl=1)
+PBmodcomp(beet0, beet_no.harv, nsim=499, cl=1)
 
 ## Simulate reference distribution separately:
 refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000)
@@ -215,7 +215,7 @@ cl <- makeCluster(rep("localhost", nc))
 PBmodcomp(beet0, beet_no.harv, cl=cl)
 
 ## Or in two steps:
-refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000, cl=cl)
+refdist <- PBrefdist(beet0, beet_no.harv, nsim=499, cl=cl)
 PBmodcomp(beet0, beet_no.harv, ref=refdist)
 
 ## It is recommended to stop the clusters before quitting R:
@@ -228,17 +228,17 @@ m11 <- lm(dist ~ speed + I(speed^2), data=cars)
 m10 <- update(m11, ~.-I(speed^2))
 anova(m11, m10)
 
-PBmodcomp(m11, m10, cl=1)
-PBmodcomp(m11, ~.-I(speed^2), cl=1)
-PBmodcomp(m11, c(0, 0, 1), cl=1)
+PBmodcomp(m11, m10, cl=1, nsim=499)
+PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=499)
+PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=499)
 
 m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
 m20 <- update(m21, ~.-I(speed^2))
 anova(m21, m20, test="Chisq")
 
-PBmodcomp(m21, m20, cl=1)
-PBmodcomp(m21, ~.-I(speed^2), cl=1)
-PBmodcomp(m21, c(0, 0, 1), cl=1)
+PBmodcomp(m21, m20, cl=1, nsim=499)
+PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=499)
+PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=499)
 
 }
 \references{
