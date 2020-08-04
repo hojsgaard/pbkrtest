@@ -22,7 +22,7 @@ Description: Test in mixed effects models. Attention is on mixed
     for citation details.
 URL: http://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
-    R (>= 3.6.0),
+    R (>= 3.5.0),
     lme4 (>= 1.1.10)
 Imports:
     Matrix (>= 1.2.3),
