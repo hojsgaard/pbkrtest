@@ -1,0 +1,79 @@
+<html><head><title>lung cancer i danish citites</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>lungcancerDk(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   lungcancerDk">
+<param name="keyword" value=" lung cancer i danish citites">
+</object>
+
+
+<h2>lung cancer i danish citites</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Lung cancer in four Danish cities in 1968-1971
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(lungcancerDk)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A dataframe with 4 variables. 
+<dl>
+<dt>age:</dt><dd>age group</dd>
+<dt>city:</dt><dd>city in which the case ocurred</dd>
+<dt>deaths:</dt><dd>number of deaths</dd>
+<dt>population:</dt><dd>size of population</dd>
+</dl>
+
+<h3>Source</h3>
+
+<p>
+Andersen, E.B. (1977) 
+<EM>Multiplicative Poisson models with unequal cell rates</EM>,
+Scandinavian Journal of Statistics, 4, 153-158
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Lindsey, J.K. (1995) <EM>Modelling Frequency and Count Data</EM>,
+Oxford Science Publications: Oxford, p. 157
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(lungcancerDk)
+attach(lungcancerDk)
+rate&lt;-deaths/population *1e5
+dat&lt;-data.frame(rate,lungcancerDk)
+w&lt;-reshape(dat,v.names=c('rate'),idvar='age',direction='wide',timevar='city')
+
+age1&lt;-c(40,55,60,65,70)
+age2&lt;-c(55,60,65,70,75)
+Age&lt;-c((age1+age2)/2,80)
+
+ matplot(Age,w[,4:7],type='l',ylab='death /(100.000*year)',
+                 lwd=c(1:4),col=c(1:4),lty=c(1:4))
+ legend(65,500,legend=c('Fredericia','Horsens','Kolding','Vejle'),lty=c(1:4),lwd=c(1:4),col=c(1:4))
+title('lung cancer death in four danish cities')
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

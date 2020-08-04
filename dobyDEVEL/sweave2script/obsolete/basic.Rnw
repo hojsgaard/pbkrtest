@@ -1,0 +1,39 @@
+\SweaveOpts{prefix.string=fig/sample, keep.source=T}
+
+@
+<<echo=F>>=
+options(SweaveHooks=list(fig=function() par(mar=c(2, 2, 2, 2) + 0.1)))
+@ %def
+
+  
+\newslide %% =================================================
+
+\section{Summarizing data}
+\label{sec:summarizingasd-data}
+%% \author{Søren Højsgaard}
+
+The åshoeså data is a list of two vectors, giving the wear of shoes of
+materials åXå and åYå for one foot each of ten boys.
+@ 
+<<>>=
+data(shoes, package="MASS")
+names(shoes) <- c("x","y")
+shoes
+@ %def 
+
+First focus on data for material åAå; 
+@ 
+<<>>=
+x <- shoes$x; x
+@ %def 
+
+We shall look at measures of where is the "location" or "center" of the data and what is the
+"spread" of data. 
+
+\newslide %% =================================================
+
+For the sum $x_1 + x_2 + x_3 + \dots + x_7+ x_8$ we write
+\begin{displaymath}
+  x_. = \Sigma_{i=1}^8 x_i = x_1 + x_2 + x_3 + \dots + x_7+ x_8
+\end{displaymath}
+

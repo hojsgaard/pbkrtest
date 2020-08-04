@@ -1,0 +1,10 @@
+exportPattern("^[[:alpha:]]+")
+
+#import(lme4)
+importFrom(lme4, fixef)
+#importFrom(pbkrtest, vcovAdj)
+
+importClassesFrom(Matrix, Matrix)
+importFrom(Matrix, Matrix, sparseMatrix)
+importMethodsFrom(Matrix, t, isSymmetric, "%*%", solve, diag)
+

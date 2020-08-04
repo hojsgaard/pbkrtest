@@ -1,0 +1,71 @@
+<html><head><title>infection from birth by Caesarian section</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>caesar(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   caesar">
+<param name="keyword" value=" infection from birth by Caesarian section">
+</object>
+
+
+<h2>infection from birth by Caesarian section</h2>
+
+
+<h3>Description</h3>
+
+<p>
+data collected from Weissenbacher, R.E, Klinikum Grosshadern, Munich, on
+the occurrence of infections of birth by Caesarian section.
+<br>
+logistic regression
+<br>
+sparse cells with non-existence of ML-estimator
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(caesar)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A dataframe with 5 variables. 
+<dl>
+<dt>infect:</dt><dd>yes: infection after birth; no: no infection</dd>
+<dt>risk:</dt><dd>1: risk factors as diabetics or excessive weight are present; 0: not present</dd>
+<dt>antib:</dt><dd>1: antibiotics given as prophylaxe; 0: no antibiotics</dd>
+<dt>caesp:</dt><dd>1: Caesarian section planned; 0: not planned</dd>
+<dt>r:</dt><dd>number of births with infection</dd>
+</dl>
+
+<h3>Source</h3>
+
+<p>
+Fahrmeyer, Tutz (2001)
+Multivariate statistical modellng based on Generalized Linear Models, 
+Springer, 2nd edition, pages 3, 30 and  51;
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+data(caesar)
+attach(caesar)
+
+#printing the data as a flat contingency table:
+  #  data.frame to contigency table
+    f&lt;-xtabs(r~infect+risk+antib+caesp)
+  # flat contigency table
+    f&lt;-ftable(caesp+infect~antib+risk,data=f)
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

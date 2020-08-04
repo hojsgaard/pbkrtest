@@ -1,0 +1,80 @@
+<html><head><title>reaction on chemotherapy  with cisplatin</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>cisplatin(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   cisplatin">
+<param name="keyword" value=" reaction on chemotherapy  with cisplatin">
+</object>
+
+
+<h2>reaction on chemotherapy  with cisplatin</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The <code>cisplatin</code> data frame describe the severity of nausea
+for patients under chemotherapy, receiving cisplatinum or not.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(cisplatin)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+This data frame contains the following columns:
+<dl>
+<dt>cisplatinum:</dt><dd>no: patient received no cisplatinum, yes: received </dd>
+<dt>severity:</dt><dd>level of serum acid phosphatase in King-Amstrong units</dd>
+<dt>number</dt><dd>number of persons with the symptoms</dd>
+</dl>
+
+<h3>Details</h3>
+
+
+
+
+<h3>Source</h3>
+
+<p>
+Farewell(1982) A note on regression analysis of ordinal data with
+variability of classification, Biometrika, 69, 533-538
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Lindsey, J. K (1995), Modelling Frequency and Count Data, Clarendon Press,
+Oxford, p. 99 ,reprint 2002
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(cisplatin)
+#
+library(MASS)
+
+## Not run: 
+* SAS example;
+data prostaticCancer; 
+infile "prostaticCancer.txt" firstobs=2;
+input  age acid Xray Tsize  Tgrade  nodal;
+proc print; run;
+## End(Not run) 
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

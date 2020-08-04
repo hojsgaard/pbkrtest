@@ -1,0 +1,21 @@
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Efron(1982)]{efron:82}
+Bradley Efron.
+\newblock \emph{The Jackknife, the Bootstrap and Other Resampling Plans}.
+\newblock Society for Industrial and Applied Mathematics, Philadelphia,
+  Pennsylvania, 1982.
+
+\bibitem[Lauridsen et~al.(1999)Lauridsen, Højsgaard, and
+  Sørensen]{lauridsen:99}
+Charlotte Lauridsen, Søren Højsgaard, and Martin~Tang Sørensen.
+\newblock Influence of dietary rapeseed oil, vitamin e and copper on the
+  performance and the antioxidative status of pigs.
+\newblock \emph{J. Anim. Sci.}, 77:\penalty0 906--916, 1999.
+
+\end{thebibliography}

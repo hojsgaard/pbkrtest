@@ -1,0 +1,33 @@
+
+\section{Mendel's law and primulae}
+\begin{topics}
+Test for binomial proportions  
+\end{topics}
+
+A total of 560 plants were classified by type of their leafs (flat or crimped) and the type of their eye
+(normal or Primrose Queen). 
+(In the picture
+\url{	http://www.primulaworld.com/PWWeb/gallery/slides/sinensisTM3.html} the eye is the yellow
+area round the mouth of the corolla tube). 
+According to simple Mendelian law one would expect
+a 3:1 ratio for the dominant to the recessive characteristic for each part of the plant.
+For leafs one would expect  420 plants with 
+flat leaves  and  140 plants with crimped leaves. For the eye one would would expect 420 plants normal and 120 plants
+Primrose Queen.
+
+\begin{table}[h]
+\begin{tabular}{c|cc|c}
+& \multicolumn{2}{c}{Leaves} & \\ \hline
+Eye & Flat & Crimped & Total\\ \hline
+Normal  & 328 & 77 &  405 \\
+Primrose Queen & 122 & 33 & 155 \\ \hline
+Total & 450 & 110 & 560 \\ \hline
+\end{tabular}    
+\end{table}
+
+Concentrate first on the leaves where 450 are flat and 110 crimped. Describe the distribution of the observations, 
+formulate the hypothesis and test it. 
+% (Take a look at the one-sample testing problem in the 
+% \verb+example-logistic.pdf+ document.)
+Repeat the analysis for the eyes.
+

@@ -1,0 +1,4 @@
+sex dose ndead ntotal
+male     8  13  20 
+female   8  10  20 
+

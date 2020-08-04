@@ -1,0 +1,107 @@
+\usepackage[inline,nomargin,draft]{fixme}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{framed}
+\usepackage{comment}
+\usepackage{amsmath}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+
+\MakeShortVerbå
+
+%%
+%% Easy matrices:
+%%
+\newcommand{\matrxr}[2][rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxr{-1&-2\\3&4}$
+
+\newcommand{\matrxc}[2][cccccccccccccccccccccccccccccccccccc]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+\newcommand{\matrxl}[2][lllllllllllllllllllllllllllllllllllll]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+
+\def\R{\texttt{R}}
+\def\code#1{\texttt{#1}}
+\def\ok{\texttt{OK}}
+\def\fix{\texttt{FIX}}
+
+\def\red#1{{\bf \textcolor{red}{#1}}}
+\def\blue#1{{\bf \textcolor{blue}{#1}}}
+\def\purple#1{{\bf \textcolor{purple}{#1}}}
+
+\def\com#1{{\em{\color{red} #1}}}
+\def\comi#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+\def\comic#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+
+\def\simn{\sim\mathcal N}
+\def\simx{\sim\chi^2}
+\def\xx{\chi^2}
+\def\norm{\mathcal N}
+
+
+\DeclareMathOperator{\RR}{\mathbb{R}}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+\DeclareMathOperator{\var}{\mathbb{V}ar}
+\DeclareMathOperator{\cov}{\mathbb{C}ov}
+%\DeclareMathOperator{\norm}{N}
+\DeclareMathOperator{\spanx}{span}
+\DeclareMathOperator{\corr}{Corr}
+\DeclareMathOperator{\deter}{det}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\odds}{odds}
+
+\def\vnorm#1{\left|\left|#1\right|\right|} 
+\def\innerp#1{\left\langle #1 \right\rangle}
+\def\inv{^{-1}}
+\def\transp{^{\top}}
+\definecolor{darkblue}{rgb}{0,0,.5}
+
+%%UHH commands added by UHH
+%%some new enviroments
+\newtheorem{theorem}{Theorem}[section]
+\newenvironment{example}{\medskip\noindent\refstepcounter{theorem}{\bf
+Example \thetheorem\ }}{\hfill $\Box$ }
+\newenvironment{theoreme}{\medskip\noindent\refstepcounter{theorem}{\bf
+Theorem \thetheorem\ }}{}
+
+\definecolor{shadecolor}{gray}{0.91}
+\definecolor{howR}{gray}{0.91}
+%\specialcomment{howR}{\begin{shaded}\small R code: }{\end{shaded}}
+%\specialcomment{howR}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+%\specialcomment{sblock}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+
+\specialcomment{solution}
+{\begin{shaded} Solution: }{\end{shaded}}
+
+\specialcomment{topics}
+{\begin{shaded} TOPICS: }{\end{shaded}}
+
+
+
+\newenvironment{howR}{}{}
+
+\newenvironment{examplea}
+                {\begin{example}  \em \openup-1pt }
+                {\hfill $\Box$  %\vspace{5mm}
+                \end{example}}
+
+

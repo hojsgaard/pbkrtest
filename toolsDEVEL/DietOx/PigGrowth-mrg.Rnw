@@ -1,0 +1,280 @@
+%%%
+%%% Automatically generated file from  PigGrowth.Rnw - DO NOT EDIT MANUALLY
+%%%
+%\newslide
+\section{Pig growth -- \texttt{dietox}}
+\label{sec:dietox}
+
+The data used here are described by \cite{lauridsen:99} and contains growth data
+for a pig feeding experiment. Data is available as the \texttt{dietox} data set
+in the \texttt{doBy} package for \R. 
+
+One of the questions asked in connection with the experiment was whether 
+copper added to pig feed increase/decrease growth. 
+Copper (hereafter abbreviated Cu) was used in three levels Cu=1: No copper,
+Cu=2: xxx mg/kg and Cu=3: yyy mg/kg. Here we shall analyze data as if they were
+layed out as a factorial experiment (even though the design was a (almost)
+balanced incomplete block design -- because there is an issue of a litter
+effect). 
+The weight of slaughter pigs were measured weekly over a 12 week period. 
+
+
+\section{Loading data}
+
+Data can be loaded as:
+@ 
+<<>>=
+library(doBy)
+data(dietox)
+dietox[1:5,]
+@ %def 
+
+Cu is coded with levels 1,2,3 meaning that \R\ will regard Cu as a numeric
+variable, which it is not. To turn Cu into a factor we do:
+@ 
+<<>>=
+dietox$Cu     <- as.factor(dietox$Cu)
+@ %def 
+
+If instead data was saved as a comma--searated file (a .csv file) it could be
+loaded as
+@ 
+<<eval=F>>=
+dietox <- read.csv("dietox.csv")
+@ %def 
+
+\newslide
+\subsection{Looking at data}
+
+
+
+\shfig{dietox01}{XXX}{height=4cm}
+
+The weight as function of time is shown in  Figure~\ref{fig:dietox01}. This plot
+is produced using the \texttt{plotBy()} function in the \texttt{doBy} package as follows:
+
+
+First, make space for 1 row and 3 columns of plots:
+@ 
+<<>>=
+par(mfrow=c(1,3))
+@ %def 
+
+Then call the \texttt{plotBy()} function:
+@ 
+<<eval=F,fig=F>>=
+plotBy(Weight~Time,subject=Pig,group=Cu,title="Cu=", data=dietox,col=1:100,lines=T)
+@ %def 
+
+\newslide
+ Figure~\ref{fig:dietox01} suggests
+\begin{itemize}
+\item Approximately linear growth curves
+\item Some tendency for variance to increase with mean
+\end{itemize}
+
+\newslide
+
+A next step could be to calculate the mean and variance for each combination of
+Cu and Time using the \texttt{summaryBy()} function:
+@ 
+<<fig=F>>=
+m.dietox <- summaryBy(Weight~Cu+Time, data=dietox, FUN=c(mean,var))
+m.dietox[1:5,]
+@ %def 
+\newslide
+-- and to plot these (see Figure~\ref{fig:dietox01mean}).
+@ 
+<<>>=
+par(mfrow=c(1,1))
+plotBy(mean.Weight~Time,subject=Cu, data=m.dietox, lines=T,
+col=c("black","red","green"), silent=F)
+@ %def 
+
+\shfig{dietox01mean}{XXX}{height=6cm,width=7cm}
+
+Figure~\ref{fig:dietox01mean} suggests that 
+\begin{itemize}
+\item Growth is not quite linear. The curves are curved (slightly S--shaped)!
+\item If there is a treatment effect, then it is small!
+\end{itemize}
+
+Next we can plot the log variance against the log mean and fit a straight line
+to the data (see Figure~\ref{fig:dietox-010}):
+@ 
+<<fig=F>>=
+plot(log(var.Weight)~log(mean.Weight), data=m.dietox)
+lm1 <- lm(log(var.Weight)~log(mean.Weight), data=m.dietox)
+abline(lm1,lwd=2,col="red")
+lm1
+@ %def 
+The plot suggests that $\log Var(y) \approx a + b \log E(y)$ and hence
+$$
+Var(y) \approx e^a \cdot E(y)^b
+$$
+The slope $b$ is about one suggesting that the variance is approximately
+proportional to the mean.
+
+\shfig{dietox-010}{XXX}{height=6cm,width=7cm}
+
+\newslide
+
+\subsection{Onto fitting some models}
+
+
+ @ 
+ <<>>=
+ lm1 <- lm(mean.Weight~Cu*Time, data=m.dietox)
+ lm2 <- lm(mean.Weight~Cu*(Time+I(Time^2)), data=m.dietox)
+ lm3 <- lm(mean.Weight~Cu*poly(Time,3), data=m.dietox)
+ @ %def 
+
+
+% par(mfrow=c(1,3)
+% plotBy(fitted(lm1)~Time, subject=Cu, data=m.dietox,lines=T,col=1:3)
+% plotBy(fitted(lm2)~Time, subject=Cu, data=m.dietox,lines=T,col=1:3)
+% plotBy(fitted(lm3)~Time, subject=Cu, data=m.dietox,lines=T,col=1:3)
+
+
+
+\newslide
+
+\subsubsection{Linear regression}
+
+Let $c$: Cu, $p$: pig (within treatment), $t$: time.
+
+Simple regression model:
+$$
+y_{cpt} = \alpha+ \beta t+ \alpha_c + \beta_c t + e_{cpt}; \ \ e_{cpt}\sim N(0,\sigma^2)
+$$
+Written shortly as:
+$$
+[y] = 1 + \underline{time} + Cu + Cu * \underline{time} + [e]
+$$
+
+
+\newslide
+\subsubsection{In \SAS\ and \R}
+
+\begin{verbatim}
+proc mixed data=dietox noinfo noclprint;
+  class cu pig;
+  model weight = time cu cu * time / solution htype=1;
+run;
+\end{verbatim}
+
+
+@ 
+<<eval=T>>=
+fm0 <- lm (Weight ~ Time + Cu + Cu * Time, data = dietox)
+@ %def 
+
+
+To plot the residuals and the fitted values, one can do:
+@ 
+<<>>=
+par(mfrow=c(2,3))
+plotBy(resid(fm0)~Time,subject=Pig,group=Cu, data=dietox, lines=T, col=1:100)
+plotBy(fitted(fm0)~Time,subject=Pig,group=Cu, data=dietox, lines=T, col=1:3)
+@ %def 
+
+\newslide
+\subsubsection{Figures}
+\shfig{dietox02}{XXX}{}
+
+If model is appropriate, residuals should fluctuate randomly around zero. That
+is clearly not so. 
+
+\newslide
+\subsubsection{Adding a random intercept term}
+
+Pigs who start above (below) average tend to keep that position throughout the
+experiment. 
+
+This suggests to add a pig--specific (random) intercept term:
+
+$$
+y_{cpt} = \alpha+ \beta t+ \alpha_c + \beta_c t +{\color{red}U_{cp}}+ e_{cpt}; \ \ 
+%e_{cpt}\sim N(0,\sigma_e^2), U_{cp}\sim N(0,\sigma_U^2), 
+$$
+Written shortly as:
+$$
+[y] = 1 + \underline{time} + Cu + Cu * \underline{time} + {\color{red}[Cu*Pig]}+[e]
+$$
+
+
+
+
+\newslide
+\subsubsection{In \SAS\ and \R}
+
+\begin{verbatim}
+proc mixed data=dietox noinfo noclprint;
+  class cu pig;
+  model weight = time cu cu * time / solution htype=1;
+  random int / subject=cu*pig;
+run;
+\end{verbatim}
+
+@ 
+<<eval=T>>=
+library(nlme)
+fm1 <- lme(Weight ~ Time + Cu + Cu * Time, data = dietox, random=~1|Pig)
+@ %def 
+
+
+\newslide
+@ 
+<<echo=F,eval=F>>=
+anova(fm1)
+@ %def 
+
+\newslide
+\subsubsection{Figures}
+
+\shfig{dietox03}{XXX}{}
+
+Residuals still problematic: Residuals on some pigs steadily increasing, others
+steadily decreasing.
+
+
+\newslide
+\subsubsection{Adding a random slope term}
+
+To account for this phenomenon, one can add a pig--specific (random) slope term:
+$$
+y_{cpt} = \alpha+ \beta t+ \alpha_c + \beta_c t +U_{cp}+ {\color{red}W_{cp} t} + e_{cpt}; \ \ 
+%e_{cpt}\sim N(0,\sigma_e^2), U_{cp}\sim N(0,\sigma_U^2), W_{cp}\sim N(0,\sigma_W^2), 
+$$
+Written shortly as:
+$$
+[y] = 1 + \underline{time} + Cu + Cu * \underline{time} + [CU*Pig] + 
+{\color{red}[CU*Pig]*\underline{time}}+[e]
+$$
+
+Such a model is called a \com{random regression model}.
+
+\newslide
+\subsubsection{In \SAS\ and \R}
+
+\begin{verbatim}
+data dietox; set dietox; 
+  timec = time;
+
+proc mixed data=dietox noinfo noclprint;
+  class cu pig timec;
+  model weight = time cu cu * time / solution htype=1;
+  random int time/ subject=cu*pig;
+run;
+\end{verbatim}
+
+@ 
+<<>>=
+fm2 <- lme(Weight ~ Cu * Time, data = dietox, random = ~ 1 + Time| Pig)
+@ %def 
+\newslide
+@ 
+<<echo=F,eval=F>>=
+anova(fm2)
+@ %def 
+

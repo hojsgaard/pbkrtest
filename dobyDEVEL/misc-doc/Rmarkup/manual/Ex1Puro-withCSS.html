@@ -1,0 +1,213 @@
+<link rel=stylesheet href="R2HTML.css" type=text/css>
+<h2>The Puromycin data  </h2>
+<h3>Søren Højsgaard  </h3>
+<!-- begin{Schunk} !--> 
+
+<p class='character'><P class='POSIXct'>2012-01-29 23:14:37 CET</p></p>
+
+</p> <!--\end{Schunk}!-->
+<br>
+<h3>The <span style="text-decoration: underline;">Puromycin</span> data </h3>
+The first lines of data are:
+<br>
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><xmp class=command>> head(Puromycin, 3)</xmp></p>
+
+
+<!-- end{Sinput} !-->
+
+
+<p align= left >
+<table cellspacing=0 border=1>
+<caption align=bottom class=captiondataframe></caption>
+<tr><td>
+	<table border=0 class=dataframe>
+	<tbody> 
+	<tr class= firstline > 
+		<th>&nbsp;  </th>
+		<th>conc  </th>
+		<th>rate  </th>
+		<th>state</th> 
+	</tr> 
+<tr> 
+<td class=firstcolumn>1
+</td>
+<td class=cellinside>0.02
+</td>
+<td class=cellinside>76
+</td>
+<td class=cellinside>treated
+</td></tr>
+ 
+<tr> 
+<td class=firstcolumn>2
+</td>
+<td class=cellinside>0.02
+</td>
+<td class=cellinside>47
+</td>
+<td class=cellinside>treated
+</td></tr>
+ 
+<tr> 
+<td class=firstcolumn>3
+</td>
+<td class=cellinside>0.06
+</td>
+<td class=cellinside>97
+</td>
+<td class=cellinside>treated
+</td></tr>
+ 
+	</tbody>
+</table>
+ </td></table>
+ <br>
+<!-- begin{Sinput} !-->
+
+<p><xmp class=command>> nr = nrow(Puromycin)</xmp></p>
+
+
+<!--\end{Sinput}!-->
+
+</p> <!--\end{Schunk}!-->
+There are 23 rows in the dataframe.
+(Notice that we may refer to R expression in the text).
+<br>
+Transformation almost gives <span style="text-decoration: underline;">linearity</span>
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><xmp class=command>> par(mfrow = c(1, 2))</xmp></p>
+
+
+
+<p><xmp class=command>> plot(rate ~ conc, data = Puromycin, col = as.numeric(state))</xmp></p>
+
+
+
+<p><xmp class=command>> plot(1/rate ~ I(1/conc), data = Puromycin, col = as.numeric(state))</xmp></p>
+
+
+<!--\end{Sinput}!-->
+
+</p> <!--\end{Schunk}!-->
+<p align= left ><img height=300 width=600 src='Ex1Puro-withCSS-003.png'></p><br>
+Fit a model to <span style="font-weight: bold;">transformed</span> data
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><xmp class=command>> m1 <- lm(1/rate ~ state + I(1/conc) + state * I(1/conc), data = Puromycin)</xmp></p>
+
+
+
+<p><xmp class=command>> summary(m1)</xmp></p>
+
+
+<!-- end{Sinput} !-->
+
+<p class='character'>
+</p>
+
+<br><li>Call:<font class='call'> lm(formula = 1/rate ~ state + I(1/conc) + state * I(1/conc), </font>
+Call:<font class='call'>     data = Puromycin)</font>
+
+<br><li>  Residuals<br>
+
+
+
+<p align= left >
+<table cellspacing=0 border=1><caption align=bottom class=captiondataframe></caption>
+<tr><td>
+	<table border=0 class=dataframe>
+	<tbody> <tr class= firstline > <th></th><th>Min</th><th>1Q</th><th>Median</th><th>3Q</th><th>Max</th> </tr>
+ 
+<tr><td class=firstcolumn></td>
+<td class=cellinside>-0.0043</td>
+<td class=cellinside>-0.0005</td>
+<td class=cellinside>-0.0002</td>
+<td class=cellinside> 0.0009</td>
+<td class=cellinside> 0.0038</td></tr>
+ 
+	</tbody>
+</table>
+ </td></table>
+ <br>
+
+<br><li>Coefficients
+
+
+
+<p align= left >
+<table cellspacing=0 border=1><caption align=bottom class=captiondataframe></caption>
+<tr><td>
+	<table border=0 class=dataframe>
+	<tbody> <tr class= firstline > <th></th><th>Estimate</th><th>Std. Error</th><th>t value</th><th>Pr(>|t|)</th><th></th> </tr>
+ 
+<tr><td class=firstcolumn>(Intercept)</td>
+<td class=cellinside> 5.11e-03</td>
+<td class=cellinside> 6.27e-04</td>
+<td class=cellinside> 8.14    </td>
+<td class=cellinside>1.3e-07  </td>
+<td class=cellinside>***      </td></tr>
+ 
+<tr><td class=firstcolumn>stateuntreated</td>
+<td class=cellinside> 1.86e-03</td>
+<td class=cellinside> 9.20e-04</td>
+<td class=cellinside> 2.03    </td>
+<td class=cellinside>0.057    </td>
+<td class=cellinside>  .      </td></tr>
+ 
+<tr><td class=firstcolumn>I(1/conc)</td>
+<td class=cellinside> 2.47e-04</td>
+<td class=cellinside> 2.86e-05</td>
+<td class=cellinside> 8.64    </td>
+<td class=cellinside>5.2e-08  </td>
+<td class=cellinside>***      </td></tr>
+ 
+<tr><td class=firstcolumn>stateuntreated:I(1/conc)</td>
+<td class=cellinside>-3.22e-05</td>
+<td class=cellinside> 4.10e-05</td>
+<td class=cellinside>-0.79    </td>
+<td class=cellinside>0.442    </td>
+<td class=cellinside>         </td></tr>
+ 
+	</tbody>
+</table>
+ </td></table>
+ <br>
+
+<p class='character'>
+<p>--- Signif. codes: 0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</p>
+</p>
+
+<br><li>Residuals standard error: 0.002 on 19 degrees of freedom
+
+<br><li>Multiple R-Squared:<b>0.876</b>
+<br><li>Adjusted R-Squared:<b>0.856</b>
+<br><li>F-statistics: <b>44.614</b> on 3 and 19 DF. P-value:<b>0</b>.
+</p> <!--\end{Schunk}!-->
+<br>
+Model diagnostics
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><xmp class=command>> par(mfrow = c(2, 2))</xmp></p>
+
+
+
+<p><xmp class=command>> plot(m1)</xmp></p>
+
+
+<!--\end{Sinput}!-->
+
+</p> <!--\end{Schunk}!-->
+<p align= left ><img height=400 width=600 src='Ex1Puro-withCSS-005.png'></p><br>
+<!--  TODO: Maybe more could be done... !-->
+<br>
+<br>
+<br>
+<br>
+<br>

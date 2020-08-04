@@ -1,0 +1,12 @@
+race type  count 
+RDM  ZZ        4
+RDM  Zz      105
+RDM  zz      290
+SDM  ZZ        0
+SDM  Zz       14
+SDM  zz       75
+Jersey  ZZ    10
+Jersey  Zz    30
+Jersey  zz    14
+
+

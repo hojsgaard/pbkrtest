@@ -1,0 +1,84 @@
+rmc <- function() {
+require(tcltk)
+  txtfont <- tkfont.create(family="courier", size=10)
+  rcmdtitle <- "R Mini Commander"
+  wfile <- ".txt"
+  tt <- tktoplevel()
+  tkwm.title(tt, rcmdtitle)
+  txt <- tktext(tt, height=20, font=txtfont)
+  #Yscroll <- tkscrollbar(tt, repeatinterval=5,
+  #      command=function(...) tkyview(tt, ...))
+  #tkconfigure(tt, yscrollcommand=function(...) tkset(Yscroll, ...))
+  #tkgrid(tt, Yscroll)
+
+  tkpack(txt)
+  save <- function() {
+    file <- tclvalue(tkgetSaveFile(
+                                   initialfile=tclvalue(tkfile.tail(wfile)),
+                                   initialdir=tclvalue(tkfile.dir(wfile))))
+    if (!length(file)) return()
+    tkwm.title(tt, paste(rcmdtitle,file))
+    chn <- tkopen(file, "w")
+    tkputs(chn, tclvalue(tkget(txt,"0.0","end")))
+    tkclose(chn)
+    wfile <<- file
+  }
+  load <- function() {
+    file <- tclvalue(tkgetOpenFile())
+    if (!length(file)) return()
+    chn <- tkopen(file, "r")
+    tkinsert(txt, "0.0", tclvalue(tkread(chn)))
+    tkclose(chn)
+    wfile <<- file
+    tkwm.title(tt, paste(rcmdtitle,file))
+  }
+  run <- function() {
+    selection <- strsplit(tclvalue(tktag.ranges(txt, "sel")), " ")[[1]]
+    if (length(selection)==0)
+      source(textConnection(tclvalue(tkget(txt,"0.0","end"))), echo=TRUE)
+    else
+      source(textConnection(tclvalue(tkget(txt,selection[1],selection[2]))), echo=TRUE)
+  }
+  close <- function(){
+    response <- tclvalue(tkmessageBox(message="Exit?",
+                                      icon="question", type="okcancel", default="cancel"))
+    if (response=="cancel") return()
+    response2 <- tkmessageBox(message="Save file?",
+                              icon="question", type="yesno", default="yes")
+    print(response2)
+    if ("yes" == tclvalue(response2)) 
+      save()
+    tkdestroy(tt)
+  }
+  about <- function(){
+    abouttxt <-
+      paste(
+            "R Mini Commander\n",
+            "Usage:\n",
+            " - To submit the entire content of the editor, click on Run or hit Alt-r or Ctrl-r or Alt-p\n",
+            " - To submit some lines only, highlight those lines, click on Run or hit Alt-R or Ctrl-r or Alt-p \n",
+            "Note:\n",
+            " - The usual Windows cut (Ctrl-x), copy (Ctrl-c) and paste (Ctrl-v) works in the R Mini Commander\n",
+            " - There is no scroll bar in R Mini Commander, but page-up/page-down and the arrows can be used for scrolling\n",
+            " - Drag-and-drop of text is not implemented in the R Mini Commander\n",
+            "\n",
+            "Author: Soren Hojsgaard, sorenh@math.aau.dk \n"
+                      )
+    tkmessageBox(message=abouttxt, icon="info", type="ok")
+
+  }
+topMenu <- tkmenu(tt)
+tkconfigure(tt, menu=topMenu)
+fileMenu <- tkmenu(topMenu, tearoff=FALSE)
+tkadd(fileMenu, "command", label="Open",       command=load)
+tkadd(fileMenu, "command", label="Save",       command=save)
+tkadd(fileMenu, "command", label="Quit",       command=close)
+tkadd(topMenu, "cascade", label="File",        menu=fileMenu)
+
+tkadd(topMenu, "command", label="Run",         command=run)
+tkadd(topMenu, "command", label="About/Help",  command=about)
+
+tkbind(tt, "<Control-r>", run)
+tkbind(tt, "<Alt-p>", run)
+}
+                                        #tkscript()

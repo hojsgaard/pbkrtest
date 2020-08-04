@@ -1,0 +1,41 @@
+\documentclass[12pt]{article}
+\usepackage{color,amsmath,amsfonts}
+\usepackage{ISMLS,a4wide}
+\usepackage{boxedminipage,color}
+
+
+\newenvironment{sframe}{\vspace{1mm}\hrule\vspace{2mm}}{}
+\newenvironment{sblock}{}{}
+
+\def\frametitle#1{\paragraph{\underline{#1}}}
+\def\institute#1{}                
+
+\title{A sample lecture}
+\author{Søren Højsgaard}
+\institute{Ph.d. course}
+
+\parindent0pt
+\parskip5pt
+
+    
+\begin{document}
+
+
+%% Efter preamble
+\definecolor{myGray}{rgb}{0.95,0.95,0.95}
+\makeatletter
+\renewenvironment{Schunk}{
+  \begin{lrbox}{\@tempboxa}
+    \begin{boxedminipage}
+      {\columnwidth}\scriptsize}
+    {\end{boxedminipage}
+  \end{lrbox}%
+  \colorbox{myGray}{\usebox{\@tempboxa}}
+}
+\makeatother
+
+\maketitle
+\tableofcontents
+
+\SweaveInput{src-bxxx}
+\end{document}

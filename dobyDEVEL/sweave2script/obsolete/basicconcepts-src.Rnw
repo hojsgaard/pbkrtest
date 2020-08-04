@@ -1,0 +1,1447 @@
+\SweaveOpts{prefix.string=fig/sample, keep.source=T}
+
+@
+<<echo=F>>=
+options(SweaveHooks=list(fig=function() par(mar=c(2, 2, 2, 2) + 0.1)))
+@ %def
+
+  
+\newslide %% =================================================
+
+\section{Summarizing data}
+\label{sec:summarizing-data}
+
+
+The åshoeså data is a list of two vectors, giving the wear of shoes of
+materials åXå and åYå for one foot each of ten boys.
+@ 
+<<>>=
+data(shoes, package="MASS")
+names(shoes) <- c("x","y")
+shoes
+@ %def 
+
+First focus on data for material åAå; 
+@ 
+<<>>=
+x <- shoes$x; x
+@ %def 
+
+We shall look at measures of where is the "location" or "center" of the data and what is the
+"spread" of data. 
+
+\newslide %% =================================================
+
+\subsection{Mesures of location}
+\label{sec:measure-location}
+
+%% \subsection{A bit of notation}
+%% \label{sec:notation}
+
+We have $n=8$ observations in the vector $x$. We denote these
+symbolically by
+\begin{displaymath}
+  x_1, x_2, x_3, \dots, x_7, x_8
+\end{displaymath}
+and they read ``x one'', ``x two'' etc.
+
+For the sum $x_1 + x_2 + x_3 + \dots + x_7+ x_8$ we write
+\begin{displaymath}
+  x_. = \Sigma_{i=1}^8 x_i = x_1 + x_2 + x_3 + \dots + x_7+ x_8
+\end{displaymath}
+and the left hand side reads ``x dot'' and $\Sigma_{i=1}^8 x_i$ 
+reads ``the sum of $x_i$ as $i$ goes from $1$ to $n$''. The symbol
+$x.$ is of course an arbitrary name for the sum. 
+
+If we divide $x_i$ by the number of observations $n$ (here $n=8$) we
+get the mean (or average). Again, we can invent any name we like for this
+average, but it is quite common to write $\bar x$:
+\begin{displaymath}
+  \bar x = 
+  \frac 1 8 x_. =
+  \frac 1 8 \sum_{i=1}^8 x_i =
+  \frac 1 8 (x_1 + x_2 + x_3 + \dots + x_7 + x_8)
+\end{displaymath}
+
+\newslide %% =================================================
+
+The mean (or average) is
+@ 
+<<>>=
+sum(x) / length(x)
+mean(x) 
+@ %def 
+
+The median is a related measure: We sort the data:
+@ 
+<<>>=
+x <- sort( x ); x
+@ %def 
+
+If the number of data points is odd, the median is the middle data
+point. 
+
+If the number is even, the median is the average around the two
+points in the middle:
+@ 
+<<>>=
+(10.7 + 10.8) / 2
+median( x )
+@ %def 
+
+\newslide %% =================================================
+
+\subsection{Measures of spread}
+\label{sec:measure-spread}
+
+There are many different measures of spread. One is the interquartile
+tange (IQR). Consider this
+@ 
+<<>>=
+quant <- quantile( x ); quant
+@ %def 
+
+The $50\%$ quantile is the median. The $75\%$ quantile is the median
+of the highs and the  $25\%$ quantile is the median
+of the lows. The difference between these two quantiles is the IQR:
+@ 
+<<>>=
+quant[4]-quant[2]
+@ %def 
+
+
+The standard measure of spread is the standard deviation. 
+
+\newslide %% =================================================
+
+The squared distance of $x_i$ to $\bar x$ is $(x_i-\bar x)²$. The
+average squared distance
+\begin{displaymath}
+  \frac{1}{n} \sum_{i=1}^n (x_i-\bar x)^2
+\end{displaymath}
+is a measure of spread of data. For technical reasons we divide by
+$n-1$ rather than $n$ and obtain the sample variance
+\begin{displaymath}
+  s^2_x = \frac{1}{n-1} \sum_{i=1}^n (x_i-\bar x)^2
+\end{displaymath}
+
+If the units of the $x_i$s are ``whatever'', then so is the unit of
+$\bar x$ but the units of $s²_x$ is
+``whatever squared''. This leads to the sample standard deviation
+which also has unit ``whatever":
+\begin{displaymath}
+  s_x = \sqrt{s²_x}  
+\end{displaymath}
+
+@ 
+<<>>=
+var( x )
+sd( x )
+@ %def 
+
+\newslide %% =================================================
+
+\subsection{An empirical rule}
+\label{sec:empirical-rule}
+
+A practical interpretation of $\bar x$ and $s_x$ is that for nearly
+symmetrical mound shaped datasets, about $68\%$ of data is within one
+standard deviation of the mean and $95\%$ is within two standard
+deviations of the mean. 
+
+Often we can get reasonable estimates of the sample mean and standard deviation
+by simply looking at data:
+
+If data is not highly skewed then the mean and median are roughly the
+same. An estimate of the median is obtained by looking at the center
+of the (sorted) data vector:
+@ 
+<<>>=
+x
+@ %def 
+Hence, the median is somewhere between $10$ and $11$: 
+@ 
+<<>>=
+median( x )
+mean( x )
+@ %def 
+
+\newslide %% =================================================
+
+About $95\%$
+of the observations will fall in the interval $\bar x \pm 2 s_x$.
+
+If we say that $95\%$ of the observations are ``practically all
+observation'' then practically all observations fall in this interval
+
+Hence the largest minus the smallest value is
+about 4 standard deviations and hence that a crude estimate of the
+standard deviation is 
+@ 
+<<>>=
+(max( x ) - min( x )) / 4
+sd( x )
+@ %def 
+
+\newslide %% =================================================
+\subsection{Covariance and correlation}
+\label{sec:covariance-correlation}
+
+In the åshoeså data there are two vectors
+@ 
+<<>>=
+shoes
+x <- shoes$x
+y <- shoes$y
+@ %def 
+
+Cleary these measurements ``co--vary''
+@ 
+<<fig=T>>=
+ggplot2::qplot(x,y)
+@ %def 
+
+A measure of how they co--vary is the (sample) covariance between $x$
+and $y$
+\begin{displaymath}
+s_{xy} = \frac{1}{n}\sum_{i=1}^n (x_i- \bar x)(y_i-\bar y)  
+\end{displaymath}
+
+Notice: If we replace $y_i$ by $x_i$ and $\bar y$ by $\bar x$ above
+then we get the sample covariance between $x$ and $x$ which is the
+(sample) variance of $x$. 
+
+Closely related to the covariance is the correlation coefficient:
+\begin{displaymath}
+  \rho_{xy}=\frac{s_{xy}}{s_x s_y}
+\end{displaymath}
+
+The correlation is always in the interval $\pm 1$. If the correlation
+is $1$ or $-1$ there is a perfect linear association between $x$ and
+$y$. If the correlation is $0$ there is no linear association at all. 
+
+@ 
+<<>>=
+cov( x, y )
+cor( x, y )
+@ %def 
+
+\newslide %% =================================================
+
+\subsection{Further properties}
+\label{sec:further-properties}
+
+Take four numbers, $a$, $b$, $c$ and $d$ and create new variables
+$u_i$ and $v_i$ as
+\begin{displaymath}
+  u_i = a + b x_i, \quad v_i = c + d y_i
+\end{displaymath}
+This corresponds to changing the scale and location of the data.
+
+Then for the new variables we have
+\begin{displaymath}
+  \bar u = a + b\bar x, \quad s^2_u = b² s^2_x, \quad s_u = b s_x,
+  \quad   s_{uv} = b d s_{xy}
+\end{displaymath}
+But 
+\begin{displaymath}
+  \rho_{uv}=\rho_{xy}
+\end{displaymath}
+
+Hence: mean, variance, standard deviation and covariance depends on
+the scale on which the variables are measured but correlation does
+not. 
+
+\newslide %% =================================================
+
+\subsection{Computations}
+\label{sec:computations}
+
+@ 
+<<>>=
+str(shoes)
+shoes <- as.data.frame( shoes )
+head(shoes, 4)
+cov(shoes)
+cor(shoes)
+@ %def 
+
+\newslide %% =================================================
+@ 
+<<>>=
+cov.wt(shoes)
+@ %def 
+
+
+
+
+
+
+
+
+
+
+
+
+\newslide
+\section{Random variables and observed data}
+
+\newslide %% =================================================
+\subsection{Random phenomena}
+
+  
+\begin{itemize}
+\item 
+  Some phenomena have the property that their repeated observation
+  under identical conditions lead to the same outcome. 
+  
+  For example,
+  take a ball initially at rest $d$ meters and drop it. If the room is
+  vacuumed  (such that friction can be ignored) the ball it will
+  land on the floor in 
+  \begin{displaymath}
+    t=\sqrt{2d/g} \mbox{ seconds }
+  \end{displaymath}
+  where $g=9.82 m/sec^2$. 
+
+
+\item Other phenomena do not have this property. 
+  
+  A familiar example is tossing a coin. If the coin is tossed 10 times
+  the occurences of heads and tails alternate in an unpredictable
+  way. We call this a \comi{random process} and for studying such a process
+  we need probability theory and statistics.
+\end{itemize}
+
+
+\subsection{Data generating mechanism}
+
+
+Consider the following experiment:
+
+\begin{enumerate}
+\item Toss as coin $N=5$ times and
+\item Count how often the coin lands head up. Denote this number by $x$.
+\end{enumerate}
+
+Imagine that the experiment is repeated $M=8$ times and we observe the
+following values of $x$
+\begin{displaymath}
+  2,5,1,4,0,0,1,3,3
+\end{displaymath}
+
+Think of each experiment as a \comi{random data generating
+  device}. The device is indeed random: There is an inherent
+indeterminacy in the outcome from the device.
+
+A \comi{random variable} is a variable whose value result from a
+random data generating device.
+
+When we apply the device we get \comi{realizations} or
+\comi{outcomens} of the random
+variable (or simply \comi{observed data}).
+
+It is conventional to use uppercase letters for random variables and
+lowercase for realizations. So we write $X$ for the random variable
+and $x$ for the observed value. 
+
+So for the example above we had $8$ random variables $X_1, \dots, X_8$
+and the outcomes were $x_1=2, x_2=5, \dots, x_8=3$. 
+
+\newslide
+
+\subsection{The binomial distribution}
+\label{sec:probabilistic-model}
+
+If we were to repeat the experiment again we can not predict the
+outcome with certainty. However we can make statements about how
+likely each outcome is. 
+
+To do so we need a \comi{probabilistic model}.
+
+Suppose the probability of head (H) is $\theta$. Then the probability
+of tail (T) is $1-\theta$. 
+
+We assume the the $N=5$ tosses are \comi{independent}. 
+
+Suppose that in a single experiment the tosses came out as
+\begin{displaymath}
+  HTHTT
+\end{displaymath}
+such that $x=2$.
+
+The probability of observing these tosses is
+\begin{eqnarray}
+\lefteqn{P(z_1=1, z_2=0, z_3=1, z_4=0, z_5=0)} \\
+&=& \theta \cdot (1-\theta) \cdot \theta \cdot (1-\theta) \cdot (1-\theta)\\
+&=& \theta^2 (1-\theta)^3.
+\end{eqnarray}
+
+However, the probability of observing $HHTTT$ and $HTTTH$ is also
+$\theta^2 (1-\theta)^3$.
+
+Hence if all we are interested is the probability of observing $2$
+heads in $5$ tosses we must count the number of ways in which we can
+obtain $2$ heads.
+
+The answer is $10$ as the table shows:
+\begin{table}
+\centering
+\caption{Possible ways in which we can obtain $2$ heads in $5$ tosses
+  of a coin.}
+\begin{tabular}{c c|c|c|c|c|c|c|c|c|c}
+ & 1 &  1 & 1 & 1 & 0 &  0 & 0 & 0 & 0 & 0\\
+ & 1 &  0 & 0 & 0&  1 &  1 & 1 & 0 & 0 & 0\\
+ & 0 &  1 & 0 & 0 & 1 &  0 & 0 & 1 & 1 & 0\\
+ & 0 &  0 & 1 & 0 & 0 &  1 & 0 & 1 & 0 & 1\\
+ & 0 &  0 & 0 & 1 & 0 &  0 & 1 & 0 & 1 & 1
+\end{tabular}
+\end{table}
+
+\newslide
+This number of 10 possibilities can be computed via
+\[
+\binom{n}{y}=\frac{n!}{y! (n-y)!}=\binom{5}{2}= \frac{5\cdot 4}{2\cdot 1} = 10.
+\]
+where e.g.\ $5!= 5\cdot 4\cdot 3\cdot 2 \cdot 1$.
+
+Note we say "5 factorial" for $5!$ and "n choose y" for
+$\binom{n}{y}$. By definition $0!=1$. 
+
+Hence the probability of $2$ heads is:
+\begin{eqnarray} \nonumber
+P(X=2) &=& \binom{5}{2} \theta^2 (1-\theta)^3.
+\end{eqnarray}
+
+More generally, the probability of observing $x$ heads in $N$ trials
+is given by the \comi{probability mass function} (or \comi{pmf} in
+short):
+\begin{equation}
+  \label{eq:basic1}
+  Pr(X=x)=    \binom{N}{x}   \theta^x (1-\theta)^{N-x}  
+\end{equation}
+where $x=0,1,\dots, N$. 
+
+\newslide
+A random variable $X$ has a \comi{binomial distribution} 
+\begin{displaymath}
+  X \sim Bin(N,\theta)
+\end{displaymath}
+if the pmf for $X$ has the form  (\ref{eq:basic1}).
+
+Notice that we are unable to calculate e.g.\ the probability of
+observing $2$ heads in a future experiment (i.e.\ $P(X=2)$) because $\theta$
+is unknown. 
+
+However we may be prepared to make the \comi{assumption} that the coin is
+\comi{fair} such that $\theta=1-\theta=1/2$. 
+
+Under this assumption we then find
+\begin{displaymath}
+  Pr(X=2) = 10 (1/2)^2 (1/2)^3 = 0.3125
+\end{displaymath}
+
+\newslide
+We may calculate $Pr(X=x)$ for $x=0,1,\dots,5$ as
+<<>>=
+pmf<-round(dbinom(0:5, size=5, prob=0.5), 4); pmf
+@ 
+Notice the symmetry in the probabilities. 
+
+The \comi{cumulative distribution function} (or \comi{cdf} in short)
+of $X$ is 
+\begin{displaymath}
+  F_X(x) = Pr(X\le x) = \sum_{x'=0}^x Pr(X=x') = \sum_{x'=0}^x p(x')
+\end{displaymath}
+
+So e.g.\ $F(3)$ is the probability of observing $\le 3$ heads in an
+experiment. 
+
+@ 
+<<>>=
+cdf <- pbinom(0:5, size=5, prob=.5); cdf
+@ %def 
+
+
+
+\newslide
+
+@ 
+<<fig=T>>=
+par(mfrow=c(1,2))
+barplot(pmf, names.arg=0:5); title("pmf")
+barplot(cdf, names.arg=0:5); title("cdf")
+@ 
+\newslide
+
+It is illustrative to make simulation studies: 
+
+We apply the data generating mechanism (toss a coin $5$
+times and count the number of heads) many times to generate data
+$x^1,\dots, x^M$ and then count the relative frequency of $2$'s
+
+@ 
+<<>>=
+set.seed(12345)
+M <- 10000
+x.sim <- rbinom(M, size=5, prob=0.5)
+head( x.sim )
+pmf.sim <- table(x.sim)/M 
+round( pmf.sim , 3 )
+cdf.sim <- cumsum( pmf.sim )
+round( cdf.sim, 3 )
+@ %def 
+
+So $Pr(X=2)=0.311$ and $F(3) = Pr(X\le 3) = 0.813 $
+
+\newslide %% =================================================
+@ 
+<<fig=T>>=
+par(mfrow=c(1,2))
+barplot(pmf.sim, names.arg=0:5); title("pmf")
+barplot(cdf.sim, names.arg=0:5); title("cdf")
+@ 
+
+\newslide
+\subsection{Mean and variance}
+\label{sec:mean-variance}
+
+The \comi{mean} or \comi{expectation} of $X$ is 
+\begin{eqnarray*}
+  \EE(X) &=& 0 P(X=0) + 1 P(X=1) + \dots + 5 P(X=5)\\
+  &=& \sum_{x=0}^5 xP(X=x)  
+\end{eqnarray*}
+which can be interpreted as the average value of $x$ if the
+experiment was repeated infinitely many times. 
+
+For the binomial distribution it can be shown that
+\begin{displaymath}
+  \EE(X) = N \theta
+\end{displaymath}
+
+The \comi{variance} of $X$ is defined as follows. Let $\mu=\EE(X)$
+\begin{eqnarray*}
+  \var(X)&=&(0-\mu)^2 P(X=0) +  \dots + (5-\mu)^2P(X=5)\\
+  &=& \sum_{x=0}^5 (x-\mu)^2 P(X=x)   
+\end{eqnarray*}
+
+
+\newslide 
+
+Notice that the variance is really also an expectation
+\begin{displaymath}
+  \var(X)=\EE([X-\mu]^2)
+\end{displaymath}
+which can be interpreted as the average value of $[x-\mu]^2$ if the
+experiment was repeated infinitely many times.
+
+For the binomial distribution it can be shown that
+\begin{displaymath}
+  \var(X) = N \theta (1-\theta)
+\end{displaymath}
+
+
+We have for the coin example (if $\theta=1/2$)
+@ 
+<<>>=
+N <- 5
+theta <- .5
+E <- N * theta; E                # Mean
+V <- N * theta * (1 - theta); V  # Variance
+@ %def 
+
+
+
+
+
+\newslide %% =================================================
+
+\subsection{Sample mean and sample variance}
+
+
+
+The empirical counter part of the mathematical expectation and
+variance is the \comi{sample mean} and \comi{sample variance}.
+
+We have repeated the experiment $M$
+times and obtained data $x^1,\dots, x^M$.
+
+The \comi{sample mean} is
+\begin{displaymath}
+  \bar x = \frac 1 M \sum_i x_i
+\end{displaymath}
+and the \comi{sample variance} is
+\begin{displaymath}
+  s^2_x = \frac 1 {M-1} \sum_i (x_i-\bar x)^2
+\end{displaymath}
+
+\newslide %% =================================================
+
+@ 
+<<>>=
+head( x.sim )
+mean( x.sim )
+var( x.sim )
+@ %def 
+
+Compare with
+@ 
+<<>>=
+E 
+V
+@ %def 
+
+
+
+
+\newslide
+
+\subsection{Mean and variance of linear transformations}
+\label{sec:mean-vari-transf}
+
+The following results can be found in any elementary text book in
+statistics but we repeat them here.
+
+Let $X_1$ and $X_2$ be random variables with expectation
+  $\EE(X_1)=\mu_1$ and $\EE(X_2)=\mu_2$. Let $a$, $b$, $c$ and $d$ be
+  numbers. 
+  
+\begin{itemize}
+
+\item Then
+  \begin{displaymath}
+    \EE(a+bX_1+c+dX_2)=a+b\EE(X_1)+ c + d\EE(X_2)    
+  \end{displaymath}
+  and in particular
+\begin{displaymath}
+  \EE(a+bX) = a + b \EE(X)
+\end{displaymath}
+
+
+\newslide %% =================================================
+\item Notice that $[X_1-\mu_1]^2= X_1^2+\mu_1^2-2\mu_1 X_1$. Hence (why?)
+\begin{displaymath}
+  \var(X_1) = \EE(X_1^2) - \mu_1^2
+\end{displaymath}
+\item   If $X$ is equal to some constant $c$ with probability $1$ (that is,
+  there is no uncertainty about the outcome of the experiment) then
+  \begin{displaymath}
+    \var(X)=0
+  \end{displaymath}
+
+\item   If $a,b$ are constants then
+  \begin{displaymath}
+    \var(a+bX) =  b^2 \var(X)
+  \end{displaymath}
+
+\item If $X_1$ and $X_2$ are random variables then
+  \begin{displaymath}
+    \var(X_1+X_2)=\var(X_1)+\var(X_2)+2\cov(X_1,X_2)
+  \end{displaymath}
+\end{itemize}
+
+
+\newslide
+\subsection{Properties of the average}
+\label{sec:properties-average}
+
+Let $X_1, \dots X_M$ be independent random variables with
+$\EE(X_i)=\mu$ and $\var(X_i)=\sigma^2$. 
+
+Suppose that we have realizations (observed data) $x_1, \dots x_M$
+from  $X_1, \dots X_M$. Then a very ``natural'' \comi{estimate} of the
+expectation $\mu$ is the \comi{sample mean}:
+\begin{displaymath}
+  \bar x = \frac{1}{M} \sum_i x_i
+\end{displaymath}
+
+To investigate whether $\bar x$ is a good estimate of $\mu$ we
+consider the following \comi{transformation} of $X_1, \dots X_M$:
+\begin{displaymath}
+  \bar X= \frac{1}{M} \sum_i X_i
+\end{displaymath}
+
+If $x_1, \dots x_M$ are realizations from  $X_1, \dots X_M$ then $\bar
+x$ is the corresponding realization from $\bar X$. 
+
+\newslide
+
+The expectation and variance of $\bar X$ becomes
+\begin{displaymath}
+  \EE(\bar X) = \frac{1}{M}\sum_i \EE(X_i) = \frac{1}{M} M \mu = \mu
+\end{displaymath}
+and
+\begin{displaymath}
+  \var(\bar X)= \frac{1}{M^2}\sum_i \var(X_i) = \sigma^2/M
+\end{displaymath}
+
+That $\EE(\bar X)=\mu$ means in practical terms that $\bar x$ on
+average will equal $\mu$. 
+
+That $\var(\bar X)=\sigma^2/M$ means that if we let $M$ become large
+(repeat the experiment many many times) then the variance goes to
+zero. 
+
+But if the variance goes to zero then $\bar X$ will be
+indistinguisable from $\mu$. And in that sense the sample mean $\bar
+x$ is a good estimate for the expectation $\mu$. 
+
+
+
+
+\newslide %% =================================================
+\section{Transformations}
+\label{sec:transformations}
+
+If $X$ is a random variable then any function of $X$ is also a random
+variable. 
+
+Let us think in terms of data generating mechanisms (i.e.\ random
+variables): 
+\begin{enumerate}
+\item Toss a fair coin $N=10$ times,
+\item record the number $x$ of heads and
+\item calculate $t=x^2$. 
+\end{enumerate}
+
+This data generating mechanism
+will be denoted by the random variable $T$. 
+
+Notice: Steps 1) and 2) above were the steps which defined the random
+variable $X$. So the random variable $T$ is obtained by applying the
+function $t(x)=x^2$ to the random variable $X$, that is
+\begin{displaymath}
+  T =t(X)
+\end{displaymath}
+
+It is relatively easy to calculate the probability mass function for
+$T$ i.e.\ $Pr(T=t')$, but for now we shall determine the function by simulation.
+
+
+<<ccc,fig=T,include=F>>=
+tt <- function(x){x^2}
+## We reuse the simulations x.sim
+t.sim <- tt(x.sim)
+table(t.sim)/M
+barplot(table(t.sim))
+@ %def 
+    
+So $Pr(T=0.01)=0.4110.$ 
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{fig/sample-ccc}
+\end{figure}
+
+
+\newslide
+\subsection{Coin tossing reviewed - A statistical model}
+\label{sec:statistical-model}
+
+The starting point data from one experiment: A coin has been tossed
+$N=5$ times and we have observed heads $x=2$ times.
+
+This experiment was carried out to shed some light on a specific
+question; for example: is it reasonable to assume that the coin is fair
+(i.e. that $\theta=1/2$).
+
+\newslide %% =================================================
+
+\subsection{Assuming a statistical distribution}
+\label{sec:assum-stat-distr}
+
+
+If we are prepared to make the
+\comi{assumption} that 1) the individual tosses are independent and 2)
+the probability of a head in each toss is $\theta$ then we end up with
+the model that $x$ is the outcome of a random variable $X$ which is
+binomially distributed
+\begin{displaymath}
+  X \sim Bin(N,\theta) \mbox{ where } 0 \le \theta\le 1
+\end{displaymath}
+
+If $\theta$ was known then we knew the data generating mechanism. 
+The problem is that we do not know $\theta$. 
+
+\newslide
+
+\subsection{Estimation of $\theta$}
+\label{sec:estimation-theta}
+
+As $\theta$ is unknown we must \comi{estimate} its value from data. 
+
+A natural estimate for $\theta$ is 
+\begin{displaymath}
+  \hat \theta = x/N = 2/5 = 0.4
+\end{displaymath}
+
+Notice that $\hat \theta$ is a function of $x$ so it would be more
+clear if we write $\hat\theta(x)=x/N$.
+
+In a similar way we can think of $\hat\theta(X)=X/N$ as a function of
+a random variable.
+
+We say that $\hat\theta(x)$ is an \comi{estimate} and that
+$\hat\theta(X)$ is an \comi{estimator}.
+
+The expectation of $\hat\theta(X)$ is
+\begin{displaymath}
+  \EE(\hat\theta(X)) = \frac 1 N N\theta =\theta
+\end{displaymath}
+
+The variance of  $\hat\theta(X)$ is
+\begin{displaymath}
+  \var(\hat\theta(X)) = \frac{1}{N^2} N \theta (1-\theta) = \frac{1}{N} \theta (1-\theta) 
+\end{displaymath}
+
+
+
+\newslide
+\section{Hypothesis test}
+
+
+
+The fundamental idea in testing a hypothesis can be summarized as follows
+\begin{itemize}
+\item Unlikely events do not occur.
+  
+  Whether an event is unlikely or not depends on the model.
+  
+\item If an unlikely event has occured then this is evidence against
+  the model.
+  
+  The model might well be wrong.
+\end{itemize}
+
+\newslide
+\subsection{Example: The boy/girl ratio}
+
+
+  In a study it was found that the number of boys and girls born is a
+  specific population was:
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{ll|l}
+      Boys & Girls & Total \\
+      \hline
+      6389 & 6135  & 12524 \\
+      0.51 & 0.49  &
+    \end{tabular}
+  \end{table}
+
+  Is there a 50--50 chance for a boy and a girl?
+
+  Let $x$ denote the number of boys. 
+  
+  We shall assume that $x$ is an outcome of a random variable $X$
+  where $X\sim bin(N,\theta)$ with $N=12524$.
+
+  Our hypothesis is that $\theta=\frac{1}{2}$. 
+
+\newslide %% =================================================
+  To test the hypothesis $\theta=\frac{1}{2}$ we define a \comi{test
+  statistic} which is a function of data.
+  
+  We choose the test statistic 
+  \begin{displaymath}
+   t(x)=(\frac{x}{N} - \frac{1}{2})^2 
+  \end{displaymath}
+  where $\frac 1 2$ appears because this is the hypothesized value of
+  $\theta$. 
+
+  Notice: 
+  
+  \begin{itemize}
+  \item   If $x$ is close to $N/2$ then $t(x)$ is small (in particular
+  $t(N/2)=0$). 
+  
+
+\item If $x$ is very large or very small then $t(x)$ is
+  large. (In particular, $t(0)=t(N)=0.25$ which is the largest
+  possible value).
+
+  \end{itemize}
+
+\newslide
+  Two things makes $t(x)$ a sensible test statistic:
+  \begin{itemize}
+  \item Values of $t(x)$ close to $0$ is evidence for the null
+    hypothesis and values of $t(x)$ far from $0$ is evidence against
+    the null hypothesis.
+  \item Under the hypothesis we can calculate the 
+    distribution of $t(X)$. 
+  \end{itemize}  
+
+  With $x=6389$ boys and $N=12524$ we get 
+  
+  \begin{displaymath}
+  t(x)=(0.51-0.5)^2=0.0001    
+  \end{displaymath}
+  
+  The question is then: Is $0.0001$ small or large?
+
+
+\newslide
+\subsection{Evidence against the hypothesis}
+
+
+
+  An answer to this question is provided by the following
+  argument. 
+  
+  Let us assume that the hypothesis is true, i.e.\ that
+  $\theta=1/2$. 
+  
+  We then ask the question: Suppose we redo the study
+  say $5000$ times. How often would we
+  observe a value of $t(x)$ which is larger or equal to $0.0001$?
+
+  \begin{itemize}
+  \item   If we often observe values of $t(x)$ which are larger or equal to
+  $0.0001$ then this suggests that $0.0001$ is not an extreme value. 
+  This is evidence for the hypothesis.
+  
+\item If values of $t(x)$ larger or equal to $0.0001$
+  are rare then this suggests that $0.0001$ is an extreme value. This
+  is evidence against the hypothesis. 
+  \end{itemize}
+
+  This suggests that we should calculate the value
+  \begin{displaymath}
+    p = Pr(T \ge t(x))
+  \end{displaymath}
+
+  \newslide  
+
+We do not have to redo the study many times. Under the hypothesis
+$\theta =1/2$ we know the data generating mechanism so we   
+can redo the study using computer simulations.
+
+
+<<aaa,fig=T,include=F>>=
+set.seed(12345)
+M <- 5000
+n.boys  <- 6389
+n.total <- 12524
+p.hat   <- n.boys/n.total
+t.obs   <- (p.hat-0.5)^2; t.obs
+x.sim   <- rbinom(n=M, size=n.total, prob=0.5)
+head(x.sim)
+t.sim  <- (x.sim/n.total - 0.5)^2
+p.value <- sum(t.sim>=t.obs) / M; p.value
+@ %def 
+  
+\newslide %% =================================================
+@ 
+<<fig=T>>=
+hist(t.sim, nclass=50)
+abline(v=t.obs, col='red')
+@ %def 
+
+
+\newslide
+\subsection{$p$--value}
+
+
+What we have calculated above (using simulations) is the probability
+\begin{displaymath}
+  p = Pr(T>t(x))=0.0214
+\end{displaymath}
+
+This value is called a \comi{$p$--value} and we have found this values using
+\comi{Monte Carlo simulation}. 
+
+Hence $p=0.0214$ is the probability of observing a value of $t(X)$
+which is at least as extreme as $t(x)$. 
+
+
+\newslide
+\subsection{Interpretation of $p$--value}
+
+
+  Let us return to the original question: Is the proportion of boys
+  and girls the same? 
+
+  A $p$--value can be regarded as a measure of evidence against the
+  hypothesis. Here the $p$--value is small and there is evidence
+  against our hypothesis. 
+  
+  But can we conclude from this that our hypothesis is false? 
+  That is, have we proven that $\theta \not = 1/2$?
+  
+  The short answer is NO: 
+  
+  If the hypothesis is true, then the probability of
+  observing $6389$ boys in $12524$ trials is $0.00054$. This is a
+  small probability, sure, but $6389$ boys is a possible outcome under
+  the hypothesis.  
+  
+  However, many studies confirm that more boys than girls are born!
+  
+\newslide
+
+
+
+  Notice: Sometimes a $p$--value is erroneously interpreted as something like
+  \begin{quote}
+  ``the $p$--value the probability that the hypothesis is true.''  
+  \end{quote}
+  
+  This is a wrong interpretation. The hypothesis is either true or
+  false (and we do not know which is the case because we do not have
+  divine insight).  
+  
+  Hence there is no
+  randomness involved and hence it does not make sense to talk about
+  such a probability.
+
+
+\newslide
+\subsection{The effect of sample size}
+
+
+  Suppose the result of study was:
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{ll|l}
+      Boys & Girls & Total \\
+      \hline
+      639 & 614  & 1253
+    \end{tabular}
+  \end{table}
+
+  (i.e.\ we have only 10\% of the data). 
+  
+  Then the fraction of boys is still $0.51$. 
+  
+  Then we can redo the calculation of the $p$--value using computer simulations.
+
+\newslide
+\begin{howR} 
+<<ddd,fig=T,include=F>>=
+set.seed(12345)
+par(mfrow=c(1,1))
+n.boys <- 639
+n.total <- 1253
+p.hat <- n.boys/n.total
+t.obs <- (p.hat-0.5)^2
+x<-rbinom(n=5000, size=n.total, prob=0.5)
+t.sim <- (x/n.total - 0.5)^2
+hist(t.sim, nclass=50)
+abline(v=t.obs, col='red')
+sum(t.sim>=t.obs)/5000
+@ %def 
+\end{howR}
+
+The $p$--value is $0.49$ and there is no evidence against the
+hypothesis $\theta=\frac 1 2$. 
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{fig/sample-ddd}
+\end{figure}
+
+
+\newslide
+\subsection{What to make of this}
+
+
+With $12524$ children there is strong evidence against the hypothesis
+$\theta=\frac 1 2$.
+
+With $1253$ children there is no evidence against the hypothesis.
+
+In both cases the fraction of boys is $0.51$ in both cases.
+
+What to make of this?
+
+We we do in significance testing is that we make a hypothesis about
+``the true state of the world'' and then we ask data to tell us if
+there is evidence against the hypothesis.
+
+\begin{itemize}
+\item If there is no evidence against the hypothesis then this might be
+because the hypothesis is true, or 
+
+\item because the hypothesis is false but
+that there is not enough data
+(information) to
+provide the evidence. 
+\end{itemize}
+
+Put more elegantly:
+\begin{quote}
+  Absence of evidence (of an effect) is NOT the same as evidence of
+  absence (of an effect).   
+\end{quote}
+
+
+
+
+\newslide %% =================================================
+
+\subsection{The shoes revisited}
+\label{sec:shoes-revisited}
+
+@ 
+<<>>=
+shoes
+x <- shoes$x
+@ %def 
+
+Suppose we want to test the hypothesis that shoes of type $x$ have
+mean $\mu_x=9$. 
+
+If $\EE(X_i)=\mu_x$ then $\EE(\bar X)=\mu_x$. This suggests to look at
+the difference between $\bar x$ and $\mu_x$; if this difference is
+numerically large we doubt the hypothesis.
+
+We have $\EE(\bar X - \mu_x)=0$ if the hypothesis is true.
+@ 
+<<>>=
+mu.x <- 9
+mean( x ) - mu.x
+@ %def 
+
+Is this a large or small difference?
+
+The units of this difference is whatever the units of the measurements
+are made in. We can make the difference as large or as small as we
+want it by changing the units (changing from minutes to nano seconds
+or to centuries). 
+
+We must somehow make the difference independent of the units.
+
+If the variance of $X_i$
+is $\sigma^2$ then the variance of $\bar X$ is $\var(\bar
+X)=\sigma^2/n$. 
+
+We must have:
+\begin{displaymath}
+  \var(\bar X - \mu_x) = \var(\bar X) = \sigma²/n
+\end{displaymath}
+
+But this also means that 
+\begin{displaymath}
+    \var(\frac{\bar X - \mu_x}{\sqrt{\sigma²/n}}) = 1
+\end{displaymath}
+
+If we estimate the variance $\sigma^2$ as $s²_x$ then $s^2_x/n$ must
+be a good estimate for $\sigma²/N$. The units of $s^2_x$ are
+``whatever squared'' if the units of $x_i$ are ``whatever''. So to get
+to the same units we take the square root: $\sqrt{s^2/n}$ has the same units as $x_i$. Hence 
+\begin{displaymath}
+\frac{\bar x - \mu_x}{\sqrt{s^2/n}}
+\end{displaymath}
+has no units; it is independent of the scale on which the measurements
+are made.
+
+@ 
+<<>>=
+z <- ( mean(x) - mu.x ) / sqrt( var(x) / length( x ) ); z
+@ %def 
+
+Numerically large values of $z$ are critical to the hypothesis; i.e.\
+makes us doubt in the hypothesis. 
+
+Under the hypothesis,
+\begin{displaymath}
+  z=\frac{\bar x - \mu_x}{\sqrt{s^2/n}}
+\end{displaymath}
+should be evaluated in a $t_{n-1}$--distribution. Numerically large
+values of $z$ causes us to doubt the hypothesis. 
+
+
+\newslide %% =================================================
+
+In practice, do a $t$-test:
+@ 
+<<>>=
+p.value <- 2*(1-pt(abs(z), df=length(x)-1)); p.value
+@ %def 
+
+Of course, there is a built in function that will do this:
+@ 
+<<>>=
+t.test(x, mu=mu.x)
+@ %def 
+
+If $n$ is not too small then $z$ can also be evaluated in a standard
+normal distribution: 
+In practice, if $|z|>2$ we doubt the
+hypothesis. 
+
+\newslide %% =================================================
+
+%% @ 
+%% <<>>=
+%% sort( x )
+%% @ %def 
+
+%% Recall that we could get a rough estimate of the mean and standard
+%% deviation as
+%% @ 
+%% <<>>=
+%% mu.approx <- (10.7 + 10.8) / 2; mu.approx
+%% sd.approx <- (max( x ) - min( x )) / 4; sd.approx
+%% z.approx <- (mu.approx - mu.x)/(sd.approx/sqrt(length(x))); z.approx
+%% @ %def 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+% \subsection{What to make of this}
+% \label{sec:xxx}
+
+
+% $\hat\theta=x/N$
+  
+
+
+
+% \section{Binomial likelihood}
+% \label{sec:xxx}
+
+
+%   Consider a binomial experiment: Toss a coin $N=10$ times. Suppose we
+%   observed $x=4$ heads.
+  
+%   The pmf for the binomial distribution is
+%   \begin{displaymath}
+%     Pr(X=x)=    \binom{N}{x}   \theta^x (1-\theta)^{N-x}
+%   \end{displaymath}
+  
+%   If $\theta$ (which is the probability of a head) is known then we
+%   can calculate things like $Pr(X=4)$.
+  
+%   But in statistics it is the other way around: We have some data and
+%   now we want say something about how data was generated. 
+  
+%   The only unknown quantity in the binomial distribution is $\theta$.
+  
+%   It turns out that a very good estimate of $\theta$ is
+%   $\hat\theta= x/N$ but we need a methodology 1) for justifying this
+%   and 2) which works in more general type of problems.
+  
+
+
+% \section{Likelihood function}
+
+% \subsection{Likelihood function}
+% \label{sec:xxx}
+
+% \label{sec:xxx}
+
+%   When $x$ and $N$ are known the pmf can be regarded as a function of
+%   $\theta$. This function is called the \tre{likelihood function}:
+%   \begin{displaymath}
+%     L(\theta)=\binom{N}{x}   \theta^x (1-\theta)^{N-x} 
+%   \end{displaymath}
+  
+%   Hence $L(\theta)$ gives the probability of observing $x=4$ for a
+%   given value of theta. So we can calulate $L(\theta)$ for a wide
+%   range of $\theta$ values.
+  
+
+% <<>>=
+% theta.vals <- seq(0,1,by=0.01)
+% L <- dbinom(x=4, size=10, prob=theta.vals)
+% @ %def 
+
+
+
+
+
+% <<fig=T>>=
+% plot(L~theta.vals, type='l')
+% @ %def     
+
+
+
+
+% \subsection{Maximizing the likelihood}
+% \label{sec:xxx}
+
+
+
+%   It is easy to spot that the value of $\theta$ which maximizes
+%   the likelihood function $L(\theta)$ is $0.4$.
+  
+%   The value of $\theta$ which maximizes the likelihood function is
+%   called the \tre{maximum likelihood estimate} or \tre{MLE} in short
+%   and is denoted by $\hat \theta$. So here $\hat\theta=0.4$.  The hat
+%   (``$\hat { }$'') symbolises that we are talking about an estimate of
+%   an unknown parameter.
+
+%   The probability of observing the data we have is larger if $\theta$
+%   is $\hat\theta$ than for any other $\theta$. 
+    
+
+
+
+%   Another way of obtaining the MLE is by mathematical maximization of
+%   $L(\theta)$. It is almost always easier to maximize the
+%   log--likelihood function $l(\theta)=\log L(\theta)$ (the $\theta$
+%   that maximizes $l(\theta)$ will also maximize $L(\theta)$). 
+  
+%   We get
+%   \begin{displaymath}
+%     l(\theta) = x\log \theta +(N-x)\log(1-\theta)
+%   \end{displaymath}
+%   where we have thrown away $\log \binom{N}{x}$ because this term does
+%   not depend on $\theta$. 
+  
+%   To maximize $l(\theta)$ we first find the derivative
+%   \begin{displaymath}
+%     l'(\theta)=\frac x \theta - \frac{N-x}{1-\theta}
+%   \end{displaymath}
+  
+%   Next we solve $l'(\theta)=0$:
+%   \begin{displaymath}
+%     0 = \frac x \theta - \frac{N-x}{1-\theta}
+%     = \frac{(1-\theta)x - \theta (N-x)}{\theta(1-\theta)}
+%     = \frac{x-N\theta}{\theta(1-\theta)}
+%   \end{displaymath}
+
+
+
+%   so $x-N\theta=0$ and hence
+%   \begin{displaymath}
+%     \hat \theta = \frac x N
+%   \end{displaymath}  
+
+
+
+
+
+
+
+
+
+% \newslide
+% \subsection{Transformations of random variables}
+% \label{sec:transformationRV}
+
+
+% We are often interested in transformations of random variables. 
+
+% Consider the following function (which we shall use later in another context)
+% \begin{displaymath}
+%   t(x)=(x/N-1/2)^2
+% \end{displaymath}
+
+% With observed data $x=4$ (in $N=10$ tosses) we get $t(x)=0.01$. 
+
+% Now let us think in terms of data generating mechanisms (i.e.\ random
+% variables): 1) Toss a fair coin $n=10$ times, 2) record the number $x$ of
+% heads and 3) calculate $t=(x/n-1/2)^2$. This data generating mechanism
+% will be denoted by the random variable $T$. 
+
+% But steps 1) and 2) above were the steps which defined the random
+% variable $X$. So the random variable $T$ is obtained by applying the
+% function $t(x)$ to the random variable $X$, that is
+% \begin{displaymath}
+%   T =t(X)
+% \end{displaymath}
+
+%   So now $t(x)=0.01$ is the realised value of $T$ that corresponds to $x=4$
+%   being the realized value of $X$. 
+
+%   It is relatively easy to calculate the probability mass function for
+%   $T$ i.e.\ $Pr(T=t)$, but for now we shall determine the function by simulation.
+  
+% \begin{sblock}
+% <<ccc,fig=T,include=F>>=
+% tt <- function(x){(x/10-0.5)^2}
+% t.obs <- tt(4)
+% ## We reuse the simulations x.sim
+% t.sim <- tt(x.sim)
+% table(t.sim)/M
+% barplot(table(t.sim))
+% @ %def 
+% \end{sblock}
+    
+% So $Pr(T=0.01)=0.4110.$ 
+
+
+
+
+
+
+
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics{fig/sample-ccc}
+% \end{figure}
+
+
+%% \newslide %% =================================================
+%% \section{Populations and sample}
+%% \label{sec:population-sample}
+
+%% The manufacturer of shoe types åXå and åYå is not particulary
+%% interested in the wear of these shoe types on these 8 particular boys.
+
+%% The manufacturer is interested in how the shoes will wear in a
+%% population of boys. But since the entire population can not be
+%% investigated a sample of boys from the poplation is taken and the
+%% shoes are tested by these boys.
+
+%% The aim is to carry the conclusion from investigating the sample over
+%% to the population.
+
+%% For the population we think there is a mean wear of shoe type åAå, and
+%% we denote this by $\mu_X$. We do not know the value of $\mu_X$ (since
+%% we can not investigate the entire population) but we have a sample
+%% mean $\bar x$ which is a guess of what $\mu_X$ could be. We say that
+%% $\bar x$ is an estimate of $\mu_X$ and write that $\hat\mu_X=\bar x$
+%% (The ``hat'' indicates that it is an estimate). 

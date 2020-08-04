@@ -1,0 +1,113 @@
+
+\section{Sexism Score}
+\begin{topics}
+  Linear normal model; two--way anova; LSMEANS
+\end{topics}
+
+A study was conducted to compare the sexist attitudes of students
+     at various types of colleges in the US. The colleges-types are:
+     mixed (gender) college with at least 75\% male students, mixed
+     college with less than 75\% male students, and single sex college.
+     For each gender, random samples of each 10 undergraduate students
+     were selected from each of the three types of colleges. Each
+     student filled in a questionnaire, from which a score for 'degree
+     of sexism'-defined as the extent to which a student considered
+     males and females to have different life roles-was determined
+
+
+
+
+
+\begin{enumerate}
+\item
+Reading the data
+<<>>=
+data(sexism,package='LiSciData')
+sexism <- transform(sexism, score = sexism)
+sexism <- transform(sexism, type = factor(type))
+sexism <- transform(sexism, gender.type = interaction(gender,type))
+head(sexism)
+@
+
+
+\item
+Plot the data to visualize the effect of gender and type on the sexism score.
+(The function \verb+stripchart+ can be used.)
+
+\item
+%We will work with the model having six different means one for each gender and type.
+Formulate a model with a separate mean for each combination of gender and type. Call the model M1.
+%\[
+%M_1:  \quad E(y_i)=\mu_i=\mu + \alpha_j + \beta_k + \gamma_{jk} ,
+% \quad k=1,2,3, \quad j=\textrm{boy, girl}
+%\]
+<<fig=F,hide=T,echo=F>>=
+m1 <- glm(score ~ gender + type+ gender:type,data=sexism)
+@
+Fit the model M1 using the \verb+glm+-function and find the estimates of
+ the model parameters.
+
+\item
+Use the function \verb+predict+ to calculate the fitted values and plot these fitted values.
+The function \verb+coplot+ can be used here. If \verb+m1+ is the object holding your
+model fit of M1 the following will work
+<<fig=F>>=
+sexism <- transform(sexism,fit=predict(m1))
+coplot(fit ~ type | gender, data = sexism ,panel = panel.smooth, pch = c(18))
+@
+Does the plot indicate an interaction between sex and type?
+
+Another possibility for such a conditional plot is via trellis-graphics implemented in the \verb+lattice+ package
+<<fig=F>>=
+library(lattice)
+print(
+xyplot(fit~type|gender,data=sexism,type='l')
+)
+@
+or
+<<fig=F>>=
+print(
+xyplot(fit~type,groups=gender,data=sexism,type='l',auto.key=TRUE)
+)
+@ 
+\item
+Now consider also the model with no interaction between gender and type
+\[
+M_2:  \quad E(y_{jk})=\mu_{jk}=\mu + \alpha_j + \beta_k,
+ \quad k=1,2,3, \quad j=\textrm{boy, girl}
+\]
+Fit this model using the \verb+glm+-function and test the hypothesis of
+no interaction using the function \verb+anova+.
+\item
+Use the model M1 to obtain an estimate for the average sexism score  for males across the types. Weight the three levels of type equally
+and use the \verb+esticon function+.
+The resulting mean is called the LSMEANS (or population average)
+for males across type.
+\item
+Similarly one can calculate the LSMEAN for females across type.
+One should consider these LSMEANS as possibly interesting predictions of the
+general level of sexism for males and females.
+But because there is an interaction between gender and type, it is 
+not an interesting scientific hypothesis, that these LSMEANS should be the same.
+Nevertheless, it is mathematically possible to test the hypothesis.
+
+In R you can do this with the \verb+drop1+ function, but for the
+contrast of the factors in the model you must use the \verb+contrast.sum+
+contrast, not the \verb+contr.treatment+ we normally use.
+<<>>=
+old<-options()$contrasts
+options(contrasts=c('contr.sum','contr.poly'))
+m1L<- glm(score ~ gender + type+ gender:type,data=sexism)
+drop1(m1L,.~.,test='F')
+@
+The row with \verb+gender+ gives the test that the averages for males and 
+females (equally weighted across type-levels) are the same.
+This hypothesis should by no means be considered as testing the 
+main-effects of gender accounted for type, as it is sometimes expressed. 
+Because there is interaction between gender and type there is no point in speaking of a main effect.
+
+Finally we reset the contrasts
+<<results=hide>>=
+options(old)
+@
+\end{enumerate}

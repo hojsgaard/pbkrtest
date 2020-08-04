@@ -1,0 +1,167 @@
+%% This file has been modified by igattr
+%% Do not edit manually
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{a4wide,SHmathnot}
+\title{Estimability}
+\author{Søren Højsgaard}
+\usepackage[small,compact]{titlesec}
+\usepackage{Sweave}
+\begin{document}
+\renewenvironment{Schunk}{\linespread{.85}\small}{}
+
+\maketitle
+\parindent0pt\parskip5pt
+
+Consider an $n$ dimensional random vector $y$ for which $\EE(y)=\mu=X\beta$
+ans $\cov(y)=V$. Here $X$ is an $n\times p$ with $n>p$ matrix which does not
+necessarily have full rank.
+A least squares estimate for $\beta$ is
+\begin{displaymath}
+  \hat \beta = (X\transp V\inv X)^- X\transp V\inv y
+\end{displaymath}
+where $A^-$ is a generalized inverse of $A$.
+We are interested in contrasts of the form $c=\lambda\transp\beta$. An
+estimate of such a contrast is $\hat c = \lambda\transp\hat\beta$.
+Generalized inverses are not unique and therefore $\hat \beta$ is not
+uniquely estimated, and hence the contrasts are not uniquely
+estimated. On the other hand the fitted values $\hat y = X \hat \beta$
+are uniquely indentified.
+
+However, for some $\lambda$s we always get the same estimated
+contrast. Such contrasts are said to be estimable. These contrasts can
+be described as follows:
+We
+can only learn about $\beta$ through $X\beta$ so the only thing we can
+say something about is linear combinations $\rho\transp X\beta$. Hence
+we can only say something about $\lambda\transp\beta$ if there exists
+$\rho$ such that $\lambda\transp\beta=\rho\transp X \beta$, i.e., if
+$\lambda=X\transp\rho$, that is, if $\lambda$ is in the column space
+$C(X\transp)$ of $X\transp$. That is, if $\lambda$ is perpendicular to
+all vectors in the null space $N(X)$ of $X$. To check
+this, we find a basis $B$ for $N(X) \subset R^p$ which can be done using SVD:
+
+Example:
+\begin{Schunk}
+\begin{Sinput}
+> ff <- factor(rep(1:3, each=2))
+> X  <- cbind(rep(1,6),model.matrix(~0+ff)); X
+\end{Sinput}
+\begin{Soutput}
+    ff1 ff2 ff3
+1 1   1   0   0
+2 1   1   0   0
+3 1   0   1   0
+4 1   0   1   0
+5 1   0   0   1
+6 1   0   0   1
+\end{Soutput}
+\begin{Sinput}
+> y  <- 1:6
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> S <- svd(X)
+> lapply(S, zapsmall)
+\end{Sinput}
+\begin{Soutput}
+$d
+[1] 2.828427 1.414214 1.414214 0.000000
+
+$u
+           [,1]       [,2]       [,3]       [,4]
+[1,] -0.4082483  0.5534366  0.1644422 -0.7071068
+[2,] -0.4082483  0.5534366  0.1644422  0.7071068
+[3,] -0.4082483 -0.1343072 -0.5615113  0.0000000
+[4,] -0.4082483 -0.1343072 -0.5615113  0.0000000
+[5,] -0.4082483 -0.4191294  0.3970691  0.0000000
+[6,] -0.4082483 -0.4191294  0.3970691  0.0000000
+
+$v
+           [,1]       [,2]       [,3] [,4]
+[1,] -0.8660254  0.0000000  0.0000000  0.5
+[2,] -0.2886751  0.7826776  0.2325563 -0.5
+[3,] -0.2886751 -0.1899391 -0.7940968 -0.5
+[4,] -0.2886751 -0.5927385  0.5615405 -0.5
+\end{Soutput}
+\end{Schunk}
+
+The basis of $N(X)$ is
+\begin{Schunk}
+\begin{Sinput}
+> B <- S$v[, S$d/max(S$d) < 1e-10, drop=F]
+> (B <- as.numeric(B/max(B)))
+\end{Sinput}
+\begin{Soutput}
+[1]  1 -1 -1 -1
+\end{Soutput}
+\end{Schunk}
+
+Hence valid vectors $\lambda$ must satisfy that $
+  \lambda_1 - \lambda_2 - \lambda_3 - \lambda_4  = 0.$
+
+\begin{Schunk}
+\begin{Sinput}
+> lam <- c(1, 1, 0, 0)
+> sum( lam*B ) # Orthogonal
+\end{Sinput}
+\begin{Soutput}
+[1] 2.220446e-16
+\end{Soutput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+> (b.hat <- as.numeric(MASS::ginv(t(X)%*%X) %*% t(X) %*% y))
+\end{Sinput}
+\begin{Soutput}
+[1]  2.625 -1.125  0.875  2.875
+\end{Soutput}
+\begin{Sinput}
+> sum( lam * b.hat )
+\end{Sinput}
+\begin{Soutput}
+[1] 1.5
+\end{Soutput}
+\end{Schunk}
+
+Take another basis for the mean space:
+\begin{Schunk}
+\begin{Sinput}
+> X2 <- X
+> X2[,3]<-0
+> (b.hat2 <- as.numeric(MASS::ginv(t(X2)%*%X2) %*% t(X2) %*% y))
+\end{Sinput}
+\begin{Soutput}
+[1]  3.5 -2.0  0.0  2.0
+\end{Soutput}
+\begin{Sinput}
+> sum( lam * b.hat2 )
+\end{Sinput}
+\begin{Soutput}
+[1] 1.5
+\end{Soutput}
+\end{Schunk}
+
+On the other other hand, the following does not produce a unique estimate:
+\begin{Schunk}
+\begin{Sinput}
+> lam2 <- c(1, 0, 0, 0)
+> sum( lam2 * b.hat )
+\end{Sinput}
+\begin{Soutput}
+[1] 2.625
+\end{Soutput}
+\begin{Sinput}
+> sum( lam2 * b.hat2 )
+\end{Sinput}
+\begin{Soutput}
+[1] 3.5
+\end{Soutput}
+\end{Schunk}
+
+
+
+\end{document}

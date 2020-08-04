@@ -1,0 +1,90 @@
+
+\section{DietOx}
+
+\label{sec:dietox}
+
+\begin{itemize}
+\item Does copper added to pig feed increase/decrease growth?
+\item Weight of slaughter pigs under treatment with Cu in their feed measured weekly
+over 12 week period. 
+\end{itemize}
+
+
+@ 
+<<>>=
+library(doBy)
+@ %def 
+
+@ 
+<<>>=
+dietox <- read.csv("dietox.csv")
+dietox$Cu <- as.factor(dietox$Cu)
+dietox[1:4,]
+@ %def 
+
+
+\setkeys{Gin}{height=0.3\textwidth}
+@ 
+<<fig=T>>=
+par(mfrow=c(1,3))
+plotBy(Weight~Time, subject=Pig, group=Cu, data=dietox, col=T, lines=T)
+@ %def 
+
+\setkeys{Gin}{height=0.6\textwidth}
+@ 
+<<fig=T,include=T>>=
+par(mfrow=c(2,2))
+lmFit1 <- lm(Weight~Time+Cu+Time:Cu, data=dietox)
+plot(lmFit1)
+@ %def 
+
+@ 
+<<fig=T>>=
+plotBy(resid(lmFit1)~Time, subject=Pig,group=Cu, data=dietox,col=T,lines=T)
+@ %def 
+
+@ 
+<<fig=T>>=
+sdietox <- summaryBy(Weight~Time, data=dietox, FUN=c(mean,var))
+plot(log(var.Weight)~log(mean.Weight), data=sdietox)
+summary(lm(log(var.Weight)~log(mean.Weight), data=sdietox))
+@ %def 
+
+
+\section{GEE}
+
+\subsection{geese}
+
+@ 
+<<eval=F>>=
+library(geepack)
+geeFit1 <- geese(Weight~Time+Cu+Time:Cu, id=Pig, data=dietox,family=poisson("identity"))
+geeFit1
+@ %def 
+
+\subsection{geew}
+
+@ 
+<<eval=F>>=
+geeFit2 <- geew(Weight~Time+Cu+Time:Cu, id=Pig, data=dietox,family=poisson("identity"))
+geeFit2
+summary(geeFit2)
+anova(geeFit2)
+@ %def 
+
+\subsection{gee}
+
+@ 
+<<eval=F>>=
+library(gee)
+geeFit3 <- gee(Weight~Time+Cu+Time:Cu, id=Pig, data=dietox,family=poisson("identity"))
+geeFit3
+summary(geeFit3)
+anova(geeFit3)
+@ %def 
+
+@ 
+<<>>=
+geeFit4 <- gee(Weight~Time+I(Time^2)+I(Time^3)+Cu+Cu:Time+Cu:I(Time^2)+Cu:I(Time^3),  id=Pig, data=d1,family=poisson("identity"),scale.fix=T)
+anova(geeFit4)
+@ %def 

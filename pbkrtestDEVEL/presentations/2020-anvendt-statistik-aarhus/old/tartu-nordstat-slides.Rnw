@@ -1,0 +1,131 @@
+%\documentclass[11pt]{beamer}
+\documentclass[compress]{beamer}
+%\setbeamersize{text margin left=22pt,text margin right=22pt}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb, times, multirow, bm}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{enumerate}
+\usepackage{tcolorbox}
+
+\usepackage{moresize}
+
+
+\addtobeamertemplate{frametitle}{
+   \let\insertframetitle\insertsectionhead}{}
+\addtobeamertemplate{frametitle}{
+   \let\insertframesubtitle\insertsubsectionhead}{}
+
+\usepackage{etoolbox} 
+\makeatletter 
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt } 
+\makeatother
+
+
+%% \setlength{\parskip}{0pt}
+%% \setlength{\OuterFrameSep}{-4pt}
+%% \makeatletter
+%% \preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%% \makeatother
+
+
+\makeatletter
+  \CheckCommand*\beamer@checkframetitle{\@ifnextchar\bgroup\beamer@inlineframetitle{}}
+  \renewcommand*\beamer@checkframetitle{\global\let\beamer@frametitle\relax\@ifnextchar\bgroup\beamer@inlineframetitle{}}
+\makeatother
+
+
+
+% \documentclass[compress]{beamer}
+% \usepackage[latin1]{inputenc}
+% \usepackage{beamerthemesplit}
+% \usepackage{graphicx}
+%\usetheme{Darmstadt}
+
+% %\usepackage[danish]{babel}
+%\usepackage{beamerarticle}
+%\usetheme{PaloAlto}
+%\usetheme{Berkeley}
+%\usetheme{Frankfurt}
+\usetheme{Hannover}
+
+%\usepackage{SHmathnot}
+%\usepackage{natbib}
+%\usepackage{amsmath,amsfonts}
+\usepackage{bm}
+\usepackage{ISMLS}
+
+\def\lmer{\texttt{lmer()}}
+%% bold letter UHH:
+\def\betab{\bm \beta}
+\def\phib{\bm \phi}
+\def\phiAhat{\bm {\hat \Phi}_A}
+\def\Lb{\bm L}
+\def\ssb{\bm{\hat \sigma}}
+\def\sigmab{\bm{\sigma}}
+\def\Sigmab{\bm{\Sigma}}
+
+\DeclareMathOperator{\var}{\mathbb{V}ar}
+\DeclareMathOperator{\cov}{\mathbb{C}ov}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+
+
+\makeatletter\def\Hy@xspace@end{}\makeatother
+
+\setbeamerfont{block body}{size=\scriptsize}
+\setbeamertemplate{footline}[page number]
+
+%\makeatletter
+%\AtBeginPart{\beamer@tocsectionnumber=0\relax\c@section=0}
+%\makeatother
+
+\title{
+  Inference in mixed models in R - beyond the usual asymptotic
+  likelihood ratio test
+}
+
+\author[shortname]{S{\o}ren H{\o}jsgaard   \inst{1} \and Ulrich Halekoh \inst{2}} 
+\institute[shortinst]{
+  \inst{1} Department of Mathematical Sciences \\ Aalborg University, Denmark\\  
+  \emph{sorenh@math.aau.dk}
+  \and 
+  \inst{2} Department of Epidemiology, Biostatistics and Biodemography \\  University of Southern Denmark, Denmark\\
+  \emph{uhalekoh@health.sdu.dk} } 
+  
+
+\newenvironment{sframe}
+{\begin{frame} [containsverbatim] }
+  {\end{frame}}
+
+\newenvironment{sff}
+{\begin{frame} [containsverbatim] }
+  {\end{frame}}
+
+\newenvironment{sblock}
+{\begin{block}{R}}
+  {\end{block}}
+
+\newenvironment{sbb}
+{\begin{block}{R}}
+  {\end{block}}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\parskip4pt
+\section*{Contents}
+\begin{frame}
+ \setcounter{framenumber}{1}
+  \tableofcontents
+\end{frame}
+
+
+<<child='tartu-nordstat-src.Rnw'>>=
+@
+
+
+\end{document}
+

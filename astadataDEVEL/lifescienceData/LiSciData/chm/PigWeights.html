@@ -1,0 +1,79 @@
+<html><head><title>Weight and feed consumption of pigs</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>PigWeights(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   PigWeights">
+<param name="keyword" value=" Weight and feed consumption of pigs">
+</object>
+
+
+<h2>Weight and feed consumption of pigs</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Weight and feed consumption of 25 pigs on 5 different treatments
+in 4 replicates of (10,5,5,5) pigs. The replicates started at approximately
+weekly intervals
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(PigWeights)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A data frame with 161 observations on the following 9 variables.
+<dl>
+<dt><code>Group</code></dt><dd>a factor with levels <code>1</code> <code>2</code> <code>3</code> <code>4</code> <code>5</code>,
+indicating the treatment the pig received</dd>
+<dt><code>Pig</code></dt><dd>The identification of the pig</dd>
+<dt><code>WeightNo</code></dt><dd>a numeric vector indicating the number of the weighing</dd>
+<dt><code>Weight</code></dt><dd>The weight of the pig at the weighing, a numeric vector</dd>
+<dt><code>ExpDays</code></dt><dd>Days since the experiment started, a numeric vector.
+Different replicates have different <code>ExpDays</code> when the
+pigs start in the experiment (<code>Days==0</code>)
+</dd>
+<dt><code>FUp</code></dt><dd>Feed intake since last weighing (Feed Unit pig), a numeric vector</dd>
+<dt><code>Gain</code></dt><dd>Weight Gain since last weighing, a numeric vector</dd>
+<dt><code>AccFUp</code></dt><dd>Accumulated feed intake since the pig started in the experiment, anumeric vector</dd>
+<dt><code>Days</code></dt><dd>Days since the pig started in the experiment, a numeric vector</dd>
+</dl>
+
+<h3>Details</h3>
+
+
+
+
+<h3>Source</h3>
+
+<p>
+The data are from an experiment conducted by Niels Oksbjerg
+</p>
+
+
+<h3>References</h3>
+
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+ library(lattice)
+ data(PigWeights)
+ with(PigWeights,xyplot(Weight~Days|Pig))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

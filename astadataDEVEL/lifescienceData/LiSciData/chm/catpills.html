@@ -1,0 +1,74 @@
+<html><head><title>Palatibility of pill.</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>catpills(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   catpills">
+<param name="keyword" value=" Palatibility of pill.">
+</object>
+
+
+<h2>Palatibility of pill.</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Four diffeerent formulation of a drug were tested for palatibility on 27 cats.
+On days 1,2,3,4,8,9,10 and 11 the degree of accept of the drug was recorded
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(catpills)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A dataframe with  variables.
+<dl>
+<dt>catid:</dt><dd>cat id</dd>
+<dt>sex</dt><dd>sex of cat, 1: make, 0: female</dd>
+<dt>breed</dt><dd>breed of cat</dd>
+<dt>weight</dt><dd>weight of a cat at the begin of the study</dd>
+<dt>age</dt><dd>age of a cat at the begin of the study</dd>
+<dt>fi</dt><dd>formulation of the drug at day i</dd>
+<dt>yi</dt><dd>score at day i: 1=readily accepted, 2:accepted, 3: reluctantly accepted, 4: accepted in food, 5: refused</dd>
+</dl>
+
+<h3>Source</h3>
+
+
+
+
+<h3>References</h3>
+
+<p>
+Hand, David and Crowder, Martin (1996)  Practical Longitudinal Data Analysis, 
+Chapman and Hall, Example 10.1, page 146
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(catpills)  
+catL&lt;-reshape(catpills,direction='long',
+     varying=list(paste('f',c(1:4,8:11),sep=''),
+                  paste('y',c(1:4,8:11),sep='')),
+     v.names=c('form','score'),timevar='day',
+     idvar='catid')
+catL$u&lt;-ifelse(catL$form  &lt;=3 ,'accept','NONaccept')
+
+
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

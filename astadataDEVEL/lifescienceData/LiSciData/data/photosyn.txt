@@ -1,0 +1,24 @@
+water radiation rate
+low  2.5 210
+low  4.8 353
+low  7.5 448
+low  5.8 590
+low  9.6 555
+medium 5.2 210
+medium 6.6 352
+medium 10.1 440
+medium 12.2 621
+medium 14.8  695
+high 6.8 247
+high 9.8 350
+high 13.8 346
+high 15.3 450
+high 19.8 560
+
+
+
+
+
+
+
+

@@ -1,0 +1,119 @@
+\documentclass[article]{jss}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+\usepackage{doBy-JSS}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Ulrich Halekoh\\ Aarhus University \And 
+        Søren Højsgaard \\ Aalborg University}
+\title{
+  Tools for Applied Statistics -- the \doby\ Package
+}
+
+  
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Ulrich Halekoh, Søren Højsgaard} %% comma-separated
+\Plaintitle{The doBy package} %% without formatting
+%%\Shorttitle{Test in mixed models} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
+}
+\Keywords{}
+
+\Plainkeywords{keywords, comma-separated, not capitalized, Java} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{13}
+%% \Issue{9}
+%% \Month{September}
+%% \Year{2004}
+%% \Submitdate{2004-09-29}
+%% \Acceptdate{2004-09-29}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+
+
+
+\Address{
+  Ulrich Halekoh\\
+  Department of Animal Health and Bioscience\\
+  Aarhus University\\
+  Blichers Allé, 8830 Tjele, Denmark\\
+  E-mail: \email{ulrich.halekoh@agrsci.dk}
+\\
+  Søren Højsgaard\\
+  Department of Mathematical Sciences\\
+  Aalborg University\\
+  Fredrik Bajers Vej 7G, 9220 Aalborg Ø, Denmark\\
+  E-mail: \email{sorenh@math.aau.dk}\\
+  URL: \url{http://people.math.aau.dk/~sorenh/}
+
+}
+
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{color}
+\usepackage[inline,nomargin,draft]{fixme}
+% \newcommand\FXInline[2]{\textbf{\color{blue}#1}:
+%   \emph{\color{blue} - #2}}
+
+
+\begin{document}
+
+%\renewenvironment{Schunk}{\linespread{.85}\small}{}
+\SweaveOpts{keep.source=T,prefix.string=figures/doby} 
+\setkeys{Gin}{width=0.5\textwidth} %sæt figurstørrelse i Sweave
+
+%\fxnote{where should this line be placesd?}
+<<echo=FALSE>>=
+library("doBy")
+library("xtable")
+options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+@
+
+
+
+
+
+\section{Introduction}
+\label{sec:intro}
+
+
+\SweaveInput{src-doBy.Rnw}
+\SweaveInput{src-popMeans.Rnw}
+
+\section{Discussion}
+\label{sec:discussion}
+
+ 
+\section{Acknowledgements}
+
+This work was supported by the Danish National Advanced Technology
+Foundation through the ILSORM project.
+
+\bibliography{doBy-JSS}
+
+\appendix
+
+
+\end{document}
+
+
+

@@ -1,0 +1,39 @@
+
+\section{Hodkin}
+\begin{topics}
+  Generalized linear models; link function; variance function
+\end{topics}
+
+<<umte>>=
+library(LiSciData)
+data(hodkin)
+v<-reshape(hodkin,direction='long',varying=list(c('hodk','nonhodk')),v.names='number',timevar='hodkin',times=c('yes','non'))
+v$hodkin<-factor(v$hodkin)
+@
+
+\begin{enumerate}
+\item
+Formulate and fit an appropriate model.Check for overdispersion.
+Does the q-q-plot of the standardized residuals tell you something 
+about overdispersion?
+<<>>=
+m<-glm(number~hodkin,data=v,family=poisson)
+m.ov<-glm(number~hodkin,data=v,family=quasipoisson)
+@
+\item
+Fit a model assuming the negative binomial distribution. Use the
+\verb+glm.nb+ function of the package \verb+MASS+
+<<>>= 
+library(MASS)
+m.neg<-glm.nb(number~hodkin,data=v)
+@
+\item
+Fit a model assuming the data to be normally distributed and
+us the log-ling.
+ Compare the coefficients, the predicted values and the AIC's of
+all your fitted models.
+\item
+Fitting the model with the normal assumption,  is there a difference 
+in AIC using the log or the identity link? 
+\end{enumerate}
+

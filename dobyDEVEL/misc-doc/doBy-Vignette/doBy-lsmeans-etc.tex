@@ -1,0 +1,690 @@
+\documentclass[11pt]{article}
+
+\usepackage{a4wide,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{url,a4wide}
+\usepackage{boxedminipage,color,xcolor}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+
+\usepackage{framed}
+\usepackage{comment}
+\definecolor{shadecolor}{gray}{0.91}
+\def\R{\texttt{R}}
+\def\pkg#1{{\bf #1}}
+\def\code#1{\texttt{#1}}
+\def\popmeans{\code{popMeans()}}
+\def\popmatrix{\code{popMatrix()}}
+\def\linmeans{\code{linMeans()}}
+\def\linmatrix{\code{linMatrix()}}
+\def\esticon{\code{esticon()}}
+
+
+%\VignetteIndexEntry{doBy-lsmeans-etc: LSmeans etc with the doBy package}
+%\VignettePackage{doBy}
+
+
+\title{LSmeans, population means, estimates and contrasts  with the \texttt{doBy} package}
+\author{S{\o}ren H{\o}jsgaard}
+\date{\pkg{doBy} version 4.5-5 as of feb 07, 2013}
+
+
+\usepackage{Sweave}
+\begin{document}
+
+\renewenvironment{Schunk}{\begin{center}
+    \scriptsize
+    \begin{boxedminipage}{1.0\textwidth}}{
+    \end{boxedminipage}\end{center}}
+
+%\renewenvironment{Schunk}{\begin{shaded}\small}{\end{shaded}}
+
+\maketitle
+\tableofcontents
+
+\parindent0pt\parskip5pt
+
+%\tableofcontents
+\setkeys{Gin}{height=3in}
+
+
+\section{Introduction}
+\label{sec:xxx}
+
+This is a working document; please feel free to suggest improvements.
+
+\begin{Schunk}
+\begin{Sinput}
+R> library(doBy)
+\end{Sinput}
+\end{Schunk}
+
+\section{Linear functions of parameters, contrasts}
+\label{sec:line-funct-param}
+
+For a regression model with parameters $\beta=(\beta^1, \beta^2,\dots,
+\beta^P)$ we shall refer to a weighted sum of the form
+\begin{displaymath}
+  \sum_j w_j \beta^j
+\end{displaymath}
+as a contrast. Notice that it is common in the litterature to require
+that $\sum_j w_j=0$ for the sum $\sum_j w_j \beta^j$ to be called a
+contrast but we do not follow this tradition here.
+
+% The effect of changing the factor $A$ from \code{A2} to \code{A3} can
+% be found as
+% @
+% <<>>=
+% w <- c(0,-1,1,0,0,0)
+% sum(coef(mm)*w)
+% @ %def
+
+% The \esticon\ function provides this estimate, the standard error
+% etc.\ as follows:
+% @
+% <<>>=
+% esticon(mm, w)
+% @ %def
+
+
+
+\section{The \code{esticon} function}
+\label{esticon}
+
+Consider a linear model which explains \code{Ozone} as a linear
+function of \code{Month} (factor) and \code{Wind} (numeric) and an
+interaction between these effects:
+
+\begin{Schunk}
+\begin{Sinput}
+R> data(airquality)
+R> airquality <- transform(airquality, Month=factor(Month))
+R> m <- lm(Ozone~Month*Wind, data=airquality)
+R> coef(summary(m))
+\end{Sinput}
+\begin{Soutput}
+              Estimate Std. Error   t value     Pr(>|t|)
+(Intercept)  50.748472  15.747605  3.222615 0.0016879982
+Month6      -41.793446  31.147533 -1.341790 0.1825314437
+Month7       68.295661  20.995006  3.252948 0.0015324979
+Month8       82.210682  20.313529  4.047090 0.0000987944
+Month9       23.439210  20.662571  1.134380 0.2591939469
+Wind         -2.368111   1.316221 -1.799175 0.0748364258
+Month6:Wind   4.050636   2.490344  1.626537 0.1068048191
+Month7:Wind  -4.663240   2.025735 -2.301999 0.0232898057
+Month8:Wind  -6.154287   1.922637 -3.200961 0.0018078805
+Month9:Wind  -1.873651   1.820335 -1.029289 0.3056867339
+\end{Soutput}
+\end{Schunk}
+
+When a parameter vector $\beta$ of (systematic) effects have been
+estimated, interest is often in a particular estimable function, i.e.\
+linear combination $\lambda^\top \beta$ and/or testing the hypothesis
+$H_0: \lambda^\top \beta=\beta_0$ where $\lambda$ is a specific vector
+defined by the investigator.  Suppose for example we want to calculate
+the expected difference in ozone between consequtive months at wind
+speed 10 mph (which is about the average wind speed over the whole
+period).
+
+The \code{esticon} function provides a way of doing so. We can
+specify several $\lambda$ vectors at the same time. For example
+
+\begin{Schunk}
+\begin{Sinput}
+R> Lambda <- rbind(
++    c(0, -1,  0,  0,  0, 0, -10,   0,   0,   0),
++    c(0,  1, -1,  0,  0, 0,  10, -10,   0,   0),
++    c(0,  0,  1, -1,  0, 0,   0,  10, -10,   0),
++    c(0,  0,  0,  1, -1, 0,   0,   0,  10, -10))
+\end{Sinput}
+\end{Schunk}
+
+Notice that the specification of \code{Lambda} depends on the choice
+of reference level of the factors; if the reference levels are
+changed, \code{Lambda} must be changed too. Estimates and tests are
+obtained with:
+
+\begin{Schunk}
+\begin{Sinput}
+R> esticon(m, Lambda)
+\end{Sinput}
+\begin{Soutput}
+  beta0    Estimate Std.Error    t.value  DF  Pr(>|t|)      Lower     Upper
+1     0   1.2870834 10.237872  0.1257179 106 0.9001934 -19.010494 21.584661
+2     0 -22.9503412 10.310435 -2.2259335 106 0.0281352 -43.391780 -2.508902
+3     0   0.9954442  7.093972  0.1403225 106 0.8886715 -13.069046 15.059934
+4     0  15.9651107  6.560102  2.4336681 106 0.0166188   2.959071 28.971151
+\end{Soutput}
+\end{Schunk}
+
+In other cases, interest is in testing a hypothesis of a contrast
+$H_0: \Lambda \beta=\beta_0$ where $\Lambda$ is a matrix as a joint test. For example
+a test of no interaction between \code{Month} and \code{Wind} can be
+made by testing jointly that the last four parameters in \code{m} are
+zero (observe that the test is a Wald test):
+\begin{Schunk}
+\begin{Sinput}
+R> Lambda <- rbind(
++    c(0,0,0,0,0,0,1,0,0,0),
++    c(0,0,0,0,0,0,0,1,0,0),
++    c(0,0,0,0,0,0,0,0,1,0),
++    c(0,0,0,0,0,0,0,0,0,1))
+\end{Sinput}
+\end{Schunk}
+
+
+\begin{Schunk}
+\begin{Sinput}
+R> esticon(m, Lambda, joint.test=TRUE)
+\end{Sinput}
+\begin{Soutput}
+   X2.stat DF   Pr(>|X^2|)
+1 22.10963  4 0.0001905969
+\end{Soutput}
+\end{Schunk}
+
+For a linear normal model a more attractice alternative (which is also
+easier to specify) is a likelihood ratio test:
+
+\begin{Schunk}
+\begin{Sinput}
+R> m2 <- update(m, .~.-Month:Wind)
+R> anova(m, m2)
+\end{Sinput}
+\begin{Soutput}
+Analysis of Variance Table
+
+Model 1: Ozone ~ Month * Wind
+Model 2: Ozone ~ Month + Wind
+  Res.Df   RSS Df Sum of Sq      F    Pr(>F)    
+1    106 56649                                  
+2    110 68465 -4    -11816 5.5274 0.0004423 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+
+However, for generalized estimating equations of glm--type (as dealt
+with in the packages \pkg{geepack} and \pkg{gee}) there is no
+likelihood. In this case \code{esticon} function provides an
+operational alternative. In fact, the \code{anova()} method in
+\pkg{geepack} is based on calling \code{esticon()}.
+
+
+
+
+
+
+\section{LSmeans (population means, marginal means)}
+\label{sec:xxx}
+
+\subsection{A simulated dataset}
+\label{sec:simulated-dataset}
+
+In the following sections we consider these data:
+\begin{Schunk}
+\begin{Sinput}
+R> library(doBy)
+R> dd <- expand.grid(A=factor(1:3),B=factor(1:3),C=factor(1:2))
+R> dd$y <- rnorm(nrow(dd))
+R> dd$x <- rnorm(nrow(dd))^2
+R> dd$z <- rnorm(nrow(dd))
+R> head(dd,10)
+\end{Sinput}
+\begin{Soutput}
+   A B C           y           x          z
+1  1 1 1 -1.45755719 1.145891959 -0.1689263
+2  2 1 1  1.06740686 0.047995932 -0.4903395
+3  3 1 1  0.17019173 0.093501436 -1.3619150
+4  1 2 1 -0.40844895 0.780132973  0.3212015
+5  2 2 1 -1.64492322 0.007045165 -1.0478856
+6  3 2 1  0.01116854 1.276386867  1.6721694
+7  1 3 1  1.12765412 0.071092626  0.1064180
+8  2 3 1  0.57435428 0.317537104 -1.6347233
+9  3 3 1  1.86739724 1.470752783  0.4752547
+10 1 1 2 -0.88774449 1.182948289  1.4022287
+\end{Soutput}
+\end{Schunk}
+
+Consider the additive model
+\begin{equation}
+  \label{eq:1}
+  y_i = \beta_0 + \beta^1_{A(i)}+\beta^2_{B(i)} + \beta^3_{C(i)} + e_i
+\end{equation}
+where $e_i \sim N(0,\sigma^2)$. We fit this model:
+
+\begin{Schunk}
+\begin{Sinput}
+R> mm <- lm(y~A+B+C, data=dd)
+R> coef(mm)
+\end{Sinput}
+\begin{Soutput}
+(Intercept)          A2          A3          B2          B3          C2 
+ -0.5875448   0.3761720   0.9139551   0.2895144   0.6187407  -0.4410459 
+\end{Soutput}
+\end{Schunk}
+
+Notice that the parameters corresponding to the factor levels
+\code{A1}, \code{B1} and \code{C2} are set to zero to ensure
+identifiability of the remaining parameters.
+
+\subsection{What are these quantities}
+\label{sec:what-are-these}
+
+LSmeans, population means and marginal means are used synonymously in
+the literature. 
+These quantities are a special kind of contrasts as defined in
+Section~\ref{sec:line-funct-param}.
+LSmeans seems to be the most widely used term, so we
+shall adopt this terms here too.
+
+The model (\ref{eq:1})
+is a model for the conditional mean $\EE(y|A,B,C)$.  Sometimes one is
+interested in quantities like $\EE(y|A)$. This quantity can not
+formally be found unless $B$ and $C$ are random variables such that we
+may find $\EE(y|A)$ by integration.
+However, suppose that $A$ is a treatment of main interest, $B$ is a
+blocking factor and $C$ represents days on which the experiment was
+carried out. Then it is tempting to average $\EE(y|A,B,C)$ over $B$
+and $C$ (average over block and day) and think of this average as
+$\EE(y|A)$.
+
+% \subsection{A brute--force calculation}
+% \label{sec:xxx}
+
+The population mean for $A=1$ is
+\begin{equation}
+  \label{eq:2}
+  \beta^0 + \beta^1_{A1} + \frac{1}{3} (\beta^2_{B1}+\beta^2_{B2}+\beta^2_{B3})
+  + \frac{1}{2}(\beta^3_{C1}+\beta^3_{C2})
+\end{equation}
+
+Recall that the
+parameters corresponding to the factor levels
+\code{A1}, \code{B1} and \code{C2} are set to zero to ensure
+identifiability of the remaining parameters. Therefore we may also
+write the population mean for $A=1$ as
+\begin{equation}
+  \label{eq:3}
+  \beta^0 + \frac{1}{3} (\beta^2_{B2}+\beta^2_{B3})
+  + \frac{1}{2}(\beta^3_{C2})
+\end{equation}
+
+
+This quantity can be estimated as:
+
+\begin{Schunk}
+\begin{Sinput}
+R> w <- c(1, 0, 0, 1/3, 1/3, 1/2)
+R> coef(mm)*w
+\end{Sinput}
+\begin{Soutput}
+(Intercept)          A2          A3          B2          B3          C2 
+-0.58754480  0.00000000  0.00000000  0.09650481  0.20624689 -0.22052294 
+\end{Soutput}
+\begin{Sinput}
+R> sum(coef(mm)*w)
+\end{Sinput}
+\begin{Soutput}
+[1] -0.505316
+\end{Soutput}
+\end{Schunk}
+
+
+We may find the population mean for all three levels of $A$ as
+\begin{Schunk}
+\begin{Sinput}
+R> W <- matrix(c(1, 0, 0, 1/3, 1/3, 1/2,
++                1, 1, 0, 1/3, 1/3, 1/2,
++                1, 0, 1, 1/3, 1/3, 1/2),nr=3, byrow=TRUE)
+\end{Sinput}
+\end{Schunk}
+
+Notice that the matrix W is based on that the first level of $A$ is
+set as the reference level. If the reference level is changed then so
+must $W$ be.
+
+% \subsection{Using \esticon}
+% \label{sec:xxx}
+
+Given that one has specified $W$, we can use the \esticon\ function in the
+\code{doBy} as illustrated below:
+
+\begin{Schunk}
+\begin{Sinput}
+R> esticon(mm, W)
+\end{Sinput}
+\begin{Soutput}
+  beta0  Estimate Std.Error    t.value DF  Pr(>|t|)      Lower     Upper
+1     0 -0.505316 0.4147344 -1.2184087 12 0.2464814 -1.4089447 0.3983127
+2     0 -0.129144 0.4147344 -0.3113897 12 0.7608477 -1.0327727 0.7744847
+3     0  0.408639 0.4147344  0.9853029 12 0.3439255 -0.4949897 1.3122677
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Using \popmatrix\  and \popmeans}
+\label{sec:xxx}
+
+Writing the matrix $W$ is somewhat tedious and hence error prone. In
+addition, there is a potential risk of getting the wrong answer if the
+the reference level of a factor has been changed.
+The \popmatrix\ function provides an automated way of generating
+such matrices.
+The above \verb+W+ matrix is  constructed by
+\begin{Schunk}
+\begin{Sinput}
+R> pma <- popMatrix(mm,effect='A')
+R> summary(pma)
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3  C2
+[1,]           1  0  0 0.3333333 0.3333333 0.5
+[2,]           1  1  0 0.3333333 0.3333333 0.5
+[3,]           1  0  1 0.3333333 0.3333333 0.5
+grid:
+'data.frame':	3 obs. of  1 variable:
+ $ A: chr  "1" "2" "3"
+at:
+ NULL
+\end{Soutput}
+\end{Schunk}
+
+The \verb+effect+ argument requires  to calculate the population means
+for each level of
+$A$ aggregating across the levels of the other variables in the data.
+
+The \popmeans\ function is simply a wrapper around first a call
+to \popmatrix\ followed by a call to (by default) \esticon:
+\begin{Schunk}
+\begin{Sinput}
+R> pme <- popMeans(mm, effect='A')
+R> pme
+\end{Sinput}
+\begin{Soutput}
+  beta0  Estimate Std.Error    t.value DF  Pr(>|t|)      Lower     Upper A
+1     0 -0.505316 0.4147344 -1.2184087 12 0.2464814 -1.4089447 0.3983127 1
+2     0 -0.129144 0.4147344 -0.3113897 12 0.7608477 -1.0327727 0.7744847 2
+3     0  0.408639 0.4147344  0.9853029 12 0.3439255 -0.4949897 1.3122677 3
+\end{Soutput}
+\end{Schunk}
+
+More details about how the matrix was constructed is provided by the
+\code{summary()} function:
+\begin{Schunk}
+\begin{Sinput}
+R> summary(pme)
+\end{Sinput}
+\begin{Soutput}
+  beta0  Estimate Std.Error    t.value DF  Pr(>|t|)      Lower     Upper A
+1     0 -0.505316 0.4147344 -1.2184087 12 0.2464814 -1.4089447 0.3983127 1
+2     0 -0.129144 0.4147344 -0.3113897 12 0.7608477 -1.0327727 0.7744847 2
+3     0  0.408639 0.4147344  0.9853029 12 0.3439255 -0.4949897 1.3122677 3
+Call:
+NULL
+Contrast matrix:
+Length  Class   Mode 
+     0   NULL   NULL 
+\end{Soutput}
+\end{Schunk}
+
+
+As an additional example we may do:
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm,effect=c('A','C'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2
+[1,]           1  0  0 0.3333333 0.3333333  0
+[2,]           1  1  0 0.3333333 0.3333333  0
+[3,]           1  0  1 0.3333333 0.3333333  0
+[4,]           1  0  0 0.3333333 0.3333333  1
+[5,]           1  1  0 0.3333333 0.3333333  1
+[6,]           1  0  1 0.3333333 0.3333333  1
+\end{Soutput}
+\end{Schunk}
+This gives the matrix for calculating the estimate for each
+combination of \code{A} and \code{C} when averaging over \code{B}.
+
+Omitting \code{effect} as in
+
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm)
+\end{Sinput}
+\begin{Soutput}
+     (Intercept)        A2        A3        B2        B3  C2
+[1,]           1 0.3333333 0.3333333 0.3333333 0.3333333 0.5
+\end{Soutput}
+\begin{Sinput}
+R> popMeans(mm)
+\end{Sinput}
+\begin{Soutput}
+  beta0    Estimate Std.Error    t.value DF  Pr(>|t|)      Lower     Upper
+1     0 -0.07527367  0.239447 -0.3143646 12 0.7586425 -0.5969839 0.4464366
+\end{Soutput}
+\end{Schunk}
+gives the ``total average''.
+
+
+\subsection{Using the \code{at} argument}
+
+We may be interested in finding the population means
+at all levels of  $A$
+but only at $C=1$. This is obtained by using the \code{at} argument
+(in which case the average is only over the remaining factor $B$):
+
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm, effect='A', at=list(C='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2
+[1,]           1  0  0 0.3333333 0.3333333  0
+[2,]           1  1  0 0.3333333 0.3333333  0
+[3,]           1  0  1 0.3333333 0.3333333  0
+\end{Soutput}
+\end{Schunk}
+
+Another way of
+creating the population means
+at  all levels of $(A,C)$ is therefore
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm, effect='A', at=list(C=c('1','2')))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2
+[1,]           1  0  0 0.3333333 0.3333333  0
+[2,]           1  1  0 0.3333333 0.3333333  0
+[3,]           1  0  1 0.3333333 0.3333333  0
+[4,]           1  0  0 0.3333333 0.3333333  1
+[5,]           1  1  0 0.3333333 0.3333333  1
+[6,]           1  0  1 0.3333333 0.3333333  1
+\end{Soutput}
+\end{Schunk}
+
+We may have several variables in the \code{at} argument:
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm, effect='A', at=list(C=c('1','2'), B='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3 B2 B3 C2
+[1,]           1  0  0  0  0  0
+[2,]           1  1  0  0  0  0
+[3,]           1  0  1  0  0  0
+[4,]           1  0  0  0  0  1
+[5,]           1  1  0  0  0  1
+[6,]           1  0  1  0  0  1
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Ambiguous specification when using the \texttt{effect} and
+  \texttt{at} arguments}
+
+There is room for an ambiguous specification if a variable appears in
+both the \code{effect} and the \code{at} argument, such as
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm, effect=c('A','C'), at=list(C='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2
+[1,]           1  0  0 0.3333333 0.3333333  0
+[2,]           1  1  0 0.3333333 0.3333333  0
+[3,]           1  0  1 0.3333333 0.3333333  0
+\end{Soutput}
+\end{Schunk}
+
+This ambiguity is due to the fact that the \verb+effect+ argument asks
+for the populations means at all levels of the variables but the
+\verb+at+ chooses only specific levels.
+
+This ambiguity is resolved as follows: Any variable in the \code{at}
+argument is removed from the \code{effect} argument such as the
+statement above is equivalent to
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm, effect='A', at=list(C='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2
+[1,]           1  0  0 0.3333333 0.3333333  0
+[2,]           1  1  0 0.3333333 0.3333333  0
+[3,]           1  0  1 0.3333333 0.3333333  0
+\end{Soutput}
+\end{Schunk}
+
+\subsection{Using covariates}
+
+Next consider the model where a covariate is included:
+\begin{Schunk}
+\begin{Sinput}
+R> mm2 <- lm(y~A+B+C+C:x, data=dd)
+R> coef(mm2)
+\end{Sinput}
+\begin{Soutput}
+(Intercept)          A2          A3          B2          B3          C2 
+ -0.5052374   0.3549056   1.0209908   0.2625319   0.6026613  -0.9749379 
+       C1:x        C2:x 
+ -0.1667626   0.5544158 
+\end{Soutput}
+\end{Schunk}
+
+In this case we get
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm2,effect='A', at=list(C='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2      C1:x C2:x
+[1,]           1  0  0 0.3333333 0.3333333  0 0.6838862    0
+[2,]           1  1  0 0.3333333 0.3333333  0 0.6838862    0
+[3,]           1  0  1 0.3333333 0.3333333  0 0.6838862    0
+\end{Soutput}
+\end{Schunk}
+
+Above, $x$ has been replaced by its average and that is the general
+rule for models including covariates. However we may use the \code{at}
+argument to ask for calculation of the population mean at some
+user-specified value of $x$, say 12:
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm2,effect='A', at=list(C='1',x=12))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2 C1:x C2:x
+[1,]           1  0  0 0.3333333 0.3333333  0   12    0
+[2,]           1  1  0 0.3333333 0.3333333  0   12    0
+[3,]           1  0  1 0.3333333 0.3333333  0   12    0
+\end{Soutput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+R> mm22 <- lm(y~A+B+C+C:x+I(x^2), data=dd)
+R> coef(mm22)
+\end{Sinput}
+\begin{Soutput}
+(Intercept)          A2          A3          B2          B3          C2 
+ 0.17788151 -0.09628859  0.49356098  0.12009353  0.51181634 -0.22423179 
+     I(x^2)        C1:x        C2:x 
+ 1.84659170 -2.71548451 -2.79331914 
+\end{Soutput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+R> popMatrix(mm22,effect='A', at=list(C='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2    I(x^2)      C1:x C2:x
+[1,]           1  0  0 0.3333333 0.3333333  0 0.4677003 0.6838862    0
+[2,]           1  1  0 0.3333333 0.3333333  0 0.4677003 0.6838862    0
+[3,]           1  0  1 0.3333333 0.3333333  0 0.4677003 0.6838862    0
+\end{Soutput}
+\end{Schunk}
+
+
+\begin{Schunk}
+\begin{Sinput}
+R> dd <- transform(dd, x.sq=x^2)
+R> mm23 <- lm(y~A+B+C+C:x+x.sq, data=dd)
+R> coef(mm23)
+\end{Sinput}
+\begin{Soutput}
+(Intercept)          A2          A3          B2          B3          C2 
+ 0.17788151 -0.09628859  0.49356098  0.12009353  0.51181634 -0.22423179 
+       x.sq        C1:x        C2:x 
+ 1.84659170 -2.71548451 -2.79331914 
+\end{Soutput}
+\begin{Sinput}
+R> popMatrix(mm23,effect='A', at=list(C='1'))
+\end{Sinput}
+\begin{Soutput}
+     (Intercept) A2 A3        B2        B3 C2      x.sq      C1:x C2:x
+[1,]           1  0  0 0.3333333 0.3333333  0 0.7601475 0.6838862    0
+[2,]           1  1  0 0.3333333 0.3333333  0 0.7601475 0.6838862    0
+[3,]           1  0  1 0.3333333 0.3333333  0 0.7601475 0.6838862    0
+\end{Soutput}
+\end{Schunk}
+
+
+\subsection{Using transformed covariates}
+
+Next consider the model where a  transformation of a covariate is included:
+\begin{Schunk}
+\begin{Sinput}
+R> mm3 <- lm(y~A+B+C+C:I(log(x)), data=dd)
+R> coef(summary(mm3))
+\end{Sinput}
+\begin{Soutput}
+                Estimate Std. Error    t value  Pr(>|t|)
+(Intercept)  -0.50937260  0.7090936 -0.7183433 0.4889890
+A2            0.52514849  0.6829990  0.7688861 0.4597350
+A3            0.99688621  0.6587576  1.5132823 0.1611520
+B2            0.28370152  0.6291978  0.4508940 0.6616851
+B3            0.58126736  0.6334672  0.9175966 0.3804286
+C2           -0.45589062  0.6722289 -0.6781776 0.5130455
+C1:I(log(x))  0.09309923  0.2342816  0.3973818 0.6994356
+C2:I(log(x))  0.25698839  0.4969782  0.5171019 0.6163285
+\end{Soutput}
+\begin{Sinput}
+R> mm3 <- lm(y~A+B+C+C:I(log(x)), data=dd)
+R> coef(summary(mm3))
+\end{Sinput}
+\begin{Soutput}
+                Estimate Std. Error    t value  Pr(>|t|)
+(Intercept)  -0.50937260  0.7090936 -0.7183433 0.4889890
+A2            0.52514849  0.6829990  0.7688861 0.4597350
+A3            0.99688621  0.6587576  1.5132823 0.1611520
+B2            0.28370152  0.6291978  0.4508940 0.6616851
+B3            0.58126736  0.6334672  0.9175966 0.3804286
+C2           -0.45589062  0.6722289 -0.6781776 0.5130455
+C1:I(log(x))  0.09309923  0.2342816  0.3973818 0.6994356
+C2:I(log(x))  0.25698839  0.4969782  0.5171019 0.6163285
+\end{Soutput}
+\begin{Sinput}
+R> popMatrix(mm3, effect='A', at=list(C='1'))

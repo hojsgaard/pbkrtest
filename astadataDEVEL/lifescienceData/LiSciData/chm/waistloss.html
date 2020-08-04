@@ -1,0 +1,74 @@
+<html><head><title>Effect on weigth loss by participatin on a 'waist loss' program</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>waistloss(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   waistloss">
+<param name="keyword" value=" Effect on weigth loss by participatin on a 'waist loss' program">
+</object>
+
+
+<h2>Effect on weigth loss by participatin on a 'waist loss' program</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The weights of 20 men were recorded before and after 
+participation in a 'waist loss' program
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(waistloss)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+Data frame containing
+<dl>
+<dt>id:</dt><dd>id number of participant</dd>
+<dt>before:</dt><dd>weight before start of program</dd>
+<dt>after:</dt><dd>weight at the end of the program</dd>
+</dl>
+
+<h3>Details</h3>
+
+<p>
+Data are from the exercise 2.5-2.2 of A. Dobson
+</p>
+
+
+<h3>Source</h3>
+
+<p>
+Dobson, A. (2002) <EM>An introduction to Generalized Linear Models</EM>,
+London: Chapman &amp; Hall, 2nd edition
+</p>
+
+
+<h3>References</h3>
+
+
+
+
+<h3>Examples</h3>
+
+<pre>
+data(waistloss)
+attach(waistloss)
+diff.weight&lt;-after-before
+boxplot(diff.weight)
+abline(h=0,col=2)
+title('weight difference after-before')
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

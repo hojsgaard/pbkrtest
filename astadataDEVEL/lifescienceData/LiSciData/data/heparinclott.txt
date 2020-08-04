@@ -1,0 +1,22 @@
+time dose  preparation
+64   0.72 standard
+57   0.72 standard
+71   0.87 standard
+61   0.87 standard
+90   1.02 standard
+85   1.02 standard
+133  1.17 standard
+99   1.17 standard
+183  1.32 standard
+145  1.32 standard
+58   0.72 test
+63   0.72 test
+67   0.87 test
+68   0.87 test
+79   1.02 test
+75   1.02 test
+94   1.17 test
+96   1.17 test
+138  1.32 test
+126  1.32 test
+

@@ -1,0 +1,54 @@
+<link rel=stylesheet href="R2HTML.css" type=text/css>
+<h2>Rmarkup Example 1 </h2>
+<h3>Søren Højsgaard </h3>
+<!--begin{Schunk}!--> 
+
+<p class='character'><tt> [1]&nbsp"2012-05-28&nbsp23:44:24" </tt></p>
+
+<!--end{Schunk}!-->
+<br>
+In this example we embed parts of the examples from the
+<span style="font-family: Courier New;">kruskal.test</span> help page into a LaTeX document :
+<br>
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><PRE>&gt data(airquality)</pre></p>
+
+
+
+<p><PRE>&gt kruskal.test(Ozone ~ Month, data = airquality)</pre></p>
+
+
+<!--end{Sinput}!-->
+
+<p class='character'><tt>  </tt>
+<br>
+<tt> 	Kruskal-Wallis&nbsprank&nbspsum&nbsptest </tt>
+<br>
+<tt>  </tt>
+<br>
+<tt> data:&nbsp&nbspOzone&nbspby&nbspMonth&nbsp </tt>
+<br>
+<tt> Kruskal-Wallis&nbspchi-squared&nbsp=&nbsp29.2666,&nbspdf&nbsp=&nbsp4,&nbspp-value&nbsp=&nbsp6.901e-06 </tt>
+<br>
+<tt>  </tt></p>
+
+<!--end{Schunk}!-->
+<br>
+which shows that the location parameter of the Ozone
+distribution varies significantly from month to month. Finally we
+include a boxplot of the data :
+<br>
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><PRE>&gt boxplot(Ozone ~ Month, data = airquality)</pre></p>
+
+
+<!--end{Sinput}!-->
+
+<!--end{Schunk}!-->
+<p align= left ><img height=400 width=400 src='SweaveEx-003.png'></p><br>
+<br>
+<br>

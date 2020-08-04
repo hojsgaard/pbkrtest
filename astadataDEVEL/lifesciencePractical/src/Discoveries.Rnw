@@ -1,0 +1,23 @@
+\section{Discoveries}
+
+\begin{enumerate}
+\item
+The data \verb+discoveries+ lists the number of great inventions and scientific discoveries in each of the years between 1860 to 1959.
+<<echo=T>>=
+data(discoveries)
+@
+
+\item
+Plot the data.
+
+\item
+Add a smooth line to the plot.
+
+\item
+How would you model data. Write down the systematic and the random part of your model.
+
+\item
+Has the discovery rate remained constant over time?
+
+\end{enumerate}
+

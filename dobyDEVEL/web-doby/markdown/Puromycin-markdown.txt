@@ -1,0 +1,39 @@
+library(knitr)
+library(markdown)
+
+cat("
+The puromycin study
+===================
+By Somebody
+-----------
+
+### Introduction 
+
+The first lines of data are:
+
+```{r}
+head(Puromycin,3)
+```
+
+There are `r nrow(Puromycin)` observations.
+
+### Transformation almost gives linearity
+```{r}
+par(mfrow=c(1,2))
+plot(rate~conc,        data=Puromycin, col=as.numeric(state))
+plot(1/rate~I(1/conc), data=Puromycin, col=as.numeric(state))
+```
+
+### Fit a model to transformed data
+```{r}
+m1 <- lm(1/rate~state + I(1/conc) + state*I(1/conc), data=Puromycin)
+summary(m1)
+```
+
+", file="Puromycin.Rmd")
+
+knit("Puromycin.Rmd")
+markdownToHTML("Puromycin.md", "Puromycin.html")
+
+## The program wkhtmltopdf does a good job in turning html into pdf:
+system("wkhtmltopdf Puromycin.html Puromycin.pdf")

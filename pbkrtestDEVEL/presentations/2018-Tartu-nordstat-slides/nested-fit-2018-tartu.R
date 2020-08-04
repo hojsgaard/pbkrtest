@@ -1,0 +1,191 @@
+library(lme4)
+library(pbkrtest)
+library(parallel)
+#' ## Analyze data
+
+rm(list=ls())
+load("nested-sim-2018.RData")
+ls()
+
+grp <- design$grp
+subj <- design$subj
+
+N <- ncol(Yn)
+##N <- 10
+PBSIM <- 1000
+
+cp <- function(rr)
+    c(sum(rr <= 0.01), sum(rr <= 0.05), sum(rr <= 0.10)) / length(rr)
+
+#' Normal
+nfun0 <- function(i){
+    lg <- lm(Yn[,i] ~ grp)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm, test="F"))[2,6]
+}
+
+nfun1 <- function(i){
+    lg <- lm(Yn[,i] ~ grp)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm, test="Chisq"))[2,5]
+}
+
+nfun2 <- function(i){
+    lg <- lmer(Yn[,i] ~ grp + (1|subj), REML=FALSE)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm))[2, "Pr(>Chisq)"]
+}
+
+nfun3 <- function(i){
+    lg <- lmer(Yn[,i] ~ grp + (1|subj), REML=FALSE)
+    sm <- update(lg, .~. - grp)
+    KRmodcomp(lg, sm)$test$p.value[1]
+}
+
+nfun4 <- function(i){
+    lg <- lmer(Yn[,i] ~ grp + (1|subj), REML=FALSE)
+    sm <- update(lg, .~. - grp)
+    seqPBmodcomp(lg, sm, nsim=PBSIM, cl=1)$test$p.value[2]
+}
+
+## nc <- 48
+## ll <- split(matrix(1:48, nr=nc),1:nc)
+## l1 <- ll[[1]]
+## system.time(mclapply(ll, function(l){ lapply(l, nfun4) }))
+## system.time(sapply(1:50, nfun4))
+
+nref0 <- sapply(1:N, nfun0)
+nref1 <- sapply(1:N, nfun1)
+nref2 <- sapply(1:N, nfun2)
+nref3 <- sapply(1:N, nfun3)
+nref4 <- sapply(1:N, nfun4)
+
+nreflist <- list(nref0, nref1, nref2, nref3, nref4)
+tab1 <- do.call(rbind, lapply(nreflist, cp))
+colnames(tab1) <- c("0.01", "0.05", "0.10")
+kable(tab1)
+
+#' ## Correlated binomials
+#' 
+
+bfun1 <- function(i){
+    y <- Yb[,i]
+    lg <- glm(cbind(y, M-y) ~ grp, family=binomial)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm, test="Chisq"))[2, "Pr(>Chi)"]
+}
+
+bfun2 <- function(i){
+    y <- Yb[,i]
+    lg <- glmer(cbind(y, M-y) ~ grp + (1|subj), family=binomial)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm))[2,8]
+}
+
+bfun4 <- function(i){
+    y <- Yb[,i]
+    lg <- glmer(cbind(y, M-y) ~ grp + (1|subj), family=binomial)    
+    sm <- update(lg, .~. - grp)
+    seqPBmodcomp(lg, sm, nsim=PBSIM, cl=1)$test$p.value[2]
+}
+
+
+bref1 <- sapply(1:N, bfun1)
+bref1 <- bref1[!is.na(bref1)]
+
+bref2 <- sapply(1:N, bfun2)
+bref2 <- bref2[!is.na(bref2)]
+
+bref4 <- sapply(1:N, bfun4)
+bref4 <- bref4[!is.na(bref4)]
+
+breflist <- list(bref1, bref2, bref4)
+btab <- do.call(rbind, lapply(breflist, cp))
+
+colnames(btab) <- c("0.01", "0.05", "0.10")
+kable(btab)
+
+pfun1 <- function(i){
+    y <- Yp[,i]
+    lg <- glm(y ~ grp, family=poisson)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm, test="Chisq"))[2, "Pr(>Chi)"]
+}
+
+pfun2 <- function(i){
+    y <- Yp[,i]
+    lg <- glmer(y ~ grp + (1|subj), family=poisson)
+    sm <- update(lg, .~. - grp)
+    as.data.frame(anova(lg, sm))[2,8]
+}
+
+pfun4 <- function(i){
+    y <- Yp[,i]
+    lg <- glmer(y ~ grp + (1|subj), family=poisson)    
+    sm <- update(lg, .~. - grp)
+    seqPBmodcomp(lg, sm, nsim=PBSIM, cl=1)$test$p.value[2]
+}
+
+pref1 <- sapply(1:N, bfun1)
+pref1 <- pref1[!is.na(pref1)]
+
+pref2 <- sapply(1:N, bfun2)
+pref2 <- pref2[!is.na(pref2)]
+
+pref4 <- sapply(1:N, bfun4)
+pref4 <- pref4[!is.na(pref4)]
+
+preflist <- list(pref1, pref2, pref4)
+ptab <- do.call(rbind, lapply(preflist, cp))
+
+colnames(ptab) <- c("0.01", "0.05", "0.10")
+kable(ptab)
+
+save(nreflist, breflist, preflist, file="reflist.RData")
+
+
+
+
+
+
+## #' Data to tartu-talk
+## #' 
+## options("digits"=4)
+## dub <- data.frame(y1=Yn[,1], y2=Yb[,1], grp, subj)
+## dput(dub)
+
+
+## #' linear model; ignore correlation
+## lg <- lm(y1 ~ grp, data=dub)
+## sm <- update(lg, .~. - grp)
+## anova(lg)
+
+## lg %>% summary  %>% coef %>% as.data.frame -> cf
+## u <- (lg %>% summary  %>% coef)[,3]
+## cf$chisq <- 1-pchisq(u^2, df=1)
+## cf
+
+## #' linear model to each stratum; same as analyzing average
+## dub$E <- with(dub, interaction(grp, subj))
+## lg <- aov(y1 ~ grp + Error(E), data=dub)
+## summary(lg)
+
+## duba <- aggregate(y1~grp+subj, FUN=mean, data=dub)
+## lm(y1~grp, data=duba) %>% summary %>% coef
+
+## #' mixed model
+## lg3 <- lmer(y1 ~ grp + (1|subj), data=dub, REML=F)
+## coef(summary(lg3))
+## sm3 <- update(lg3, .~. - grp)
+## anova(lg3, sm3)
+
+
+## coef(summary(lg))
+## coef(summary(lg3))
+
+## load_all("pbkrtest")
+## KRmodcomp(lg3, sm3)
+## PBmodcomp(lg3, sm3)
+## seqPBmodcomp(lg3, sm3)
+
+

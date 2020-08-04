@@ -1,0 +1,767 @@
+%%%
+%%% Automatically generated file from  shell.Rnw - DO NOT EDIT MANUALLY
+%%%
+\documentclass[10pt]{article}
+\usepackage{url,a4}
+\usepackage{SHmathnot,graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[authoryear,round,longnamesfirst]{natbib}
+\parskip5pt
+\parindent0pt
+\def\R{\texttt{R}}
+\def\SAS{\texttt{SAS}}
+
+
+\RequirePackage{boxedminipage}
+
+\begin{document}
+
+\renewenvironment{Schunk}{\begin{center}
+    \begin{boxedminipage}{0.95\textwidth}}{
+    \end{boxedminipage}\end{center}}
+
+\RecustomVerbatimEnvironment{Sinput}{Verbatim}%
+{fontsize=\small,formatcom=\color{black},frame=single,framerule=1pt}
+\RecustomVerbatimEnvironment{Soutput}{Verbatim}%
+{fontsize=\scriptsize, formatcom=\color{black},frame=single,framerule=0.1pt}
+
+\title{Some aspects of practical data analysis of ``glm-type''
+data  using
+\R.}
+\author{        
+    Søren Højsgaard\\
+    {\normalfont Biometry Research Unit}\\
+    {\normalfont Danish Institute of Agricultural Sciences} \\
+    \url{sorenh@agrsci.dk} 
+  }
+\maketitle
+\SweaveOpts{prefix.string=fig/dietox}
+%\setkeys{Gin}{width=0.5\textwidth}
+
+\def\shfig#1#2#3{
+\begin{figure}[ht]
+  \centering
+  \includegraphics[#3]{fig/#1}
+  \caption{FILENAME: #1}
+  \label{fig:#1}
+\end{figure}
+}
+\def\newslide{}
+
+\tableofcontents
+%\newpage
+@ 
+<<echo=F,results=hide>>=
+f <- list.files("../SHtools/R",pattern="\\.R",full.names=T)
+f <- f[(1:length(f))[-grep("~",f)]]
+sapply(f,source)
+library(geepack)
+@ %def 
+
+<<echo=FALSE>>=
+options(width=70,prompt='>',continue=' ')
+@
+
+
+
+
+
+
+\section{Introduction} 
+
+This note illustrates some aspects of practical data analysis of ``glm-type''
+data  using
+\R. Thus we do not claim that this is THE appropriate analysis of the specific
+data. In the note, \R\ code is put into boxes with thick lines while 
+outout is put into boxes with thin lines, e.g.\
+
+@ 
+<<>>=
+x <- 1:10
+x
+@ %def 
+
+
+\subsection{\R\ Packages used}
+
+\begin{itemize}
+\item In this note we use the package \texttt{geepack} which are on
+CRAN, \url{www.R-project.org}. 
+
+\item In addition we use the package \texttt{doBy} which is NOT on CRAN. \texttt{doBy}
+can be downloaded from
+\url{http://genetics.agrsci.dk/~sorenh/misc}. 
+
+\item Finally we use the \texttt{pda} package (which is also not on CRAN,
+but available from Brian Yandells homepage,
+\url{http://www.stat.wisc.edu/~yandell/}.) Note that \texttt{pda} is planned to
+go on CRAN (hopefully later this year). The future of \texttt{doBy} is more
+uncertain. Perhaps someone will incorporate in one of these general utilities
+packages on CRAN. 
+
+\end{itemize}
+
+The \texttt{doBy} package contains various facilities for making group wise
+plots (surely other -- and better -- facilities are available for this in R. We
+have just found that the facilities in \texttt{doBy} are simple to use for
+novices.) In addition the package contains facilities for working with
+generalized estimating equations (GEE)s through the function
+\texttt{geeglm()}. This function is not much more than a ``glm--like'' front end to
+the \texttt{geese()} function in the \texttt{geepack} package. Finally the
+package contains the \texttt{esticon()} function by which one can specify quite
+general contrasts.
+The \texttt{pda}
+package contains lots of material. Here we only focus on using the
+\texttt{lsmean()} function. 
+
+
+
+
+%%% Input from file PigGrowth.Rnw
+%\newslide
+\subsection{Pig growth -- \texttt{dietox}}
+\label{sec:dietox}
+
+The data used here are described by \cite{lauridsen:99} and contains growth data
+for a pig feeding experiment. Data is available as the \texttt{dietox} data set
+in the \texttt{doBy} package for \R. 
+
+One of the questions asked in connection with the experiment was whether 
+copper added to pig feed increase/decrease growth. 
+Copper (hereafter abbreviated Cu) was used in three levels Cu=1: No copper,
+Cu=2: 35 mg/kg feed and Cu=3: 175 mg/kg feed. Here we shall analyze data as if they were
+layed out as a factorial experiment (even though the design was a (almost)
+balanced incomplete block design -- because there is an issue of a litter
+effect). 
+The weight of slaughter pigs were measured weekly over a 12 week period. 
+
+
+\section{Loading data}
+
+Data can be loaded as:
+@ 
+<<>>=
+library(doBy)
+data(dietox)
+dietox[1:5,]
+@ %def 
+
+Cu is coded with levels 1,2 and 3 meaning that \R\ will regard Cu as a numeric
+variable, which it is not. To turn Cu into a factor we do:
+@ 
+<<>>=
+dietox$Cu     <- as.factor(dietox$Cu)
+@ %def 
+
+Note: If instead data was saved as a comma--searated file (a .csv file) it could be
+loaded as
+@ 
+<<eval=F>>=
+dietox <- read.csv("dietox.csv")
+@ %def 
+
+\newslide
+\section{Looking at data}
+
+
+
+\shfig{dietox01}{XXX}{height=4cm}
+
+The weight as function of time is shown in  Figure~\ref{fig:dietox01}.  
+which suggests
+\begin{itemize}
+\item Approximately linear growth curves
+\item Some tendency for variance to increase with mean
+\end{itemize}
+ 
+This plot
+is produced using the \texttt{plotBy()} function in the \texttt{doBy} package as follows:
+First, make space for 1 row and 3 columns of plots:
+@ 
+<<>>=
+par(mfrow=c(1,3))
+@ %def 
+
+Then call the \texttt{plotBy()} function:
+@ 
+<<eval=F,fig=F>>=
+plotBy(Weight~Time,subject=Pig,group=Cu,title="Cu=", data=dietox,col=1:100,lines=T)
+@ %def 
+
+\newslide
+
+\newslide
+
+
+\subsection{Looking at the growth curve}
+
+Next we  calculate the mean and variance for each combination of
+Cu and Time using the \texttt{summaryBy()} function, which is also in the
+\texttt{doBy} package:
+@ 
+<<fig=F>>=
+m.dietox <- summaryBy(Weight~Cu+Time, data=dietox, FUN=c(mean,var))
+m.dietox[1:5,]
+@ %def 
+\newslide
+
+Figure~\ref{fig:dietox01mean} gives an idea of the growth curves.
+Figure~\ref{fig:dietox01mean} suggests that
+\begin{itemize}
+\item Growth is not quite linear. The curves are curved (slightly S--shaped)!
+\item If there is a treatment effect, then it is small!
+\end{itemize}
+The plot is produced by:
+
+@ 
+<<>>=
+par(mfrow=c(1,1))
+plotBy(mean.Weight~Time,subject=Cu, data=m.dietox, lines=T,
+col=c("black","red","green"), silent=F)
+@ %def 
+
+\shfig{dietox01mean}{XXX}{height=6cm,width=7cm}
+
+
+
+
+\subsection{Modelling the mean structure}
+
+
+Based on Figure \ref{fig:dietox01mean} we fit polynomial models to the means as
+@ 
+<<>>=
+lm1 <- lm(mean.Weight~Cu*Time, data=m.dietox)
+lm2 <- lm(mean.Weight~Cu*(Time+I(Time^2)), data=m.dietox)
+lm3 <- lm(mean.Weight~Cu*(Time+I(Time^2)+I(Time^3)), data=m.dietox)
+@ %def 
+- and plot the residuals (Figure~\ref{fig:dietox-residplots01}):
+@ 
+<<residplots01,fig=F>>=
+ par(mfrow=c(1,3))
+ plotBy(resid(lm1)~Time, subject=Cu, data=m.dietox,lines=T,col=1:3)
+ plotBy(resid(lm2)~Time, subject=Cu, data=m.dietox,lines=T,col=1:3)
+ plotBy(resid(lm3)~Time, subject=Cu, data=m.dietox,lines=T,col=1:3)
+@ %def 
+
+\shfig{dietox-residplots01}{XXX}{height=6cm,width=14cm}
+
+The residual plots comfirm the S--shaped curve: A 3rd degree polynomial is
+needed to remove systematic patterns in the residuals.
+Inspired by this we fit the same model to the original data:
+@ 
+<<residplots02,fig=F>>=
+mf <- formula(Weight~Cu*(Time+I(Time^2)+I(Time^3)))
+lm4 <- lm(mf, data=dietox)
+plotBy(resid(lm4)~Time, subject=Pig, data=dietox,lines=T,col=1:3)
+@ %def 
+\shfig{dietox-residplots02}{XXX}{height=6cm,width=7cm}
+
+Figure~\ref{fig:dietox-residplots02} shows that a 3rd degree polynomial seems to
+remove all systematic effects, but also that the variance increases with time
+(and hence with the mean). Finally the plot shows that measurements on the same
+animal tend to be positively correlated.
+
+
+\subsection{Investigating the relationship between the mean and variance}
+
+Next we can plot the log variance against the log mean and fit a straight line
+to these data (see Figure~\ref{fig:dietox-010}):
+@ 
+<<fig=F>>=
+plot(log(var.Weight)~log(mean.Weight), data=m.dietox)
+l <- lm(log(var.Weight)~log(mean.Weight), data=m.dietox)
+abline(l,lwd=2,col="red")
+l
+@ %def 
+The plot suggests that 
+\begin{equation}
+  \label{eq:vm1}
+ \log Var(y) \approx a + b \log E(y) 
+\end{equation}
+and hence
+$$
+Var(y) \approx e^a \cdot E(y)^b
+$$
+The slope $b$ is about one suggesting that the variance is approximately
+proportional to the mean.
+
+\shfig{dietox-010}{XXX}{height=6cm,width=7cm}
+
+Note that we can calculate the mean and variance for each combination of time
+and Cu in this example since there are many observations for each combination of
+\texttt{Time x Cu}. In situations where this is not the case an alternative idea
+can be used: We found that a 3rd degree polynomial seems to remove practically
+all systematic variation from data. Let $\hat\mu$ and $e$ denote the fitted
+values and the residuals under the 3rd degree model \texttt{lm4}. Then we can
+plot $\log e^2$ against $\log \hat\mu$:
+@ 
+<<varmeanplots01, fig=F>>=
+plot(log(fitted(lm4)),log(resid(lm4)^2))
+l <- lm(log(resid(lm4)^2)~log(fitted(lm4)))
+abline(l, col="red")
+l
+@ %def 
+
+The idea behind doing so is as follows: The residuals $e_i = y_i -\hat\mu_i$
+have mean $E(e_i)=0$ and the variance is $Var(e_i)\approx Var(y_i)$. Now since
+$E(e_i)=0$ we have $Var(e_i) =E(e_i^2)$. A simple estimate of $E(e_i^2)$ is
+$e_i^2$. So discovering an (approximately) linear relationship between 
+$\log e_i^2$ and $\log \hat\mu_i$ suggests the variance function in
+\eqref{eq:vm1}. Above we find that the slope is aboout 1 in accordance with the
+previous findings. The plot is in Figure~\ref{fig:dietox-varmeanplots01}.  
+
+\shfig{dietox-varmeanplots01}{XXX}{height=6cm,width=10cm}
+
+
+
+\newslide
+
+
+
+
+
+\section{Fitting a gee model}
+
+Based on the previous findings interest is in fitting a model which:
+\begin{enumerate}
+\item Describes the mean structure (and we have already seen that a 3rd degree
+  polynomial could be a good starting point).
+\item Accounts for that the variance is approximately proportional to the mean.
+\item Accounts for that there are repeated measurements on the same animal
+\end{enumerate}
+
+
+One way to meet these three requirements is to fit a gee model:
+@ 
+<<>>=
+gee1 <- geeglm(mf, data=dietox, id=Pig, family=poisson("identity"),corstr="ar1")
+@ %def 
+
+For comparison we fit a quasi--poisson model which only accounts for 1. and
+2. above as
+@ 
+<<>>=
+qpo1 <-glm(mf, data=dietox, family=quasipoisson("identity"))
+@ %def 
+
+
+It is informative to compare the regression coefficients and the
+models and the
+standard errors of the 1) gee model, 2) the
+quasi--poisson model and 3) the linear model:
+
+@ 
+<<>>=
+sgee1 <- summary(gee1)
+sqpo1 <- summary(qpo1)
+slm4 <- summary(lm4)
+Egee <- sgee1$coef[,1]
+Eqpo <- sqpo1$coef[,1]
+Elm <- slm4$coef[,1]
+SEgee <- sgee1$coef[,2]
+SEqpo <- sqpo1$coef[,2]
+SElm <- slm4$coef[,2]
+Rgee  <-  sgee1$coef[,2]/slm4$coef[,2]
+Rqpo <- sqpo1$coef[,2]/slm4$coef[,2]
+
+round(cbind(Egee,Eqpo,Elm,SEgee,SEqpo,SElm,Rgee,Rqpo),3)
+@ %def 
+
+The output shows that 1) the parameter estimates are almost identical whereas 2)
+the standard errors differ quite a bit. \texttt{Rgee} gives the ratio between
+the standard errors for the gee model and the linear model while \texttt{Rqpo}
+gives the ratio between the standard errors for the quasi poisson model and the
+linear model. The gee model reduces the standard error to about 0.3 of the
+standard errors for the linear model whereas the quasi poisson model reduces the
+standard error to about 0.8 of the standard errors for the linear model.
+
+So what can be concluded from this: We have three different models (or perhaps more
+appropriately: three different estimation methods) which produce
+practically the same parameter estimates but with markedly different
+standard errors of the estimates?
+
+We claim that the standard errors for the gee model are the most reliable, i.e.\
+the other two models overestimate the standard error.  The reason being that the
+gee model adjusts for the fact that measurements at two different time points on
+the same pig tend to be more alike than on two different pigs. We shall return
+to this in Section~\ref{why}.
+
+
+\section{Model selection}
+
+
+We proceed by adding terms sequentially to the models
+@ 
+<<eval=F>>=
+anovalm4  <- anova(lm4)
+anovaqpo1 <- anova(qpo1,test="F")
+anovagee1 <- anova(gee1)
+@ %def 
+
+@ 
+<<>>=
+anovalm4
+anovaqpo1
+anovagee1
+@ %def 
+
+We see that only under the gee model any treatment effect comes near to being
+significant. This is closely related to that the standard errors of the
+parameter estimates are smallest under the gee model. \cite{lauridsen:99} find,
+by a different analysis (random regression) that there is a statistically
+significant effect of Cu -- but the effect is clearly very small.
+
+Dropping the highest order term from the model gives the model gee2 below, and
+this model will be our focus in the following:
+@ 
+<<>>=
+gee2 <- update(gee1,.~.-Cu:I(Time^3))
+summary(gee2)
+@ %def 
+
+
+
+\section{Estimating contrasts}
+
+Suppose first we want to estimate the predicted value for Cu=2 and Cu=3 at Time=7.
+The traditional way of doing this in \R\ is by using the \texttt{predict()} function:
+@ 
+<<>>=
+dnew <- data.frame(Time=c(7,7),Cu=as.factor(c(2,3)))
+predict(gee2,dnew)
+@ %def 
+
+The difficulty arises when wanting to estimate the difference in those predicted
+values. A solution to this problem is provided by 
+ the \texttt{esticon()} function in the package
+XXXX as follows. Define
+@ 
+<<>>=
+L.Cu2 <- c(1,1,0,7,7^2,7^3,7,0,7^2,0)
+L.Cu3 <- c(1,0,1,7,7^2,7^3,0,7,0,7^2)
+L.Cu2
+L.Cu3
+@ %def 
+
+Then the predicted values and the difference between them is 
+@ 
+<<>>=
+sum(gee2$coef * L.Cu2)
+sum(gee2$coef * L.Cu3)
+sum(gee2$coef * (L.Cu3-L.Cu2))
+@ %def 
+
+The problem in practice is that when estimating such functions (contrasts) we
+always want an estimate of the standard error and often we want to test the
+hypothesis that the contrast is equal to a specifed value. To obtain this we
+use the \texttt{esticon()} function
+@ 
+<<>>=
+L <- rbind(L.Cu2,L.Cu3,diff=L.Cu3-L.Cu2)
+L
+esticon(gee2, L)
+@ %def 
+
+So the estimated difference is not significantly different from
+\texttt{beta0=0}. 
+
+
+\section{LSmeans}
+
+We conclude by showing how to calculate LSmeans. This is done using the
+\texttt{lsmean()} function in the \texttt{pda} package. One has to be a little
+bit careful when using \texttt{lsmean()} as illustrated in the following:
+
+Consider
+@ 
+<<>>=
+lsmean(gee2)
+@ %def 
+
+The values in the \texttt{pred} column are ``wrong'', (and it is the hope that
+this error in the \texttt{pda} package will be fixed). To get the right answer
+one needs to define the quadratic and cubic terms directly and rewrite the model
+in terms of these as: 
+@ 
+<<>>=
+dietox2 <- dietox
+dietox2$Time2 <- dietox$Time^2
+dietox2$Time3 <- dietox$Time^3
+
+gee3 <- geeglm(Weight~Cu*Time+Cu*Time2+Time3, data=dietox2, id=Pig, family=poisson("identity"),corstr="ar1")
+lsmean(gee3)
+@ %def 
+
+For completeness we write out the details of what the specific LSmeans are in
+this case:
+@ 
+<<>>=
+mT <- mean(dietox$Time)
+mT2 <- mean(dietox$Time^2)
+mT3 <- mean(dietox$Time^3)
+
+L1 <- c(1,0,0,mT,mT2,mT3,0,0,0,0)
+L2 <- c(1,1,0,mT,mT2,mT3,mT,0,mT2,0)
+L3 <- c(1,0,1,mT,mT2,mT3,0,mT,0,mT2)
+esticon(gee2,rbind(L1,L2,L3))
+@ %def 
+
+
+ 
+
+
+\appendix
+
+\section{On why the gee model fits best}
+\label{why}
+
+
+To justify the claim that the standard errors produced from the gee model are
+the most appropriate ones, reconsider the notion of variance of an estimator: Let
+$\hat\theta(y)$ be an estimator of a parameter $\theta$ based on a sample of
+data $y=(y_1, \dots, y_n)$.  The variance $Var(\hat\theta)$ is a measure of how
+much $\hat\theta(y)$ will vary if the experiment is repeated under identical
+conditions a large number of times. To be specific let $y^1=(y^1_1,
+\dots,y^1_n), \dots, y^R=(y^R_1, \dots,y^R_n)$ denote the samples which are
+obtained after repeating the experiment $R$ times. Let $\hat\theta(y^1), \dots,
+\hat\theta(y^R)$ be the corresponding estimates calculated for each of the $R$
+experiments. Then the variance of $\hat\theta(y^1), \dots, \hat\theta(y^R)$ is
+(when $R\rightarrow \infty$) equal to $Var(\hat\theta)$.
+
+In practice $R$ is finite.  Letting $\bar{ \hat\theta}$ denote the average of
+$\hat\theta(y^1), \dots, \hat\theta(y^R)$. Then 
+$$
+\var(\hat\theta) \approx
+\frac 1 {R-1} \sum_r (\hat\theta(y_r)- \bar{ \hat\theta} )^2 
+$$
+
+In real life the experiment can not be repeated, but there is a statistical
+technique called ``jacknife'' by which one can mimic the replication of an
+experiment. We will not go into details about the method but refer to e.g.\
+\cite{efron:82}. Instead we will show that the jacknife technique is very simple to
+implement in practice:
+@ 
+<<eval=F>>=
+d <- unique(dietox$Pig)
+v1 <- v2 <- v3 <- NULL
+for (i in 1:length(d)){
+ print(c(i,d[i]))
+ dsub <- subset(dietox,Pig!=d[i])
+ gee1 <- geeglm(mf, data=dsub, id=Pig, family=poisson("identity"),corstr="ar1")
+ qpo1 <-glm(mf, data=dsub, family=quasipoisson("identity"))
+ lm4 <- lm(mf, data=dsub)
+ v1 <- rbind(v1,summary(gee1)$coef[,1])
+ v2 <- rbind(v2,summary(qpo1)$coef[,1])
+ v3 <- rbind(v3,summary(lm4)$coef[,1]) 
+ }
+SEgeej <- sqrt(apply(v1,2,var)*(nrow(v1)-1))
+SEqpoj <- sqrt(apply(v2,2,var)*(nrow(v2)-1))
+SElmj <- sqrt(apply(v3,2,var)*(nrow(v3)-1))
+@ %def 
+
+@ 
+<<>>=
+round(cbind(SEqpoj,SEgeej,SElmj,SEgee,SEqpo, SElm),3)
+@ %def 
+
+The first three columns contain the jacknife estimates of the standard errors
+under the three different estimation methods. They are practically identical and
+represent an approximation to the true standard error which one would find when
+repeating the experiment a large number of times. The next three columns contain
+the standard errors estimated using the different models, and we see that the
+gee model produces the standard errors which are closest to the ``true'' ones.
+
+
+
+
+
+
+
+
+% \section{Comparison: Fitting a mixed model}
+
+
+
+% @ 
+% <<>>=
+% library(nlme)
+% lme1 <- lme(Weight~Cu*(Time+I(Time^2)+I(Time^3)), data = dietox, random=~1|Pig)
+% summary(lme1)$tTable
+% anova(lme1)
+% @ %def 
+
+% @ 
+% <<>>=
+% cbind(SElme=summary(lme1)$tTable[,2],
+% SEgee=sgee1$coef[,2],SEqpo=sqpo1$coef[,2],SElm=slm4$coef[,2]) 
+% @ %def 
+
+
+
+
+
+
+% \newslide
+
+% \subsubsection{Linear regression}
+
+% Let $c$: Cu, $p$: pig (within treatment), $t$: time.
+
+% Simple regression model:
+% $$
+% y_{cpt} = \alpha+ \beta t+ \alpha_c + \beta_c t + e_{cpt}; \ \ e_{cpt}\sim N(0,\sigma^2)
+% $$
+% Written shortly as:
+% $$
+% [y] = 1 + \underline{time} + Cu + Cu * \underline{time} + [e]
+% $$
+
+
+% \newslide
+% \subsubsection{In \SAS\ and \R}
+
+% \begin{verbatim}
+% proc mixed data=dietox noinfo noclprint;
+%   class cu pig;
+%   model weight = time cu cu * time / solution htype=1;
+% run;
+% \end{verbatim}
+
+
+% @ 
+% <<eval=T>>=
+% fm0 <- lm (Weight ~ Time + Cu + Cu * Time, data = dietox)
+% @ %def 
+
+
+% To plot the residuals and the fitted values, one can do:
+% @ 
+% <<>>=
+% par(mfrow=c(2,3))
+% plotBy(resid(fm0)~Time,subject=Pig,group=Cu, data=dietox, lines=T, col=1:100)
+% plotBy(fitted(fm0)~Time,subject=Pig,group=Cu, data=dietox, lines=T, col=1:3)
+% @ %def 
+
+% \newslide
+% \subsubsection{Figures}
+% \shfig{dietox02}{XXX}{}
+
+% If model is appropriate, residuals should fluctuate randomly around zero. That
+% is clearly not so. 
+
+% \newslide
+% \subsubsection{Adding a random intercept term}
+
+% Pigs who start above (below) average tend to keep that position throughout the
+% experiment. 
+
+% This suggests to add a pig--specific (random) intercept term:
+
+% $$
+% y_{cpt} = \alpha+ \beta t+ \alpha_c + \beta_c t +{\color{red}U_{cp}}+ e_{cpt}; \ \ 
+% %e_{cpt}\sim N(0,\sigma_e^2), U_{cp}\sim N(0,\sigma_U^2), 
+% $$
+% Written shortly as:
+% $$
+% [y] = 1 + \underline{time} + Cu + Cu * \underline{time} + {\color{red}[Cu*Pig]}+[e]
+% $$
+
+
+
+
+% \newslide
+% \subsubsection{In \SAS\ and \R}
+
+% \begin{verbatim}
+% proc mixed data=dietox noinfo noclprint;
+%   class cu pig;
+%   model weight = time cu cu * time / solution htype=1;
+%   random int / subject=cu*pig;
+% run;
+% \end{verbatim}
+
+% @ 
+% <<eval=T>>=
+% library(nlme)
+% fm1 <- lme(Weight ~ Time + Cu + Cu * Time, data = dietox, random=~1|Pig)
+% @ %def 
+
+
+% \newslide
+% @ 
+% <<echo=F,eval=F>>=
+% anova(fm1)
+% @ %def 
+
+% \newslide
+% \subsubsection{Figures}
+
+% \shfig{dietox03}{XXX}{}
+
+% Residuals still problematic: Residuals on some pigs steadily increasing, others
+% steadily decreasing.
+
+
+% \newslide
+% \subsubsection{Adding a random slope term}
+
+% To account for this phenomenon, one can add a pig--specific (random) slope term:
+% $$
+% y_{cpt} = \alpha+ \beta t+ \alpha_c + \beta_c t +U_{cp}+ {\color{red}W_{cp} t} + e_{cpt}; \ \ 
+% %e_{cpt}\sim N(0,\sigma_e^2), U_{cp}\sim N(0,\sigma_U^2), W_{cp}\sim N(0,\sigma_W^2), 
+% $$
+% Written shortly as:
+% $$
+% [y] = 1 + \underline{time} + Cu + Cu * \underline{time} + [CU*Pig] + 
+% {\color{red}[CU*Pig]*\underline{time}}+[e]
+% $$
+
+% Such a model is called a \com{random regression model}.
+
+% \newslide
+% \subsubsection{In \SAS\ and \R}
+
+% \begin{verbatim}
+% data dietox; set dietox; 
+%   timec = time;
+
+% proc mixed data=dietox noinfo noclprint;
+%   class cu pig timec;
+%   model weight = time cu cu * time / solution htype=1;
+%   random int time/ subject=cu*pig;
+% run;
+% \end{verbatim}
+
+% @ 
+% <<>>=
+% fm2 <- lme(Weight ~ Cu * Time, data = dietox, random = ~ 1 + Time| Pig)
+% @ %def 
+% \newslide
+% @ 
+% <<echo=F,eval=F>>=
+% anova(fm2)
+% @ %def 
+
+%%% End of input from file PigGrowth.Rnw
+
+
+%\input{DietOx-source.Rnw}
+@ 
+<<echo=F>>=
+options(width=140,prompt='> ')
+@ %def 
+
+\bibliographystyle{plainnat}
+\bibliography{fulldef,stat}
+
+\end{document}
+
+
+
+
+
+
+
+

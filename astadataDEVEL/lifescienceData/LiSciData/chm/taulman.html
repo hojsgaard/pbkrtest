@@ -1,0 +1,78 @@
+<html><head><title>Squirrels</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>taulman(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   taulman">
+<param name="keyword" value=" Squirrels">
+</object>
+
+
+<h2>Squirrels</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The demographic distribution of caught flying squirrels in reponse to experimental logging (harvest)
+and year of the eperiment.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(taulman)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+This data frame contains:
+<dl>
+<dt>treat:</dt><dd>treatment (hervest, control</dd>
+<dt>year:</dt><dd>year if experiment</dd>
+<dt>age:</dt><dd>age of the caught flying squirrel</dd>
+<dt>count:</dt><dd>number of squirrels caught</dd>
+
+<p>
+</dl>
+
+<h3>Details</h3>
+
+<p>
+Logistic regression, log-linear model, three-way table
+</p>
+
+
+<h3>Source</h3>
+
+<p>
+Taulman. J.F, Smith, K.G. and Thill, R.E. (1998)
+Demographic and behavioral responses of southern flying squirrels to experimental logging in Arkansas
+<EM>Ecological Applications</EM>, 8, pp. 1144-1155
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Quinn, Gerry. P. and Keough, Michael J. (2002) <EM>Experimental Design and Data Analysis for Biologists</EM>, University Press, Cambridge
+Table 14-3 and Box 14-6
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(taulman)
+tab&lt;-xtabs(count~treat+year+age,data=taulman)
+print(ftable(tab))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

@@ -1,0 +1,75 @@
+<html><head><title>Regeneration and dispersal mechanism of plants</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>french(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   french">
+<param name="keyword" value=" Regeneration and dispersal mechanism of plants">
+</object>
+
+
+<h2>Regeneration and dispersal mechanism of plants</h2>
+
+
+<h3>Description</h3>
+
+<p>
+In a study the number of occurrences  between the regeneration mechanism of species 
+(either by seed or only vegetatively)
+and their dispersal mechanism (by ants or vertebrate) was recorded.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(french)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+This data frame contains:
+<dl>
+<dt>regen:</dt><dd>regeneration mechanism, seed og veg(etatively)</dd>
+<dt>dispers:</dt><dd>disperal mechanism, ant or vert(ebrate)</dd>
+<dt>count:</dt><dd>number occurences in each class</dd>
+</dl>
+
+<h3>Details</h3>
+
+<p>
+Log-linear model
+</p>
+
+
+<h3>Source</h3>
+
+<p>
+French, R.H and Westoby, M. (1996) 
+vertebrate-dispersed species in fore-prone environment.
+<EM>Australian Journal of Ecology</EM>, 21, pp. 379&ndash;385
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Quinn, Gerry. P. and Keough, Michael J. (2002) <EM>Experimental Design and Data Analysis for Biologists</EM>, University Press, Cambridge
+table 14.1, Box 14.2
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(french)
+print(xtabs(count~regen+dispers,data=french))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

@@ -1,0 +1,957 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<meta name="GENERATOR" content="TtH 3.89">
+ <style type="text/css"> div.p { margin-top: 7pt;}</style>
+ <style type="text/css"><!--
+ td div.comp { margin-top: -0.6ex; margin-bottom: -1ex;}
+ td div.comb { margin-top: -0.6ex; margin-bottom: -.6ex;}
+ td div.hrcomp { line-height: 0.9; margin-top: -0.8ex; margin-bottom: -1ex;}
+ td div.norm {line-height:normal;}
+ span.roman {font-family: serif; font-style: normal; font-weight: normal;} 
+ span.overacc2 {position: relative;  left: .8em; top: -1.2ex;}
+ span.overacc1 {position: relative;  left: .6em; top: -1.2ex;} --></style>
+ 
+
+
+<title> LSmeans, population means, estimates and contrasts  with the {doBy} package</title>
+ 
+<h1 align="center">LSmeans, population means, estimates and contrasts  with the <tt>doBy</tt> package </h1>
+
+<h3 align="center">S&#248;ren H&#248;jsgaard </h3>
+
+<h3 align="center"><b>doBy</b> version 4.5-5 as of feb 05, 2013 </h3>
+
+<div class="p"><!----></div>
+  
+<div class="p"><!----></div>
+
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; Introduction</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; The <tt>esticon</tt> function</a><br />
+<a href="#tth_sEc3"
+>3&nbsp; A simulated dataset</a><br />
+<a href="#tth_sEc4"
+>4&nbsp; Linear functions of parameters, contrasts</a><br />
+<a href="#tth_sEc5"
+>5&nbsp; Population means</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.1"
+>5.1&nbsp; A brute-force calculation</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc5.2"
+>5.2&nbsp; Using <tt>esticon()</tt></a><br />
+<a href="#tth_sEc6"
+>6&nbsp; Using <tt>popMatrix()</tt>&nbsp;and <tt>popMeans()</tt></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.1"
+>6.1&nbsp; Using the <tt>at</tt> argument</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.2"
+>6.2&nbsp; Ambiguous specification when using the <tt>effect</tt> and <tt>at</tt> arguments</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.3"
+>6.3&nbsp; Using covariates</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.4"
+>6.4&nbsp; Using transformed covariates</a><br />
+<a href="#tth_sEc7"
+>7&nbsp; The <tt>engine</tt> argument of <tt>popMeans()</tt></a><br />
+
+
+<div class="p"><!----></div>
+
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Introduction</h2>
+<a name="sec:xxx">
+</a>
+
+<div class="p"><!----></div>
+This is a working document; please feel free to suggest improvements.
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;library(doBy)
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;The <tt>esticon</tt> function</h2>
+<a name="esticon">
+</a>
+
+<div class="p"><!----></div>
+Consider a linear model which explains <tt>Ozone</tt> as a linear
+function of <tt>Month</tt> and <tt>Wind</tt>:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;data(airquality)
+&nbsp;airquality&nbsp;&lt;-&nbsp;transform(airquality,&nbsp;Month=factor(Month))
+&nbsp;m&lt;-lm(Ozone~Month*Wind,&nbsp;data=airquality)
+&nbsp;coefficients(m)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+(Intercept)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Month6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Month7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Month8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Month9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wind&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;50.748&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-41.793&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;68.296&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;82.211&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;23.439&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-2.368&nbsp;
+Month6:Wind&nbsp;Month7:Wind&nbsp;Month8:Wind&nbsp;Month9:Wind&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.051&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-4.663&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-6.154&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-1.874&nbsp;
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+When a parameter vector &#946; of (systematic) effects have been
+estimated, interest is often in a particular estimable function, i.e.&nbsp;linear combination &#955;<sup>T</sup> &#946; and/or testing the hypothesis
+H<sub>0</sub>: &#955;<sup>T</sup> &#946; = &#946;<sub>0</sub> where &#955; is a specific vector
+defined by the user.
+
+<div class="p"><!----></div>
+Suppose for example we want to calculate the expected difference in
+ozone between consequtive months at wind speed 10 mph (which is about
+the average wind speed over the whole period).
+
+<div class="p"><!----></div>
+The <tt>esticon</tt> function provides a way of doing so.
+ We can specify several &#955; vectors at the same time. For example
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;Lambda&nbsp;&lt;-&nbsp;rbind(
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,-1,0,0,0,0,-10,0,0,0),
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,1,-1,0,0,0,10,-10,0,0),
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,0,1,-1,0,0,0,10,-10,0),
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,0,0,1,-1,0,0,0,10,-10)
+&nbsp;&nbsp;&nbsp;&nbsp;)
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;esticon(m,&nbsp;Lambda)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;beta0&nbsp;Estimate&nbsp;Std.Error&nbsp;t.value&nbsp;&nbsp;DF&nbsp;Pr(&#62;|t|)&nbsp;&nbsp;&nbsp;Lower&nbsp;&nbsp;Upper
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1.2871&nbsp;&nbsp;&nbsp;&nbsp;10.238&nbsp;&nbsp;0.1257&nbsp;106&nbsp;&nbsp;0.90019&nbsp;-19.010&nbsp;21.585
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-22.9503&nbsp;&nbsp;&nbsp;&nbsp;10.310&nbsp;-2.2259&nbsp;106&nbsp;&nbsp;0.02814&nbsp;-43.392&nbsp;-2.509
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0.9954&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7.094&nbsp;&nbsp;0.1403&nbsp;106&nbsp;&nbsp;0.88867&nbsp;-13.069&nbsp;15.060
+4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;15.9651&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.560&nbsp;&nbsp;2.4337&nbsp;106&nbsp;&nbsp;0.01662&nbsp;&nbsp;&nbsp;2.959&nbsp;28.971
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+In other cases, interest is in testing a hypothesis of a contrast
+H<sub>0</sub>: &#923; &#946; = &#946;<sub>0</sub> where &#923; is a matrix. For example
+a test of no interaction between <tt>Month</tt> and <tt>Wind</tt> can be
+made by testing jointly that the last four parameters in <tt>m</tt> are
+zero (observe that the test is a Wald test):
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;Lambda&nbsp;&lt;-&nbsp;rbind(
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,0,0,0,0,0,1,0,0,0),
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,0,0,0,0,0,0,1,0,0),
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,0,0,0,0,0,0,0,1,0),
+&nbsp;&nbsp;&nbsp;&nbsp;c(0,0,0,0,0,0,0,0,0,1)
+&nbsp;&nbsp;&nbsp;&nbsp;)
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;esticon(m,&nbsp;Lambda,&nbsp;joint.test=T)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;X2.stat&nbsp;DF&nbsp;Pr(&#62;|X^2|)
+1&nbsp;&nbsp;&nbsp;22.11&nbsp;&nbsp;4&nbsp;&nbsp;0.0001906
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+For a linear normal model, one would typically prefer to do a
+likelihood ratio test instead. However, for generalized estimating
+equations of glm-type (as dealt with in the packages <b>geepack</b>
+and <b>gee</b>) there is no likelihood. In this case <tt>esticon</tt>
+function provides an operational alternative.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;A simulated dataset</h2>
+<a name="sec:simulated-dataset">
+</a>
+
+<div class="p"><!----></div>
+Consider these data:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;library(doBy)
+&nbsp;dd&nbsp;&lt;-&nbsp;expand.grid(A=factor(1:3),B=factor(1:3),C=factor(1:2))
+&nbsp;dd$y&nbsp;&lt;-&nbsp;rnorm(nrow(dd))
+&nbsp;dd$x&nbsp;&lt;-&nbsp;rnorm(nrow(dd))^2
+&nbsp;dd$z&nbsp;&lt;-&nbsp;rnorm(nrow(dd))
+&nbsp;head(dd,10)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;A&nbsp;B&nbsp;C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z
+1&nbsp;&nbsp;1&nbsp;1&nbsp;1&nbsp;-1.39918&nbsp;&nbsp;1.324525&nbsp;&nbsp;1.2155
+2&nbsp;&nbsp;2&nbsp;1&nbsp;1&nbsp;&nbsp;1.31774&nbsp;&nbsp;2.325944&nbsp;&nbsp;0.8665
+3&nbsp;&nbsp;3&nbsp;1&nbsp;1&nbsp;&nbsp;0.02265&nbsp;&nbsp;2.117689&nbsp;-0.4598
+4&nbsp;&nbsp;1&nbsp;2&nbsp;1&nbsp;-0.10185&nbsp;&nbsp;2.453452&nbsp;&nbsp;0.9988
+5&nbsp;&nbsp;2&nbsp;2&nbsp;1&nbsp;&nbsp;0.89448&nbsp;&nbsp;0.690510&nbsp;-0.3352
+6&nbsp;&nbsp;3&nbsp;2&nbsp;1&nbsp;-0.60579&nbsp;&nbsp;0.115301&nbsp;&nbsp;1.2075
+7&nbsp;&nbsp;1&nbsp;3&nbsp;1&nbsp;-1.49305&nbsp;&nbsp;0.479673&nbsp;&nbsp;0.0138
+8&nbsp;&nbsp;2&nbsp;3&nbsp;1&nbsp;&nbsp;0.68182&nbsp;11.181538&nbsp;&nbsp;0.4928
+9&nbsp;&nbsp;3&nbsp;3&nbsp;1&nbsp;-0.72781&nbsp;&nbsp;0.007692&nbsp;-0.3969
+10&nbsp;1&nbsp;1&nbsp;2&nbsp;-0.28547&nbsp;&nbsp;0.226861&nbsp;&nbsp;1.1120
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+Consider the additive model
+<a name="eq:1">
+</a>
+<br clear="all" /><table border="0" width="100%"><tr><td>
+<table align="center" cellspacing="0"  cellpadding="2"><tr><td nowrap="nowrap" align="center">
+  y<sub>i</sub> = &#946;<sub>0</sub> + &#946;<sup>1</sup><sub>A(i)</sub>+&#946;<sup>2</sup><sub>B(i)</sub> + &#946;<sup>3</sup><sub>C(i)</sub> + e<sub>i</sub></td></tr></table>
+</td><td width="1%">(1)</td></tr></table>
+
+
+where e<sub>i</sub> &#160;&#8764;&#160;N(0,&#963;<sup>2</sup>). We fit this model:
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;mm&nbsp;&lt;-&nbsp;lm(y~A+B+C,&nbsp;data=dd)
+&nbsp;coef(mm)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+(Intercept)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2&nbsp;
+&nbsp;&nbsp;&nbsp;-0.10920&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.64889&nbsp;&nbsp;&nbsp;&nbsp;-0.31111&nbsp;&nbsp;&nbsp;&nbsp;-0.03415&nbsp;&nbsp;&nbsp;&nbsp;-0.44635&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.48645&nbsp;
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+Notice that the parameters corresponding to the factor levels
+<tt>A1</tt>, <tt>B1</tt> and <tt>C2</tt> are set to zero to ensure
+identifiability of the remaining parameters.
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;Linear functions of parameters, contrasts</h2>
+<a name="sec:line-funct-param">
+</a>
+
+<div class="p"><!----></div>
+For a regression model with parameters &#946; = (&#946;<sup>1</sup>, &#946;<sup>2</sup>,...,&#946;<sup>P</sup>) we shall refer to a weighted sum of the form
+
+<br clear="all" /><table border="0" width="100%"><tr><td>
+<table align="center" cellspacing="0"  cellpadding="2"><tr><td nowrap="nowrap" align="center">
+ </td><td nowrap="nowrap" align="center">
+<small></small><!--sup
+--><br /><font size="+3">&#8721;<br />
+</font><small>j</small>&nbsp;<br /></td><td nowrap="nowrap" align="center">
+w<sub>j</sub> &#946;<sup>j</sup></td></tr></table>
+</td></tr></table>
+
+
+as a contrast. Notice that it is common in the litterature to require
+that sum<sub>j</sub> w<sub>j</sub>=0 for the sum  &#8721;<sub>j</sub> w<sub>j</sub> &#946;<sup>j</sup> to be called a
+contrast but we do not follow this tradition here.
+
+<div class="p"><!----></div>
+The effect of changing the factor A from <tt>A2</tt> to <tt>A3</tt> can
+be found as
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;w&nbsp;&lt;-&nbsp;c(0,-1,1,0,0,0)
+&nbsp;sum(coef(mm)*w)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+[1]&nbsp;-0.96
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+The <tt>esticon()</tt>&nbsp;function provides this estimate, the standard error
+etc.&nbsp;as follows:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;esticon(mm,&nbsp;w)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;beta0&nbsp;Estimate&nbsp;Std.Error&nbsp;t.value&nbsp;DF&nbsp;Pr(&#62;|t|)&nbsp;&nbsp;Lower&nbsp;&nbsp;Upper
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;-0.96&nbsp;&nbsp;&nbsp;&nbsp;0.5963&nbsp;&nbsp;&nbsp;-1.61&nbsp;12&nbsp;&nbsp;&nbsp;0.1334&nbsp;-2.259&nbsp;0.3393
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc5">
+5</a>&nbsp;&nbsp;Population means</h2>
+<a name="sec:xxx">
+</a>
+
+<div class="p"><!----></div>
+Population means (sometimes also called marginal means)
+are in some sciences much used for reporting marginal effects (to be
+described below). Population means are known as lsmeans in SAS
+jargon. Population means is a special kind of contrasts as defined in
+Section&nbsp;<a href="#sec:line-funct-param">4</a>.
+
+<div class="p"><!----></div>
+The model (<a href="#eq:1">1</a>)
+is a model for the conditional mean \EE(y&#124;A,B,C).  Sometimes one is
+interested in quantities like \EE(y&#124;A). This quantity can not
+formally be found unless B and C are random variables such that we
+may find \EE(y&#124;A) by integration.
+
+<div class="p"><!----></div>
+However, suppose that A is a treatment of main interest, B is a
+blocking factor and C represents days on which the experiment was
+carried out. Then it is tempting to average \EE(y&#124;A,B,C) over B
+and C (average over block and day) and think of this average as
+\EE(y&#124;A).
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.1">
+5.1</a>&nbsp;&nbsp;A brute-force calculation</h3>
+<a name="sec:xxx">
+</a>
+
+<div class="p"><!----></div>
+The population mean for A=1 is
+<a name="eq:2">
+</a>
+<br clear="all" /><table border="0" width="100%"><tr><td>
+<table align="center" cellspacing="0"  cellpadding="2"><tr><td nowrap="nowrap" align="center">
+  &#946;<sup>0</sup> + &#946;<sup>1</sup><sub>A1</sub> + </td><td nowrap="nowrap" align="center">
+1
+<div class="hrcomp"><hr noshade="noshade" size="1"/></div>3<br /></td><td nowrap="nowrap" align="center">
+(&#946;<sup>2</sup><sub>B1</sub>+&#946;<sup>2</sup><sub>B2</sub>+&#946;<sup>2</sup><sub>B3</sub>) + </td><td nowrap="nowrap" align="center">
+1
+<div class="hrcomp"><hr noshade="noshade" size="1"/></div>2<br /></td><td nowrap="nowrap" align="center">
+(&#946;<sup>3</sup><sub>C1</sub>+&#946;<sup>3</sup><sub>C2</sub>)</td></tr></table>
+</td><td width="1%">(2)</td></tr></table>
+
+
+
+<div class="p"><!----></div>
+Recall that the
+parameters corresponding to the factor levels
+<tt>A1</tt>, <tt>B1</tt> and <tt>C2</tt> are set to zero to ensure
+identifiability of the remaining parameters. Therefore we may also
+write the population mean for A=1 as
+<a name="eq:3">
+</a>
+<br clear="all" /><table border="0" width="100%"><tr><td>
+<table align="center" cellspacing="0"  cellpadding="2"><tr><td nowrap="nowrap" align="center">
+  &#946;<sup>0</sup> + </td><td nowrap="nowrap" align="center">
+1
+<div class="hrcomp"><hr noshade="noshade" size="1"/></div>3<br /></td><td nowrap="nowrap" align="center">
+(&#946;<sup>2</sup><sub>B2</sub>+&#946;<sup>2</sup><sub>B3</sub>) + </td><td nowrap="nowrap" align="center">
+1
+<div class="hrcomp"><hr noshade="noshade" size="1"/></div>2<br /></td><td nowrap="nowrap" align="center">
+(&#946;<sup>3</sup><sub>C2</sub>)</td></tr></table>
+</td><td width="1%">(3)</td></tr></table>
+
+
+
+<div class="p"><!----></div>
+This quantity can be estimated as:
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;w&nbsp;&lt;-&nbsp;c(1,&nbsp;0,&nbsp;0,&nbsp;1/3,&nbsp;1/3,&nbsp;1/2)
+&nbsp;coef(mm)*w
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+(Intercept)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2&nbsp;
+&nbsp;&nbsp;&nbsp;-0.10920&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.00000&nbsp;&nbsp;&nbsp;&nbsp;-0.01138&nbsp;&nbsp;&nbsp;&nbsp;-0.14878&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.24322&nbsp;
+&nbsp;
+</pre> </b></font>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;sum(coef(mm)*w)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+[1]&nbsp;-0.02615
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+We may find the population mean for all three levels of A as
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;W&nbsp;&lt;-&nbsp;matrix(c(1,&nbsp;0,&nbsp;0,&nbsp;1/3,&nbsp;1/3,&nbsp;1/2,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,&nbsp;1,&nbsp;0,&nbsp;1/3,&nbsp;1/3,&nbsp;1/2,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1,&nbsp;0,&nbsp;1,&nbsp;1/3,&nbsp;1/3,&nbsp;1/2),nr=3,&nbsp;byrow=TRUE)
+&nbsp;W
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[,1]&nbsp;[,2]&nbsp;[,3]&nbsp;&nbsp;&nbsp;[,4]&nbsp;&nbsp;&nbsp;[,5]&nbsp;[,6]
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0.5
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0.5
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0.5
+&nbsp;
+</pre> </b></font>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;W&nbsp;%*%&nbsp;coef(mm)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[,1]
+[1,]&nbsp;-0.02615
+[2,]&nbsp;&nbsp;0.62274
+[3,]&nbsp;-0.33725
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+Notice that the matrix W is based on that the first level of A is
+set as the reference level. If the reference level is changed then so
+must W be.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc5.2">
+5.2</a>&nbsp;&nbsp;Using <tt>esticon()</tt></h3>
+<a name="sec:xxx">
+</a>
+
+<div class="p"><!----></div>
+Given that one has specified W, the <tt>esticon()</tt>&nbsp;function in the
+<tt>doBy</tt> package be used for the calculations above and the
+function also provides standard errors, confidence
+limits etc:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;esticon(mm,&nbsp;W)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;beta0&nbsp;Estimate&nbsp;Std.Error&nbsp;&nbsp;t.value&nbsp;DF&nbsp;Pr(&#62;|t|)&nbsp;&nbsp;&nbsp;Lower&nbsp;&nbsp;Upper
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-0.02615&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;-0.06201&nbsp;12&nbsp;&nbsp;&nbsp;0.9516&nbsp;-0.9449&nbsp;0.8926
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;0.62274&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;&nbsp;1.47683&nbsp;12&nbsp;&nbsp;&nbsp;0.1655&nbsp;-0.2960&nbsp;1.5415
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-0.33725&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;-0.79980&nbsp;12&nbsp;&nbsp;&nbsp;0.4394&nbsp;-1.2560&nbsp;0.5815
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc6">
+6</a>&nbsp;&nbsp;Using <tt>popMatrix()</tt>&nbsp;and <tt>popMeans()</tt></h2>
+<a name="sec:xxx">
+</a>
+
+<div class="p"><!----></div>
+Writing the matrix W is somewhat tedious and hence error prone. In
+addition, there is a potential risk of getting the wrong answer if the
+the reference level of a factor has been changed.
+The <tt>popMatrix()</tt>&nbsp;function provides an automated way of generating
+such matrices.
+The above <tt>W</tt> matrix is  constructed by
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;pma&nbsp;&lt;-&nbsp;popMatrix(mm,effect='A')
+&nbsp;summary(pma)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;&nbsp;C2
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;0.5
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;0.5
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;0.5
+grid:
+'data.frame':	3&nbsp;obs.&nbsp;of&nbsp;&nbsp;1&nbsp;variable:
+&nbsp;$&nbsp;A:&nbsp;chr&nbsp;&nbsp;"1"&nbsp;"2"&nbsp;"3"
+at:
+&nbsp;NULL
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+The <tt>popMeans()</tt>&nbsp;function is simply a wrapper around first a call
+to <tt>popMatrix()</tt>&nbsp;followed by a call to (by default) <tt>esticon()</tt>:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;pme&nbsp;&lt;-&nbsp;popMeans(mm,&nbsp;effect='A')
+&nbsp;pme
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;beta0&nbsp;Estimate&nbsp;Std.Error&nbsp;&nbsp;t.value&nbsp;DF&nbsp;Pr(&#62;|t|)&nbsp;&nbsp;&nbsp;Lower&nbsp;&nbsp;Upper&nbsp;A
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-0.02615&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;-0.06201&nbsp;12&nbsp;&nbsp;&nbsp;0.9516&nbsp;-0.9449&nbsp;0.8926&nbsp;1
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;0.62274&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;&nbsp;1.47683&nbsp;12&nbsp;&nbsp;&nbsp;0.1655&nbsp;-0.2960&nbsp;1.5415&nbsp;2
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-0.33725&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;-0.79980&nbsp;12&nbsp;&nbsp;&nbsp;0.4394&nbsp;-1.2560&nbsp;0.5815&nbsp;3
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+More details about how the matrix was constructed is provided by the
+<tt>summary()</tt> function:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;summary(pme)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;beta0&nbsp;Estimate&nbsp;Std.Error&nbsp;&nbsp;t.value&nbsp;DF&nbsp;Pr(&#62;|t|)&nbsp;&nbsp;&nbsp;Lower&nbsp;&nbsp;Upper&nbsp;A
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-0.02615&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;-0.06201&nbsp;12&nbsp;&nbsp;&nbsp;0.9516&nbsp;-0.9449&nbsp;0.8926&nbsp;1
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;0.62274&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;&nbsp;1.47683&nbsp;12&nbsp;&nbsp;&nbsp;0.1655&nbsp;-0.2960&nbsp;1.5415&nbsp;2
+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;-0.33725&nbsp;&nbsp;&nbsp;&nbsp;0.4217&nbsp;-0.79980&nbsp;12&nbsp;&nbsp;&nbsp;0.4394&nbsp;-1.2560&nbsp;0.5815&nbsp;3
+Call:
+NULL
+Contrast&nbsp;matrix:
+Length&nbsp;&nbsp;Class&nbsp;&nbsp;&nbsp;Mode&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;NULL&nbsp;&nbsp;&nbsp;NULL&nbsp;
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+The <tt>effect</tt> argument requires  to calculate the population means
+for each level of
+A aggregating across the levels of the other variables in the data.
+
+<div class="p"><!----></div>
+Likewise we may do:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm,effect=c('A','C'))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[4,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;1
+[5,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;1
+[6,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;1
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+This gives the matrix for calculating the estimate for each
+combination of <tt>A</tt> and <tt>C</tt> when averaging over <tt>B</tt>.
+Consequently
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMeans(mm)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;beta0&nbsp;Estimate&nbsp;Std.Error&nbsp;t.value&nbsp;DF&nbsp;Pr(&#62;|t|)&nbsp;&nbsp;Lower&nbsp;&nbsp;Upper
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;0.08645&nbsp;&nbsp;&nbsp;&nbsp;0.2435&nbsp;&nbsp;0.3551&nbsp;12&nbsp;&nbsp;&nbsp;0.7287&nbsp;-0.444&nbsp;0.6169
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+gives the "total average".
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc6.1">
+6.1</a>&nbsp;&nbsp;Using the <tt>at</tt> argument</h3>
+
+<div class="p"><!----></div>
+We may be interested in finding the population means
+at all levels of  A
+but only at C=1. This is obtained by using the <tt>at</tt> argument:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm,effect='A',&nbsp;at=list(C='1'))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+Notice here that average is only taken over B. Another way of
+creating the population means
+at  all levels of (A,C) is therefore
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm,effect='A',&nbsp;at=list(C=c('1','2')))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[4,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;1
+[5,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;1
+[6,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;1
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+We may have several variables in the <tt>at</tt> argument:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm,effect='A',&nbsp;at=list(C=c('1','2'),&nbsp;B='1'))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;B2&nbsp;B3&nbsp;C2
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0
+[4,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;1
+[5,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;1
+[6,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;&nbsp;1
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc6.2">
+6.2</a>&nbsp;&nbsp;Ambiguous specification when using the <tt>effect</tt> and
+  <tt>at</tt> arguments</h3>
+
+<div class="p"><!----></div>
+There is room for an ambiguous specification if a variable appears in
+both the <tt>effect</tt> and the <tt>at</tt> argument, such as
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm,effect=c('A','C'),&nbsp;at=list(C='1'))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+This ambiguity is due to the fact that the <tt>effect</tt> argument asks
+for the populations means at all levels of the variables but the
+<tt>at</tt> chooses only specific levels.
+
+<div class="p"><!----></div>
+This ambiguity is resolved as follows: Any variable in the <tt>at</tt>
+argument is removed from the <tt>effect</tt> argument such as the
+statement above is equivalent to
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm,effect='A',&nbsp;at=list(C='1'))
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc6.3">
+6.3</a>&nbsp;&nbsp;Using covariates</h3>
+
+<div class="p"><!----></div>
+Next consider the model where a covariate is included:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;mm2&nbsp;&lt;-&nbsp;lm(y~A+B+C+C:x,&nbsp;data=dd)
+&nbsp;coef(mm2)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+(Intercept)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2&nbsp;
+&nbsp;&nbsp;&nbsp;-0.37992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.58345&nbsp;&nbsp;&nbsp;&nbsp;-0.21457&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.11568&nbsp;&nbsp;&nbsp;&nbsp;-0.47142&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.88353&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C1:x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2:x&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;0.09513&nbsp;&nbsp;&nbsp;&nbsp;-0.20237&nbsp;
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+In this case we get
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm2,effect='A',&nbsp;at=list(C='1'))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2&nbsp;C1:x&nbsp;C2:x
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;1.59&nbsp;&nbsp;&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;1.59&nbsp;&nbsp;&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;1.59&nbsp;&nbsp;&nbsp;&nbsp;0
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+Above, x has been replaced by its average and that is the general
+rule for models including covariates. However we may use the <tt>at</tt>
+argument to ask for calculation of the population mean at some
+user-specified value of x, say 12:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;popMatrix(mm2,effect='A',&nbsp;at=list(C='1',x=12))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2&nbsp;C1:x&nbsp;C2:x
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;12&nbsp;&nbsp;&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;12&nbsp;&nbsp;&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;12&nbsp;&nbsp;&nbsp;&nbsp;0
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc6.4">
+6.4</a>&nbsp;&nbsp;Using transformed covariates</h3>
+
+<div class="p"><!----></div>
+Next consider the model where a  transformation of a covariate is included:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;mm3&nbsp;&lt;-&nbsp;lm(y~A+B+C+C:log(x),&nbsp;data=dd)
+&nbsp;coef(mm3)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+(Intercept)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C2&nbsp;
+&nbsp;&nbsp;&nbsp;-0.13970&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.61069&nbsp;&nbsp;&nbsp;&nbsp;-0.21550&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.01296&nbsp;&nbsp;&nbsp;&nbsp;-0.37431&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.46806&nbsp;
+&nbsp;&nbsp;C1:log(x)&nbsp;&nbsp;&nbsp;C2:log(x)&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;0.08663&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.01046&nbsp;
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+In this case we can not use <tt>popMatrix()</tt>&nbsp;(and hence
+<tt>popMeans()</tt>&nbsp;directly.  Instead we have first to
+generate a new variable, say <tt>log.x</tt>, with
+<tt>log.x</tt>=log(x), in the data and then proceed as
+
+<div class="p"><!----></div>
+   <font color="#FF0000"><b>
+<pre>
+&nbsp;dd&nbsp;&lt;-&nbsp;transform(dd,&nbsp;log.x&nbsp;=&nbsp;log(x))
+&nbsp;mm3&nbsp;&lt;-&nbsp;lm(y~A+B+C+C:log.x,&nbsp;data=dd)
+&nbsp;popMatrix(mm3,effect='A',&nbsp;at=list(C='1'))
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Intercept)&nbsp;A2&nbsp;A3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B3&nbsp;C2&nbsp;C1:log.x&nbsp;C2:log.x
+[1,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;-0.64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+[2,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;-0.64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+[3,]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;0&nbsp;&nbsp;1&nbsp;0.3333&nbsp;0.3333&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;-0.64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc7">
+7</a>&nbsp;&nbsp;The <tt>engine</tt> argument of <tt>popMeans()</tt></h2>
+
+<div class="p"><!----></div>
+The <tt>popMatrix()</tt>is a function to generate a linear tranformation matrix of the model
+parameters with emphasis on  constructing such matrices for population
+means.
+<tt>popMeans()</tt>&nbsp;invokes by default the <tt>esticon()</tt>&nbsp;function on this
+linear transformation matrix for calculating parameter estimates and
+confidecne intervals.
+A similar function to <tt>esticon()</tt>&nbsp;is the <tt>glht</tt> function of the <tt>multcomp</tt>
+ package.
+
+<div class="p"><!----></div>
+ The <tt>glht()</tt> function
+ can be chosen via the <tt>engine</tt> argument of <tt>popMeans()</tt>:
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;&nbsp;library(multcomp)
+&nbsp;g&lt;-popMeans(mm,effect='A',&nbsp;at=list(C='1'),engine="glht")
+&nbsp;g
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+	&nbsp;General&nbsp;Linear&nbsp;Hypotheses
+
+Linear&nbsp;Hypotheses:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estimate
+1&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;-0.269
+2&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;0.380
+3&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;-0.580
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+This allows to apply the methods available on the <tt>glht</tt> object like
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;summary(g,test=univariate())
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+	&nbsp;Simultaneous&nbsp;Tests&nbsp;for&nbsp;General&nbsp;Linear&nbsp;Hypotheses
+
+Fit:&nbsp;lm(formula&nbsp;=&nbsp;y&nbsp;~&nbsp;A&nbsp;+&nbsp;B&nbsp;+&nbsp;C,&nbsp;data&nbsp;=&nbsp;dd)
+
+Linear&nbsp;Hypotheses:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estimate&nbsp;Std.&nbsp;Error&nbsp;t&nbsp;value&nbsp;Pr(&#62;|t|)
+1&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;-0.269&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.487&nbsp;&nbsp;&nbsp;-0.55&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.59
+2&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;0.380&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.487&nbsp;&nbsp;&nbsp;&nbsp;0.78&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.45
+3&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;-0.580&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.487&nbsp;&nbsp;&nbsp;-1.19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.26
+(Univariate&nbsp;p&nbsp;values&nbsp;reported)
+&nbsp;
+</pre> </b></font>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;confint(g,calpha=univariate_calpha())
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+	&nbsp;Simultaneous&nbsp;Confidence&nbsp;Intervals
+
+Fit:&nbsp;lm(formula&nbsp;=&nbsp;y&nbsp;~&nbsp;A&nbsp;+&nbsp;B&nbsp;+&nbsp;C,&nbsp;data&nbsp;=&nbsp;dd)
+
+Quantile&nbsp;=&nbsp;2.179
+95%&nbsp;confidence&nbsp;level
+&nbsp;
+
+Linear&nbsp;Hypotheses:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estimate&nbsp;lwr&nbsp;&nbsp;&nbsp;&nbsp;upr&nbsp;&nbsp;&nbsp;
+1&nbsp;==&nbsp;0&nbsp;-0.269&nbsp;&nbsp;&nbsp;-1.330&nbsp;&nbsp;0.792
+2&nbsp;==&nbsp;0&nbsp;&nbsp;0.380&nbsp;&nbsp;&nbsp;-0.681&nbsp;&nbsp;1.440
+3&nbsp;==&nbsp;0&nbsp;-0.580&nbsp;&nbsp;&nbsp;-1.641&nbsp;&nbsp;0.480
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+which yield the same results as the <tt>esticon()</tt>&nbsp;function.
+
+<div class="p"><!----></div>
+By default the functions will adjust the tests  and confidence intervals for multiplicity
+
+<div class="p"><!----></div>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;summary(g)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+	&nbsp;Simultaneous&nbsp;Tests&nbsp;for&nbsp;General&nbsp;Linear&nbsp;Hypotheses
+
+Fit:&nbsp;lm(formula&nbsp;=&nbsp;y&nbsp;~&nbsp;A&nbsp;+&nbsp;B&nbsp;+&nbsp;C,&nbsp;data&nbsp;=&nbsp;dd)
+
+Linear&nbsp;Hypotheses:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estimate&nbsp;Std.&nbsp;Error&nbsp;t&nbsp;value&nbsp;Pr(&#62;|t|)
+1&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;-0.269&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.487&nbsp;&nbsp;&nbsp;-0.55&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.92
+2&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;0.380&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.487&nbsp;&nbsp;&nbsp;&nbsp;0.78&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.81
+3&nbsp;==&nbsp;0&nbsp;&nbsp;&nbsp;-0.580&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.487&nbsp;&nbsp;&nbsp;-1.19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.55
+(Adjusted&nbsp;p&nbsp;values&nbsp;reported&nbsp;--&nbsp;single-step&nbsp;method)
+&nbsp;
+</pre> </b></font>
+  <font color="#FF0000"><b>
+<pre>
+&nbsp;confint(g)
+&nbsp;
+</pre> </b></font>
+  <font color="#0000FF"><b>
+<pre>
+	&nbsp;Simultaneous&nbsp;Confidence&nbsp;Intervals
+
+Fit:&nbsp;lm(formula&nbsp;=&nbsp;y&nbsp;~&nbsp;A&nbsp;+&nbsp;B&nbsp;+&nbsp;C,&nbsp;data&nbsp;=&nbsp;dd)
+
+Quantile&nbsp;=&nbsp;2.732
+95%&nbsp;family-wise&nbsp;confidence&nbsp;level
+&nbsp;
+
+Linear&nbsp;Hypotheses:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Estimate&nbsp;lwr&nbsp;&nbsp;&nbsp;&nbsp;upr&nbsp;&nbsp;&nbsp;
+1&nbsp;==&nbsp;0&nbsp;-0.269&nbsp;&nbsp;&nbsp;-1.600&nbsp;&nbsp;1.061
+2&nbsp;==&nbsp;0&nbsp;&nbsp;0.380&nbsp;&nbsp;&nbsp;-0.951&nbsp;&nbsp;1.710
+3&nbsp;==&nbsp;0&nbsp;-0.580&nbsp;&nbsp;&nbsp;-1.911&nbsp;&nbsp;0.750
+&nbsp;
+</pre> </b></font>
+
+<div class="p"><!----></div>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 3.89.<br />On 05 Feb 2013, 00:39.</small>
+</html>

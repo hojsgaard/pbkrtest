@@ -1,0 +1,15 @@
+operation effect count
+1  none      61
+1  weak      28
+1  moderate   7
+2  none      68
+2  weak      23
+2  moderate  13
+3  none      58
+3  weak      40
+3  moderate  12
+4  none      53
+4  weak      38
+4  moderate  16
+
+

@@ -1,0 +1,576 @@
+---
+title: Inferens i mixed models i R - hinsides det sædvanlige likelihood ratio test
+author: |
+  | Søren Højsgaard^[University of Aalborg, Denmark]
+date: "6. januar, 2020"
+always_allow_html: true
+output:
+  bookdown::pdf_document2:
+    toc: false
+    includes:
+      in_header: beyond-preamble.txt
+bibliography: ["beyond.bib"]
+link-citations: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, size="small", message=FALSE,
+                      warning=FALSE, cache=!TRUE)
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+    x <- def.chunk.hook(x, options)
+    ifelse(options$size != "normalsize",
+           paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"),
+           x)
+})
+library(lme4)
+library(doBy)
+library(broom)
+library(magrittr)
+library(pbkrtest)
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+options("digits"=3)
+options("show.signif.stars"=FALSE)
+```
+
+
+**Resumé:** _Inferens i lineære mixed models og i generaliserede lineære mixed
+models er ofte baseret på $\chi^2$ approximationen til likelihood ratio
+teststørrelsens fordeling. Det går som regel godt i store datasæt, men
+et datasæt kan på samme tid være stort med hensyn til nogle
+aspekter af en problemstilling og lille med hensyn til andre
+aspekter. Et klassisk eksempel er data fra et split-plot forsøg:
+Delploteffekten kan være velbestemt mens helploteffekten ofte vil være
+dårligere bestemt. I visse planlagte forsøgstyper ved vi, hvordan vi
+skal håndtere hypotesetests i sådanne modeller. I observationelle
+studier er det mindre klart, hvordan man skal håndtere
+hypotesetests. Een mulighed mulighed er at lave en form for F-test
+hvor nævner-frihedsgraderne er justerede (typisk) for at tage hånd om,
+at dispersionsparametre er estimerede fra data og dermed ikke må
+betragtes som kendte. En anden tilgang er at basere tests på
+parametrisk bootstrap. Fordelen ved denne metode er, at den
+umiddelbart lader sig anvende i mere generelle situationer end lineære
+mixed models; f.eks. i generaliserede lineære modeller. Begge metoder
+er tilgængelige i R pakken `pbkrtest`.
+
+# Introduktion
+
+Mixed models håndteres i `R` [@R:19], oftest med `lme4` pakken
+[@lme4:15]. Tests er baserede på $\chi^2$ approksimationen af
+likelihood ratio (LR) teststørrelsen, hvilket fungerer fint i store
+datasæt men ofte mindre godt i små datasæt. Dertil kommer, at et
+datasæt kan være stort med hensyn til nogle aspekter af en model og
+samtidig lille med hensyn til andre aspekter. R-pakken `pbkrtest`
+tilbyder alternativer til $\chi^2$ approksimationen af LR
+teststørrelsen, nemlig: 1) Tests baserede på en F-teststørrelse (hvor
+nævnerfrihedsgraderne estimeres fra data), 2) tests baserede på
+parametrisk bootstrap (hvor data er simuleret under
+modellen). Parametrisk bootstrap kan også bruges for tests i
+generaliserede lineære modeller. Med (lineære) mixed models forstås i
+det følgende modeller af formen 
+$$
+y = X\beta + Zu + e 
+$$
+
+hvor $y$ og $e$ er $n$ vektorer af stokastiske variable, $X$ er
+$n\times p$ model matrix for systematiske effekter, $\beta$ er $p$
+vektor af regressionskoefficienter, $Z$ er $n \times q$ model matrix
+for de tilfældig effekter og $u$ er $q$ vector af tilfældige
+effekter. Det antages at $u \sim N(0, G)$ og $e\sim N(0, R)$ og at $u$
+og $e$ er uafhængige. Generaliserede lineære modeller modeller er som
+generaliserede lineære modeller at det antages at $g(\mu)=X\beta +
+Zu$, hvor $g$ er linkfunktionen.
+
+
+
+# Eksempel: Dobbeltregistreing i laboratorieforsøg {#petri}
+
+```{r echo=FALSE}
+dub=
+structure(list(y1 = c(67, 72, 140, 13, 27, 37, -76, -66, -56, 
+26, 45, 90, 48, 53, 95, 70, 99, 131), y2 = c(1L, 1L, 1L, 1L, 
+2L, 1L, 0L, 2L, 3L, 2L, 1L, 0L, 2L, 3L, 2L, 2L, 0L, 0L), grp = structure(c(1L, 
+1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 
+2L), .Label = c("ctrl", "trt1"), class = "factor"), subj = structure(c(1L, 
+1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 5L, 5L, 5L, 6L, 6L, 
+6L), .Label = c("subj1", "subj2", "subj3", "subj4", "subj5", 
+"subj6"), class = "factor")), row.names = c(2L, 3L, 1L, 4L, 6L, 
+                                            5L, 8L, 7L, 9L, 11L, 10L, 12L, 15L, 13L, 14L, 17L, 18L, 16L), class = "data.frame")
+```
+
+Betragt et konstrueret, men meget simpelt, eksempel: Vi ønsker at
+sammenligne to grupper (f.eks. behandling mod kontrol). Til rådighed
+er der $M$ _units_ (petriskåle, personer, dyr...) per gruppe og der
+måles på hver unit ialt $R$ gange. Målinger på samme unit vil oftest
+give anledning til _clustering_ i data.  Et datasæt i "long format"
+vil altså have $T=2 \times M \times R$ rækker.  Table
+\@ref(tab:petrisim1) viser et simuleret datasæt med $M=3$ units per
+gruppe; $R=3$ gentagne målinger per unit.  Problemstillingen er, at
+målinger på samme unit typisk er positivt korrelerede, og hvis man
+ikke tager højde for dette, så kan man komme til at overvurdere
+mængden af information, der er i datasættet. Mere konkret er det
+typiske billede at 1) estimater for standardfejl blive for små og 2)
+derfor bliver teststørrelser bliver for store og 3) derfor bliver
+$p$-værdier for små og 4) derfor kommer effekter til at fremstå
+stærkere end de i virkeligheden er.
+
+
+```{r petrisim1, echo=F}
+ddd <- cbind(dub[1:9,], dub[-(1:9),])
+dub$y2 <- NULL
+kable(ddd, booktabs=TRUE, linesep="",
+      caption="Simuleret datasæt. $y_1$ er en numerisk respons.")
+```
+
+
+
+__Ignorer clustering  i data__: 
+En simpel regressionsmodel er 
+$$
+y_{gir} = \mu + \beta_g + e_{gir}, 
+$$
+hvor $g$ refererer til gruppe, $i$ til individ indenfor gruppe, $r$
+til måling indenfor individ og $e_{gir}\sim N(0,\sigma^2)$.  Denne
+model vil typisk være utilstrækkelig fordi man har målt på samme unit
+flere gange, men vi inkluderer resultatet for sammenligningens
+skyld. Behandlingseffekten er $\beta_{trt}-\beta_{ctrl}$ og denne
+omtales i det følgende som $\beta_1$ i benævnes i tabeller med `grptrt1`.
+Estimatet for $\beta_1$ giver dermed behandlingseffekten.  Tabel
+\@ref(tab:petri2) viser resultatet af at fitte denne
+model. $p$-værdien for behandlingseffekten bliver meget lille, hvilket
+indikerer stor sikkerhed af en behandlingseffekt.
+
+```{r petri2, echo=F}
+lg1 <- lm(y1 ~ grp, data=dub)
+lg1 %>% summary %>% coef %>% as.data.frame -> tb1
+tb1$"Pr(>X2)" = 1 - pchisq(tb1[,3]^2, df=1)
+kable(tb1, booktabs=T,
+      caption="Resultatet af at analysere data når clustering i units ignoreres: $p$-værdien for behandlingseffekten er ganske lille, hvilket indikerer en behandlingseffekt.") %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+
+__Standard tilgang: Analyser gennemsnit:__
+En hyppigt anvendt tilgang er at udregne gennemsnit for hver
+unit  og analysere disse. Mere konkret betragtes modellen
+$$
+\bar y_{gi} = \mu + \beta_g + e_{gi}, 
+$$
+hvor der er beregnet gennemsnit indenfor hver unit.
+Denne tilgang virker fint i den forstand,
+at man får de rette tests når data er balancerede. Man får dog ikke
+noget estimat for "within-subject" variationen, hvilket dog ikke
+nødvendigvis er et stort problem i den konkrete sammenhæng. At
+analysere gennemsnitte er dog langt fra altid en mulighed. 
+Tabel \@ref(tab:petri1) indeholder resultatet for analyse af
+gennemsnittet. Tabellen indeholder både resultaterne for tests baseret
+på $t$-fordelingen (svarende til at der tages højde for, at variansen
+er estimeret fra data) og for tests baseret på normalfordelingen
+(svarende til at der ikke tages højde for, at variansen er estimeret
+fra data).
+
+```{r petri1, echo=F}
+duba <- aggregate(y1 ~ grp + subj, FUN=mean, data=dub)
+lm(y1 ~ grp, data=duba) %>% summary %>% coef %>% as.data.frame -> tb2
+tb2$"Pr(>X2)" = 1 - pchisq(tb2[,3]^2, df=1)
+kable(tb2, booktabs=T, caption="Resultat efter analyse af gennemsnit over units.") %>%
+    kable_styling(latex_options =c("hold_position"))
+
+```
+
+__Model med tilfældige effekter:__
+At analysere et gennemsnit er muligt i dette eksempel men langt fra
+altid. Et alternativ er at anvende en lineær mixed model (i dette tilfælde en
+varianskomponent model) hvor unit optræder som en tilfældig effekt.
+Dvs. vi betragter modellen
+$$
+y_{gir} = \mu + \beta_g + U_{gi} + e_{gir}, 
+$$
+hvor $U_{gi} \sim N(0, \omega^2)$ og $e_{gir}\sim N(0,\sigma^2)$.
+Resultatet ses i Tabel \@ref(tab:petri3).  Bemærk at testet er baseret
+på $\chi^2$ fordelingen. Det vil sige at der tages ikke højde for, at
+variansen er estimeret. I stedet er der en implicit antagelse om, at
+den estimerede varians er lig med den sande varians. Bemærk at
+$p$-værdierne er de samme som $p$-værdierne baseret på $\chi^2$
+approksimationen i Table \@ref(tab:petri1). Dette er en konsekvens af, 
+at data er balancerede.
+
+```{r petri3, echo=F}
+lg2 <- lmer(y1 ~ grp + (1|subj), data=dub)
+sm2 <- update(lg2, .~. -grp)
+tab  <- tidy(lg2)[1:2,]
+tab$group <- NULL
+ss<- tab$statistic
+tab$"Pr(>X2)" <- 1-pchisq(ss^2, df=1)
+kable(tab, booktabs=T,
+      caption="Resultat efter at fitte en mixed model med unit som tilfældig effekt.")  %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+# Muligheder med `pbkrtest` pakken:
+
+R pakken `pbkrtest` implementerer to methoder for modelsammenligninger
+i mixed models, hvori der tages højde for at varians- og
+kovariansparametre er estimerede fra data: 1) Parametrisk boostrap og
+2) Kenward-Rogers approksimation (deraf navnet på pakken).
+
+
+
+## Kenward & Rogers tilgang
+
+I kort form er tilgangen i @kenward:roger:97 som følger:
+For den multivariate normalfordeling
+$Y\sim N( X \beta, \Sigma)$
+betragtes test af hypotesen $L(\beta - \beta_0)=0$.
+Da $\hat \beta \sim N_d(\beta, \Phi)$ bliver en Wald test-størrelse
+$$
+  W = [L(\hat\beta - \beta_0)]' [L\Phi L']^{-1} [L(\hat\beta - \beta_0)].
+$$
+
+Asympototisk er $W \sim \chi^2_d$-fordelt under null
+hypotesen. For at beregne denne størrelse skal et estimat $\hat\Phi$
+anvendes. Implicit i antagelsen om at $W$ skal være asymptotisk
+$\chi^2_d$ fordelt er at $\hat\Phi$ er lig med den sande varians.  En
+skaleret version af $W$ er
+\begin{displaymath}
+  F = \frac{1}{d} W = \frac{1}{d}(\hat \betab - \betab_0)' \Lb'   (\Lb' \bm \Phi(\ssb) \Lb)^{-1}
+ \Lb (\hat \betab - \betab_0).
+\end{displaymath}
+I beregningen af $F$ er
+$\bm \Phi (\sigma) = (\bm X' \bm \Sigma(\sigma) \bm X)^{-1} \approx
+\cov(\hat \betab)$, 
+$\ssb$ er vektor af REML estimater for elementerne i  $\Sigma=\var(Y)$
+og $\hat  \betab$ er REML estimate for $\betab$.
+
+
+Asymptotisk er $F \sim \frac{1}{d} \chi^2_d$ under null hypotesen, og
+ man man kan tænke på $F$ som grænsen af en $F_{d,m}$-fordeling når
+ $m\rightarrow \infty$ Een måde hvorpå man kan tage højde for at
+ $\Phi=\var(\hat\beta)$ er estimeret fra data er ved at komme med
+ et bedre bud på hvad nævnerfrihedsgraderne $m$ er (bedre bud end
+ $m=\infty$). @kenward:roger:97 gjorde følgende:
+
+* Erstattede $\bm \Phi$ med en forbedret small-sample approksimation
+  $\bm \Phi_A$.
+ 
+* Udledte formler for middelværdi $E^*$ and varians $V^*$ af $F$ (baseret på en 
+  førsteordens Taylorudvikling). 
+
+* Skalerede $F$ med en faktor $\lambda$ og bestemte nævner
+  frihedsgraderne $m$ ved at match momenterne af $F/\lambda$ med
+  momenterne i en $F_{d,m}$ fordeling.
+
+
+
+
+
+__Anvendelse af Kenward-Rogers metode__:
+Tabel \@ref(tab:petri4) viser resultat efter at fitte en mixed model
+med unit som tilfældig effekt til de simulerede data. 
+Den rapporterede $p$-værdi er for
+testet af ingen effekt at behandling. Testet er baseret på at
+approksimere teststørrelsen med en $F$-størrelse, hvori
+frihedsgraderne er estimerede udfra data.  Bemærk, at $p$-værdien er
+den samme $p$-værdien i Tabel \@ref(tab:petri1), hvor det er
+gennemsnittene, der analyseres.
+
+
+```{r petri4, echo=F}
+a <- KRmodcomp(lg2, sm2)
+a<-a$test[1,,drop=F]
+names(a)[1] <- "statistic"
+kable(a, booktabs=T,
+      caption="Resultat efter at fitte en mixed model med unit som tilfældig effekt. Den rapporterede $p$-værdi er for testet af ingen effekt at behandling. Testet er baseret på at approksimere teststørrelsen med en $F$-størrelse, hvori frihedsgraderne er estimerede udfra data.")  %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+
+
+## Parametrisk bootstrap
+
+Tilgangen i parametrisk bootstrap er som følger.
+Vi betragter to konkurrerende modeller: En stor model $f_1(y; \theta)$ og en 
+simplere null model $f_0(y; \theta_0)$; null-modellen er en delmodel af den store model. Vi beregner en teststørrelse $t_{obs}$. 
+Så bliver $p$-værdien for hypotesen  
+$$
+ p = \sup_{\theta \in \Theta_0} Pr_{\theta}(T \ge t_{obs}),
+$$
+hvor supremum er under hypotesen. 
+Sædvanligvis kan man ikke beregne dette supremum i praksis, så i stedet beregner vi testsandsynligheden baseret på parameterestimatet, dvs.
+$$
+ p^{PB} = Pr_{\hat\theta}(T \ge t_{obs}),
+$$
+
+I  praksis approksimeres  $p^{PB}$ som følger:
+
+1. Træk $B$ parametrisk bootstrap datasæt $D^1, \dots D^B$ fra den
+   fittede null model $f_0(\cdot; \hat \theta_0)$.
+
+1. Fit den store og null modellen til hvert af disse datasæts.
+
+1. Beregn likelihood ratio (LR) teststørrelsen for hvert simuleret
+   datasæt. Dette giver referencefordelingen.
+
+1. Beregn hvor ekstrem den observerede teststørrelse er; dette giver $p$-værdien.
+
+
+Resultatet er anvendelsen af metoden er vist i Table \@ref(tab:petri5).
+
+```{r petri5, echo=F}
+b <- PBmodcomp(lg2, sm2)
+b <- as.data.frame(b)
+names(b)[1]<-"statistic"
+kable(a, booktabs=T,
+      caption="Resultat efter at fitte en mixed model med unit som tilfældig effekt. Den rapporterede $p$-værdi er for testet af ingen effekt at behandling og er beregnet ved parametrisk bootstrap.")  %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+
+
+
+
+
+```{r, echo=F, include=FALSE}
+lg2 <- update(lg2, REML=FALSE)
+sm2 <- update(sm2, REML=FALSE)
+# Observed test statistic:
+t.obs <- 2 * (logLik(lg2) - logLik(sm2))
+t.obs
+# Reference distribution
+set.seed(121315)
+t.sim <- PBrefdist(lg2, sm2, nsim=1999)
+# p-value
+head(t.sim)
+sum(t.sim >= t.obs) / length(t.sim)
+# compare with X^2 dist
+1 - pchisq(t.obs, df=1)
+```
+
+Figur \@ref(fig:overlay) viser $\chi^2_1$ fordelingen (kurve) lagt
+oven på simuleret reference fordeling. Den simulerede
+referencefordeling har tungere hale end den teoretiske, og dette giver
+den større $p$-værdi.
+
+```{r overlay, echo=FALSE, fig.width=6, fig.height=3, fig.cap="Tætheden for den approximerende $\\chi^2$ fordeling lagt ovenpå den referencefordeling man får ved parametrisk bootstrap, dvs. et histogram. Til venstre: Hele intervallet for teststørrelsen. Til højre: Den del af halen af fordelingen det er relevant at betragte."}
+par(mfrow=c(1,2))
+t.sim2 <- t.sim[t.sim<10]
+hist(t.sim2, breaks=40, prob=T, main="", xlab="")
+abline(v=t.obs, lwd=3)
+f <- function(x){dchisq(x, df=1)}
+curve(f, 0, 20, add=TRUE, lwd=2)
+thres <- 1
+t.sim3 <-  t.sim2[t.sim2>=thres]
+hist(t.sim3, breaks=30, prob=T, main="", xlab="")
+abline(v=t.obs, lwd=3)
+f3 <- function(x){dchisq(x, df=1)/pchisq(thres, df=1, lower.tail = F)}
+curve(f3, 0, 20, add=TRUE, lwd=2)
+```
+
+Parametrisk bootstrap er en computerintensiv metode, men der er en
+række muligheder for at gøre beregningerne hurtigere:
+
+1. Seventielle $p$-værdier: 
+   Ovenfor simulerede man et fast antal
+   værdier $t^1, \dots, t^B$ af teststørrelsen under hypotesen for at
+   kunne beregne $p^{PB}$. Et alternativ er at kan man i stedet
+   introducere en stop-regel, f.eks.  \emph{Simuler indtil vi har opnået
+   f.eks.  $h=20$ værdier af $t^j$, der er større end $t_{obs}$.} Hvis
+   dette er opnået efter $J$ simulationer, så skal den rapporterede
+   $p$-værdi være $h/J$.
+   
+1. Parallelle beregninger: En anden måde at gøre beregningerne
+   hurtigere på er ved at udnytte flere kerner på samme
+   computer. Dette sker som default på linux og mac platforme; på
+   windows platform skal gå igennem visse opsætningsskridt.
+   
+1. Parametrisk form af referencefordelingen: Estimation af
+   hale-sandsynligheder kræver flere samples en at estimere
+   middelværdi og varians af fordelingen. Derfor er det fristende at
+   approximere en simuleret referencefordeling med en kendt fordeling
+   så færre simulationer er nødvendige. Eksempelvis kan man matche
+   middelværdi og varians i en gammafordeling med middelværdi og
+   varians af den simulerede referencefordeling og derefter beregne
+   halesandsynligheder i denne gammafordeling.
+   
+
+
+
+
+
+
+
+# Simulationsstudium
+
+Betragt igen situationen i Afsnit \@ref(petri). Vi ønsker at teste
+hypotesen at der ikke er nogen behandlingseffekt (forskel i
+middelværdi).  Vi gentager studiet mange gange (f.eks. $1000$
+gange). Da studierne er lavet ved computersimulation kan vi generere
+data således, at vi ved at der ikke er nogen behandlingseffekt. Hvis
+der ikke er nogen behandlingseffekt og hvis vi tester på
+signifikansniveau 5%, så skal vi i ca. $50$ tilfælde få forkastet
+hypotesen. Den andel af testene der giver anledning til forkastelse
+kaldes for dækningsprocenten (eng: coverage percentage). 
+
+
+Hvis hypotesen forkastes f.eks. $100$ gange så er dækningsprocenten
+$10$ og det svarer til at $p$-værdierne er anti-konservative. Effekter
+forekommer at være mere signifikante end de i virkeligheden er;
+dvs. vi kommer til fejlagtigt at drage "for stærke"
+konklusioner. Tabel \@ref(tab:testtab1) viser resultaterne for de
+forskellige modeltyper.
+
+
+```{r testtab1, echo=F}
+ntab <-
+    structure(list(`0.01` = c(0.206, 0.244, 0.01, 0.066, 0.054, 0.01, 
+0.006), `0.05` = c(0.314, 0.352, 0.056, 0.128, 0.144, 0.056, 
+0.054), `0.10` = c(0.408, 0.424, 0.108, 0.188, 0.226, 0.108, 
+0.1)), class = "data.frame", row.names = c("lm+F", "lm+X2", "avg_lm+F", 
+                                           "avg_lm+X2", "mixed+X2", "mixed+F", "mixed+PB"))
+ntab <- round(ntab, 2)
+kable(ntab, booktabs=T,
+      caption="Dækningsprocenter for forskellige signifikansniveauer. De tre rækker, der markerede giver i praksis de korrekte dækningsprocenter og opnås når der tages højde for usikkerheden på variansparametrene.",
+      linesep="")  %>% 
+    kable_styling(latex_options =c("hold_position")) %>% 
+    row_spec(c(3, 6,7), underline = T)
+```
+
+
+Konklusionerne er som følger: 
+
+1. Hvis man holder sig indefor den verden, der hedder lineære normale
+   modeller så får man den rette dækningsprocent når 1) analyserer
+   gennemsnittene og 2) baserer testene på at der tages højde for, at
+   residualvariationen er estimeret fra data (dvs. man lave $F$-test i
+   stedet for $\chi^2$ test).
+   
+1. Hvis man betragter mixed models så er konklusionen den samme: Hvis
+   man tager højde for at variansparametrene er estimerede fra data
+   (og derfor laver $F$-test baseret på Kenward-Roger eller test
+   baseret på parametrisk bootstrap) så får man den rette
+   dækningsprocent. Baserer man testene på $\chi^2$ approksimationen
+   får man alt for store dækningsprocenter svarende til at en effekt
+   kommer til at se mere signifikant ud end den er.
+
+Man kan, med en hvis ret, argumetere for at de problemstillinger med
+tests man i de foregående afsnit har forsøgt at håndtere alle er
+knyttet til, at der er tale om et meget lille studium: To behandliger,
+tre individer per behandling og tre målinger per individ. Havde man
+blot haft flere individer ville problemerne forsvinde af sig selv. Men
+ofte er der naturlige begrænsninger på antallet af individer. Et
+eksempel herpå er givet i Afsnit \@ref(beets).
+
+
+# Eksempel: Sukkerroer - et split plot eksperiment / hierarkisk design {#beets}
+
+Man ønsker at modellere hvordan sukkerindhold (pct) i sukkerroer
+afhænger af så- og høsttidspunkt. Der er fem såtidspunkter ($s$) og to
+høsttidspunkter ($h$). Forsøget var udlagt i tre blokke. Data findes i
+`pbkrtest` pakken og stammer fra et forsøg lavet ved det tidligere
+Danmarks JordbrugsForskning, der i dag er en del af Aarhus
+Universitet. I dette afsnit illustrerer vi desuden brugen af `pbkrtest` pakken. 
+
+Forsøgsplanen er som følger:
+
+```{r size="small"}
+       # Plot allocation:
+       #       |  Block 1       |  Block 2       |  Block 3       |
+       #       +----------------|----------------|----------------+
+       # Plot  | h1 h1 h1 h1 h1 | h2 h2 h2 h2 h2 | h1 h1 h1 h1 h1 | Harvest time
+       # 1-15  | s3 s4 s5 s2 s1 | s3 s2 s4 s5 s1 | s5 s2 s3 s4 s1 | Sowing time
+       #       |----------------|----------------|----------------|
+       # Plot  | h2 h2 h2 h2 h2 | h1 h1 h1 h1 h1 | h2 h2 h2 h2 h2 | Harvest time
+       # 16-30 | s2 s1 s5 s4 s3 | s4 s1 s3 s2 s5 | s1 s4 s3 s2 s5 | Sowing time
+       #       +----------------|----------------|----------------+
+```
+
+
+De første observationer ses i Tabel \@ref(tab:beetstab1).
+
+```{r, beetstab1, echo=F}
+data(beets, package='pbkrtest')
+head(beets, 4)  %>% kable(booktabs=T, caption="De første observationer i `beets` datasættet.")  %>%
+    kable_styling(latex_options =c("hold_position"))
+```
+
+Uanset om
+man betragter udbytte eller sukkerprocent viser et plot (ikke gengivet
+her) at der ikke er indikation af interaktion mellem så- og
+høsttidspunktet. En model for forsøget kunne derfor være
+
+\begin{equation}
+   \label{eq:beetsmodel1}
+   y_{hbs} = \mu + \alpha_h + \beta_b + \gamma_s + U_{hb} + \epsilon_{hbs},
+\end{equation}
+
+hvor $U_{hb} \sim N(0,\omega^2)$ og $\epsilon_{hbs}\sim
+N(0,\sigma^2)$. Bemærk at $U_{hb}$ beskriver den tilfældige variation
+mellem plots (indenfor blokke).
+Med `lmer()` funktionen fra `lme4` pakken kan vi teste for ingen
+effekt af så- og høsttidspunkt som følger:
+
+```{r}
+beet.lg <- lmer(sugpct ~ block + sow + harvest + 
+                      (1 | block:harvest), data=beets, REML=FALSE)
+beet.noh <- update(beet.lg, .~. - harvest) # Fjern høsttidspunkt
+beet.nos <- update(beet.lg, .~. - sow)     # Fjern såtidspunkt
+anova(beet.lg, beet.noh)
+anova(beet.lg, beet.nos)
+```
+
+
+Begge effekter forekommer at være stærkt signifikante, men det
+interessante er her at sammenligne med resultaterne med Kenward-Roger
+og parametrisk bootstrap metoden. For såtidspunktet får man stadig
+meget små $p$-værdier, men for høsttidspunktet bliver billedet et
+andet.
+
+```{r, echo=FALSE}
+set.seed("301219")
+```
+
+```{r}
+KRmodcomp(beet.lg, beet.noh)
+PBmodcomp(beet.lg, beet.noh)
+```
+
+Afslutningsvist bemærkes det, at da designet er balanceret kan man lave $F$-tests indenfor strata som vist nedenfor. Bemærk: 
+F-teststørrelsen er $F_{1,2}$ for høsttidspunkt og  $F_{4,20}$ for såtidspunkt.
+
+```{r}
+beets$bh <- with(beets, interaction(block, harvest))
+summary(aov(sugpct ~ block + sow + harvest + 
+                Error(bh), data=beets))
+```
+
+
+
+
+# Diskussion og afsluttende bemærkninger
+
+Eksemplerne der er vist ovenfor er sådan, at man kan komme udenom
+problemet med korrelerede målinger ved at beregne passende gennemsnit
+og analysere disse. Dette er gjort for at vise, at de metoder fra
+`pbkrtest` der illustreres giver de "rette svar". Den virkelige styrke
+ligger dog i, at man kan arbejde med generelle mixed models og stadig
+beregne bedre referencefordelinger for teststørrelserne og dermed få
+mere retvisende konklusioner.
+
+Det noteres, at der i beregningerne i Kenward-Rogers metode er brug for at udregne
+$G_j \Sigma^{-1} G_j$, 
+hvor $\Sigma=\sum_i \sigma_i G_i$ og heri er $\sigma_i$'erne ukendte
+parametre og $G_i$'erne er kendte matricer.  Det kan være både tids- og
+pladskrævende at beregne ovenstående sum.  Et alternativ for lineære
+mixed models er en Sattherthwaite-type approksimation; denne er
+hurtigere at beregne og er på vej i en kommende udgave af `pbkrtest`.
+Et alternativ (der også virker for generaliserede lineære mixed
+models) er at beregne $p$-værdier ved parametrisk
+bootstrap. Slutteligt skal det nævnes, 1) at `pbkrtest` er tilgængelig
+på
+[https://cran.r-project.org/package=pbkrtest](https://cran.r-project.org/package=pbkrtest),
+2) at `pbkrtest` er beskrevet i @halekoh:hojsgaard:14 og 3) at udviklingsversioner af  `pbkrtest` er tilgængelige på
+  github og kan installeres med \texttt{devtools::install\_github(hojsgaard/pbkrtest)}.
+
+# Referencer

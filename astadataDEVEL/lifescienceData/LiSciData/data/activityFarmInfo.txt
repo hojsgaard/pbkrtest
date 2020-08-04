@@ -1,0 +1,6 @@
+farm owner type
+A Lars Ecological
+B Bo Conventional
+C Ursula Conventional
+D Ejvind Ecological
+E Morten Conventional

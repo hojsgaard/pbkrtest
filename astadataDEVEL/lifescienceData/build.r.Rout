@@ -1,0 +1,181 @@
+
+R version 2.12.2 (2011-02-25)
+Copyright (C) 2011 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+[1] "R updates packages"
+[1] "R loads packages"
+[1] "D:/LiSciDataDEVEL"
+> #building the package and generating a.zip file
+> 
+> 
+> 
+> malt<- function(major,minor1,minor2,act=TRUE){
++ 
++ olt<-getwd()
++  #if the version is on the R path
++ vor<-paste("c:/programs/r/R-",major,'.',minor1,'.',minor2,"/bin/",sep='')
++ # else just use R-act for the actually installed version
++ vor<-NULL
++ ##setwd("i:/biometri/LiSciDataDevel")
++ setwd("d:/LiSciDataDEVEL")
++ 
++ Rcmd<-if (act) {"Rcmd "} else { 
++ # for the 32 bit version
++  paste("C:/programs/R/R-",major,".",minor1,".",minor2,"/bin/i386/Rcmd.exe ",sep='')
++ # version 2.11
++ # paste("C:/programs/R/R-",major,".",minor1,".",minor2,"/bin/Rcmd.exe ",sep='')  
++ }
++ 
++ browser()
++ system(paste(vor,Rcmd, " build --binary LiSciData",sep=''))
++ system('rm *.tar')
++ setwd("d:/grafdat")
++ system(paste(vor,Rcmd, " build --binary GrafenHails",sep=''))
++ setwd(olt)
++ 
++ ##setwd("i:/biometri/LiSciData")
++ # makes the packages file for data repository
++ 
++ library(tools)
++ 
++ 
++ 
++ 
++ rpackageNew<-paste("c:/temp/rpackage",major,'.',minor1,sep='')
++ 
++ 
++ dir.create(rpackageNew)
++ 
++ system(paste("cp d:/grafdat/GrafenHails*.zip ", rpackageNew))
++ system("mv d:/grafdat/GrafenHails*.zip  RpackZipped")
++ 
++ 
++ system(paste("cp LiSciData*.zip ",rpackageNew))
++ system("mv LiSciData*.zip  RpackZipped ")
++ 
++ 
++ ##write_PACKAGES('rpackage/')
++ write_PACKAGES(paste(rpackageNew,'/',sep=''))
++ 
++ 
++ ##system(paste("mv rpackage ",rpackageNew,sep=''))
++ ##system(paste("cp rpackage ",rpackageNew,sep=''))
++ ##system('removePackages.bat &')
++              }
+> 
+> 
+> #malt(2,9,2)
+> #malt(2,10,0)
+> ##malt(2,11,1,act=FALSE )
+> malt(2,12,2,act=FALSE)
+Called from: malt(2, 12, 2, act = FALSE)
+Browse[1]> 
+* checking for file 'LiSciData/DESCRIPTION' ... OK
+* preparing 'LiSciData':
+* checking DESCRIPTION meta-information ... OK
+cygwin warning:
+  MS-DOS style path detected: d:/LiSciDataDEVEL/LiSciData_0.0-01.tar
+  Preferred POSIX equivalent is: /cygdrive/d/LiSciDataDEVEL/LiSciData_0.0-01.tar
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+cygwin warning:
+  MS-DOS style path detected: d:/LiSciDataDEVEL/LiSciData_0.0-01.tar
+  Preferred POSIX equivalent is: /cygdrive/d/LiSciDataDEVEL/LiSciData_0.0-01.tar
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+* checking for LF line-endings in source and make files
+* checking for empty or unneeded directories
+* building binary distribution
+* installing *source* package 'LiSciData' ...
+** data
+** help
+*** installing help indices
+** building package indices ...
+** testing if installed package can be loaded
+Design library by Frank E Harrell Jr
+
+Type library(help='Design'), ?DesignOverview, or ?Design.Overview')
+to see overall documentation.
+
+* MD5 sums
+packaged installation of 'LiSciData' as LiSciData_0.0-01.zip
+
+* DONE (LiSciData)
+* checking for file 'GrafenHails/DESCRIPTION' ... OK
+* preparing 'GrafenHails':
+* checking DESCRIPTION meta-information ... OK
+cygwin warning:
+  MS-DOS style path detected: d:/grafdat/GrafenHails_0.0-6.tar
+  Preferred POSIX equivalent is: /cygdrive/d/grafdat/GrafenHails_0.0-6.tar
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+cygwin warning:
+  MS-DOS style path detected: d:/grafdat/GrafenHails_0.0-6.tar
+  Preferred POSIX equivalent is: /cygdrive/d/grafdat/GrafenHails_0.0-6.tar
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+* checking for LF line-endings in source and make files
+* checking for empty or unneeded directories
+* building binary distribution
+* installing *source* package 'GrafenHails' ...
+** data
+** help
+*** installing help indices
+** building package indices ...
+** testing if installed package can be loaded
+* MD5 sums
+packaged installation of 'GrafenHails' as GrafenHails_0.0-6.zip
+
+* DONE (GrafenHails)
+cygwin warning:
+  MS-DOS style path detected: c:/temp/rpackage2.12
+  Preferred POSIX equivalent is: /cygdrive/c/temp/rpackage2.12
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+cygwin warning:
+  MS-DOS style path detected: d:/grafdat/GrafenHails_0.0-6.zip
+  Preferred POSIX equivalent is: /cygdrive/d/grafdat/GrafenHails_0.0-6.zip
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+cygwin warning:
+  MS-DOS style path detected: c:/temp/rpackage2.12
+  Preferred POSIX equivalent is: /cygdrive/c/temp/rpackage2.12
+  CYGWIN environment variable option "nodosfilewarning" turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+/usr/bin/cp: cannot create regular file `c:/temp/rpackage2.12/LiSciData_0.0-01.zip': Permission denied
+Warning message:
+In dir.create(rpackageNew) : 'c:\temp\rpackage2.12' already exists
+> 
+> 
+> #Finally puttin onto the web
+> #system('build.bat')
+> 
+> 
+> 	
+> 
+> proc.time()
+   user  system elapsed 
+   0.84    0.03   13.07 

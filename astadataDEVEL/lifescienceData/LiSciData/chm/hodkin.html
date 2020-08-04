@@ -1,0 +1,72 @@
+<html><head><title>Damage of carrots by carrotr fly larvae</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>hodkin(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   hodkin">
+<param name="keyword" value=" Damage of carrots by carrotr fly larvae">
+</object>
+
+
+<h2>Damage of carrots by carrotr fly larvae</h2>
+
+
+<h3>Description</h3>
+
+<p>
+T4 cells/<i>mm^3</i> in blood samples from 20 patients in
+remission from Hodgkin's disease and 20 patients in remission
+from disseminated malignancies.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(hodkin)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+Data frame containing
+<dl>
+<dt>hodk:</dt><dd>nuber of cells T4 per <i>mm^3</i> from patients with Hodkin disease</dd>
+<dt>nonhodk:</dt><dd>nuber of cells T4 per <i>mm^3</i> from patients with Non-Hodkin disease</dd>
+</dl>
+
+<h3>Details</h3>
+
+
+
+
+<h3>Source</h3>
+
+<p>
+Altman, D. G. (1991) <EM> Practical Statistics for Medical Research</EM>, Chapman and Hall, London, p. 199
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Lindsey, J.K. and Jones, B. (1998) <EM>Choosing among generalized linear models applied to medical data</EM> 
+Statistics in Medicine, 17, p. 59-68
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(hodkin)
+#reshape the data into long fromat
+hodkinL&lt;-reshape(hodkin,direction='long',varying=list(c('hodk','nonhodk')),v.names='ncell',times=c('yes','non'),timevar='hodkin')
+hodkinL&lt;-transform(hodkinL,hodkin=factor(hodkin))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

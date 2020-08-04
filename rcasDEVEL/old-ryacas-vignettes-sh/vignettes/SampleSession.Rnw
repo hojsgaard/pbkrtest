@@ -1,0 +1,24 @@
+\section{A sample session} 
+\label{sec:xxx}
+
+A few sample calculations are given below. Note that lines starting
+with a hash (\#) are regarded as comments by \guy\ and are not executed.
+@ 
+<<>>=
+# Assign value to a variable:
+n:=10
+# Make numerical calculation:
+n^2+25
+# Differentiate:
+D(x)Sin(x)
+# Expand polynomium:
+Expand((1+x)^3);
+# Integrate:
+Integrate(x,a,b)Sin(x);
+# Taylor expansion 
+texp := Taylor(x,0,3) Exp(x)
+# Show the result in nice form:
+PrettyForm(texp);
+# Show the result in Latex format
+TexForm(texp) 
+@ %def 

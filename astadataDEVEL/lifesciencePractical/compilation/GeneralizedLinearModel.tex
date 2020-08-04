@@ -1,0 +1,1496 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4wide,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{url,a4}
+\usepackage{boxedminipage,color,xcolor}
+\usepackage{shortvrb}
+\usepackage{framed}
+\usepackage{comment}
+
+\usepackage[inline,nomargin,draft]{fixme}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{framed}
+\usepackage{comment}
+\usepackage{amsmath}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+
+\MakeShortVerbå
+
+%%
+%% Easy matrices:
+%%
+\newcommand{\matrxr}[2][rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxr{-1&-2\\3&4}$
+
+\newcommand{\matrxc}[2][cccccccccccccccccccccccccccccccccccc]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+\newcommand{\matrxl}[2][lllllllllllllllllllllllllllllllllllll]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+
+\def\R{\texttt{R}}
+\def\code#1{\texttt{#1}}
+\def\ok{\texttt{OK}}
+\def\fix{\texttt{FIX}}
+
+\def\red#1{{\bf \textcolor{red}{#1}}}
+\def\blue#1{{\bf \textcolor{blue}{#1}}}
+\def\purple#1{{\bf \textcolor{purple}{#1}}}
+
+\def\com#1{{\em{\color{red} #1}}}
+\def\comi#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+\def\comic#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+
+\def\simn{\sim\mathcal N}
+\def\simx{\sim\chi^2}
+\def\xx{\chi^2}
+\def\norm{\mathcal N}
+
+
+\DeclareMathOperator{\RR}{\mathbb{R}}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+\DeclareMathOperator{\var}{\mathbb{V}ar}
+\DeclareMathOperator{\cov}{\mathbb{C}ov}
+%\DeclareMathOperator{\norm}{N}
+\DeclareMathOperator{\spanx}{span}
+\DeclareMathOperator{\corr}{Corr}
+\DeclareMathOperator{\deter}{det}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\odds}{odds}
+
+\def\vnorm#1{\left|\left|#1\right|\right|} 
+\def\innerp#1{\left\langle #1 \right\rangle}
+\def\inv{^{-1}}
+\def\transp{^{\top}}
+\definecolor{darkblue}{rgb}{0,0,.5}
+
+%%UHH commands added by UHH
+%%some new enviroments
+\newtheorem{theorem}{Theorem}[section]
+\newenvironment{example}{\medskip\noindent\refstepcounter{theorem}{\bf
+Example \thetheorem\ }}{\hfill $\Box$ }
+\newenvironment{theoreme}{\medskip\noindent\refstepcounter{theorem}{\bf
+Theorem \thetheorem\ }}{}
+
+\definecolor{shadecolor}{gray}{0.91}
+\definecolor{howR}{gray}{0.91}
+%\specialcomment{howR}{\begin{shaded}\small R code: }{\end{shaded}}
+%\specialcomment{howR}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+%\specialcomment{sblock}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+
+\specialcomment{solution}
+{\begin{shaded} Solution: }{\end{shaded}}
+
+\specialcomment{topics}
+{\begin{shaded} TOPICS: }{\end{shaded}}
+
+
+
+\newenvironment{howR}{}{}
+
+\newenvironment{examplea}
+                {\begin{example}  \em \openup-1pt }
+                {\hfill $\Box$  %\vspace{5mm}
+                \end{example}}
+
+
+
+%%\excludecomment{topics}
+%%\excludecomment{solution}
+
+\usepackage{Sweave}
+\begin{document}
+
+
+\RecustomVerbatimEnvironment{Sinput}{Verbatim}%
+    {fontsize=\scriptsize,frame=single,framerule=1pt,
+      rulecolor=\color{red},
+      fillcolor=\color{yellow}
+    }
+\RecustomVerbatimEnvironment{Soutput}{Verbatim}%
+    {fontsize=\scriptsize, frame=single,framerule=0.1pt}
+
+
+
+
+% \renewenvironment{Schunk}{\linespread{.85}\scriptsize}{}
+    
+%% Efter preamble
+% \definecolor{myGray}{rgb}{0.95,0.95,0.95}
+
+% \makeatletter
+% \renewenvironment{Schunk}{
+%   \begin{lrbox}{\@tempboxa}
+%     \begin{boxedminipage}
+%       {\columnwidth}\scriptsize}
+%     {\end{boxedminipage}
+%   \end{lrbox}%
+%   \colorbox{myGray}{\usebox{\@tempboxa}}
+% }
+% \makeatother
+
+
+\parindent0pt
+\parskip5pt
+
+
+{Miniproject: Logistic regression - Poisson regression - Gamma regression - GLM}
+
+{Ulrich Halekoh and Søren Højsgaard \hfill Created: \today}
+
+
+\hrule
+
+\tableofcontents
+
+
+\setkeys{Gin}{width=4in,height=3in}
+
+\begin{topics}
+Logistic regression  
+\end{topics}
+
+\section{Shuttle}
+On January, 28, 1986, the shuttle Challenger (flight 61-I) 
+exploded shortly after the start. Later it was found 
+that 'a combustion gas leak' caused the catastrophe. 
+The leakage may by attributed to the failure of one or several of six 
+O-rings, which task was to seal the field joints of the motor.
+
+The night before the event engineers discussed the problem 
+in a three hour telephone conference. 
+In the conference a plot of the failure of O-rings in former missions 
+were discussed, but only data for flights with failures were used, 
+the flights without failures were considered not to contribute valuable information.
+Later the Rogers Commission noted that this was a failure of a 
+proper data analysis.
+
+\begin{Schunk}
+\begin{Sinput}
+ library(LiSciData)
+ data(shuttleOrings)
+\end{Sinput}
+\end{Schunk}
+
+\begin{enumerate}
+\item
+Plot the number of damages against the temperature. What seems to be 
+the conclusion on the effect of temperature, if one disregards the flights where
+no damages were observed?
+\item
+Fit a logistic regression model using \verb+temp+ and \verb+pres+ as covariates.
+\item
+Use a model where the temperature is the only covariate.
+Predict the probability of the damage of at least one O-ring
+at the temperature of 31 Fahrenheit (=(31-32)*5/9  ${}^0$C=-0.6 ${}^0$C.)
+(Remember, if $\pi$ is the probability of a ring to fail, the probability of at least one ring to fail is 
+$1-(1-\pi)^6$.)
+Provide  a confidence interval.
+\item
+Fit models with the probit and the cloglog-link.
+Predict again the above probability.
+\end{enumerate}
+
+\section{Mendel's law and primulae}
+\begin{topics}
+Test for binomial proportions  
+\end{topics}
+
+A total of 560 plants were classified by type of their leafs (flat or crimped) and the type of their eye
+(normal or Primrose Queen). 
+(In the picture
+\url{	http://www.primulaworld.com/PWWeb/gallery/slides/sinensisTM3.html} the eye is the yellow
+area round the mouth of the corolla tube). 
+According to simple Mendelian law one would expect
+a 3:1 ratio for the dominant to the recessive characteristic for each part of the plant.
+For leafs one would expect  420 plants with 
+flat leaves  and  140 plants with crimped leaves. For the eye one would would expect 420 plants normal and 120 plants
+Primrose Queen.
+
+\begin{table}[h]
+\begin{tabular}{c|cc|c}
+& \multicolumn{2}{c}{Leaves} & \\ \hline
+Eye & Flat & Crimped & Total\\ \hline
+Normal  & 328 & 77 &  405 \\
+Primrose Queen & 122 & 33 & 155 \\ \hline
+Total & 450 & 110 & 560 \\ \hline
+\end{tabular}    
+\end{table}
+
+Concentrate first on the leaves where 450 are flat and 110 crimped. Describe the distribution of the observations, 
+formulate the hypothesis and test it. 
+% (Take a look at the one-sample testing problem in the 
+% \verb+example-logistic.pdf+ document.)
+Repeat the analysis for the eyes.
+
+\section{A simple example on different presentation of tabulated data}
+In a study on the ratio of born boys to girls one observed 10 families with 1 child
+and 17 families with 2 children and recorded the number of boys.
+Answer the question whether boys are equally frequent then girls in a family. 
+
+How would you test the supposition?
+The experimenter tabulated the data in three different ways. 
+Which tabulation do you think is most convenient for your analysis?
+
+\begin{table}[h]
+\centering
+\caption{Number of families with 1 or 2 children classified after their number of boys.}
+\label{tab:boys1}
+\begin{tabular}{lrrrr}\hline
+& \multicolumn{3}{c}{Number of boys} & Total\\ 
+number children & 0 & 1 & 2 \\ \hline
+1               & 9 & 1 & - & 10\\
+2               & 2 & 10 & 5  & 17\\ \hline
+\end{tabular}
+\end{table}
+\begin{table}[h]
+\centering
+\caption{Number of families with 1 or 2 children classified after their number of boys and girls.}
+\label{tab:boys2}
+\begin{tabular}{cccr}\hline
+ boys & girls & number children & number families \\
+0 & 1 & 1 &   9 \\
+0 & 2 &  2&  2 \\
+1 & 0 &  1&  1 \\
+1 & 1 &  2 & 10 \\
+2 & 0 &  2& 5 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Number of families with 1 or 2 children classified after their number of boys and girls.}
+\label{tab:boys3}
+\begin{tabular}{cccc}\hline
+number boys  & \multicolumn{3}{c}{number girls}\\ \hline 
+      &  0 & 1 & 2 \\
+0     & -  & 9 & 2 \\
+1     &  1 & 10 & - \\
+2     & 2  & - & - \\ \hline
+\end{tabular} 
+\end{table}
+
+
+
+\begin{solution}
+
+
+We use Table \ref{tab:boys2}.
+We assume that in each family $i=1,\dots,27$ of size $n_i$ the number of boys is binomially distributed 
+with probability $\pi$, 
+\[
+Y_{i}  \sim bin(n_i,\pi)
+\]
+The number of families give  the frequency how often  a certain number of boys is
+observed in a specific family size. We use this as a frequency in the model fit.
+\begin{Schunk}
+\begin{Sinput}
+ dboys<-data.frame(boys=c(0,0,1,1,2),girls=c(1,2,0,1,0),nfam=c(9,2,1,10,5))
+\end{Sinput}
+\end{Schunk}
+
+Fit
+\begin{Schunk}
+\begin{Sinput}
+ m<-glm(cbind(boys,girls)~1,data=dboys,family=binomial,weights=nfam)
+\end{Sinput}
+\end{Schunk}
+
+We generate now a data set, where each family is individually represented, e.g.
+the 2 families with 0 boy and 1 girl are represented by 2 observations (0,1) and (0,1).
+The data set will have 10+17=27 rows, one for each family. 
+\begin{Schunk}
+\begin{Sinput}
+ explode<-function(dat,number){
+  #explodes data by copying each row in data with the entry i  number
+  # number is a column of dat!
+  numb<-dat[,number]
+  dat<-dat[! (is.na(numb) | numb==0),]
+  numb<-dat[,number]
+  dat$inde<-1:nrow(dat)
+  numb<-dat[,number]
+  indec<-data.frame(inde=rep(dat$inde,numb))
+  datexploded<-merge(dat,indec,by='inde')
+  }
+ dboysE<-explode(dboys,'nfam')
+\end{Sinput}
+\end{Schunk}
+An alternative solution is therefore
+\begin{Schunk}
+\begin{Sinput}
+ m.a<-glm(cbind(boys,girls)~1,data=dboysE,family=binomial)
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+
+\section{Low birth weight in infants}
+%
+\begin{enumerate}
+\item
+The data set \verb+birthwt+ contains information about 189 births at a US hospital.
+\begin{Schunk}
+\begin{Sinput}
+ library(MASS)
+ data(birthwt)
+\end{Sinput}
+\end{Schunk}
+\item
+Use the help page for the data frame to find out what variables the data set contain.
+\begin{Schunk}
+\begin{Sinput}
+ help(birthwt)
+\end{Sinput}
+\end{Schunk}
+\item
+Run the example code of the data frame.
+This creates the data frame \verb+bwt+ that aggregate levels of
+some of the variables of \verb+birthwt+. 
+\begin{Schunk}
+\begin{Sinput}
+ example(birthwt)
+\end{Sinput}
+\end{Schunk}
+
+\item
+We treat 'low' as the response-variable and wish to find the effect of the other variable on
+the weight of the children. What type of model will we use?
+
+\item
+Examine the effect of the independent variables on the birthweight.
+Which can be left out your model.
+
+\item
+Make a residual analysis of your fitted model.
+
+\end{enumerate}
+
+\section{Damage of carrots by carrot larvae}
+Wheatley and Freeman (1982) analysed an experiment on the impact of two different insecticides, applied in different soil depths, on the damage of carrots by carrot fly larvae. Additionally to the two insecticides two control experiments without applied insecticides were performed. The experiment was repeated three times. 
+
+From each plot on which a treatment had been applied a number of carrots were chosen, washed and classified as damaged or not. 
+
+
+Reading  data and printing the data
+\begin{Schunk}
+\begin{Sinput}
+ data(carrotfly,package='LiSciData')
+\end{Sinput}
+\end{Schunk}
+\verb+dami+ are the number of damaged carrots in replicate \verb+i+ and \verb+exami+ are the corresponding 
+analysed carrots.
+
+\begin{enumerate}
+\item
+\begin{itemize}
+\item
+The data are given in wide format 
+(all observations for one \verb+insecticide+ $\times$ \verb+depth+ 
+combinations are in one row.
+Transform the data such that in each row we have the two observations (number of damaged and examined  carrots)
+for each replicate. Take care to create a variable \verb+replicate+ that identifies the replicates.
+(The example code of the carrotfly-data may be of help (you need to load the package \verb+LiSciData+).
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ library(LiSciData)
+ example(carrotfly)
+\end{Sinput}
+\begin{Soutput}
+crrtfl data(carrotfly)
+
+crrtfl #reshape the data into long fromat
+crrtfl carrot<-reshape(carrotfly,direction='long',varying=list(c('dam1','dam2','dam3'),
+crrtfl                             c('exam1','exam2','exam3')),
+crrtfl                       v.names=c('dam','exam'),
+crrtfl                       times =c(1,2,3),timevar='replicate')
+
+crrtfl #removing the id variable
+crrtfl carrot<-subset(carrot,select=-id)
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+\item
+Make the variables \verb+replicate+ a factor.
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ carrot<-transform(carrot,replicate=factor(replicate))
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+\item
+Create a factor variable \verb+alltreat+  has  as levels the combinations of the levels of \verb+insecticide+ and
+\verb+depth+. \verb+alltreat+ represents thus a factor variable with 11 levels representing 11 considering all combinations of insecticide and depth as 11 different treatments.  Use the function \verb+interaction+ to perform the task.
+The function \verb+interaction+ generates a factor with  levels that consists of all possible combinations of the levels of  \verb+depth+ and \verb+insecticide+ . It will therefore also create level-combinations that are not presented in the data, e.g. the combination \verb+insecticide='control', depth=1+. To get rid of these combinations use the \verb+drop=T+
+argument.
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ carrot<-transform(carrot,alltreat=interaction(depth,insecticide,drop=T))
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+\end{itemize}
+\item
+Formulate a model and fit a model, where you analyse the impact of replicate and the 11 different treatments on the damage of
+carrots.
+\begin{solution}
+We assume that the data are binomially distributed.
+\begin{Schunk}
+\begin{Sinput}
+ g<-glm(cbind(dam,exam-dam)~replicate+alltreat,data=carrot,family=binomial)
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+\item
+Are there signs of overdispersion?
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ X2<-sum(residuals(g,type='pearson')^2)/g$df.residual
+ X2
+\end{Sinput}
+\begin{Soutput}
+[1] 5.362905
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+\item
+Test whether the treatments have an impact on the number of damaged roots.
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ g.quasi<-glm(cbind(dam,exam-dam)~replicate+alltreat,data=carrot,family=quasibinomial)
+ anova(g.quasi,test='F')
+\end{Sinput}
+\begin{Soutput}
+Analysis of Deviance Table
+
+Model: quasibinomial, link: logit
+
+Response: cbind(dam, exam - dam)
+
+Terms added sequentially (first to last)
+
+
+          Df Deviance Resid. Df Resid. Dev      F    Pr(>F)    
+NULL                         35    1824.41                     
+replicate  2    64.69        33    1759.73  6.031  0.007839 ** 
+alltreat  10  1636.75        23     122.97 30.520 6.417e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+or
+\begin{Schunk}
+\begin{Sinput}
+ g.quasi.0<-glm(cbind(dam,exam-dam)~replicate,data=carrot,family=quasibinomial)
+ anova(g.quasi,g.quasi.0,test='F')
+\end{Sinput}
+\begin{Soutput}
+Analysis of Deviance Table
+
+Model 1: cbind(dam, exam - dam) ~ replicate + alltreat
+Model 2: cbind(dam, exam - dam) ~ replicate
+  Resid. Df Resid. Dev  Df Deviance     F    Pr(>F)    
+1        23     122.97                                 
+2        33    1759.73 -10  -1636.8 30.52 6.417e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+\item
+Test whether  the effect of the insecticides are different for the depth 1.
+\item
+Test the null-hypothesis: The effects of the insecticides are not different on any level of
+depth?
+
+\begin{solution}
+
+This hypothesis is formulated by several contrasts to be zero at the same time.
+If the model is
+\[
+logit(\pi)= \mu + \alpha_{id} + \beta_r
+\]
+then the hypothesis of no insecticide effect is
+\[
+\alpha_{diazonon,d}-\alpha_{disulfoton,d}=0
+\]
+for all   $d=1,2,5,5,10,25$. (Why is $d=0$ not included?)
+You can use the \verb+esticon+ function of \verb+doBy+ package to test this hypothesis:
+ The parameter estimates are
+\begin{Schunk}
+\begin{Sinput}
+ coef(g.quasi)
+\end{Sinput}
+\begin{Soutput}
+           (Intercept)             replicate2             replicate3 
+             1.6341642              0.5031748              0.5863955 
+    alltreat1.diazinon   alltreat2.5.diazinon     alltreat5.diazinon 
+            -1.1202164             -2.1065815             -3.6135831 
+   alltreat10.diazinon    alltreat25.diazinon   alltreat1.disulfoton 
+            -4.0302763             -1.9878067             -1.4707183 
+alltreat2.5.disulfoton   alltreat5.disulfoton  alltreat10.disulfoton 
+            -1.6703448             -2.2139604             -2.8947688 
+ alltreat25.disulfoton 
+            -1.1735287 
+\end{Soutput}
+\end{Schunk}
+the contrast vector for the difference 
+\[
+\alpha_{diazonon,d}-\alpha_{disulfoton,d}=0
+\]
+would be
+\begin{Schunk}
+\begin{Sinput}
+ lamb1<-lamb2<-lamb5<-lamb10<-lamb25<-0*coef(g.quasi)
+ lamb1[c('alltreat1.diazinon','alltreat1.disulfoton')]<-c(-1,1)
+ lamb2[c('alltreat2.5.diazinon','alltreat2.5.disulfoton')]<-c(-1,1)
+ lamb5[c('alltreat5.diazinon','alltreat5.disulfoton')]<-c(-1,1)
+ lamb10[c('alltreat10.diazinon','alltreat10.disulfoton')]<-c(-1,1)
+ lamb25[c('alltreat25.diazinon','alltreat25.disulfoton')]<-c(-1,1)
+ lamb<-rbind(lamb1,lamb2,lamb5,lamb10,lamb25)
+\end{Sinput}
+\end{Schunk}
+and using the esticon function with the matrix $lamb$ as contrast matrix:
+\begin{Schunk}
+\begin{Sinput}
+ esticon(g.quasi,cm=lamb,joint.test=T)
+\end{Sinput}
+\begin{Soutput}
+   X2.stat DF   Pr(>|X^2|)
+1 37.95923  5 3.845064e-07
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+\item
+Assume now that the transformed data $\text{logit}(dam/exam)$ 
+are normally distributed.
+Fit a model with the same covariates as above and compare the parameter estimates and their standard errors.
+\end{enumerate}
+
+
+\section{Esophageal cancer}
+
+
+\begin{enumerate}
+
+\item
+The data set \verb+esoph+ contains records from a case-control study of esophageal cancer.
+For 88  combinations of age , alcohol consumption and tobacco consumption the number of cases
+and controls are given.
+\begin{Schunk}
+\begin{Sinput}
+ data(esoph)
+\end{Sinput}
+\end{Schunk}
+
+\item
+Make some descriptive plots of data.
+
+\item
+Formulate a model for your data.
+
+\item
+Fit the model with interactions between all three predictors.
+
+\item
+Eliminate factors to simplify the model as far as is possible.
+
+\item
+All three factors are ordered. Convert the factors to numerical 
+variables using the \verb+recodevar+ of the package \verb+doBy+.
+
+\item
+Can the model be simplified using the numerical representation of the predictors?
+
+\item
+Analyse the residuals of your final model.
+\end{enumerate}
+\section{Discoveries}
+
+\begin{enumerate}
+\item
+The data \verb+discoveries+ lists the number of great inventions and scientific discoveries in each of the years between 1860 to 1959.
+\begin{Schunk}
+\begin{Sinput}
+ data(discoveries)
+\end{Sinput}
+\end{Schunk}
+
+\item
+Plot the data.
+
+\item
+Add a smooth line to the plot.
+
+\item
+How would you model data. Write down the systematic and the random part of your model.
+
+\item
+Has the discovery rate remained constant over time?
+
+\end{enumerate}
+
+
+\section{Bacteria}
+We reanalyze data we used already in the last project day.
+In an experiment on nutrients on bacterial growth,
+bacteria were grown in different media with the nutrients sucrose and leucine added.
+After fours days the numbers of bacteria, \verb+density+, were counted.
+\begin{Schunk}
+\begin{Sinput}
+ library(LiSciData)
+ data(bactsucrose)
+\end{Sinput}
+\end{Schunk}
+
+\begin{enumerate}
+\item
+Assume the responses \verb+density+ to be normally distributed.
+Assume the predictors \verb+day+, \verb+sucrose+ and \verb+leucine+ as factors.
+Consider  a model which is  additive in \verb+day+ and with an interaction between the other two
+factors.  
+Which link function would the Box-Cox approach suggest?
+\item
+Fit the corresponding model  using the identified link assuming the data to be normally distributed.
+\item
+We want to identify an appropriate variance function.
+Take the absolute residuals \verb+abs(res)+ (on the response scale) from the above model 
+and the predicted values \verb+fit+ (on the response scale) and fit the linear model
+\[
+E(\log(|res|))= \phi + \lambda \log (fit)
+\]
+Twice the slope of the fitted equation will give the exponent $\lambda$ in the variance function
+\[
+V(\mu)= \phi \mu^\lambda
+\]
+\item
+Use the estimated $2 \cdot \lambda$ to propose a different distribution for the observations. Fit this new model.
+\item
+Check whether you still need the interaction between sucrose and leucine.
+\item
+Fit two models with the \verb+log+ link assuming either normally or gamma distributed data.
+Use AIC and cross-validation to decide which model to choose.
+
+\end{enumerate}
+
+
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ bactsucrose<-transform(bactsucrose,y=density/max(density),day=factor(day),sucrose=factor(sucrose),leucine=factor(leucine))
+ library(MASS)
+ boxcox(y~day+sucrose+leucine+sucrose:leucine,data=bactsucrose)
+ m.normal.log<- glm(density~day+sucrose+leucine+sucrose:leucine,data=bactsucrose,family=gaussian(link=log))
+ res<-residuals(m.normal.log,type='response')
+ fit<-predict(m.normal.log,type='response')
+ g<-glm(log(abs(res))~log(fit))
+ m.normal.log<- glm(density~day+sucrose+leucine+sucrose:leucine,data=bactsucrose,family=gaussian(link=log))
+ m.gamma.log<-glm(density~day+sucrose+leucine+sucrose:leucine,data=bactsucrose,family=Gamma(link=log))
+ library(boot)
+ AIC(m.normal.log)
+ AIC(m.gamma.log)
+ cv.glm(bactsucrose,m.normal.log)$delta
+ cv.glm(bactsucrose,m.gamma.log)$delta
+\end{Sinput}
+\end{Schunk}
+
+\end{solution}
+
+ 
+\section{Criminal teens and Poisson distribution}
+Sometimes the Poisson distribution can explain a phenomenon just as a random phenomenon,
+making more intricate argumentation superfluous.
+In an article from 17. December 2007, Politiken wrote 
+{\it 
+{\bf Violent teens live in small  villages  - not the large city}
+It was beautiful in the countryside. In old days. Today the small villages as
+Farsø, Bredebro, Aarup and Holsted are on the top if the number of
+ sentences for violence  for  persons aged between 15 and 17  is counted.
+If the number of young persons that are involved in 
+violence is related to the number of teens in their community,
+then the largest towns are ranked very low with Copenhagen at number 81
+and Aarhus as number 125 of the 272 communities in 2006.
+An explanation could be that the small communities have the cheapest accommodations.
+}
+A sociologist confronted with these data commented, that the findings were surprising.
+
+We want to find out whether the data provide evidence for  
+something surprising going on or 
+whether a simple assumption of equal rates based on  Poisson counts would explain the data.
+
+\begin{enumerate}
+\item
+First we make a little theoretical exercise.
+Assume we have 3 councils with the following population of teens:
+\begin{Schunk}
+\begin{Sinput}
+ pop<-rep(c(10,100,1000),each=c(1,1,1))
+\end{Sinput}
+\end{Schunk}
+We assume further that each community has the same problem with violent teens,
+i.e. we assume that all towns have the same rate of violent teens.
+Let us assume the violence-rate is 3\%, e.g. 3 violent per 100 teens.
+We assume that the number of violent teens is Poisson distributed and
+generate for each town the number of violent teens according to this assumption
+A single replication would be coded as:
+\begin{Schunk}
+\begin{Sinput}
+ b<-rpois(length(pop),lambda=0.03*pop)
+\end{Sinput}
+\end{Schunk}
+We repeat this 1000 times
+\begin{Schunk}
+\begin{Sinput}
+ set.seed(89)
+ b<-matrix(NA,length(pop),1000)
+ for (i in 1:1000) {
+  b[,i]<-rpois(length(pop),lambda=0.03*pop)
+  }
+\end{Sinput}
+\end{Schunk}
+Now we calculate for each town the  proportion of violent teens for each of our replication
+\begin{Schunk}
+\begin{Sinput}
+ b<-b/pop
+\end{Sinput}
+\end{Schunk}
+We plot the distribution of the proportion for each town
+\begin{Schunk}
+\begin{Sinput}
+ par(mfrow=c(2,2))
+  hist(b[1,],xlim=c(0,0.25),ylim=c(0,65),main='village',probability=TRUE)
+  hist(b[2,],xlim=c(0,0.25),ylim=c(0,65),main='town',probability=TRUE)
+  hist(b[3,],xlim=c(0,0.25),ylim=c(0,65),main='large city',probability=TRUE)	
+\end{Sinput}
+\end{Schunk}
+\includegraphics{fig/PRACS-031}
+ Looking at the plots, which type of city (i.e. village, town, large city) do you think will most probably
+be 
+\begin{enumerate} 
+\item
+ among those with the smallest proportions of violent teens,
+\item
+among those with the largest proportions of violent teens,
+\item
+among those with a median amount of violent teens?
+\end{enumerate}
+Relate your conclusion to that of the article that the violent live in small but not in large cities.
+
+\item
+We analyze now the data. We consider only the non-aggregated data, i.e. we do not use the 
+data for the 'Amt's and for 'Hele landet'.
+Additionally we exclude all data with a ratio of 0 because for these data we cannot calculate the number of
+teens aged between 15 and 17 in a city.
+
+Preparation of the data, the rows for 'Amt' and 'Hele-landet' are deleted and the number of
+teens aged 15 to 17 in each town is calculated.
+\begin{Schunk}
+\begin{Sinput}
+ v<-get(data(poissonviolence,package='LiSciData'))
+ v$pop<-with(v,number/ratio*1000)
+ is.amt<-grep('Amt',v$kommune)
+ v<-v[-is.amt,]
+ v<-subset(v, !(kommune %in% c('Hele_landet')))
+\end{Sinput}
+\end{Schunk}
+
+\begin{enumerate}
+\item
+Fit now two alternative models to the data
+\begin{enumerate}
+\item
+A simple Poisson model to the data, assuming a common violence rate for each community.
+Consider the necessity to account for overdispersion.
+\item
+A model, where the violence rate is proportional to the
+size of the town
+\end{enumerate}
+\item
+Are the two models statistically different?
+\item
+What is the likely  consequence that we left out the towns where the
+ratio of violent teens had been estimated to zero?
+\end{enumerate} 
+
+
+\begin{solution}
+A proposal solution to the model fitting
+
+\begin{Schunk}
+\begin{Sinput}
+ M0<-glm(number~offset(log(pop)),data=v,family=poisson)
+ X2pearson<-function(m) sum(residuals(m,type='pearson')^2)/m$df.residual
+ X2pearson(M0)
+\end{Sinput}
+\begin{Soutput}
+[1] 1.774907
+\end{Soutput}
+\begin{Sinput}
+ M1<-glm(number~offset(log(pop)),data=v,family=quasipoisson)
+ M2<-glm(number~log(pop)+offset(log(pop)),data=v,family=quasipoisson)
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+
+\end{enumerate}
+
+\section{Survial data}
+The data in set \verb+whitebloodcell+  of the package \verb+LiSciData+ contain the 
+survival time (in weeks) of patients after the diagnosis of
+leukemia. Also the logarithm to the base 10 of the
+counts of the white blood cells at the time of diagnoses
+is given.
+
+Survival times can sometimes be assumed to be exponentially
+distributed.
+
+The exponential distribution is a special case of the gamma
+distribution with the dispersion parameter (the reciprocal of the
+shape parameter) equal to 1.
+The density if the Gamma distribution is
+\[
+f(y)= \frac{1}{s^a \Gamma(a)} y^{a-1} e^{-\frac{y}{s}}
+\]
+with $s>0$ the scale parameter, $a>0$ the shape parameter.
+
+Setting $a=1$ and defining the rate $\lambda=1/s$ we get the most common
+form of the density for the exponential distribution
+\[
+f(y)= \lambda e^{-\lambda y}.
+\]
+
+\begin{enumerate}
+\item
+What is the expectation and the variance of an exponential
+distribution. (HINT: Refer to the lecture notes for the Gamma distribution)
+
+\begin{solution}
+The Gamma distribution has expectation and variance
+\[
+\EE(Y)=a\cdot s  \quad \var(Y)=a\cdot s^2
+\]
+With $a=1$ and $s=\frac{1}{\lambda}$
+we have for an exponentially distributed random variable $Y$
+\[
+\EE(Y)=1/\lambda  \quad  \var(Y)= 1/\lambda^2
+\]
+\end{solution}
+
+
+\item
+Draw the density of the exponential distribution with
+the expectation of 4.7. (HINT: use the R-function \verb+dexp+).
+
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ x<-seq(0,20,l=50)
+\end{Sinput}
+\end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+ plot(x,dexp(x,rate=1/4.7),type='l')
+\end{Sinput}
+\end{Schunk}
+\includegraphics{fig/PRACS-035}
+\end{solution}
+
+
+\item
+Assume that the expected survival times may be described by
+\[
+\EE(Y_i|x_i)= \exp(\alpha + \gamma x_i)
+\]
+where $x_i$ are the $\log_{10}$ counts of the white blood cells.
+
+Fit an appropriate GLM (write down the formula for the linear
+ predictor)
+ and give an estimate for the parameters and
+their standard errors.
+
+Be aware of the following: The estimation of the parameters of the
+linear predictor of a GLM is independent of the estimate for
+the dispersion. This is reflected in R by the fact that a \verb+glm+
+object has no dispersion attribute. But if you you use the
+\verb+summary+
+function, the dispersion parameter is either estimated by default via
+the Pearson's $X^2$ or you may specify it.
+
+Because we assume that our data are exponentially distributed, you must choose 
+the dispersion equal to 1 (remember that the dispersion is the reciprocal of the shape parameter: $\phi=1/a$)!
+
+\begin{solution}
+The model is linear on the log-scale, we use therefore the
+\verb+log+-link:
+\[
+\log(\EE(Y_i|x_i))= \alpha + \gamma x_i
+\]
+
+\begin{Schunk}
+\begin{Sinput}
+ library(LiSciData)
+ data(whitebloodcell)
+ g<-glm(time~logcount,data=whitebloodcell,family=Gamma(link=log))
+\end{Sinput}
+\end{Schunk}
+ 
+ATTENTION: We must explicitely specify the \verb+log+-link for the
+Gamma family, because R assumes by default the canonical link for the
+Gamma distribution, i.e. the inverse function. 
+
+\begin{Schunk}
+\begin{Sinput}
+ summary(g,dispersion=1)$coef
+\end{Sinput}
+\begin{Soutput}
+             Estimate Std. Error   z value     Pr(>|z|)
+(Intercept)  8.343253   1.608815  5.185960 2.149046e-07
+logcount    -1.080825   0.389811 -2.772689 5.559521e-03
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+
+
+\item
+What is the expected life time  for patients with 
+a $\log_{10}$ cell count of 4.5? (HINT: Use the \verb+predict+ function).
+
+
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ predict(g,newdata=data.frame(logcount=4.5),type='response')
+\end{Sinput}
+\begin{Soutput}
+       1 
+32.44487 
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+
+
+\item
+Provide a confidence interval for this expected
+lifetime. (HINT: Use the \verb+se+ argument of the \verb+predict+ function
+and set the \verb+dispersion+ argument to 1).
+
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ e<-predict(g,newdata=data.frame(logcount=4.5),dispersion=1,se=TRUE)
+\end{Sinput}
+\end{Schunk}
+
+
+\begin{Schunk}
+\begin{Sinput}
+ ci.log<-e$fit+ 1.96* e$se.fit *c(-1,1)
+\end{Sinput}
+\begin{Soutput}
+[1] 2.906002 4.053082
+\end{Soutput}
+\begin{Sinput}
+ ci<-exp(ci.log)
+\end{Sinput}
+\begin{Soutput}
+[1] 18.28355 57.57466
+\end{Soutput}
+\end{Schunk}
+If we repeat the calculation of the confidecne interval, but
+incorporate the dispersion into its calculation, we get a  narrower interval
+(Note that I do NOT set the value of dispersion)
+\begin{Schunk}
+\begin{Sinput}
+ e<-predict(g,newdata=data.frame(logcount=4.5),se=TRUE)
+ ci.log<-e$fit+ 1.96* e$se.fit *c(-1,1)
+ ci<-exp(ci.log)
+\end{Sinput}
+\end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+ ci<-exp(ci.log)
+\end{Sinput}
+\begin{Soutput}
+[1] 18.57472 56.67214
+\end{Soutput}
+\end{Schunk}
+
+\end{solution}
+\end{enumerate}
+
+\section{Insurance claims}
+
+Install the CRAN-package \verb+faraway+.  In the
+\verb+faraway+-package you find the data set \verb+motorins+ which
+contain the number of car insurance claims for 1797 groups of cars in
+Sweden in 1977.
+
+\begin{Schunk}
+\begin{Sinput}
+ data(motorins,package='faraway')
+\end{Sinput}
+\end{Schunk}
+
+
+We want examine the effect of Zone, Make and  on the number of claims.
+
+\begin{enumerate}
+\item
+Formulate a model to solve the problem.
+Which variable could be used as an offset in this model?
+Check your model.
+
+\begin{Schunk}
+\begin{Sinput}
+ g.quasi<-glm(cbind(dam,exam-dam)~replicate+alltreat,data=carrot,family=quasibinomial)
+ carrot$p<-carrot$dam/carrot$exam
+ g<-glm(log(p/(1-p))~replicate+alltreat,data=carrot,family=gaussian)
+\end{Sinput}
+\end{Schunk}
+
+\item
+Compare your previous analysis to an analysis where you assume that
+the data a log-normally distributed.
+\begin{enumerate}
+\item
+Fit a normal linear model for the
+log-transformed data (i.e. assume that the survival times
+are log-normally distributed)
+
+
+\begin{solution}
+
+\begin{Schunk}
+\begin{Sinput}
+ g.lognormal<-lm(log(time)~logcount,data=whitebloodcell)
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+
+\item
+Based on your model, estimate the mean life time of patients
+with 
+a $\log_{10}$ cell count of 4.5?.
+(HINT: predict first the expected $\log$-survival time, and transform
+this to the original scale using the formula given in the lecture notes.)
+
+What is your conclusion from comparing the two ways of analysis for these data?
+
+
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ exp(
+  predict(g.lognormal,newdata=data.frame(logcount=4.5))+
+  0.5*summary(g.lognormal)$sigma^2)
+\end{Sinput}
+\begin{Soutput}
+       1 
+28.29349 
+\end{Soutput}
+\end{Schunk}
+\end{solution}
+\end{enumerate}
+
+
+\end{enumerate}
+
+
+\section{Weight loss under training}
+\begin{topics}
+  Generalized linear models; gee
+\end{topics}
+
+Twenty men participated in a 'waist loss' program where there initial weight and their weight after 
+completion of the program were measured. The question is, whether the program had an effect.
+\begin{Schunk}
+\begin{Sinput}
+ library(LiSciData)
+ data(waistloss)
+\end{Sinput}
+\end{Schunk}
+
+\begin{enumerate}
+\item
+Plot the weights against the before/ after factor combing the points for each man.
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ library(lattice)
+ waistL<-reshape(waistloss,direction='long',varying=list(c('before','after')),v.names='weight',time=c('before','after'),
+  timevar='time')
+ waistL$timenum<-with(waistL,ifelse(time=='before',-1,1))
+ xyplot(weight~timenum,groups=id,type='l',data=waistL)
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+\item 
+Formulate and fit a model where you assume that all observations are independent.
+\item
+Formulate and fit an appropriate model to the data taking the correlation between the repeated measurements into account.
+\item
+Do you think that the working correlation \verb+exchangeable+ and \verb+ar1+ could yield different results?
+\item 
+Compare the estimates and standard errors of the two previous model fits.
+\item
+Analyze the difference of the weights for each man. Compare the results to your previous analysis.
+The test you perform here is also known as a 'paired t-test'. (You can try to use the R-function
+\verb+t.test+. The result should be the same as for the analysis of the differences).
+
+\begin{solution}
+\begin{Schunk}
+\begin{Sinput}
+ library(geepack)
+ waistL<-with(waistL,waistL[order(id,time),])
+ m.un<-glm(weight~time,data=waistL)
+ m.gee<-geeglm(weight~time,data=waistL,id=id,corstr='exchangeable')
+ waistloss$diff<-with(waistloss,before-after)
+ m.diff<-glm(diff~1,data=waistloss)
+\end{Sinput}
+\end{Schunk}
+\end{solution}
+
+\end{enumerate}
+\section{Sitka Spruce trees}
+\begin{topics}
+  Generalized linear models
+\end{topics}
+In a study on the effect of ozone on the growth of trees, 54 sitka 
+spruce trees
+ were grown in an atmosphere enriched with ozone, and 25 trees were grown under normal conditions.
+The 79 trees of the same age were 
+randomly assigned to the two groups at the beginning of the growth experiment.
+ 
+
+In 1989, the second year of growth, the size of the trees was measured
+ at roughly
+     monthly intervals.  
+
+The data set \verb+sitka89+ in our data library \verb+LiSciData+ 
+contains the size of the trees measured as $\log(h*d^2)$ 
+where $h$ is the height of a tree and $d$ its diameter, 
+ the time of measurement in days 
+after January, 1st, 1988, an identification number  for each tree and
+the indicator of the treatment.
+
+
+
+
+\begin{enumerate}
+\item
+Plot the growth curves for all trees and the mean of the growth curves for the ozone and the control group
+\item
+Propose and fit a model assuming that all observations are independent.
+Use the time-variable as a factor.
+\item 
+Fit a model taking into account the repeated measurements on the same tree.
+\item
+Compare the parameter estimates and their standard errors of the two fits.
+\item
+Test the null-hypothesis that there is no effects of ozone.
+\item
+Provide the effect-estimates for each tree.
+\item
+Make some residual plots.
+\end{enumerate}
+\section{Influence of method of anaesthetic gas application.}
+\begin{topics}
+  Generalized linear Models
+\end{topics}
+
+In a study the effect of  two different airway-masks (classical FM and experimental LMA) on the post-operative
+experience of sore throat was analyzed. 
+Data from surgeries with 10 consultants (anaethesists) were collected 
+on different patients.  
+
+The data are available as  as
+\begin{Schunk}
+\begin{Sinput}
+ data(soreThroat,package='LiSciData')
+\end{Sinput}
+\end{Schunk}
+
+\begin{enumerate}
+\item
+Plot the proportion of patients experiencing sore throat against the type of airway mask.
+\item
+Formulate and fit a model to the data assuming independence of the observations.
+\item
+Formulate and fit a random intercept model taking account of the correlation between observations from the same consultant.\item
+ Provide parameter estimates and their confidence intervals.
+\item
+Test the null- hypothesis that the two  airway masks are  equivalent.
+\item
+Give the estimates for the consultant effects.
+\end{enumerate}
+
+
+\section{Damage of carrots by carrot fly larvae}
+
+\begin{topics}
+  Generalized linear models; link function; variance function
+\end{topics}
+
+
+In a cross-sectional study the relation between plasma retinol and person 
+characteristics and dietary factors were collected. Low level of plasma retinol
+is suspected ti be related to increase risk of cancer.
+
+
+The data \verb+plasmaRetinol+ (removing the one observations with zero
+plasma concentration): 
+\begin{Schunk}
+\begin{Sinput}
+ v<-get(data(plasmaRetinol,package='LiSciData'))
+ v<-subset(v,betaplasma>0)
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Sinput}
+ v<-transform(v,sex=factor(sex,labels=c('M','F')),
+  smokstat=factor(smokstat,labels=c('nev','for','cur')),
+  vituse=factor(vituse))
+ names(v)[names(v)=='beteadiet']<-'betadiet'
+\end{Sinput}
+\end{Schunk}
+\begin{enumerate}
+\item
+Fit the following three models to the response \verb+betaplasma+
+ and the independent factors
+\verb+vituse+,\verb+sexp+,\verb+age+,\verb+kcal+,\verb+fat+,\verb+fat+,
+\verb+alcohol+,\verb+cholestorol+\verb+betadiet+.
+Decide which variables should be factors and which variables should be
+covariates.
+\begin{enumerate}
+\item
+response is normally distributed, link is the identity
+\item
+response is normally distributed, link is the logarithm,
+\item
+response is Gamma distributed, link is the logarithm
+\end{enumerate}
+Which model seems to fit best?
+
+\begin{Schunk}
+\begin{Sinput}
+ m.normal.id<-glm(betaplasma~vituse+sex +age + kcal+fat+fiber+alcohol+cholesterol+betadiet,data=v)	
+ #
+ m.normal.log<-glm(betaplasma~vituse+sex +age + kcal+fat+fiber+alcohol+cholesterol+betadiet,data=v,family=gaussian(link=log))	
+ #
+ m.gamma.log<-glm(betaplasma~vituse+sex +age + kcal+fat+fiber+I(fiber^2)+alcohol+cholesterol+betadiet,data=v,family=Gamma(link=log))
+\end{Sinput}
+\end{Schunk}
+
+\item
+In the third model, make q-q-plots of the  Pearson and the deviance residuals, What do you observe?
+
+\item
+Fit a generalized additive model (using the package \verb+mgcv+), using smooth terms for all covariates.
+Would you need to enhance your model?
+\begin{Schunk}
+\begin{Sinput}
+ library(mgcv)
+ mm<-gam(betaplasma~vituse+sex +s(age) + s(kcal)+s(fat)+s(fiber)+s(alcohol)+
+  s(cholesterol)+s(betadiet),
+         data=v)	
+\end{Sinput}
+\end{Schunk}
+\end{enumerate}
+\section{Fruitfly}
+\begin{topics}
+  Generalized linear models; link function; variance function
+\end{topics}
+
+
+In study on the impact of sexual activity on lift-time of male fruit-flies,
+three groups with different degrees of sexual activity were measured.
+Additionally the thorax-length of males was measured because it is known to have an impact on longevity.
+
+\begin{Schunk}
+\begin{Sinput}
+ data(fruitfly,package='faraway')
+ sapply(fruitfly,class)
+\end{Sinput}
+\begin{Soutput}
+   thorax longevity  activity 
+"numeric" "integer"  "factor" 
+\end{Soutput}
+\end{Schunk}
+
+
+
+Formulate
+and fit an appropriate model to the data.
+\begin{enumerate}
+\item
+Start with a simple normal modal using the identity link
+\item
+use a model where the variance function is quadratic in the mean.
+\item
+use the preceding model bu use now a log-link.
+(Because \verb+longevity+ is a measure of lifetime, 
+one often analysis the logarithm of such positive data).
+\end{enumerate}
+
+Use residual analysis and the AIC-criterion to find an appropriate model.
+
+What would the conclusion be if one would not use the thorax-length in the analysis?
+
+ 
+\section{Bacteria}
+In an experiment on nutrients on bacterial growth,
+bacteria were grown in different media with the nutrients sucrose and leucione add3ed.
+After fours days the number of bacteria \verb+density+were counted.
+\begin{Schunk}
+\begin{Sinput}
+ v<-get(data(bactsucrose,package='LiSciData'))
+ v$y<-with(v,density/quantile(density,0.9))
+\end{Sinput}
+\end{Schunk}
+
+Fit following models
+\begin{enumerate}
+\item
+Assume the responses to be normally distributed and use a identity link.
+Fit the maximal model.
+\item
+Take the absolute residuals \verb+abs(res)=+ from the above model and the predicted values \verb+fit+ and fit the linear model
+\begin{verbatim}
+lm(log(abs(res))~log(fit))
+\end{verbatim}
+Twice the slope of the fitted equation will give the exponent $\lambda$ in the variance function
+\[
+V(\mu)= \phi \mu^\lambda
+\]
+Use the estimated $\lambda$ to improve your model-fit.
+\item
+Check whether you still need the interaction between sucrose and leucine.
+\item
+Try in your model the \verb+log+ and the \verb+identity+-link.
+Use AIC and cross-validation to decide which model to choose.
+\begin{Schunk}
+\begin{Sinput}
+ m.gamma.log<-glm(density~day+sucrose+leucine,data=v,family=Gamma(link=log))
+ m.gamma.id<-glm(density~day+sucrose+leucine,data=v,family=Gamma(link=identity))
+\end{Sinput}
+\end{Schunk}
+
+
+\begin{Schunk}
+\begin{Sinput}
+ library(boot)
+ extractAIC(m.gamma.id)
+\end{Sinput}
+\begin{Soutput}
+[1]    4.000 2074.988
+\end{Soutput}
+\begin{Sinput}
+ extractAIC(m.gamma.log)
+\end{Sinput}
+\begin{Soutput}
+[1]    4.000 2043.355
+\end{Soutput}
+\begin{Sinput}
+ cv.glm(v,m.gamma.id)$delta
+\end{Sinput}
+\begin{Soutput}
+[1] 1.013426e+19 1.010748e+19
+\end{Soutput}
+\begin{Sinput}
+ cv.glm(v,m.gamma.log)$delta
+\end{Sinput}
+\begin{Soutput}
+[1] 6.007113e+18 5.904827e+18
+\end{Soutput}
+\end{Schunk}
+\end{enumerate}
+
+\section{Hodkin}
+\begin{topics}
+  Generalized linear models; link function; variance function
+\end{topics}
+
+\begin{Schunk}
+\begin{Sinput}
+ library(LiSciData)
+ data(hodkin)
+ v<-reshape(hodkin,direction='long',varying=list(c('hodk','nonhodk')),v.names='number',timevar='hodkin',times=c('yes','non'))
+ v$hodkin<-factor(v$hodkin)
+\end{Sinput}
+\end{Schunk}
+
+\begin{enumerate}
+\item
+Formulate and fit an appropriate model.Check for overdispersion.
+Does the q-q-plot of the standardized residuals tell you something 
+about overdispersion?
+\begin{Schunk}
+\begin{Sinput}
+ m<-glm(number~hodkin,data=v,family=poisson)
+ m.ov<-glm(number~hodkin,data=v,family=quasipoisson)
+\end{Sinput}
+\end{Schunk}
+\item
+Fit a model assuming the negative binomial distribution. Use the
+\verb+glm.nb+ function of the package \verb+MASS+
+\begin{Schunk}
+\begin{Sinput}
+ library(MASS)
+ m.neg<-glm.nb(number~hodkin,data=v)
+\end{Sinput}
+\end{Schunk}
+\item
+Fit a model assuming the data to be normally distributed and
+us the log-ling.
+ Compare the coefficients, the predicted values and the AIC's of
+all your fitted models.
+\item
+Fitting the model with the normal assumption,  is there a difference 
+in AIC using the log or the identity link? 
+\end{enumerate}
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

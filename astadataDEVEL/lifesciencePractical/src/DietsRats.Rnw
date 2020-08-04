@@ -1,0 +1,97 @@
+\section{Diets of Rats}
+
+\begin{topics}
+  Linear model with quadratic terms in $x$; calculate $p$--value by
+  hand. 
+\end{topics}
+
+The growth rate, $y$, of rats was studied for different amounts of
+supplement to their diet, $x$.  Data for this exercise can be found in
+the data frame 'dietsup' of the course package \verb+LiSciData+.
+
+
+\begin{enumerate}
+\item
+Read in the data and plot the rate of growth as a function of the amount of supplement.
+
+<<>>=
+data(dietsup, package="LiSciData")
+head(dietsup)
+@
+
+\item
+Based on the plot, a model where the growth rate is related to the amount of supplement
+through a quadratic equation could be reasonable.
+Formulate  and fit such a model with the \verb+glm+-function.
+%\[
+%E(y_i)=\mu_i= \mu + \alpha x_i + \beta x_i^2, \quad y_i \sim N(\mu_i,\sigma^2).
+%\]
+<<uu,echo=F>>=
+m1 <-  glm(y ~x + I(x^2),data=dietsup)
+@
+
+What are the estimates of the parameters in this model?
+
+\item
+Add the fitted values to your plot of data.
+
+
+
+
+\item
+Consider the regression model without the quadratic term.
+Write down this model.
+%\[
+%E(y_i)=\mu_i= \mu + \alpha x_i, \quad y_i \sim N(\mu_i,\sigma^2).
+%\]
+Fit the model  and plot the residuals against the predicted
+values for model checking.
+
+\item
+Test whether there is a need for a quadratic term in the model using the \verb+anova+-function.
+
+\item
+The test statistic you just found is calculated in the following way.
+In the column \verb+Deviance+ of the output of \verb+anova+
+one finds actually the {\bf difference}
+in the residual deviances $D_0-D_1=$
+686.4-45.2=641.2
+Hence the F-test statistic is
+\[
+\frac{ (D_0-D_1)/ (7-8)} {D_1/7}= \frac {641.2 /(8-7)}
+{45.2/7}= 99.3
+\]
+
+You can calculate the p-value 'by hand'. You calculate the probability that
+an F-distributed random variable with degrees of freedom 1 and 7 is larger
+than 99.3:
+<<results=verbatim>>=
+pf(99.3,1,7,lower.tail=FALSE)
+@
+A histogram of 1000 observations from the F-distribution with degrees of 
+freedom 1 and 7 showing
+the 95 percent quantile of this F-distribution can be created as follows.
+\\
+Generating random number from the F-distribution with 1 and 7 degrees of freedom
+<<fig=F,results=hide>>=
+set.seed(998)
+y  <- rf(n=1000,1,7)
+@
+The $95\%$ quantile of the distribution
+<<results=hide>>=
+q95 <- qf(0.95,1,7)
+@
+and a histogram:
+<<fig=F,results=hide>>=
+hist(y,probability=TRUE)
+lines(density(y))
+abline(v=q95)
+@
+\begin{enumerate}
+\item
+How large is the area to the right of the vertical line?
+\item
+On which side from the vertical line in the histogram must  the F-test statistic lie, such that
+a F-test is significant? 
+\end{enumerate}
+\end{enumerate}

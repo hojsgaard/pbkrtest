@@ -1,0 +1,145 @@
+
+\section{Survial data}
+The data in set \verb+whitebloodcell+  of the package \verb+LiSciData+ contain the 
+survival time (in weeks) of patients after the diagnosis of
+leukemia. Also the logarithm to the base 10 of the
+counts of the white blood cells at the time of diagnoses
+is given.
+
+Survival times can sometimes be assumed to be exponentially
+distributed.
+
+The exponential distribution is a special case of the gamma
+distribution with the dispersion parameter (the reciprocal of the
+shape parameter) equal to 1.
+The density if the Gamma distribution is
+\[
+f(y)= \frac{1}{s^a \Gamma(a)} y^{a-1} e^{-\frac{y}{s}}
+\]
+with $s>0$ the scale parameter, $a>0$ the shape parameter.
+
+Setting $a=1$ and defining the rate $\lambda=1/s$ we get the most common
+form of the density for the exponential distribution
+\[
+f(y)= \lambda e^{-\lambda y}.
+\]
+
+\begin{enumerate}
+\item
+What is the expectation and the variance of an exponential
+distribution. (HINT: Refer to the lecture notes for the Gamma distribution)
+
+\begin{solution}
+The Gamma distribution has expectation and variance
+\[
+\EE(Y)=a\cdot s  \quad \var(Y)=a\cdot s^2
+\]
+With $a=1$ and $s=\frac{1}{\lambda}$
+we have for an exponentially distributed random variable $Y$
+\[
+\EE(Y)=1/\lambda  \quad  \var(Y)= 1/\lambda^2
+\]
+\end{solution}
+
+
+\item
+Draw the density of the exponential distribution with
+the expectation of 4.7. (HINT: use the R-function \verb+dexp+).
+
+\begin{solution}
+<<>>=
+x<-seq(0,20,l=50)
+@
+<<fig=TRUE>>=
+plot(x,dexp(x,rate=1/4.7),type='l')
+@
+\end{solution}
+
+
+\item
+Assume that the expected survival times may be described by
+\[
+\EE(Y_i|x_i)= \exp(\alpha + \gamma x_i)
+\]
+where $x_i$ are the $\log_{10}$ counts of the white blood cells.
+
+Fit an appropriate GLM (write down the formula for the linear
+ predictor)
+ and give an estimate for the parameters and
+their standard errors.
+
+Be aware of the following: The estimation of the parameters of the
+linear predictor of a GLM is independent of the estimate for
+the dispersion. This is reflected in R by the fact that a \verb+glm+
+object has no dispersion attribute. But if you you use the
+\verb+summary+
+function, the dispersion parameter is either estimated by default via
+the Pearson's $X^2$ or you may specify it.
+
+Because we assume that our data are exponentially distributed, you must choose 
+the dispersion equal to 1 (remember that the dispersion is the reciprocal of the shape parameter: $\phi=1/a$)!
+
+\begin{solution}
+The model is linear on the log-scale, we use therefore the
+\verb+log+-link:
+\[
+\log(\EE(Y_i|x_i))= \alpha + \gamma x_i
+\]
+
+<<>>=
+library(LiSciData)
+data(whitebloodcell)
+g<-glm(time~logcount,data=whitebloodcell,family=Gamma(link=log))
+@
+ 
+ATTENTION: We must explicitely specify the \verb+log+-link for the
+Gamma family, because R assumes by default the canonical link for the
+Gamma distribution, i.e. the inverse function. 
+
+<<print=TRUE>>=
+summary(g,dispersion=1)$coef
+@
+\end{solution}
+
+
+\item
+What is the expected life time  for patients with 
+a $\log_{10}$ cell count of 4.5? (HINT: Use the \verb+predict+ function).
+
+
+\begin{solution}
+<<print=TRUE>>=
+predict(g,newdata=data.frame(logcount=4.5),type='response')
+@
+\end{solution}
+
+
+\item
+Provide a confidence interval for this expected
+lifetime. (HINT: Use the \verb+se+ argument of the \verb+predict+ function
+and set the \verb+dispersion+ argument to 1).
+
+\begin{solution}
+<<>>=
+e<-predict(g,newdata=data.frame(logcount=4.5),dispersion=1,se=TRUE)
+@
+
+
+<<print=TRUE>>=
+ci.log<-e$fit+ 1.96* e$se.fit *c(-1,1)
+ci<-exp(ci.log)
+@
+If we repeat the calculation of the confidecne interval, but
+incorporate the dispersion into its calculation, we get a  narrower interval
+(Note that I do NOT set the value of dispersion)
+<<>>=
+e<-predict(g,newdata=data.frame(logcount=4.5),se=TRUE)
+ci.log<-e$fit+ 1.96* e$se.fit *c(-1,1)
+ci<-exp(ci.log)
+@
+<<print=TRUE>>=
+ci<-exp(ci.log)
+@
+
+\end{solution}
+\end{enumerate}

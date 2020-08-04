@@ -1,0 +1,42 @@
+\begin{topics}
+Logistic regression  
+\end{topics}
+
+\section{Shuttle}
+On January, 28, 1986, the shuttle Challenger (flight 61-I) 
+exploded shortly after the start. Later it was found 
+that 'a combustion gas leak' caused the catastrophe. 
+The leakage may by attributed to the failure of one or several of six 
+O-rings, which task was to seal the field joints of the motor.
+
+The night before the event engineers discussed the problem 
+in a three hour telephone conference. 
+In the conference a plot of the failure of O-rings in former missions 
+were discussed, but only data for flights with failures were used, 
+the flights without failures were considered not to contribute valuable information.
+Later the Rogers Commission noted that this was a failure of a 
+proper data analysis.
+
+<<results=hide>>=
+library(LiSciData)
+data(shuttleOrings)
+@
+
+\begin{enumerate}
+\item
+Plot the number of damages against the temperature. What seems to be 
+the conclusion on the effect of temperature, if one disregards the flights where
+no damages were observed?
+\item
+Fit a logistic regression model using \verb+temp+ and \verb+pres+ as covariates.
+\item
+Use a model where the temperature is the only covariate.
+Predict the probability of the damage of at least one O-ring
+at the temperature of 31 Fahrenheit (=(31-32)*5/9  ${}^0$C=-0.6 ${}^0$C.)
+(Remember, if $\pi$ is the probability of a ring to fail, the probability of at least one ring to fail is 
+$1-(1-\pi)^6$.)
+Provide  a confidence interval.
+\item
+Fit models with the probit and the cloglog-link.
+Predict again the above probability.
+\end{enumerate}

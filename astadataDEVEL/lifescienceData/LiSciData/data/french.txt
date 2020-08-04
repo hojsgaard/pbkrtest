@@ -1,0 +1,5 @@
+regen dispers count
+seed  ant     25
+seed  vert     6
+veg   ant     36
+veg   vert    21

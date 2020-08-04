@@ -1,0 +1,96 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{a4wide,SHmathnot}
+\title{Estimability}
+\author{Søren Højsgaard}
+\usepackage[small,compact]{titlesec}
+\begin{document}
+\renewenvironment{Schunk}{\linespread{.85}\small}{}
+
+\maketitle
+\parindent0pt\parskip5pt
+
+Consider an $n$ dimensional random vector $y$ for which $\EE(y)=\mu=X\beta$
+ans $\cov(y)=V$. Here $X$ is an $n\times p$ with $n>p$ matrix which does not
+necessarily have full rank.
+A least squares estimate for $\beta$ is
+\begin{displaymath}
+  \hat \beta = (X\transp V\inv X)^- X\transp V\inv y
+\end{displaymath}
+where $A^-$ is a generalized inverse of $A$.
+We are interested in contrasts of the form $c=\lambda\transp\beta$. An
+estimate of such a contrast is $\hat c = \lambda\transp\hat\beta$.
+Generalized inverses are not unique and therefore $\hat \beta$ is not
+uniquely estimated, and hence the contrasts are not uniquely
+estimated. On the other hand the fitted values $\hat y = X \hat \beta$
+are uniquely indentified.
+
+However, for some $\lambda$s we always get the same estimated
+contrast. Such contrasts are said to be estimable. These contrasts can
+be described as follows:
+We
+can only learn about $\beta$ through $X\beta$ so the only thing we can
+say something about is linear combinations $\rho\transp X\beta$. Hence
+we can only say something about $\lambda\transp\beta$ if there exists
+$\rho$ such that $\lambda\transp\beta=\rho\transp X \beta$, i.e., if
+$\lambda=X\transp\rho$, that is, if $\lambda$ is in the column space
+$C(X\transp)$ of $X\transp$. That is, if $\lambda$ is perpendicular to
+all vectors in the null space $N(X)$ of $X$. To check
+this, we find a basis $B$ for $N(X) \subset R^p$ which can be done using SVD:
+
+Example:
+@
+<<>>=
+ff <- factor(rep(1:3, each=2))
+X  <- cbind(rep(1,6),model.matrix(~0+ff)); X
+y  <- 1:6
+@ %def
+
+@
+<<>>=
+S <- svd(X)
+lapply(S, zapsmall)
+@ %def
+
+The basis of $N(X)$ is
+@
+<<>>=
+B <- S$v[, S$d/max(S$d) < 1e-10, drop=F]
+(B <- as.numeric(B/max(B)))
+@ %def
+
+Hence valid vectors $\lambda$ must satisfy that $
+  \lambda_1 - \lambda_2 - \lambda_3 - \lambda_4  = 0.$
+
+@
+<<>>=
+lam <- c(1, 1, 0, 0)
+sum( lam*B ) # Orthogonal
+@ %def
+
+@
+<<>>=
+(b.hat <- as.numeric(MASS::ginv(t(X)%*%X) %*% t(X) %*% y))
+sum( lam * b.hat )
+@ %def
+
+Take another basis for the mean space:
+@
+<<>>=
+X2 <- X
+X2[,3]<-0
+(b.hat2 <- as.numeric(MASS::ginv(t(X2)%*%X2) %*% t(X2) %*% y))
+sum( lam * b.hat2 )
+@ %def
+
+On the other other hand, the following does not produce a unique estimate:
+@
+<<>>=
+lam2 <- c(1, 0, 0, 0)
+sum( lam2 * b.hat )
+sum( lam2 * b.hat2 )
+@ %def
+
+
+
+\end{document}

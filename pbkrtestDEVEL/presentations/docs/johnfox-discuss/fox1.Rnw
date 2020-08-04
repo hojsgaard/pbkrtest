@@ -1,0 +1,80 @@
+\documentclass[article,nojss]{jss}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Ulrich Halekoh\\ Aarhus University \And 
+        Søren Højsgaard \\ Aalborg University}
+\title{ Proposals from J. Fox} 
+
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Ulrich Halekoh, Søren Højsgaard} %% comma-separated
+\Plaintitle{Kenward-Roger Approximation in} %% without formatting
+\Shorttitle{Test in mixed models} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
+}
+\Keywords{
+}
+\Plainkeywords{keywords} 
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{13}
+%% \Issue{9}
+%% \Month{September}
+%% \Year{2004}
+%% \Submitdate{2004-09-29}
+%% \Acceptdate{2004-09-29}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+
+
+
+\Address{
+}
+
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{JSS-style}
+
+\usepackage{color}
+\usepackage[inline,nomargin,draft]{fixme}
+% \newcommand\FXInline[2]{\textbf{\color{blue}#1}:
+%   \emph{\color{blue} - #2}}
+
+
+\begin{document}
+
+\renewenvironment{Schunk}{\linespread{.85}\small}{}
+\SweaveOpts{keep.source=T,prefix.string=fig/mm} 
+\setkeys{Gin}{width=0.5\textwidth} %sæt figurstørrelse i Sweave
+
+%\fxnote{where should this line be placesd?}
+<<echo=FALSE>>=
+library("pbkrtest")
+@
+
+
+\SweaveInput{src-fox1.rnw}
+
+
+\end{document}
+
+
+

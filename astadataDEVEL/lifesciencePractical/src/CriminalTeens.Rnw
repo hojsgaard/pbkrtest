@@ -1,0 +1,116 @@
+\section{Criminal teens and Poisson distribution}
+Sometimes the Poisson distribution can explain a phenomenon just as a random phenomenon,
+making more intricate argumentation superfluous.
+In an article from 17. December 2007, Politiken wrote 
+{\it 
+{\bf Violent teens live in small  villages  - not the large city}
+It was beautiful in the countryside. In old days. Today the small villages as
+Farsø, Bredebro, Aarup and Holsted are on the top if the number of
+ sentences for violence  for  persons aged between 15 and 17  is counted.
+If the number of young persons that are involved in 
+violence is related to the number of teens in their community,
+then the largest towns are ranked very low with Copenhagen at number 81
+and Aarhus as number 125 of the 272 communities in 2006.
+An explanation could be that the small communities have the cheapest accommodations.
+}
+A sociologist confronted with these data commented, that the findings were surprising.
+
+We want to find out whether the data provide evidence for  
+something surprising going on or 
+whether a simple assumption of equal rates based on  Poisson counts would explain the data.
+
+\begin{enumerate}
+\item
+First we make a little theoretical exercise.
+Assume we have 3 councils with the following population of teens:
+<<>>=
+pop<-rep(c(10,100,1000),each=c(1,1,1))
+@
+We assume further that each community has the same problem with violent teens,
+i.e. we assume that all towns have the same rate of violent teens.
+Let us assume the violence-rate is 3\%, e.g. 3 violent per 100 teens.
+We assume that the number of violent teens is Poisson distributed and
+generate for each town the number of violent teens according to this assumption
+A single replication would be coded as:
+<<>>=
+b<-rpois(length(pop),lambda=0.03*pop)
+@
+We repeat this 1000 times
+<<>>=
+set.seed(89)
+b<-matrix(NA,length(pop),1000)
+for (i in 1:1000) {
+b[,i]<-rpois(length(pop),lambda=0.03*pop)
+}
+@
+Now we calculate for each town the  proportion of violent teens for each of our replication
+<<>>=
+b<-b/pop
+@
+We plot the distribution of the proportion for each town
+<<fig=TRUE>>=
+par(mfrow=c(2,2))
+ hist(b[1,],xlim=c(0,0.25),ylim=c(0,65),main='village',probability=TRUE)
+ hist(b[2,],xlim=c(0,0.25),ylim=c(0,65),main='town',probability=TRUE)
+ hist(b[3,],xlim=c(0,0.25),ylim=c(0,65),main='large city',probability=TRUE)	
+@
+ Looking at the plots, which type of city (i.e. village, town, large city) do you think will most probably
+be 
+\begin{enumerate} 
+\item
+ among those with the smallest proportions of violent teens,
+\item
+among those with the largest proportions of violent teens,
+\item
+among those with a median amount of violent teens?
+\end{enumerate}
+Relate your conclusion to that of the article that the violent live in small but not in large cities.
+
+\item
+We analyze now the data. We consider only the non-aggregated data, i.e. we do not use the 
+data for the 'Amt's and for 'Hele landet'.
+Additionally we exclude all data with a ratio of 0 because for these data we cannot calculate the number of
+teens aged between 15 and 17 in a city.
+
+Preparation of the data, the rows for 'Amt' and 'Hele-landet' are deleted and the number of
+teens aged 15 to 17 in each town is calculated.
+<<>>=
+v<-get(data(poissonviolence,package='LiSciData'))
+v$pop<-with(v,number/ratio*1000)
+is.amt<-grep('Amt',v$kommune)
+v<-v[-is.amt,]
+v<-subset(v, !(kommune %in% c('Hele_landet')))
+@
+
+\begin{enumerate}
+\item
+Fit now two alternative models to the data
+\begin{enumerate}
+\item
+A simple Poisson model to the data, assuming a common violence rate for each community.
+Consider the necessity to account for overdispersion.
+\item
+A model, where the violence rate is proportional to the
+size of the town
+\end{enumerate}
+\item
+Are the two models statistically different?
+\item
+What is the likely  consequence that we left out the towns where the
+ratio of violent teens had been estimated to zero?
+\end{enumerate} 
+
+
+\begin{solution}
+A proposal solution to the model fitting
+
+<<>>=
+M0<-glm(number~offset(log(pop)),data=v,family=poisson)
+X2pearson<-function(m) sum(residuals(m,type='pearson')^2)/m$df.residual
+X2pearson(M0)
+M1<-glm(number~offset(log(pop)),data=v,family=quasipoisson)
+M2<-glm(number~log(pop)+offset(log(pop)),data=v,family=quasipoisson)
+@
+\end{solution}
+
+\end{enumerate}

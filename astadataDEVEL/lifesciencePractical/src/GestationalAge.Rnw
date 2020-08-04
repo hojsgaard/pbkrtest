@@ -1,0 +1,93 @@
+\section{Gestational Age}
+\begin{topics}
+  Linear normal model; two regression lines
+\end{topics}
+
+
+The data are from a study, where for boys and girls their
+gestational(prenatal) weights were recorded. In the data set
+'gestation' of the course package \verb+LiSciData+ the data are given
+in 'long format', e.g. each row consists of measurements of a boy and
+a girl.  We first reshape the data, such that each row contains just
+the measurements for one boy or girl.  We add a variable \verb+sex+,
+and make it a factor, to indicate the sex of the individual.
+
+\begin{enumerate}
+\item
+Reading the data
+<<gg>>=
+data(gestation, package="LiSciData")
+gestation<- reshape(gestation,direction='long',
+            varying=list(age=c('boys.age','girls.age'),
+            weight=c('boys.weight','girls.weight')),
+            v.names=c('age','weight'),
+            timevar='sex',times=c('boy','girl'))
+gestation$sex<-factor(gestation$sex)
+head(gestation)
+@
+
+
+\item
+First, plot the weight against gestational age, differentiating between boys and girls.
+Then add a smooth line for both sexes.(You can use the \verb+lowess+-function.)
+
+\item
+Formulate two models.
+
+M1:
+A model with different intercepts but common slope for regressions
+of weight on the gestational age.
+
+M2:
+A model that additionally differentiates the two slopes for the sexes.
+
+%\[
+%M_1:  \quad E(y_i)=\mu_i=\mu + \alpha_k + \beta x_i,
+%\quad i=1,\dots,N, \quad k=\textrm{boy,girl}
+%\]
+%
+%\[
+%M_2: \quad  E(y_i)=\mu_i=\mu + \alpha_k + \beta x_i + \beta_k x_i,
+%\quad i=1,\dots,N, \quad  k=\textrm{boy,girl}
+%\]
+
+Fit these models using the \verb+glm+-function.
+
+\item
+In model M1 find and interpret the estimates of the model parameters.
+Use  the \verb+esticon+-function of the package \verb+doBy+ to
+find the estimate of the intercept for girls.
+
+Here we note that a simpler way to obtain this intercept is to declare
+the model M1 by
+<<results=hide>>=
+m1.alter <- glm(weight ~ sex + age - 1, data = gestation)
+coef(summary(m1.alter))[,c(1,2)]
+@
+
+Also find and interpret the estimates of the model parameters in model M2.
+
+\item
+Use the function \verb+predict+ to calculate the fitted values of M1.
+Then plot these fitted lines together with the observations.
+
+\item
+In the model M1 find confidence intervals for the parameters.
+
+\item
+We want to test whether it is necessary to have a slope for each sex.
+Use the function \verb+anova+ to compare the two models M1 and M2.
+
+\item
+Use the function \verb+drop1+ on \verb+m1+. What does the result tell you?
+
+\item
+Plots for model checking can be obtained.
+<<mm,fig=F,results=hide,echo=T>>=
+m1 <- glm(weight~sex+age-1,data=gestation)
+par(mfrow=c(2,2))
+plot(m1,pch=c(16,1)[gestation$sex],cex=2)
+@
+Does the model fit data?
+\end{enumerate}
+

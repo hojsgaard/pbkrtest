@@ -1,0 +1,731 @@
+\documentclass[11pt]{article}
+\usepackage{hyperref,a4wide,color,boxedminipage,Sweave}
+\usepackage[utf8]{inputenc}
+
+\usepackage{framed}
+\usepackage{comment}
+\definecolor{shadecolor}{gray}{0.91}
+
+
+\special{html:
+  <link title="main" media="all" rel="stylesheet" href="../../../shdcss.css"
+ type="text/css" />
+}
+
+\def\proglang#1{{#1}}
+\def\pkg#1{{\bf #1}}
+\def\doby{\pkg{doBy}}
+\def\code#1{\texttt{#1}}
+\def\shd#1{\footnote{SHD: #1}}
+
+\def\R{\proglang{R}}
+
+\def\summaryby{\code{summaryBy}}
+\def\splitby{\code{splitBy}}
+
+%\VignetteIndexEntry{doBy-main: Main features of the doBy package}
+%\VignettePackage{doBy}
+
+<<echo=FALSE,print=FALSE>>=
+prettyVersion <- packageDescription("doBy")$Version
+prettyDate <- format(Sys.Date(), "%b %d, %Y")
+@
+
+\title{Main features of the \texttt{doBy} package}
+\author{S{\o}ren H{\o}jsgaard}
+\date{\pkg{doBy} version \Sexpr{prettyVersion} as of \Sexpr{prettyDate}}
+
+\begin{document}
+
+
+
+\maketitle
+\tableofcontents
+
+\SweaveOpts{keep.source=T,prefix.string=figures/doBy}
+\setkeys{Gin}{height=3.5in,width=3.5in}
+
+\renewenvironment{Schunk}{\begin{center}
+    \scriptsize
+    \begin{boxedminipage}{1.0\textwidth}}{
+    \end{boxedminipage}\end{center}}
+
+%\renewenvironment{Schunk}{\begin{shaded}\small}{\end{shaded}}
+
+
+@
+<<echo=FALSE>>=
+dir.create("figures")
+oopt <- options()
+options("digits"=4, "width"=80, "prompt"=" ", "continue"="  ")
+options(useFancyQuotes="UTF-8")
+@ %def
+
+\parindent0pt\parskip5pt
+
+\section{Introduction}
+\label{sec:introduction}
+
+The \doby{} package contains a variety of utility functions. This
+working document describes some of these functions. The
+package originally grew out of a need to calculate groupwise summary
+statistics (much in the spirit of \code{PROC SUMMARY} of the
+\proglang{SAS} system), but today the package contains many different
+utilities.
+
+The \doby\ package (and this document as a .pdf file) is available
+from
+
+\url{http://cran.r-project.org/web/packages/doBy/index.html}
+
+The package is loaded with:
+@
+<<>>=
+library(doBy)
+@ %def
+
+
+\section{Data used for illustration}
+\label{sec:co2data}
+
+The description of the \code{doBy} package is based on the following
+datasets.
+
+\paragraph{CO2 data}
+The \code{CO2} data frame comes  from an
+experiment on the cold tolerance of the grass species {\em Echinochloa
+crus-galli}.
+To limit the amount of output we modify names and levels of variables
+as follows
+@
+<<>>=
+data(CO2)
+CO2 <- transform(CO2, Treat=Treatment, Treatment=NULL)
+levels(CO2$Treat) <- c("nchil","chil")
+levels(CO2$Type)  <- c("Que","Mis")
+CO2 <- subset(CO2, Plant %in% c("Qn1", "Qc1", "Mn1", "Mc1"))
+@ %def
+%Data is shown in Section~\ref{sec:appdata}.
+
+
+\paragraph{Airquality data}
+
+The \code{airquality}
+dataset contains  air quality measurements in New York, May to
+September 1973. The months are coded as $5,\dots,9$.
+To limit the output we only consider data for two months:
+@
+<<>>=
+airquality <- subset(airquality, Month %in% c(5,6))
+@ %def
+%Data is shown in Section~\ref{sec:appdata}.
+
+\paragraph{Dietox data}
+The \code{dietox} data are provided in the \code{doBy} package and
+result from a study of the effect of adding vitamin E and/or copper to
+the feed of slaughter pigs.
+
+\section{Working with groupwise data}
+\label{sec:work-with-groupw}
+
+\subsection{The \code{summaryBy} function}
+\label{sec:summaryBy}
+
+The \summaryby{} function is used for calculating quantities like
+``the mean and variance of $x$ and $y$ for
+each combination of two factors $A$ and $B$''. Examples are based on
+the \code{CO2} data.
+
+
+\subsubsection{Basic usage}
+\label{sec:xxx}
+
+
+For example, the mean and variance of \code{uptake} and
+\code{conc} for each value of \code{Plant} is obtained by:
+@
+<<>>=
+myfun1 <- function(x){c(m=mean(x), v=var(x))}
+summaryBy(conc+uptake~Plant, data=CO2,
+FUN=myfun1)
+@ %def
+
+Defining the function to return named values as above is the
+recommended use of \summaryby.
+Note that the values returned by the function has been named as
+\code{m} and \code{v}.
+
+If the result of the function(s) are not named, then the names in the
+output data in general become less intuitive:
+@
+<<>>=
+myfun2 <- function(x){c(mean(x), var(x))}
+summaryBy(conc+uptake~Plant, data=CO2,FUN=myfun2)
+@ %def
+
+
+
+\subsubsection{Using predefined functions}
+\label{sec:xxx}
+
+
+It is possible use a vector of predefined functions. A typical usage will be
+by invoking a list of predefined functions:
+@
+<<>>=
+summaryBy(uptake~Plant, data=CO2, FUN=c(mean,var,median))
+@ %def
+
+Slightly more elaborate is
+@
+<<>>=
+mymed <- function(x)c(med=median(x))
+summaryBy(uptake~Plant, data=CO2, FUN=c(mean,var,mymed))
+@ %def
+
+The naming of the output variables determined from what the functions
+returns. The names of the last two columns above are imposed
+by \summaryby{} because \code{myfun2} does not return named values.
+
+
+
+% \subsubsection{Naming output variables with the \code{postfix} argument}
+% \label{sec:postfix}
+
+% The \code{postfix} argument gives an altertive way of naming the
+% output variables: For example, the functions \code{myfun1} and
+% \code{myfun2} both returns
+% two values. These can be named as:
+% @
+% <<>>=
+% summaryBy(conc+uptake~Plant, data=CO2, postfix=list(
+% c("mean1", "var1"),c("mean2", "var2")),
+% FUN=c(myfun1,myfun2))
+% @ %def
+
+% Specifying \code{postfix=} overrides these names but when \code{FUN}
+% is a list of functions, the new names are not very informative
+% either:\footnote{This may be improved on later.}
+% @
+% <<>>=
+% summaryBy(uptake~Plant, data=CO2,
+% postfix=c("aa","bb","cc"),
+% FUN=c(mean,var,myfun1,myfun2))
+% @ %def
+
+
+
+\subsubsection{Copying variables out with the \code{id} argument}
+\label{sec:xxx}
+
+To get the value of the \code{Type} and \code{Treat} in the first row of the
+groups (defined by the values of \code{Plant}) copied to the output
+dataframe we use the \code{id} argument:
+as:
+@
+<<>>=
+summaryBy(conc+uptake~Plant, data=CO2, FUN=myfun1, id=~Type+Treat)
+@ %def
+
+
+\subsubsection{Statistics on functions of data}
+\label{sec:xxx}
+We may want to calculate the mean and variance for the logarithm of
+\code{uptake}, for \code{uptake}+\code{conc} (not likely to be a
+useful statistic) as well as for \code{uptake} and
+\code{conc}. This can be achieved as:
+@
+<<>>=
+summaryBy(log(uptake)+I(conc+uptake)+ conc+uptake~Plant, data=CO2,
+FUN=myfun1)
+@ %def
+
+If one does not want output variables to contain parentheses then
+setting \code{p2d=TRUE} causes the parentheses to be replaced by dots
+(``.'').
+@
+<<>>=
+summaryBy(log(uptake)+I(conc+uptake)~Plant, data=CO2, p2d=TRUE,
+FUN=myfun1)
+@ %def
+
+
+
+
+
+
+
+\subsubsection{Using '.' on the left hand side of a formula}
+\label{sec:xxx}
+
+It is possible  to use the dot (".") on the left hand side of
+the formula. The dot means "all numerical variables which do not
+appear elsewhere" (i.e.\ on the right hand side of the formula and in
+the \code{id} statement):
+@
+<<>>=
+summaryBy(log(uptake)+I(conc+uptake)+. ~Plant, data=CO2,
+FUN=myfun1)
+@ %def
+
+
+\subsubsection{Using '.' on the right hand side of a formula}
+\label{sec:xxx}
+
+The dot (".") can also be used on the right hand side of the formula
+where it refers to "all non--numerical variables which are not
+specified elsewhere":
+@
+<<>>=
+summaryBy(log(uptake) ~Plant+., data=CO2,
+FUN=myfun1)
+@ %def
+
+\subsubsection{Using '1' on the right hand side of the formula}
+\label{sec:xxx}
+
+Using 1 on the
+  right hand side means no grouping:
+@
+<<>>=
+summaryBy(log(uptake) ~ 1, data=CO2,
+FUN=myfun1)
+@ %def
+
+
+
+\subsubsection{Preserving names of variables using \code{keep.names}}
+\label{sec:xxx}
+If the function applied to data only returns one value, it is possible
+to force that the summary variables retain the original names by
+setting \code{keep.names=TRUE}. A
+typical use of this could be
+@
+<<>>=
+summaryBy(conc+uptake+log(uptake)~Plant,
+data=CO2, FUN=mean, id=~Type+Treat, keep.names=TRUE)
+@ %def
+
+
+
+\subsection{The \code{orderBy} function}
+\label{orderBy}
+
+Ordering (or sorting) a data frame is possible with the \code{orderBy}
+function.
+Suppose we want to order the rows of the the \code{airquality} data by \code{Temp} and by
+\code{Month} (within \code{Temp}). This can be achieved by:
+@
+<<results=hide>>=
+x<-orderBy(~Temp+Month, data=airquality)
+@ %def
+The first lines of the result are:
+@
+<<echo=TRUE>>=
+head(x)
+@ %def
+
+If we want the ordering to be by decreasing values of one of the
+variables, we change the sign, e.g.
+@
+<<>>=
+x<-orderBy(~-Temp+Month, data=airquality)
+head(x)
+@ %def
+
+
+
+\subsection{The \code{splitBy} function}
+\label{splitBy}
+
+Suppose we want to split the \code{airquality} data into a list of dataframes, e.g.\ one
+dataframe for each month. This can be achieved by:
+@
+<<>>=
+x<-splitBy(~Month, data=airquality)
+x
+@ %def
+Hence for month 5, the relevant entry-name in the list is '5' and this
+part of data  can
+be extracted as
+@
+<<results=hide>>=
+x[['5']]
+@ %def
+
+Information about the grouping is stored as a dataframe
+in an attribute called \code{groupid} and can be retrieved with:
+<<>>=
+attr(x,"groupid")
+@ %def
+
+
+\subsection{The \code{sampleBy} function}
+\label{sampleBy}
+
+Suppose we want a random sample of 50 \% of the observations from a
+dataframe. This can be achieved with:
+@
+<<results=hide>>=
+sampleBy(~1, frac=0.5, data=airquality)
+@ %def
+
+Suppose instead that we want a  systematic sample of  every fifth
+observation within each month. This is achieved with:
+@
+<<results=hide>>=
+sampleBy(~Month, frac=0.2, data=airquality,systematic=T)
+@ %def
+
+
+\subsection{The \code{subsetBy} function}
+\label{subsetBy}
+
+Suppose we want to select those rows within each month for which the the
+wind speed is larger than the mean wind speed (within the month). This
+is achieved by:
+@
+<<results=hide>>=
+subsetBy(~Month, subset=Wind>mean(Wind), data=airquality)
+@ %def
+Note that the statement \code{Wind>mean(Wind)} is evaluated within
+each month.
+
+
+
+\subsection{The \code{transformBy} function}
+\label{sec:transformby}
+
+The \code{transformBy} function is analogous to the \code{transform}
+function except that it works within groups. For example:
+@
+<<results=hide>>=
+transformBy(~Month, data=airquality, minW=min(Wind), maxW=max(Wind),
+    chg=sum(range(Wind)*c(-1,1)))
+@ %def
+
+
+\subsection{The \code{lapplyBy} function}
+\label{sec:transformby}
+
+This \code{lapplyBy} function is a wrapper for first splitting data
+into a list according to the formula (using splitBy) and then applying
+a function to each element of the list (using apply).
+
+Suppose we want to calculate the weekwise feed efficiency of the pigs
+in the \code{dietox} data, i.e. weight gain divided by feed intake.
+@
+<<>>=
+data(dietox)
+dietox <- orderBy(~Pig+Time, data=dietox)
+v<-lapplyBy(~Pig, data=dietox, function(d) c(NA, diff(d$Weight)/diff(d$Feed)))
+dietox$FE <- unlist(v)
+@ %def
+
+Technically, the above is the same as
+@
+<<>>=
+dietox <- orderBy(~Pig+Time, data=dietox)
+wdata <- splitBy(~Pig, data=dietox)
+v <- lapply(wdata, function(d) c(NA, diff(d$Weight)/diff(d$Feed)))
+dietox$FE <- unlist(v)
+@ %def
+
+
+% \subsection{Example: using \code{splitBy()}}
+% \label{sec:exampl-using-codespl}
+
+% @
+% <<>>=
+% CO2.lst <- splitBy(~Type+Treat, data=CO2)
+% CO2.lst
+% @ %def
+
+% @
+% <<>>=
+% wd <- CO2.lst[[1]] ## wd : "working data"
+% wd$l.fit <- fitted(with(wd, loess(uptake~conc)))
+% @ %def
+
+% @
+% <<>>=
+% CO2.lst2 <- lapplyBy(~Type+Treat, data=CO2, FUN=function(wd){
+%     wd$l.fit <- fitted(with(wd, loess(uptake~conc)))
+%     wd
+% })
+% @
+
+
+% <<fig=T>>=
+% par(mfrow=c(2,2))
+% lapply(CO2.lst2, function(wd){
+%     plot(uptake~conc, data=wd)
+%     lines(l.fit~conc, data=wd)
+% })
+% @ %def
+
+
+
+
+
+
+
+
+
+
+\section{Miscellaneous}
+\label{sec:xxx}
+
+
+% Observe that another function for calculating contrasts as above is the
+% \code{contrast} function in the \pkg{Design} package but it applies to
+% a narrower range of models than \code{esticon} does.
+
+
+% \subsection{LSMEANS}
+% \label{sec:xxx}
+
+
+% Marginal means (also called population means or LSMEANS) can be
+% calulated with \verb'lsmeans()'. See the documentation of  \verb'lsmeans()' for
+% examples.
+
+
+\subsection{The \code{firstobs()} / \code{lastobs()} function}
+\label{firstlast}
+
+To obtain the indices of the first/last occurences of an item in a
+vector do:
+@
+<<>>=
+x <- c(1,1,1,2,2,2,1,1,1,3)
+firstobs(x)
+lastobs(x)
+@ %def
+
+The same can be done on a data frame, e.g.
+@
+<<>>=
+firstobs(~Plant, data=CO2)
+lastobs(~Plant, data=CO2)
+@ %def
+
+\subsection{The \code{which.maxn()} and \code{which.minn()} functions}
+\label{sec:whichmaxn}
+
+The location of the $n$ largest / smallest entries in a numeric vector
+can be obtained with
+@
+<<>>=
+x <- c(1:4,0:5,11,NA,NA)
+which.maxn(x,3)
+which.minn(x,5)
+@ %def
+
+\subsection{Subsequences - \code{subSeq()}}
+\label{sec:xxx}
+
+Find (sub) sequences in a vector:
+
+@
+<<>>=
+x <- c(1,1,2,2,2,1,1,3,3,3,3,1,1,1)
+subSeq(x)
+subSeq(x, item=1)
+@ %def
+
+@ 
+<<>>=
+subSeq(letters[x])
+subSeq(letters[x],item="a")
+@ %def 
+
+
+\subsection{Recoding values of a vector - \code{recodeVar()}}
+\label{sec:xxx}
+
+@
+<<>>=
+x <- c("dec","jan","feb","mar","apr","may")
+src1 <- list(c("dec","jan","feb"), c("mar","apr","may"))
+tgt1 <- list("winter","spring")
+recodeVar(x,src=src1,tgt=tgt1)
+@ %def
+
+\subsection{Renaming columns of a dataframe or matrix --  \code{renameCol()}}
+\label{sec:xxx}
+
+@
+<<>>=
+head(renameCol(CO2, 1:2, c("kk","ll")))
+head(renameCol(CO2, c("Plant","Type"), c("kk","ll")))
+@ %def
+
+\subsection{Time since an event - \code{timeSinceEvent()}}
+\label{sec:xxx}
+
+Consider the vector
+@
+<<>>=
+yvar <- c(0,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0)
+@ %def
+
+Imagine that "1" indicates an event of some kind which takes place
+at a certain time point. By default time points are assumed
+equidistant but for illustration we define time time variable
+@
+<<>>=
+tvar <- seq_along(yvar) + c(0.1,0.2)
+@ %def
+
+Now we find time since event as
+@
+<<print=T>>=
+tse<- timeSinceEvent(yvar,tvar)
+@ %def
+
+The output reads as follows:
+\begin{itemize}
+\item \verb'abs.tse': Absolute time since (nearest) event.
+\item \verb'sign.tse': Signed time since (nearest) event.
+\item \verb'ewin': Event window: Gives a symmetric window around each event.
+\item \verb'run': The value of \verb'run' is set to $1$ when the first
+  event occurs and is increased by $1$ at each subsequent event.
+\item \verb'tae': Time after event.
+\item \verb'tbe': Time before event.
+\end{itemize}
+
+@
+<<fig=T>>=
+plot(sign.tse~tvar, data=tse, type="b")
+grid()
+rug(tse$tvar[tse$yvar==1], col='blue',lwd=4)
+points(scale(tse$run), col=tse$run, lwd=2)
+lines(abs.tse+.2~tvar, data=tse, type="b",col=3)
+@ %def
+
+@
+<<fig=T>>=
+plot(tae~tvar, data=tse, ylim=c(-6,6),type="b")
+grid()
+lines(tbe~tvar, data=tse, type="b", col='red')
+rug(tse$tvar[tse$yvar==1], col='blue',lwd=4)
+lines(run~tvar, data=tse, col='cyan',lwd=2)
+@ %def
+
+@
+<<fig=T>>=
+plot(ewin~tvar, data=tse,ylim=c(1,4))
+rug(tse$tvar[tse$yvar==1], col='blue',lwd=4)
+grid()
+lines(run~tvar, data=tse,col='red')
+@ %def
+
+
+We may now find times for which time since an event is at most 1 as
+@
+<<>>=
+tse$tvar[tse$abs<=1]
+@ %def
+
+\subsection{Example: Using \code{subSeq()} and \code{timeSinceEvent()}}
+
+Consider the \verb|lynx| data:
+
+@
+<<fig=T>>=
+yvar <- as.numeric(lynx)
+tvar <- 1821:1934
+plot(tvar,yvar,type='l')
+@ %def
+
+Suppose we want to estimate the cycle lengths. One way of doing this
+is as follows:
+
+@
+<<>>=
+yyy <- yvar>mean(yvar)
+head(yyy)
+sss <- subSeq(yyy,TRUE)
+sss
+@ %def
+
+@
+<<fig=T>>=
+plot(tvar,yvar,type='l')
+rug(tvar[sss$midpoint],col='blue',lwd=4)
+@ %def
+
+Create the 'event vector'
+@
+<<>>=
+yvar2 <- rep(0,length(yvar))
+yvar2[sss$midpoint] <- 1
+str(yvar2)
+@ %def
+
+@
+<<>>=
+tse <- timeSinceEvent(yvar2, tvar)
+head(tse,20)
+@ %def
+
+We get two different (not that different) estimates of period
+lengths:
+@
+<<print=T>>=
+len1 <- tapply(tse$ewin, tse$ewin, length)
+len2 <- tapply(tse$run, tse$run, length)
+c(median(len1),median(len2),mean(len1),mean(len2))
+@ %def
+
+We can overlay the cycles as:
+@
+<<fig=T>>=
+tse$yvar <- yvar
+tse2 <- na.omit(tse)
+plot(yvar~tae, data=tse2)
+@ %def
+
+@
+<<fig=T>>=
+plot(tvar,yvar,type='l',lty=2)
+mm <- lm(yvar~tae+I(tae^2)+I(tae^3), data=tse2)
+lines(fitted(mm)~tvar, data=tse2, col='red')
+@ %def
+
+
+% \section{Acknowledgements}
+% \label{discussion}
+
+% Credit is due to
+% Dennis Chabot, Gabor Grothendieck, Paul Murrell, Jim Robison-Cox  and Erik J{\o}rgensen for
+% reporting various bugs and making various suggestions to the
+% functionality in the \doby{} package.
+
+@
+<<echo=F>>=
+options(oopt)
+@ %def
+
+
+\end{document}
+
+
+
+\appendix
+
+\section{The data}
+\label{sec:appdata}
+
+The reduced \code{C02} are:
+@
+<<>>=
+CO2
+@ %def
+
+The reduced \code{airquality} data are:
+@
+<<>>=
+head(airquality, n=20)
+@ %def

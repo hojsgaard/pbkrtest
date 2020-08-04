@@ -1,0 +1,183 @@
+<html><head><title>~~function to do ... ~~</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>rlsfit(RLS)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   rlsfit">
+<param name="keyword" value=" ~~function to do ... ~~">
+</object>
+
+
+<h2>~~function to do ... ~~</h2>
+
+
+<h3>Description</h3>
+
+<p>
+~~ A concise (1-5 lines) description of what the function does. ~~
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+rlsfit(xx, yy, tvar=xx, degree = 1, lambda = 0.99,  b=NULL, Pi=NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>xx</code></td>
+<td>
+~~Describe <code>xx</code> here~~ </td></tr>
+<tr valign="top"><td><code>yy</code></td>
+<td>
+~~Describe <code>yy</code> here~~ </td></tr>
+<tr valign="top"><td><code>tvar</code></td>
+<td>
+~~Describe <code>yy</code> here~~ </td></tr>
+<tr valign="top"><td><code>b</code></td>
+<td>
+~~Describe <code>b</code> here~~ </td></tr>
+<tr valign="top"><td><code>Pi</code></td>
+<td>
+~~Describe <code>Pi</code> here~~ </td></tr>
+<tr valign="top"><td><code>lambda</code></td>
+<td>
+~~Describe <code>lam</code> here~~ </td></tr>
+<tr valign="top"><td><code>degree</code></td>
+<td>
+~~Describe <code>degree</code> here~~ </td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+~~ If necessary, more details than the description above ~~
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+~Describe the value returned
+If it is a LIST, use
+</p>
+<table summary="R argblock">
+<tr valign="top"><td><code>comp1 </code></td>
+<td>
+Description of 'comp1'</td></tr>
+<tr valign="top"><td><code>comp2 </code></td>
+<td>
+Description of 'comp2'</td></tr>
+</table>
+<p>
+
+...</p>
+
+<h3>Warning</h3>
+
+<p>
+....
+</p>
+
+
+<h3>Note</h3>
+
+<p>
+~~further notes~~ 
+</p>
+<p>
+~Make other sections like Warning with section{Warning }{....} ~
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>
+~~who you are~~
+</p>
+
+
+<h3>References</h3>
+
+<p>
+~put references to the literature/web site here ~
+</p>
+
+
+<h3>See Also</h3>
+
+<p>
+~~objects to See Also as <code><a onclick="findlink('utils', 'help.html')" style="text-decoration: underline; color: blue; cursor: hand">help</a></code>, ~~~
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+##---- Should be DIRECTLY executable !! ----
+##-- ==&gt;  Define data, use random,
+##--    or do  help(data=index)  for the standard data sets.
+
+## The function is currently defined as
+function (xx, yy, b, Pi, lam = 0.5, degree = 1) 
+{
+    lenx &lt;- length(xx)
+    J &lt;- diag(1, degree + 1)
+    if (degree == 0) {
+        X &lt;- matrix(1, nrow = lenx, ncol = 1)
+    }
+    else {
+        if (degree == 1) {
+            X &lt;- cbind(1, xx)
+        }
+        else {
+            X &lt;- cbind(1, xx, xx^2)
+        }
+    }
+    if (missing(Pi)) 
+        Pi &lt;- diag(100, degree + 1)
+    if (missing(b)) 
+        b &lt;- rep(0, degree + 1)
+    ans1 &lt;- matrix(NA, nrow = lenx, ncol = length(b))
+    ans2 &lt;- matrix(NA, nrow = lenx, ncol = 4)
+    colnames(ans2) &lt;- c("yt1.hat", "yt.hat", "et1", "et")
+    for (tt in 1:lenx) {
+        xt &lt;- X[tt, ]
+        yt &lt;- yy[tt]
+        if (!is.na(yt)) {
+            k &lt;- (Pi %*% xt/lam)/as.numeric(1 + t(xt) %*% Pi %*% 
+                xt/lam)
+            yt1.hat &lt;- as.numeric(t(xt) %*% b)
+            et1 &lt;- yt - yt1.hat
+            b &lt;- b + k * et1
+            Pi &lt;- (J - k %*% t(xt)) %*% Pi/lam
+            yt.hat &lt;- as.numeric(t(xt) %*% b)
+            et &lt;- yt - yt.hat
+            ans1[tt, ] &lt;- b
+            ans2[tt, ] &lt;- c(yt1.hat, yt.hat, et1, et)
+        }
+    }
+    ans &lt;- cbind(ans1, ans2)
+    ans
+  }
+</pre>
+
+<script Language="JScript">
+function findlink(pkg, fn) {
+var Y, link;
+Y = location.href.lastIndexOf("\\") + 1;
+link = location.href.substring(0, Y);
+link = link + "../../" + pkg + "/chtml/" + pkg + ".chm::/" + fn;
+location.href = link;
+}
+</script>
+
+
+<hr><div align="center">[Package <em>RLS</em> version 0.1 <a href="00Index.html">Index]</a></div>
+
+</body></html>

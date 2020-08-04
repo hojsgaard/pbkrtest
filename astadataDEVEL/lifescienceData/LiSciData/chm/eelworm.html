@@ -1,0 +1,86 @@
+<html><head><title>EElworm eelworms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>eelworm(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   eelworm">
+<param name="keyword" value=" EElworm eelworms">
+</object>
+
+
+<h2>EElworm eelworms</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Experiment carried out the Rothamsted Experimental Station
+to to measure the effetiveness of 4 soil fimugants in keeping
+down the numner of eelworms in the soil.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(eelworm)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+This data frame contains:
+<dl>
+<dt>block:</dt><dd>Number of block, 1,2,3 or 4</dd>
+<dt>plot:</dt><dd>Plot within block, 1,2,..., 12</dd>
+<dt>conc:</dt><dd>Concentration of fumigant, 0= zero concentration, 1=base concentration, 2=twice the conetration as the base.</dd>
+<dt>fumigant:</dt><dd>Fumigant used, CO=none (control),
+CN=chlorodinitrobenzene,
+CS=carbon disulphide jelly,
+CM=Cymag (propriety preparation),
+CK=Seekay (propriety preparation)</dd>
+<dt>n.before:</dt><dd>Number of eelworm eelworms in a soil sample before application                        of a fumigant</dd>
+<dt>n.after:</dt><dd>Number of eelworm eelworms in a soil sample after application                        of a fumigant</dd>
+<dt>li:</dt><dd>The concentration of fumigant, conc, standardized, such that it has mean 0 and variance 1</dd>
+<dt>qu:</dt><dd>The square of the concentration of fumigant, <i>conc^2</i>, standardized and made orthogonal to the variable <KBD>li</KBD>, such that <KBD>sum(li*qu)=0</KBD>
+or said differently, the correlation <KBD>cor(li,qu)=0</KBD>.</dd>
+<dt>treat:</dt><dd>Treatment generated from combining the 
+3 levels of concentration and the 4 fumigants. factor with 9 levels: 0.CO= no fumigant, 1.CK= concentration 1 and fumigant CK, 
+2.CK =  concentration 2 and fumigant CK, etc.</dd>
+</dl>
+
+<h3>Details</h3>
+
+<p>
+The experiment was laid out as a randomized block experiment, 
+with 4 blocks and 12 plots whithin each block.
+The treatment combinations (concentration.fumigant)
+0.CO, 0.CO, 0.CO, 0.CO,  1.CK, 2.CK, 1.CM, 2.CM, 1.CN, 2.CN, 1.CS, 2.CS
+were randomly applied to the 12 plots. 
+The combination 0.CO was applied to 4 plots 
+to ensure  an accurate standard against which to compare
+the fumigants. 
+ANOVA, ANCOVA, randomized block design
+</p>
+
+
+<h3>Source</h3>
+
+<p>
+Cochran W.G.  and Cox, Gertrude M. (1957) <EM>Experimental Design</EM>
+chapters 3.2 and 3.8, Table 3.1, p. 46.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>      
+data(eelworm)
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

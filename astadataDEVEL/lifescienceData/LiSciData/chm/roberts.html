@@ -1,0 +1,77 @@
+<html><head><title>Dead coolbah trees</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>roberts(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   roberts">
+<param name="keyword" value=" Dead coolbah trees">
+</object>
+
+
+<h2>Dead coolbah trees</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The presence of dead coolibah trees (Eucalyptus coolibah)
+was observed in  sampled quadrats along a transect on floodplain.
+Of interest was the dependence of the presence of these trees on the position on the transect, either
+close to the dunes, to the lakeshore or intermediate.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(roberts)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+This data frame contains:
+<dl>
+<dt>coolbah:</dt><dd>presence of dead coolbah trees in sampling quadrat (with, without)</dd>
+<dt>position:</dt><dd>position of the quadrat on the transect line (top=dunes, bottom=lokeshore, middle= intermediate)</dd>
+<dt>count:</dt><dd>number of dead coolbah trees in the sampling quadrat</dd>
+</dl>
+
+<h3>Details</h3>
+
+<p>
+logistic regression,  Log-linear model
+</p>
+
+
+<h3>Source</h3>
+
+<p>
+Roberts, J. (1993) Regeneration and growth of coolibah 
+Eucalyptus Coolabah subsp. arida, a riparian [dansk: bred] tree
+in the Cooper Crek region of South Australia,
+<EM>Australian Journal of Ecology</EM>, 18, pp. 345&ndash;350
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Quinn, Gerry. P. and Keough, Michael J. (2002) <EM>Experimental Design and Data Analysis for Biologists</EM>, University Press, Cambridge
+Table 14-1 and Box 14-3
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(roberts)
+print(xtabs(count~position+coolbah,data=roberts))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

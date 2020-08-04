@@ -1,0 +1,28 @@
+%% preamble
+
+%\usepackage{bbm,bm}
+
+\usepackage{fancyvrb}
+\def\bm{ }
+\newcommand{\lmer}{\texttt{lmer()}}
+\newcommand{\betab}{\bm{\beta}}
+\newcommand{\phib}{\bm{\phi}}
+\newcommand{\phiAhat}{ {\hat \Phi}_A}
+\newcommand{\Lb}{L}
+\newcommand{\ssb}{{\hat \sigma}}
+\newcommand{\sigmab}{{\sigma}}
+\newcommand{\Sigmab}{{\Sigma}}
+\newcommand{\transp}{^{\top}}
+\newcommand{\inv}{^{-1}}
+\def\pkg#1{\texttt{#1}}
+
+\newcommand{\var}{\mathbb{V}ar}
+\newcommand{\cov}{\mathbb{C}ov}
+\newcommand{\EE}{\mathbb{E}}
+
+\usepackage{etoolbox} 
+\makeatletter 
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt } 
+\makeatother
+
+\newcommand{\ssss}{\vspace{5mm}}

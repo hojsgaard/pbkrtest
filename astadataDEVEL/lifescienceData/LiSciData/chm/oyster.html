@@ -1,0 +1,50 @@
+<html><head><title>Oyster data</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>oyster(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   oyster">
+<param name="keyword" value=" Oyster data">
+</object>
+
+
+<h2>Oyster data</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Oysters at three different locations (in the cooling water)
+near a power plant in Denmark. Start weight and end weight is recorded.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(oyster)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A data frame with 20 observations on the following 3 variables.
+<dl>
+<dt>treat</dt><dd>a factor with levels <code>bay</code> <code>drain</code> <code>entrance</code></dd>
+<dt>startwgt</dt><dd>a numeric vector</dd>
+<dt>endwgt</dt><dd>a numeric vector</dd>
+</dl>
+
+<h3>Examples</h3>
+
+<pre>
+data(oyster)
+plot(endwgt~startwgt, data=oyster, col=as.numeric(treat))
+## maybe str(oyster) ; plot(oyster) ...
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

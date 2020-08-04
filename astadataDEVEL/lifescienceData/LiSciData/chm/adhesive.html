@@ -1,0 +1,91 @@
+<html><head><title>Adhesivness of a product</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>adhesive(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   adhesive">
+<param name="keyword" value=" Adhesivness of a product">
+</object>
+
+
+<h2>Adhesivness of a product</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Experiment to investigate the effect of temperature and
+humidity on the force required to separate an adhesive product from a
+certain material. Four specific temperatures and two specific
+humidities were analysed.
+<br>
+To way ANOVA
+<br>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(adhesive)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A dataframe with 3 variables. 
+<dl>
+<dt>force:</dt><dd>force to separate the adhesive from the material</dd>
+<dt>temperature:</dt><dd>4 levels</dd>
+<dt>humidity:</dt><dd>2 levels</dd>
+</dl>
+
+<h3>Source</h3>
+
+<p>
+Milton, J. S. and Arnold, Jesse, C. (1995)
+Introduction to Probability and Statistics, 
+McGrwa Hill, New York, p. 607, table 14.2
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+library(dataRep)
+library(doBy)
+library(lattice)
+data(adhesive)
+ad&lt;-summaryBy(force~temperature+humidity,data=adhesive,FUN=list(mean))
+plot(force~temperature,data=adhesive,type='p',
+ pch=c(17,18)[humidity], col= c(2,3)[humidity])
+lines(force.mean~temperature,data=ad,subset=humidity==1,type='l',lty=2,col=2)
+lines(force.mean~temperature,data=ad,subset=humidity==2,type='l',lty=1,col=3)
+title('Adhesive force dependency on temperature and humidity',cex.main=0.9)
+legend(1.0,25,legend=c('humidity=1','humidity=2'),pch=c(17,18),lty=c(2,1),
+                 col=c(2,3))
+   
+              
+
+# the above plot by trelluis graphic. The smoothing seems to be too flexible  
+xyplot(force~temperature,groups=humidity,data=adhesive,
+                   type=c('p','smooth'),auto.key=TRUE,
+         main='Adhesive force dependency on temperature and humidity'
+                  )
+
+# the same plot with a bit mor contrl over the smoothing with the loess functionm and the parameter span
+xyplot(force~temperature,data=adhesive,groups=humidity,
+         panel=panel.superpose,panel.groups=function(x,y,...){
+                panel.loess(x,y,span=1,...)
+                panel.xyplot(x,y,...)},
+          auto.key=TRUE,
+         main='Adhesive force dependency on temperature and humidity'
+                  )
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

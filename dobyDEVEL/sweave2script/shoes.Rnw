@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{From sweave to an R script}
+\author{Søren Højsgaard}
+
+\begin{document}
+\maketitle
+
+\section{The shoes data}
+
+Consider the shoes data from the MASS package:
+
+@ 
+<<>>=
+data(shoes, package="MASS")
+shoes
+@ %def 
+
+
+We shall do
+\begin{itemize}
+\item an unpaired $t$-test 
+  and
+\item a paired $t$-test
+\end{itemize}
+
+Compare two shoe types with a $t$-test:
+
+@ 
+<<>>=
+with(shoes, t.test(A, B))
+@ %def 
+
+The test is misleading because observations are paired. A better
+alternative is to make a paired $t$-test:
+
+@ 
+<<>>=
+with(shoes, t.test(A, B, paired=T))
+@ %def 
+
+
+\end{document}

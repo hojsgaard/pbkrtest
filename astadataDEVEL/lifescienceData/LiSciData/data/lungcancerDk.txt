@@ -1,0 +1,29 @@
+age   city       deaths population
+40-54 Fredericia  11   3059
+40-54 Horsens     13   2879
+40-54 Kolding      4   3142
+40-54 Vejle        5   2520
+55-59 Fredericia  11    800
+55-59 Horsens      6   1083 
+55-59 Kolding      8   1050
+55-59 Vejle        7    878
+60-64 Fredericia  11    710
+60-64 Horsens     15    923
+60-64 Kolding      7    895
+60-64 Vejle       10    839
+65-69 Fredericia  10    581
+65-69 Horsens     10    834
+65-69 Kolding     11    702
+65-69 Vejle       14    631
+70-74 Fredericia  11    509
+70-74 Horsens     12    634
+70-74 Kolding      9    535 
+70-74 Vejle        8    539
+75-   Fredericia  10    605
+75-   Horsens      2    782
+75-   Kolding     12    659 
+75-   Vejle        7    619
+
+
+
+ 

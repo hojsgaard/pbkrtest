@@ -1,0 +1,71 @@
+<html><head><title>Development of body weight of rats.</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>ratsbodyweight(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   ratsbodyweight">
+<param name="keyword" value=" Development of body weight of rats.">
+</object>
+
+
+<h2>Development of body weight of rats.</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Two treatments were compared to a  control on their effect on the growth 
+of rats.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(ratsbodyweight)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A dataframe with 6 variables. 
+ratid   treat   week0 week1 week2  week3 week4
+<dl>
+<dt>ratid</dt><dd>id of rat</dd>
+<dt>treat</dt><dd>treatment</dd>
+<dt>week0</dt><dd>weight at start of experiment</dd>
+<dt>week1</dt><dd>weight at week 1</dd>
+<dt>week2</dt><dd>weight at week 2</dd>
+<dt>week3</dt><dd>weight at week 3</dd>
+<dt>week4</dt><dd>weight at week 4</dd>
+</dl>
+
+<h3>Source</h3>
+
+<p>
+Box, G.E.P. (1950) Problems in the Analysis of Growth and Wear Curves, 
+Biometrics, 6(4), 362-389
+</p>
+
+
+<h3>References</h3>
+
+
+
+
+<h3>Examples</h3>
+
+<pre>
+library(lattice)
+data(ratsbodyweight)
+rat&lt;-reshape(ratsbodyweight,direction='long',varying=list(paste('week',c(0:4),sep='')),v.name='weight',idvar='ratid',timevar='week',time=c(0:4))
+ print(
+xyplot(weight~week|treat,groups=ratid,data=rat,type='l')
+ )  
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

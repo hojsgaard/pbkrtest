@@ -1,0 +1,16 @@
+
+
+\documentclass[pdftex,a4paper]{article}
+\usepackage{pdfpages}
+\begin{document}
+
+\includepdf[pages=1, nup=1,  landscape=TRUE,frame=true,
+  scale=0.9]{useR-slides.pdf}
+\includepdf[pages=2-,nup=2x2,landscape=true,frame=true,
+ scale=0.9,  offset=20 1, column=TRUE]
+{useR-slides.pdf}
+
+
+
+
+\end{document}  

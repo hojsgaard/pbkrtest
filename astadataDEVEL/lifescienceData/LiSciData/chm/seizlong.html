@@ -1,0 +1,76 @@
+<html><head><title>Epiliptic Seizures</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>seizlong(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   seizlong">
+<param name="keyword" value=" Epiliptic Seizures">
+</object>
+
+
+<h2>Epiliptic Seizures</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The dataset
+has the number of epiliptic seizures in each of four two-week
+intervals, and in a baseline eight-week inverval, for treatment
+and control groups with a total of 59 individuals.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(seizlong)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A data frame with 295 observations on the following 7 variables.
+<dl>
+<dt>trt</dt><dd>a numeric vector, 0: placebo, 1: treatment</dd>
+<dt>age</dt><dd>age of subject</dd>
+<dt>time</dt><dd>time of registration, 0: prior to randomization,
+1,2,3,4: follow-up visit</dd>
+<dt>y</dt><dd>Number of epileptic seizures. For time 0: In the 8 week
+period prior to randomization. For time 1..4: In the 2 week period
+before each follow-up visit</dd>
+<dt>id</dt><dd>Identification of subject</dd>
+<dt>D</dt><dd>Variable given the length (2 or 8 weeks) of the
+registration period</dd>
+<dt>x</dt><dd>a numeric vector. 0: prior to randomization, 1: after randomization</dd>
+</dl>
+
+<h3>Source</h3>
+
+<p>
+Thall, P.F. and Vail S.C. (1990) Some covariance models for
+longitudinal count data with overdispersion. Biometrics *46*:
+657-671.
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Diggle, P.J., Liang, K.Y., and Zeger, S.L. (1994) Analysis of
+Longitudinal Data. Clarendon Press.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(seizlong)
+## maybe str(seizlong) ; plot(seizlong) ...
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

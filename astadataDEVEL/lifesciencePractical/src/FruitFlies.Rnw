@@ -1,0 +1,78 @@
+\section{Fruitfly}
+\begin{topics}
+  Generalized linear models; link function; variance function
+\end{topics}
+
+
+In study on the impact of sexual activity on lift-time of male fruit-flies,
+three groups with different degrees of sexual activity were measured.
+Additionally the thorax-length of males was measured because it is known to have an impact on longevity.
+
+<<rassel,results=verbatim>>=
+data(fruitfly,package='faraway')
+sapply(fruitfly,class)
+@
+
+
+
+Formulate
+and fit an appropriate model to the data.
+\begin{enumerate}
+\item
+Start with a simple normal modal using the identity link
+\item
+use a model where the variance function is quadratic in the mean.
+\item
+use the preceding model bu use now a log-link.
+(Because \verb+longevity+ is a measure of lifetime, 
+one often analysis the logarithm of such positive data).
+\end{enumerate}
+
+Use residual analysis and the AIC-criterion to find an appropriate model.
+
+What would the conclusion be if one would not use the thorax-length in the analysis?
+
+ 
+\section{Bacteria}
+In an experiment on nutrients on bacterial growth,
+bacteria were grown in different media with the nutrients sucrose and leucione add3ed.
+After fours days the number of bacteria \verb+density+were counted.
+<<blatt>>=
+v<-get(data(bactsucrose,package='LiSciData'))
+v$y<-with(v,density/quantile(density,0.9))
+@
+
+Fit following models
+\begin{enumerate}
+\item
+Assume the responses to be normally distributed and use a identity link.
+Fit the maximal model.
+\item
+Take the absolute residuals \verb+abs(res)=+ from the above model and the predicted values \verb+fit+ and fit the linear model
+\begin{verbatim}
+lm(log(abs(res))~log(fit))
+\end{verbatim}
+Twice the slope of the fitted equation will give the exponent $\lambda$ in the variance function
+\[
+V(\mu)= \phi \mu^\lambda
+\]
+Use the estimated $\lambda$ to improve your model-fit.
+\item
+Check whether you still need the interaction between sucrose and leucine.
+\item
+Try in your model the \verb+log+ and the \verb+identity+-link.
+Use AIC and cross-validation to decide which model to choose.
+<<>>=
+m.gamma.log<-glm(density~day+sucrose+leucine,data=v,family=Gamma(link=log))
+m.gamma.id<-glm(density~day+sucrose+leucine,data=v,family=Gamma(link=identity))
+@
+
+
+<<ss>>=
+library(boot)
+extractAIC(m.gamma.id)
+extractAIC(m.gamma.log)
+cv.glm(v,m.gamma.id)$delta
+cv.glm(v,m.gamma.log)$delta
+@
+\end{enumerate}

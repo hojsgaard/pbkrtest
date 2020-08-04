@@ -1,0 +1,7 @@
+I have a few small suggestions in addition to those of the reviewers: As it
+stands, the pbkrtest package "requires" and hence
+ always loads several other packages that it doesn't necessarily need;
+ I would move as many of these as possible to "suggests" and load via require()
+ if and when they're needed. As well, I think that the paper would profit from good
+ copy-editing; since JSS doesn't do that, the authors might be encouraged to have 
+ the paper edited by someone with good English skills.

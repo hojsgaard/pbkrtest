@@ -1,0 +1,12 @@
+level  pos1  pos2    count 
+upper  right  front   10
+upper  right  back    15
+upper  left   front   15
+upper  left   back    22
+lower  right  front   14
+lower  right  back    19
+lower  left   front   17
+lower  left   back    31
+
+
+

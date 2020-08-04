@@ -1,0 +1,15 @@
+conc  n    taster
+   0.32  0    yes
+   0.63  2    yes    
+   1.27  9    yes
+   2.54 16    yes
+   5.08 23    yes
+  10.2  12    yes
+  20.3   3    yes
+  40.6   0    NA
+  81.2   3    non
+ 162     5    non
+ 325     8    non
+ 650    10    non
+1300     8    non
+1500     5    non

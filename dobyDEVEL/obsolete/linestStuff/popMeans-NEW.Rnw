@@ -1,0 +1,666 @@
+\documentclass[11pt]{article}
+
+%\VignettePackage{doBy}
+%\VignetteIndexEntry{doBy: population means}
+%\VignetteIndexEntry{LSMEANS}
+%\VignetteIndexEntry{contrasts}
+%\VignetteIndexEntry{estimable functions}
+
+
+\usepackage{a4wide,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{url,a4,SHmathnot}
+\usepackage{boxedminipage,color,xcolor}
+
+\usepackage[inline,nomargin,draft]{fixme}
+\newcommand\FXInline[2]{\textbf{\color{blue}#1}:
+  \emph{\color{blue} - #2}}
+
+\usepackage[cm]{fullpage}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+%%\DeclareMathOperator{\EE}{\mathbb{E}}
+
+\usepackage{framed}
+\usepackage{comment}
+\definecolor{shadecolor}{gray}{0.91}
+\def\pkg#1{{\bf #1}}
+\def\R{\texttt{R}}
+\def\code#1{\texttt{#1}}
+\def\popmeans{\code{popMeans()}}
+\def\popmatrix{\code{popMatrix()}}
+\def\linmeans{\code{linMeans()}}
+\def\linmatrix{\code{linMatrix()}}
+\def\esticon{\code{esticon()}}
+\def\lsmeans{\code{LSMEANS}}
+\def\linmat{\code{linestMatrix()}}
+\def\linest{\code{linest()}}
+
+<<echo=FALSE,print=FALSE>>=
+require( doBy )
+prettyVersion <- packageDescription("doBy")$Version
+prettyDate <- format(Sys.Date())
+@
+
+
+\title{Population means (also called marginal means or LSMEANS),
+  contrasts and estimable functions
+  in the \texttt{doBy} package}
+\author{S{\o}ren H{\o}jsgaard and Ulrich Halekoh}
+\date{\pkg{doBy} version \Sexpr{prettyVersion} as of \Sexpr{prettyDate}}
+
+\begin{document}
+
+
+\definecolor{darkred}{rgb}{.7,0,0}
+\definecolor{midnightblue}{rgb}{0.098,0.098,0.439}
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{
+  fontfamily=tt,
+  %%fontseries=b,
+  %% xleftmargin=2em,
+  formatcom={\color{midnightblue}}
+}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{
+  fontfamily=tt,
+  %%fontseries=b,
+  %% xleftmargin=2em,
+  formatcom={\color{darkred}}
+}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{
+  fontfamily=tt,
+  %%fontseries=b,
+  %% xleftmargin=2em,
+  formatcom={\color{blue}}
+}
+
+\fvset{listparameters={\setlength{\topsep}{-2pt}}}
+\renewenvironment{Schunk}{\linespread{.90}}{}
+
+%%\renewenvironment{Schunk}{\begin{shaded}\small}{\end{shaded}}
+@
+<<echo=F>>=
+options("width"=90, "digits"=3)
+@ %def
+
+\maketitle
+\hrule
+\tableofcontents
+
+\listoffixmes
+
+\parindent0pt
+\parskip5pt
+
+%\tableofcontents
+\setkeys{Gin}{height=3in}
+\SweaveOpts{keep.source=T}
+
+
+
+
+\section{Linear functions of parameters, contrasts}
+\label{sec:line-funct-param}
+
+
+Consider an $n$ dimensional random vector $y=(y_i)$ for which
+$\EE(y)=\mu=X\beta$ and $\cov(y)=V$. Here $X$ is an $n\times p$ with
+$n>p$. We are
+interested in linear functions of $\beta$, say
+\begin{displaymath}
+  c=w\transp\beta= \sum_j w_j \beta_j .
+\end{displaymath}
+
+If $X$ has full rank, the least squares estimate of $\beta$ is given by
+\begin{displaymath}
+  \hat \beta = (X\transp V\inv X)\inv X\transp V\inv y = Py
+\end{displaymath}
+The estimated linear function then becomes
+\begin{displaymath}
+    \hat c=w\transp\hat\beta= \sum_j w_j \hat\beta_j .
+\end{displaymath}
+
+
+
+
+
+@
+<<echo=F>>=
+library(doBy)
+dd <- expand.grid(A=factor(1:2),B=factor(1:3),C=factor(1:2))
+dd$y <- rnorm(nrow(dd))
+dd$x <- rnorm(nrow(dd))^2
+dd$z <- rnorm(nrow(dd))
+@ %def
+
+Consider these balanced simulated data:
+@
+<<>>=
+head(dd,5)
+ftable(xtabs(~A+B+C, data=dd), col.vars=2:3)
+@ %def
+
+Consider the additive model
+\begin{equation}
+  \label{eq:1}
+  y_i = \beta_0 + \beta^1_{A(i)}+\beta^2_{B(i)} + \beta^3_{C(i)} + e_i
+\end{equation}
+where $e_i \sim N(0,\sigma^2)$. We fit this model:
+
+@
+<<>>=
+mm <- lm(y~A+B+C, data=dd); coef(mm)
+##mm.int <- update(mm, .~.+A:C); coef(mm.int)
+@ %def
+
+Notice that the parameters corresponding to the factor levels
+\code{A=1}, \code{B=1} and \code{C=1} are set to zero to ensure
+identifiability of the remaining parameters.
+
+
+The effect of changing the factor $B$ from \code{B=2} to \code{B=3} can
+be found as
+@
+<<>>=
+w <- c(0,0,-1,1,0); sum(coef(mm)*w)
+@ %def
+
+@
+<<>>=
+warp1 <- lm(breaks ~ wool + tension, data=warpbreaks)
+warp2 <- lm(breaks ~ wool + tension + wool:tension, data=warpbreaks)
+@ %def
+
+@
+<<>>=
+(g1 <- glht(warp1, mcp(wool="Tukey")))
+(g2 <- glht(warp2, mcp(wool="Tukey")))
+@ %def
+
+<<>>=
+summary(g1, test=univariate())
+confint(g1, calpha=univariate_calpha())
+summary(g2, test=univariate())
+confint(g2, calpha=univariate_calpha())
+@
+
+@
+<<>>=
+linestMatrix(warp1, "wool")
+linestMatrix(warp2, "wool")
+linestMatrix(warp1, "tension")
+linestMatrix(warp2, "tension")
+@ %def
+
+
+
+
+
+%% \begin{displaymath}
+%%   b^A_1+b^A_2+b^B_1+b^B_2+b^B_3+b^C_1+b^C_2
+%% \end{displaymath}
+
+%% \begin{displaymath}
+%%   b^A_1+b^A_2+b^B_1+b^B_2+b^B_3+b^C_1+b^C_2+b^{AC}_{11}+b^{AC}_{21}+b^{AC}_{12}+b^{AC}_{22}
+%% \end{displaymath}
+
+
+%% @
+%% <<>>=
+%% dd2<-dd
+%% dd2$B <- relevel(dd$B, ref=2)
+%% mm2 <- lm(y~A+B+C, data=dd2); coef(mm2)
+%% @ %def
+
+
+%% @
+%% <<>>=
+%% sum(coef(mm2)*w)
+%% @ %def
+
+
+
+@
+<<>>=
+linestMatrix(mm, at=list(B=2))
+@ %def
+
+@
+<<>>=
+linest(mm, KK=matrix(w, nrow=1))
+@ %def
+
+
+\section{Population means}
+\label{sec:xxx}
+
+Population means (sometimes also called marginal means)
+are in some sciences much used for reporting marginal effects (to be
+described below). Population means are known as LSMEANS in SAS
+jargon.
+Population means is a special kind of contrasts as defined in
+Section~\ref{sec:line-funct-param}.
+
+The model (\ref{eq:1}) is a specification of the conditional mean
+$\EE(y|A,B,C)$ as a function of the factors $A,B,C$.  Sometimes one is
+interested in quantities like $\EE(y|A)$.
+For example, suppose that $A$ is a treatment of main interest, $B$ is a
+blocking factor and $C$ represents days on which the experiment was
+carried out.
+
+This quantity can not formally be found from the model unless $B$ and
+$C$ are random variables such that we may find $\EE(y|A)$ by
+integration.
+
+Then it is tempting to average $\EE(y|A,B,C)$ over $B$
+and $C$ (average over block and day) and think of this average as
+$\EE(y|A)$.
+
+From a practical perspective the effect of
+@
+<<>>=
+summaryBy(y~A, data=dd)
+@ %def
+
+
+\subsection{A brute--force calculation}
+\label{sec:xxx}
+
+The population mean for $A=1$ is
+\begin{equation}
+  \label{eq:2}
+  \beta^0 + \beta^1_{A1} + \frac{1}{3} (\beta^2_{B1}+\beta^2_{B2}+\beta^2_{B3})
+  + \frac{1}{2}(\beta^3_{C1}+\beta^3_{C2})
+\end{equation}
+
+Recall that the
+parameters corresponding to the factor levels
+\code{A=1}, \code{B=1} and \code{C=1} are set to zero to ensure
+identifiability of the remaining parameters. Therefore we may also
+write the population mean for $A=1$ as
+\begin{equation}
+  \label{eq:3}
+  \beta^0 + \frac{1}{3} (\beta^2_{B2}+\beta^2_{B3})
+  + \frac{1}{2}(\beta^3_{C2})
+\end{equation}
+
+
+%% This quantity can be estimated as:
+
+%% @
+%% <<>>=
+%% w <- c(1, 0, 1/3, 1/3, 1/2); w * coef(mm)
+%% sum( w * coef(mm) )
+%% @ %def
+
+
+We may find the population mean for all levels of $A$ as
+@
+<<echo=T>>=
+W <- matrix(c(1, 0, 1/3, 1/3, 1/2,
+               1, 1, 1/3, 1/3, 1/2), nr=2, byrow=TRUE)
+W %*% coef(mm)
+@ %def
+
+Notice that the matrix $W$ is based on that the first level of $A$ is
+set as the reference level. If the reference level is changed then so
+must $W$ be.
+
+Given that one has specified $W$, the \esticon\ function in the
+\code{doBy} package be used for the calculations above and the
+function also provides standard errors, confidence
+limits etc:
+%% @
+%% <<>>=
+%% esticon(mm, W)
+%% @ %def
+
+@
+<<>>=
+linest(mm, KK=W)
+@ %def
+
+
+\section{Using \linmat\  and \linest}
+\label{sec:xxx}
+
+Writing the matrix $W$ is somewhat tedious and hence error prone. In
+addition, there is a potential risk of getting the wrong answer if the
+the reference level of a factor has been changed.  The \popmatrix\
+function provides an automated way of generating such matrices.  The
+above \verb+W+ matrix is constructed by
+
+@
+<<>>=
+( pma <- linestMatrix(mm, effect="A") )
+@ %def
+
+
+\fxnote{summary-metode}
+
+@
+<<>>=
+( pme <- linest(mm, effect='A') )
+@ %def
+
+\fxnote{igen brug for en summary metode}
+
+
+
+The \verb+effect+ argument requires  to calculate the population means
+for each level of
+$A$ aggregating across the levels of the other variables in the data.
+Likewise we may do:
+@
+<<>>=
+linestMatrix(mm,effect=c('A','C'))
+@ %def
+
+
+This gives the matrix for calculating the estimate for each
+combination of \code{A} and \code{C} when averaging over \code{B}.
+Consequently
+@
+<<>>=
+linestMatrix(mm)
+linest(mm)
+@ %def
+gives the ``total average''.
+
+
+\fxnote{hvorfor er rowname 'estimate'}
+
+\subsection{Using the \code{at} argument}
+
+We may be interested in finding the population means
+at all levels of  $A$
+but only at $C=1$. This is obtained by using the \code{at} argument:
+@
+<<>>=
+linestMatrix(mm,effect='A', at=list(C='1'))
+@ %def
+Notice here that average is only taken over $B$. Another way of
+creating the population means
+at  all levels of $(A,C)$ is therefore
+<<eval=F>>=
+linestMatrix(mm,effect='A', at=list(C=c('1','2')))
+@ %def
+
+There is a possibility of an ambiguous specification if the same variable appears in
+both the \code{effect} and the \code{at} argument.
+This ambiguity is due to the fact that the \verb+effect+ argument asks
+for the populations means at all levels of the variables but the
+\verb+at+ chooses only specific levels.
+This ambiguity is resolved as follows: Any variable in the \code{at}
+argument is removed from the \code{effect} argument such that the
+following two statements are equivalent
+@
+<<results=hide>>=
+linestMatrix( mm, effect=c('A', 'C'), at=list(C='1') )
+linestMatrix( mm, effect='A', at=list(C='1') )
+@ %def
+
+\fxnote{jeg tror 'at' skal omdøbes til 'values'}
+
+
+
+%% \subsection{Using covariates}
+
+%% Next consider the model where a covariate is included:
+%% @
+%% <<>>=
+%% mm2 <- lm(y~A+B+C+C:x, data=dd)
+%% coef(mm2)
+%% @ %def
+
+%% In this case we get
+%% <<>>=
+%% popMatrix(mm2,effect='A', at=list(C='1'))
+%% @ %def
+
+%% Above, $x$ has been replaced by its average and that is the general
+%% rule for models including covariates. However we may use the \code{at}
+%% argument to ask for calculation of the population mean at some
+%% user-specified value of $x$, say 12:
+%% <<>>=
+%% popMatrix(mm2,effect='A', at=list(C='1',x=12))
+%% @ %def
+
+
+%% \subsection{Using transformed covariates}
+
+%% Next consider the model where a  transformation of a covariate is included:
+%% @
+%% <<>>=
+%% mm3 <- lm(y~A+B+C+C:log(x), data=dd)
+%% coef(mm3)
+%% @ %def
+
+%% In this case we can not use \popmatrix\ (and hence
+%% \popmeans\ directly.  Instead we have first to
+%% generate a new variable, say \verb+log.x+, with
+%% \verb+log.x+$=\log(x)$, in the data and then proceed as
+
+%% <<results=hide>>=
+%% dd <- transform(dd, log.x = log(x))
+%% mm3 <- lm(y~A+B+C+C:log.x, data=dd)
+%% popMatrix(mm3,effect='A', at=list(C='1'))
+%% @ %def
+
+%% \section{The \code{engine} argument of \popmeans}
+
+%% The \popmatrix is a function to generate a linear tranformation matrix
+%% of the model parameters with emphasis on constructing such matrices
+%% for population means.  \popmeans\ invokes by default the \esticon\
+%% function on this linear transformation matrix for calculating
+%% parameter estimates and confidecne intervals.  A similar function to
+%% \esticon\ is the \verb+glht+ function of the
+%% \pkg{multcomp} package.
+
+%% %%  The \code{glht()} function
+%% %%  can be chosen via the \verb+engine+ argument of \popmeans:
+%% %% <<>>=
+%% %%  library(multcomp)
+%% %% g<-popMeans(mm,effect='A', at=list(C='1'),engine="glht")
+%% %% g
+%% %% @ %def
+
+
+%% @
+%% <<>>=
+%% library(multcomp)
+%% ( KK <- linestMatrix( mm, effect='A', at=list(C='1')) )
+%% ( g <- glht(mm, KK) )
+%% @ %def
+
+
+
+%% This allows to apply the methods available on the \verb+glht+ object like
+%% <<>>=
+%% summary(g,test=univariate())
+%% confint(g,calpha=univariate_calpha())
+%% @
+%% % which yield the same results as the \esticon\ function.
+
+%% By default the functions will adjust the tests  and confidence intervals for multiplicity
+%% <<>>=
+%% summary(g)
+%% confint(g)
+%% @
+
+%% \section{Estimable functions}
+%% \label{sec:estimable-functions}
+
+
+%% \section{Linear functions of parameters, contrasts}
+%% \label{sec:line-funct-param}
+
+
+%% Consider an $n$ dimensional random vector $y=(y_i)$ for which
+%% $\EE(y)=\mu=X\beta$ and $\cov(y)=V$. Here $X$ is an $n\times p$ with
+%% $n>p$ matrix which does not necessarily have full rank. We are
+%% interested in linear functions of $\beta$, say
+%% \begin{displaymath}
+%%   c=w\transp\beta= \sum_j w_j \beta_j .
+%% \end{displaymath}
+
+%% If $X$ has full column rank and $V$ has full rank then the unique
+%% least squares estimate for $\beta$ is
+%% \begin{displaymath}
+%%   \hat \beta = (X\transp V\inv X)\inv X\transp V\inv y
+%% \end{displaymath}
+%% and the estimate of the linear function $c$ is uniquely given as
+%% $\hat c = w\transp \hat\beta$. If $X$ does not have full column rank a
+%% least squares estimate of $\beta$ is
+%% \begin{displaymath}
+%%   \hat \beta = G X\transp V\inv y
+%% \end{displaymath}
+%% where $G$ is a generalized inverse of $X\transp V\inv X$. Since the
+%% generalized inverse is not unique then neither is the estimate
+%% $\hat\beta$.
+
+%% All we specify with $\mu=X\beta$ is that $\mu$ is a vector in the
+%% linear subspace $L=C(X)$ where $C(X)$ denotes the column space of
+%% $X$.
+
+%% where $A^-$ is a generalized inverse of $A$. If $X$ has full column
+%% rank then $X\transp V\inv X$ is invertible so the least squares
+%% estimate is unique. Otherwise, there are infinitely many least squares
+%% estimates. Even if there are infinitely many generalized inverses, the
+%% fitted values $\hat y = X \hat \beta$ are uniquely indentified.
+
+%% An estimate of such a contrast is $\hat c = \lambda\transp\hat\beta$.
+%% Generalized inverses are not unique and therefore $\hat \beta$ is not
+%% uniquely estimated, and hence $c$ is not uniquely
+%% estimated. On the other hand the fitted values $\hat y = X \hat \beta$
+%% are uniquely indentified.
+
+%% However, for some $w$s we always get the same estimated
+%% contrast. Such linear functions are said to be estimable. These linear
+%% functios can
+%% be described as follows:
+%% We
+%% can only learn about $\beta$ through $X\beta$ so the only thing we can
+%% say something about is linear combinations $\rho\transp X\beta$. Hence
+%% we can only say something about $w\transp\beta$ if there exists
+%% $\rho$ such that $w\transp\beta=\rho\transp X \beta$, i.e., if
+%% $w=X\transp\rho$, that is, if $w$ is in the column space
+%% $C(X\transp)$ of $X\transp$. That is, if $w$ is perpendicular to
+%% all vectors in the null space $N(X)$ of $X$. To check
+%% this, we find a basis $B$ for $N(X) \subset R^p$ which can be done
+%% with a singular value decomposition of $X$, i.e.\
+%% \begin{displaymath}
+%%   X = U D V\transp
+%% \end{displaymath}
+%% A basis for $N(X)$ is given by those columns of $V$ that corresponds
+%% to zeros on the diagonal of $D$.
+
+%% Example:
+%% @
+%% <<>>=
+%% ff <- factor(rep(1:3, each=2))
+%% X1 <- cbind(rep(1,6),model.matrix(~0+ff)); X1
+%% y  <- 1:6
+%% @ %def
+
+%% @
+%% <<>>=
+%% S <- svd(X1)
+%% lapply(S, zapsmall)
+%% @ %def
+
+%% A basis of $N(X1)$ is
+%% @
+%% <<>>=
+%% B <- S$v[, S$d/max(S$d) < 1e-10, drop=F]
+%% (B <- as.numeric(B/max(B)))
+%% @ %def
+
+%% Hence valid vectors $\lambda$ must satisfy that $
+%%   \lambda_1 - \lambda_2 - \lambda_3 - \lambda_4  = 0.$
+
+%% @
+%% <<>>=
+%% lam <- c(1, 1, 0, 0)
+%% sum( lam*B ) # Orthogonal
+%% @ %def
+
+%% @
+%% <<>>=
+%% (b.hat <- as.numeric(MASS::ginv(t(X1)%*%X1) %*% t(X1) %*% y))
+%% sum( lam * b.hat )
+%% @ %def
+
+%% Take another basis for the mean space:
+%% @
+%% <<>>=
+%% X2 <- X1
+%% X2[,3]<-0
+%% (b.hat2 <- as.numeric(MASS::ginv(t(X2)%*%X2) %*% t(X2) %*% y))
+%% sum( lam * b.hat2 )
+%% @ %def
+
+%% On the other other hand, the following does not produce a unique estimate:
+%% @
+%% <<>>=
+%% lam2 <- c(1, 0, 0, 0)
+%% sum( lam2 * b.hat )
+%% sum( lam2 * b.hat2 )
+%% @ %def
+
+
+%% @
+%% <<>>=
+%% XtX <- t(X1)%*%X1
+%% XtX
+%% S <- svd(XtX)
+
+%% d <- S$d
+%% d[d>1e-10] <- 1/d[d>1e-10]
+%% d <- diag(d)
+%% G <- S$v %*% d %*% t(S$u)
+%% zapsmall(XtX %*% G %*% XtX)
+
+%% d[4,4] <- 100
+%% G <- S$v %*% d %*% t(S$u)
+%% zapsmall(XtX %*% G %*% XtX)
+
+%% d[4,1] <- 100000
+%% G <- S$v %*% d %*% t(S$u)
+%% zapsmall(XtX %*% G %*% XtX)
+
+
+%% @ %def
+
+
+
+\end{document}
+
+
+
+
+%% For a regression model with parameters $\beta=(\beta^1, \beta^2,\dots,
+%% \beta^p)$ we shall refer to a weighted sum of the form
+%% \begin{displaymath}
+%%   \sum_j w_j \beta^j
+%% \end{displaymath}
+%% as a contrast. Notice that it is common in the litterature to require
+%% that $\sum_j w_j=0$ for the sum $  \sum_j w_j \beta^j$ to be called a
+%% contrast but we do not follow this tradition here.
+%% We are interested in contrasts of the form $c=\lambda\transp\beta$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

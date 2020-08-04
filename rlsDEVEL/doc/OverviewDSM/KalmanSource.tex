@@ -1,0 +1,215 @@
+\section{The state space model}
+\label{KFapp}
+
+Given three things
+\begin{eqnarray*}
+  (\theta_0) &:& \mbox{Prior}\\
+  (\theta_t|\theta_{t-1}) &:& \mbox{System equation}\\
+  (y_t|\theta_t) &:& \mbox{Observation equation}
+\end{eqnarray*}
+Let $D_t=\{y_1, \dots, y_t\}$ denote the information
+available at time $t$.
+
+\subsection{The Kalman Filter (KF)}
+
+
+\subsection{Steps in the KF}
+
+The Kalman filter (KF) consists of
+\begin{description}
+\item[Prior for $\theta_1$:] 
+  $$
+  (\theta_1) = \int(\theta_1|\theta_0)(\theta_0)d\theta_0
+  $$
+
+\item[One--step forecast:] 
+  $$
+  (y_1) = \int(y_1|\theta_1)(\theta_1)d\theta_1
+  $$
+
+\item[Posterior for $\theta_1$:] 
+  $$
+  (\theta_1|y_1) = \frac{(y_1|\theta_1)(\theta_1)}
+  {\int(y_1|\theta_1)(\theta_1)d\theta_1}
+  $$
+\end{description}
+
+\subsection{Updating}
+
+When $y_1$ is observed we have information $D_1=\{y_1\}$. The prior
+for $\theta_2$ is
+  $$
+  (\theta_2|D_1) = \int(\theta_2|\theta_1)(\theta_1|D_1)d\theta_1
+  $$
+The one--step forecast becomes
+  $$
+  (y_2|D_1) = \int(y_2|\theta_2)(\theta_2|D_1)d\theta_2
+  $$
+and finally the posterior is
+  $$
+  (\theta_2|y_2,D_1) \equiv (\theta_2|D_2) = 
+  \frac{(y_2|\theta_2)(\theta_2|D_1)}
+  {\int(y_2|\theta_2)(\theta_2|D_1)d\theta_2}
+  $$
+
+Proceeding this way, we have at the end $(\theta_t|D_t)$ for
+$t_1,\dots, T$.
+
+
+\subsection{Forecasting}
+
+Forecasting of the system equations goes like
+$$
+(\theta_3|D_1)=\int(\theta_3|\theta_2)(\theta_2|D_1)d\theta_2,\ \ \
+(\theta_4|D_1)=\int(\theta_4|\theta_3)(\theta_3|D_1)d\theta_3 \dots
+$$
+Predictions for the observables become of the form
+$$
+(y_3|D_1) = \int(y_3|\theta_3)(\theta_3|D_1)d\theta_3 \dots
+$$
+
+
+\subsection{The Kalman Smoother (KS)}
+
+
+\subsection{Example when $T=3$}
+
+When the information set is $D_3=\{y_1,y_2,y_3\}$ we can work backwards as
+follows:
+$$
+(\theta_2|D_3)=\int (\theta_2,\theta_3|D_3)d\theta_3 = 
+\int (\theta_2|\theta_3,D_3)(\theta_3|D_3)d\theta_3 
+$$
+Now $(\theta_3|D_3)$ is available from the KF. The term
+$(\theta_2|\theta_3,D_3)$ is
+\begin{eqnarray*}
+  (\theta_2|\theta_3,D_3) &=& (\theta_2|\theta_3,D_2)
+  = (\theta_3|\theta_2)(\theta_2|D_2) / (\theta_3|D_2)
+\end{eqnarray*}
+Note that $(\theta_3|D_2)$ is a simple 1--step forecast and that
+$(\theta_2|D_2)$ is available from the KF.
+
+Proceeding we get
+$$
+(\theta_1|D_3) = \int (\theta_1|\theta_2,D_3)(\theta_2|D_3) d\theta_2
+$$
+Now, $(\theta_2|D_3)$ is available from the previous step of the KS while
+$$
+(\theta_1|\theta_2,D_3) = (\theta_1|\theta_2,D_2) =
+(\theta_2|\theta_1)(\theta_1|D_1)/(\theta_2|D_1)
+$$
+where again $(\theta_1|D_1)$ is available from the KF while $(\theta_2|D_1)$ is
+a simple 1--step forecast.
+
+Finally for $\theta_0$ we get
+$$
+(\theta_0|D_3)=\int (\theta_0|\theta_1,D_3)(\theta_1|D_3)d\theta_1
+$$
+As before $(\theta_1|D_3)$ is available from the previous KS step, while 
+$(\theta_0|\theta_1,D_3)=(\theta_0|\theta_1) =
+(\theta_1|\theta_0)(\theta_0)/(\theta_1)$. 
+
+\subsection{The general case}
+
+Given $(\theta_T|D_T)$ the Kalman smoother updates
+$\theta_t$ backwards in time. First we need $(\theta_{T-1}|D_T)$:
+$$
+(\theta_{T-1}|D_T) 
+=
+\int(\theta_{T-1},\theta_T|D_T) d\theta_T
+=
+\int (\theta_{T-1}|\theta_T,D_T)(\theta_{T}|D_T)  d\theta_T
+$$
+The last term is avaliable from the Kalman filter, so we
+only need the former. From the model we have
+$$
+(\theta_{T-1}|\theta_T,D_T) = (\theta_{T-1}|\theta_T,D_{T-1})
+$$
+The last term can be calculated as
+$$
+(\theta_{T-1}|\theta_T,D_{T-1}) =
+\frac{(\theta_T|\theta_{T-1})(\theta_{T-1}|D_{T-1})}{(\theta_T|D_{T-1})}
+$$
+where $(\theta_T|D_{T-1})=
+\int (\theta_T|\theta_{T-1})(\theta_{T-1}|D_{T-1})
+d\theta_{T-1}$ is the prior for $\theta_T$ based on
+$D_{T-1}$. With this at hand the formula becomes
+\begin{eqnarray*}
+(\theta_{T-1}|D_T) 
+&=&
+\int \frac{(\theta_T|\theta_{T-1})(\theta_{T-1}|D_{T-1})}{(\theta_T|D_{T-1})}
+(\theta_{T}|D_T)  d\theta_T\\
+&=&
+(\theta_{T-1}|D_{T-1})
+\int \left[\frac{(\theta_{T}|D_T)}{(\theta_T|D_{T-1})}\right]
+(\theta_T|\theta_{T-1})  d\theta_T
+  \end{eqnarray*}
+Note that the term in $[\dots]$ is the ratio between the
+posterior and prior for $\theta_T$ so the integral is the
+expected value of this ratio with respect to the transition
+distribution $(\theta_T|\theta_{T-1})$.
+
+When going $k$ time steps back from $T$ we need
+$(\theta_{T-k}|D_T)$ which becomes
+\begin{eqnarray*}
+  (\theta_{T-k}|D_T) = \int (\theta_{T-k}|\theta_{T-k+1},
+  D_T) 
+(\theta_{T-k+1}|D_T)d\theta_{T-k+1}
+\end{eqnarray*}
+The last term $(\theta_{T-k+1}|D_T)$ was calculated from the
+Kalman smoother in the previous step ($k-1$ steps backward
+from $T$). The first term is
+\begin{eqnarray*}
+(\theta_{T-k}|\theta_{T-k+1}, D_T) &\equiv&
+   (\theta_{T-k}|\theta_{T-k+1}, D_{T-k})\\
+&=&
+\frac{(\theta_{T-k+1}|\theta_{T-k})(\theta_{T-k}|D_{T-k})}
+{(\theta_{T-k+1}|D_{T-k})}
+\end{eqnarray*}
+So the formula becomes
+\begin{eqnarray*}
+(\theta_{T-k}|D_T) = (\theta_{T-k}|D_{T-k}) \int 
+\left[\frac{(\theta_{T-k+1}|D_T)}
+{(\theta_{T-k+1}|D_{T-k})}\right]
+(\theta_{T-k+1}|\theta_{T-k})d\theta_{T-k+1}  
+\end{eqnarray*}
+The term in $[\dots]$ is the ratio between the previously
+smoothed value (at time $T-k+1$) and the prior for
+$\theta_{T-k+1}$ given only data $D_{T-k}$. 
+
+\section{Estimation by Forward Filtering, Backwards
+  Sampling}
+
+The aim is to simulate from $(\theta|y)$. For simplicity,
+let $T=3$, so $y=y^3=D_3$. We then have
+\begin{eqnarray*}
+  (\theta|y)\equiv(\theta|D_3) &=&
+  (\theta_3|D_3)(\theta_2,\theta_1|\theta_3,D_3) \\
+  &=&
+  (\theta_3|D_3)(\theta_2,\theta_1|\theta_3,D_2) \\
+  &=&
+  (\theta_3|D_3)(\theta_2|\theta_3,D_2)(\theta_1|\theta_2,\theta_3,D_2) \\
+  &=&
+  (\theta_3|D_3)(\theta_2|\theta_3,D_2)(\theta_1|\theta_2,D_1)
+\end{eqnarray*}
+In general
+\begin{eqnarray*}
+  (\theta|y)=(\theta_T|y^T)\prod_{t=1}^{T-1}(\theta_t|\theta_{t-1},y^t)
+\end{eqnarray*}
+So the simulation scheme becomes
+\begin{itemize}
+\item Draw $\theta_T^{(1)}$ from $(\theta_T|D_T)$
+\item For $t=T-1, \dots, 1$ draw $\theta_t^{(1)}$ from
+  $(\theta_t|\theta_{(t+1)}^{(1)}, D_t)$
+\end{itemize}
+Then $\theta^{(1)}=(\theta^{(1)}_1, \dots, \theta^{(1)}_T)$
+is a sample from $(\theta|y)$.
+
+To be general, the sampling is from 
+$$
+(\theta_{T-k}|\theta_{T-k+1},D_{T-k})
+\propto
+(\theta_{T-k+1}|\theta_{T-k})(\theta_{T-k}|D_{T-k})
+$$
+Thus the sampling problem is that of sampling from $(x|z)$
+when $(x,z)$ is defined through $(x,z)=(z|x)(x)$.

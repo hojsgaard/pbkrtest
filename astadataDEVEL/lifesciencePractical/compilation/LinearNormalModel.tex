@@ -1,0 +1,596 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4wide,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{url,a4}
+\usepackage{boxedminipage,color,xcolor}
+\usepackage{shortvrb}
+\usepackage{framed}
+\usepackage{comment}
+
+\usepackage[inline,nomargin,draft]{fixme}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{framed}
+\usepackage{comment}
+\usepackage{amsmath}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+
+\MakeShortVerbå
+
+%%
+%% Easy matrices:
+%%
+\newcommand{\matrxr}[2][rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxr{-1&-2\\3&4}$
+
+\newcommand{\matrxc}[2][cccccccccccccccccccccccccccccccccccc]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+\newcommand{\matrxl}[2][lllllllllllllllllllllllllllllllllllll]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+
+\def\R{\texttt{R}}
+\def\code#1{\texttt{#1}}
+\def\ok{\texttt{OK}}
+\def\fix{\texttt{FIX}}
+
+\def\red#1{{\bf \textcolor{red}{#1}}}
+\def\blue#1{{\bf \textcolor{blue}{#1}}}
+\def\purple#1{{\bf \textcolor{purple}{#1}}}
+
+\def\com#1{{\em{\color{red} #1}}}
+\def\comi#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+\def\comic#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+
+\def\simn{\sim\mathcal N}
+\def\simx{\sim\chi^2}
+\def\xx{\chi^2}
+\def\norm{\mathcal N}
+
+
+\DeclareMathOperator{\RR}{\mathbb{R}}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+\DeclareMathOperator{\var}{\mathbb{V}ar}
+\DeclareMathOperator{\cov}{\mathbb{C}ov}
+%\DeclareMathOperator{\norm}{N}
+\DeclareMathOperator{\spanx}{span}
+\DeclareMathOperator{\corr}{Corr}
+\DeclareMathOperator{\deter}{det}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\odds}{odds}
+
+\def\vnorm#1{\left|\left|#1\right|\right|} 
+\def\innerp#1{\left\langle #1 \right\rangle}
+\def\inv{^{-1}}
+\def\transp{^{\top}}
+\definecolor{darkblue}{rgb}{0,0,.5}
+
+%%UHH commands added by UHH
+%%some new enviroments
+\newtheorem{theorem}{Theorem}[section]
+\newenvironment{example}{\medskip\noindent\refstepcounter{theorem}{\bf
+Example \thetheorem\ }}{\hfill $\Box$ }
+\newenvironment{theoreme}{\medskip\noindent\refstepcounter{theorem}{\bf
+Theorem \thetheorem\ }}{}
+
+\definecolor{shadecolor}{gray}{0.91}
+\definecolor{howR}{gray}{0.91}
+%\specialcomment{howR}{\begin{shaded}\small R code: }{\end{shaded}}
+%\specialcomment{howR}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+%\specialcomment{sblock}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+
+\specialcomment{solution}
+{\begin{shaded} Solution: }{\end{shaded}}
+
+\specialcomment{topics}
+{\begin{shaded} TOPICS: }{\end{shaded}}
+
+
+
+\newenvironment{howR}{}{}
+
+\newenvironment{examplea}
+                {\begin{example}  \em \openup-1pt }
+                {\hfill $\Box$  %\vspace{5mm}
+                \end{example}}
+
+
+
+%%\excludecomment{topics}
+%%\excludecomment{solution}
+
+\usepackage{Sweave}
+\begin{document}
+
+
+\RecustomVerbatimEnvironment{Sinput}{Verbatim}%
+    {fontsize=\scriptsize,frame=single,framerule=1pt,
+      rulecolor=\color{red},
+      fillcolor=\color{yellow}
+    }
+\RecustomVerbatimEnvironment{Soutput}{Verbatim}%
+    {fontsize=\scriptsize, frame=single,framerule=0.1pt}
+
+
+
+
+% \renewenvironment{Schunk}{\linespread{.85}\scriptsize}{}
+    
+%% Efter preamble
+% \definecolor{myGray}{rgb}{0.95,0.95,0.95}
+
+% \makeatletter
+% \renewenvironment{Schunk}{
+%   \begin{lrbox}{\@tempboxa}
+%     \begin{boxedminipage}
+%       {\columnwidth}\scriptsize}
+%     {\end{boxedminipage}
+%   \end{lrbox}%
+%   \colorbox{myGray}{\usebox{\@tempboxa}}
+% }
+% \makeatother
+
+
+\parindent0pt
+\parskip5pt
+
+
+{Miniproject: Four small projects}
+
+{Ulrich Halekoh and Søren Højsgaard \hfill Created: \today}
+
+\hrule
+
+
+\setkeys{Gin}{width=4in,height=3in}
+
+\section{Diets of Rats}
+
+\begin{topics}
+  Linear model with quadratic terms in $x$; calculate $p$--value by
+  hand. 
+\end{topics}
+
+The growth rate, $y$, of rats was studied for different amounts of
+supplement to their diet, $x$.  Data for this exercise can be found in
+the data frame 'dietsup' of the course package \verb+LiSciData+.
+
+
+\begin{enumerate}
+\item
+Read in the data and plot the rate of growth as a function of the amount of supplement.
+
+\begin{Schunk}
+\begin{Sinput}
+ data(dietsup, package="LiSciData")
+ head(dietsup)
+\end{Sinput}
+\begin{Soutput}
+   x  y
+1 10 73
+2 10 78
+3 15 85
+4 20 90
+5 20 91
+6 25 87
+\end{Soutput}
+\end{Schunk}
+
+\item
+Based on the plot, a model where the growth rate is related to the amount of supplement
+through a quadratic equation could be reasonable.
+Formulate  and fit such a model with the \verb+glm+-function.
+%\[
+%E(y_i)=\mu_i= \mu + \alpha x_i + \beta x_i^2, \quad y_i \sim N(\mu_i,\sigma^2).
+%\]
+
+What are the estimates of the parameters in this model?
+
+\item
+Add the fitted values to your plot of data.
+
+
+
+
+\item
+Consider the regression model without the quadratic term.
+Write down this model.
+%\[
+%E(y_i)=\mu_i= \mu + \alpha x_i, \quad y_i \sim N(\mu_i,\sigma^2).
+%\]
+Fit the model  and plot the residuals against the predicted
+values for model checking.
+
+\item
+Test whether there is a need for a quadratic term in the model using the \verb+anova+-function.
+
+\item
+The test statistic you just found is calculated in the following way.
+In the column \verb+Deviance+ of the output of \verb+anova+
+one finds actually the {\bf difference}
+in the residual deviances $D_0-D_1=$
+686.4-45.2=641.2
+Hence the F-test statistic is
+\[
+\frac{ (D_0-D_1)/ (7-8)} {D_1/7}= \frac {641.2 /(8-7)}
+{45.2/7}= 99.3
+\]
+
+You can calculate the p-value 'by hand'. You calculate the probability that
+an F-distributed random variable with degrees of freedom 1 and 7 is larger
+than 99.3:
+\begin{Schunk}
+\begin{Sinput}
+ pf(99.3,1,7,lower.tail=FALSE)
+\end{Sinput}
+\begin{Soutput}
+[1] 2.189525e-05
+\end{Soutput}
+\end{Schunk}
+A histogram of 1000 observations from the F-distribution with degrees of 
+freedom 1 and 7 showing
+the 95 percent quantile of this F-distribution can be created as follows.
+\\
+Generating random number from the F-distribution with 1 and 7 degrees of freedom
+\begin{Schunk}
+\begin{Sinput}
+ set.seed(998)
+ y  <- rf(n=1000,1,7)
+\end{Sinput}
+\end{Schunk}
+The $95\%$ quantile of the distribution
+\begin{Schunk}
+\begin{Sinput}
+ q95 <- qf(0.95,1,7)
+\end{Sinput}
+\end{Schunk}
+and a histogram:
+\begin{Schunk}
+\begin{Sinput}
+ hist(y,probability=TRUE)
+ lines(density(y))
+ abline(v=q95)
+\end{Sinput}
+\end{Schunk}
+\begin{enumerate}
+\item
+How large is the area to the right of the vertical line?
+\item
+On which side from the vertical line in the histogram must  the F-test statistic lie, such that
+a F-test is significant? 
+\end{enumerate}
+\end{enumerate}
+
+\section{Gestational Age}
+\begin{topics}
+  Linear normal model; two regression lines
+\end{topics}
+
+
+The data are from a study, where for boys and girls their
+gestational(prenatal) weights were recorded. In the data set
+'gestation' of the course package \verb+LiSciData+ the data are given
+in 'long format', e.g. each row consists of measurements of a boy and
+a girl.  We first reshape the data, such that each row contains just
+the measurements for one boy or girl.  We add a variable \verb+sex+,
+and make it a factor, to indicate the sex of the individual.
+
+\begin{enumerate}
+\item
+Reading the data
+\begin{Schunk}
+\begin{Sinput}
+ data(gestation, package="LiSciData")
+ gestation<- reshape(gestation,direction='long',
+              varying=list(age=c('boys.age','girls.age'),
+              weight=c('boys.weight','girls.weight')),
+              v.names=c('age','weight'),
+              timevar='sex',times=c('boy','girl'))
+ gestation$sex<-factor(gestation$sex)
+ head(gestation)
+\end{Sinput}
+\begin{Soutput}
+      sex age weight id
+1.boy boy  40   2968  1
+2.boy boy  38   2795  2
+3.boy boy  40   3163  3
+4.boy boy  35   2925  4
+5.boy boy  36   2625  5
+6.boy boy  37   2847  6
+\end{Soutput}
+\end{Schunk}
+
+
+\item
+First, plot the weight against gestational age, differentiating between boys and girls.
+Then add a smooth line for both sexes.(You can use the \verb+lowess+-function.)
+
+\item
+Formulate two models.
+
+M1:
+A model with different intercepts but common slope for regressions
+of weight on the gestational age.
+
+M2:
+A model that additionally differentiates the two slopes for the sexes.
+
+%\[
+%M_1:  \quad E(y_i)=\mu_i=\mu + \alpha_k + \beta x_i,
+%\quad i=1,\dots,N, \quad k=\textrm{boy,girl}
+%\]
+%
+%\[
+%M_2: \quad  E(y_i)=\mu_i=\mu + \alpha_k + \beta x_i + \beta_k x_i,
+%\quad i=1,\dots,N, \quad  k=\textrm{boy,girl}
+%\]
+
+Fit these models using the \verb+glm+-function.
+
+\item
+In model M1 find and interpret the estimates of the model parameters.
+Use  the \verb+esticon+-function of the package \verb+doBy+ to
+find the estimate of the intercept for girls.
+
+Here we note that a simpler way to obtain this intercept is to declare
+the model M1 by
+\begin{Schunk}
+\begin{Sinput}
+ m1.alter <- glm(weight ~ sex + age - 1, data = gestation)
+ coef(summary(m1.alter))[,c(1,2)]
+\end{Sinput}
+\end{Schunk}
+
+Also find and interpret the estimates of the model parameters in model M2.
+
+\item
+Use the function \verb+predict+ to calculate the fitted values of M1.
+Then plot these fitted lines together with the observations.
+
+\item
+In the model M1 find confidence intervals for the parameters.
+
+\item
+We want to test whether it is necessary to have a slope for each sex.
+Use the function \verb+anova+ to compare the two models M1 and M2.
+
+\item
+Use the function \verb+drop1+ on \verb+m1+. What does the result tell you?
+
+\item
+Plots for model checking can be obtained.
+\begin{Schunk}
+\begin{Sinput}
+ m1 <- glm(weight~sex+age-1,data=gestation)
+ par(mfrow=c(2,2))
+ plot(m1,pch=c(16,1)[gestation$sex],cex=2)
+\end{Sinput}
+\end{Schunk}
+Does the model fit data?
+\end{enumerate}
+
+
+
+\section{Sexism Score}
+\begin{topics}
+  Linear normal model; two--way anova; LSMEANS
+\end{topics}
+
+A study was conducted to compare the sexist attitudes of students
+     at various types of colleges in the US. The colleges-types are:
+     mixed (gender) college with at least 75\% male students, mixed
+     college with less than 75\% male students, and single sex college.
+     For each gender, random samples of each 10 undergraduate students
+     were selected from each of the three types of colleges. Each
+     student filled in a questionnaire, from which a score for 'degree
+     of sexism'-defined as the extent to which a student considered
+     males and females to have different life roles-was determined
+
+
+
+
+
+\begin{enumerate}
+\item
+Reading the data
+\begin{Schunk}
+\begin{Sinput}
+ data(sexism,package='LiSciData')
+ sexism <- transform(sexism, score = sexism)
+ sexism <- transform(sexism, type = factor(type))
+ sexism <- transform(sexism, gender.type = interaction(gender,type))
+ head(sexism)
+\end{Sinput}
+\begin{Soutput}
+  sexism type gender score gender.type
+1     50    1   male    50      male.1
+2     35    1   male    35      male.1
+3     37    1   male    37      male.1
+4     32    1   male    32      male.1
+5     46    1   male    46      male.1
+6     38    1   male    38      male.1
+\end{Soutput}
+\end{Schunk}
+
+
+\item
+Plot the data to visualize the effect of gender and type on the sexism score.
+(The function \verb+stripchart+ can be used.)
+
+\item
+%We will work with the model having six different means one for each gender and type.
+Formulate a model with a separate mean for each combination of gender and type. Call the model M1.
+%\[
+%M_1:  \quad E(y_i)=\mu_i=\mu + \alpha_j + \beta_k + \gamma_{jk} ,
+% \quad k=1,2,3, \quad j=\textrm{boy, girl}
+%\]
+Fit the model M1 using the \verb+glm+-function and find the estimates of
+ the model parameters.
+
+\item
+Use the function \verb+predict+ to calculate the fitted values and plot these fitted values.
+The function \verb+coplot+ can be used here. If \verb+m1+ is the object holding your
+model fit of M1 the following will work
+\begin{Schunk}
+\begin{Sinput}
+ sexism <- transform(sexism,fit=predict(m1))
+ coplot(fit ~ type | gender, data = sexism ,panel = panel.smooth, pch = c(18))
+\end{Sinput}
+\end{Schunk}
+Does the plot indicate an interaction between sex and type?
+
+Another possibility for such a conditional plot is via trellis-graphics implemented in the \verb+lattice+ package
+\begin{Schunk}
+\begin{Sinput}
+ library(lattice)
+ print(
+  xyplot(fit~type|gender,data=sexism,type='l')
+  )
+\end{Sinput}
+\end{Schunk}
+or
+\begin{Schunk}
+\begin{Sinput}
+ print(
+  xyplot(fit~type,groups=gender,data=sexism,type='l',auto.key=TRUE)
+  )
+\end{Sinput}
+\end{Schunk}
+\item
+Now consider also the model with no interaction between gender and type
+\[
+M_2:  \quad E(y_{jk})=\mu_{jk}=\mu + \alpha_j + \beta_k,
+ \quad k=1,2,3, \quad j=\textrm{boy, girl}
+\]
+Fit this model using the \verb+glm+-function and test the hypothesis of
+no interaction using the function \verb+anova+.
+\item
+Use the model M1 to obtain an estimate for the average sexism score  for males across the types. Weight the three levels of type equally
+and use the \verb+esticon function+.
+The resulting mean is called the LSMEANS (or population average)
+for males across type.
+\item
+Similarly one can calculate the LSMEAN for females across type.
+One should consider these LSMEANS as possibly interesting predictions of the
+general level of sexism for males and females.
+But because there is an interaction between gender and type, it is 
+not an interesting scientific hypothesis, that these LSMEANS should be the same.
+Nevertheless, it is mathematically possible to test the hypothesis.
+
+In R you can do this with the \verb+drop1+ function, but for the
+contrast of the factors in the model you must use the \verb+contrast.sum+
+contrast, not the \verb+contr.treatment+ we normally use.
+\begin{Schunk}
+\begin{Sinput}
+ old<-options()$contrasts
+ options(contrasts=c('contr.sum','contr.poly'))
+ m1L<- glm(score ~ gender + type+ gender:type,data=sexism)
+ drop1(m1L,.~.,test='F')
+\end{Sinput}
+\begin{Soutput}
+Single term deletions
+
+Model:
+score ~ gender + type + gender:type
+            Df Deviance    AIC F value     Pr(F)    
+<none>           1365.3 371.76                      
+gender       1   1593.5 379.03  9.0237  0.004034 ** 
+type         2   2022.7 391.34 13.0013 2.459e-05 ***
+gender:type  2   1624.6 378.19  5.1279  0.009141 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+The row with \verb+gender+ gives the test that the averages for males and 
+females (equally weighted across type-levels) are the same.
+This hypothesis should by no means be considered as testing the 
+main-effects of gender accounted for type, as it is sometimes expressed. 
+Because there is interaction between gender and type there is no point in speaking of a main effect.
+
+Finally we reset the contrasts
+\begin{Schunk}
+\begin{Sinput}
+ options(old)
+\end{Sinput}
+\end{Schunk}
+\end{enumerate}
+
+\section{Bacteria}
+
+\begin{topics}
+  Linear normal model; log-transformation.
+\end{topics}
+
+In an experiment on nutrients on bacterial growth,
+bacteria were grown in different media with the nutrients sucrose and leucine added.
+After fours days the numbers of bacteria, \verb+density+, were counted.
+\begin{Schunk}
+\begin{Sinput}
+ data(bactsucrose, package="LiSciData")
+ head(bactsucrose)
+\end{Sinput}
+\begin{Soutput}
+  day sucrose leucine  density
+1   1       1       1 2.47e+07
+2   1       1       2 3.81e+07
+3   1       1       3 3.05e+08
+4   1       2       1 1.22e+07
+5   1       2       2 8.93e+07
+6   1       2       3 1.54e+09
+\end{Soutput}
+\end{Schunk}
+
+\begin{enumerate}
+\item Assume the responses to be normally distributed and use an
+  identity link.  Assume the predictors \verb+day+, \verb+sucrose+ and
+  \verb+leucine+ as factors.  Fit a model which is additive in
+  \verb+day+ and with an interaction between the other two factors.
+
+\item
+Look at the residuals. What do you observe?
+\item
+
+  Fit the model, where you assume that the transformed observations
+\verb+log(density)+ are normally distributed.
+Look at the residuals.
+
+\end{enumerate}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

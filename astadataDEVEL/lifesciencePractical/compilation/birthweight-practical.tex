@@ -1,0 +1,324 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4wide,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{url,a4}
+\usepackage{boxedminipage,color,xcolor}
+\usepackage{shortvrb}
+\usepackage{framed}
+\usepackage{comment}
+
+\usepackage[inline,nomargin,draft]{fixme}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{framed}
+\usepackage{comment}
+\usepackage{amsmath}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+
+\MakeShortVerbå
+
+%%
+%% Easy matrices:
+%%
+\newcommand{\matrxr}[2][rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxr{-1&-2\\3&4}$
+
+\newcommand{\matrxc}[2][cccccccccccccccccccccccccccccccccccc]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+\newcommand{\matrxl}[2][lllllllllllllllllllllllllllllllllllll]
+{\left[
+    \begin{array}{#1}
+      #2 \\
+    \end{array}
+  \right]}
+% Usage: $\matrxl{-1&-2\\3&4}$
+
+
+\def\R{\texttt{R}}
+\def\code#1{\texttt{#1}}
+\def\ok{\texttt{OK}}
+\def\fix{\texttt{FIX}}
+
+\def\red#1{{\bf \textcolor{red}{#1}}}
+\def\blue#1{{\bf \textcolor{blue}{#1}}}
+\def\purple#1{{\bf \textcolor{purple}{#1}}}
+
+\def\com#1{{\em{\color{red} #1}}}
+\def\comi#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+\def\comic#1{{\bf\sc{\color{darkblue} #1}}\index{#1}}
+
+\def\simn{\sim\mathcal N}
+\def\simx{\sim\chi^2}
+\def\xx{\chi^2}
+\def\norm{\mathcal N}
+
+
+\DeclareMathOperator{\RR}{\mathbb{R}}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+\DeclareMathOperator{\var}{\mathbb{V}ar}
+\DeclareMathOperator{\cov}{\mathbb{C}ov}
+%\DeclareMathOperator{\norm}{N}
+\DeclareMathOperator{\spanx}{span}
+\DeclareMathOperator{\corr}{Corr}
+\DeclareMathOperator{\deter}{det}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\odds}{odds}
+
+\def\vnorm#1{\left|\left|#1\right|\right|} 
+\def\innerp#1{\left\langle #1 \right\rangle}
+\def\inv{^{-1}}
+\def\transp{^{\top}}
+\definecolor{darkblue}{rgb}{0,0,.5}
+
+%%UHH commands added by UHH
+%%some new enviroments
+\newtheorem{theorem}{Theorem}[section]
+\newenvironment{example}{\medskip\noindent\refstepcounter{theorem}{\bf
+Example \thetheorem\ }}{\hfill $\Box$ }
+\newenvironment{theoreme}{\medskip\noindent\refstepcounter{theorem}{\bf
+Theorem \thetheorem\ }}{}
+
+\definecolor{shadecolor}{gray}{0.91}
+\definecolor{howR}{gray}{0.91}
+%\specialcomment{howR}{\begin{shaded}\small R code: }{\end{shaded}}
+%\specialcomment{howR}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+%\specialcomment{sblock}{\begin{shaded}\vspace{-4mm}\small}{\vspace{-3mm}\end{shaded}}
+
+\specialcomment{solution}
+{\begin{shaded} Solution: }{\end{shaded}}
+
+\specialcomment{topics}
+{\begin{shaded} TOPICS: }{\end{shaded}}
+
+
+
+\newenvironment{howR}{}{}
+
+\newenvironment{examplea}
+                {\begin{example}  \em \openup-1pt }
+                {\hfill $\Box$  %\vspace{5mm}
+                \end{example}}
+
+
+
+%%\excludecomment{topics}
+%%\excludecomment{solution}
+
+\usepackage{Sweave}
+\begin{document}
+
+
+\RecustomVerbatimEnvironment{Sinput}{Verbatim}%
+    {fontsize=\scriptsize,frame=single,framerule=1pt,
+      rulecolor=\color{red},
+      fillcolor=\color{yellow}
+    }
+\RecustomVerbatimEnvironment{Soutput}{Verbatim}%
+    {fontsize=\scriptsize, frame=single,framerule=0.1pt}
+
+
+
+
+% \renewenvironment{Schunk}{\linespread{.85}\scriptsize}{}
+    
+%% Efter preamble
+% \definecolor{myGray}{rgb}{0.95,0.95,0.95}
+
+% \makeatletter
+% \renewenvironment{Schunk}{
+%   \begin{lrbox}{\@tempboxa}
+%     \begin{boxedminipage}
+%       {\columnwidth}\scriptsize}
+%     {\end{boxedminipage}
+%   \end{lrbox}%
+%   \colorbox{myGray}{\usebox{\@tempboxa}}
+% }
+% \makeatother
+
+
+\parindent0pt
+\parskip5pt
+
+
+{Miniproject: Birthweight of babies}
+
+{Søren Højsgaard \hfill Created: \today}
+
+\hrule
+
+
+\setkeys{Gin}{width=4in,height=3in}
+
+
+\section{Birthweight of babies}
+\label{sec:birthweight-babies}
+
+
+\begin{topics} 
+Linear normal model
+\end{topics}
+
+The \verb+births+ data in the \verb+Epi+ package contains recordings
+of birtweights of babies in a London hospital together with recordings
+of several possible explanatory variables.
+
+The purpose of this exercise is to establish a model for understanding
+how the birthweight is related to the explanatory variables. 
+
+\begin{Schunk}
+\begin{Sinput}
+ library(Epi)
+ data(births)
+ head(births)
+\end{Sinput}
+\begin{Soutput}
+  id bweight lowbw gestwks preterm matage hyp sex
+1  1    2974     0   38.52       0     34   0   2
+2  2    3270     0      NA      NA     30   0   1
+3  3    2620     0   38.15       0     35   0   2
+4  4    3751     0   39.80       0     31   0   1
+5  5    3200     0   38.89       0     33   1   1
+6  6    3673     0   40.97       0     33   0   2
+\end{Soutput}
+\begin{Sinput}
+ dim(births)
+\end{Sinput}
+\begin{Soutput}
+[1] 500   8
+\end{Soutput}
+\begin{Sinput}
+ sapply(births, class)
+\end{Sinput}
+\begin{Soutput}
+       id   bweight     lowbw   gestwks   preterm    matage       hyp       sex 
+"numeric" "numeric" "numeric" "numeric" "numeric" "numeric" "numeric" "numeric" 
+\end{Soutput}
+\end{Schunk}
+
+
+\begin{enumerate}
+\item
+  \begin{enumerate}
+  \item Plot the birth weights of babies and observe the
+    distribution. Comments?
+
+\begin{solution} 
+
+\begin{Schunk}
+\begin{Sinput}
+ hist(births$bweight)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{fig/PRACS-004}
+\end{solution}    
+
+\item See how birth weight of babies are related to gestation
+    period, and maternal age by scatter plot. Differentiate metween males and
+    females in the plot. (Hint: åxyplot()å could be your friend.) Comments?
+
+  \item Make a scatterplot of all pair of variables. (Hint: åpairs()å
+    could be your friend). Comments?
+  \end{enumerate}
+
+\item
+\begin{enumerate}
+\item Assume that number of boys follows a 
+  $bin(N=500,\theta)$--distribution.
+
+\item Estimate $\theta$ from observed
+  data. Estimate the variance of $\hat\theta$ from data. 
+
+\item What is the probability of observing a male child?
+
+\item What is the probability of observing at least 26 babies of the
+  same sex in 44 births? (Use above estimated value of $\theta$.)
+\end{enumerate}
+
+\item Fit a linear normal model $M_1$ for $bweight \sim
+  gestwks + matage$ to the \verb+births+ data. 
+
+  \begin{enumerate}
+  \item Write down in precise mathematical terms what your model is.
+  \item Write down in your own words what the assumptions behind a
+    linear normal model are. Investigate the residuals of $M_1$.
+    Comment on whether you find that these assumptions are likely to
+    be satisfied for these data.
+    
+  \item Write down in your own words what a least squares fit of a
+    model to data is.
+    
+  \item From model $M_1$ report the estimated parameters and their
+    standard deviations. 
+    
+  \item In model $M_1$, calculate the values of fitted values (use
+    function \verb+predict()+) and plot the fitted line over the
+    observations.
+  
+  \item Test the effect of each term in the model $M_1$ using the
+    function \verb+drop1()+.
+    
+  \item Predict the birth weights at weeks $10,15,20,25,30,35,40,45,50$
+    for women of age $20$, $30$ and $40$. Include confidence intervals
+    in your prediction. Present the results as a table and as
+    illustrative graphics. Comment on these predictions.  
+  \end{enumerate}
+  
+\item Fit an interaction model $M_2$ for $bweight \sim
+  gestwks+matage+gestwks*matage$ to the \verb+births+ data. 
+
+\item Write down $M_2$ in precise mathematical terms.
+
+\item Investigate whether $M_2$ fits well to data.
+
+\item Test whether the additive model is more appropriate or the
+  interactive model. 
+
+\item Fit a model $M_3$ that differentiate the two slope for sexes.
+
+\item Write down $M_3$ in precise mathematical terms.
+
+\item Investigate whether $M_3$ fits well to data.
+  
+\item Investigate whether it is necessary to have two slopes for each sex
+  by comparing the models $M_1$ and $M_3$.
+
+\end{enumerate}
+
+
+
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

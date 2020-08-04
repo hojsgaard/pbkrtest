@@ -1,0 +1,76 @@
+<html><head><title>Suicides in the USA in the years 1968-1970</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>suicideUSA(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   suicideUSA">
+<param name="keyword" value=" Suicides in the USA in the years 1968-1970">
+</object>
+
+
+<h2>Suicides in the USA in the years 1968-1970</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Suicides inm the USA
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(suicideUSA)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A dataframe with 3 variables. 
+<dl>
+<dt>year:</dt><dd>year of suicide</dd>
+<dt>month:</dt><dd>month of the year</dd>
+<dt>n:</dt><dd>number of recorded suicides</dd>
+</dl>
+
+<h3>Source</h3>
+
+<p>
+Haberman, S.J. (1978) Analysis of Qualitative Data, Vol. I,
+Introductory Topics, New York: Academic Press
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Lindsey, J.K. (2002) Modelling Frequency and Count Data, Oxford: Claredon Press, Exercise 1.6(4)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(suicideUSA)
+attach(suicideUSA)
+month&lt;-ordered(month,levels=month[1:12])
+w&lt;-xtabs(n~month+year)
+print(w)
+days&lt;-rep(31,12)
+days[c(4,6,9,11,9)]&lt;-30
+days[2]&lt;-28
+plot(w[,1]/days,xlab='month',ylab='suicides per day',axes=FALSE)
+axis(2)
+axis(1,labels=levels(month),at=1:12,cex.axis=0.9)
+box()
+title('suicides in the USA in 1968')
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-3 <a href="00Index.html">Index]</a></div>
+
+</body></html>

@@ -1,0 +1,197 @@
+2017-03-12 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Converted to roxygen format
+
+	* Put on github
+
+	* Certain internal computations reverted to earlier implementation.
+	
+	* Version 0.4-7 uploaded
+
+2016-01-27 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Update of description file with correct version requirement.
+
+	* Version 0.4-6 uploaded		
+	
+2016-01-12 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Tunings of vcovAdj in an attempt to gain speed in larger
+	problems. 
+
+	* Illustrated in man page how to mimic vcov using parametric
+	bootstrap. 
+
+	* Updates of man pages
+	
+	* Version 0.4-5 uploaded		
+
+
+2015-12-11 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Updates to comply with R-devel
+
+	* Version 0.4-4 uploaded	
+
+2015-07-12 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Updated explanation about the samples that are not used in
+	PBmodcomp.
+
+	* Bug fixed in calculating denominator degrees of freedom (ddf)
+	for the F-test
+
+	* Version 0.4-3 uploaded
+
+2014-11-11 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Package no longer Depend(s) on MASS
+
+	* Version 0.4-2 uploaded
+
+
+2014-09-08 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* vcovAdj was very slow on large problems. Thanks to John Fox for
+	notification. Reason was that chol and chol2inv was not imported
+	from the Matrix package. Fixed now.
+
+	* get_Lb_ddf function and method for linear mixed models added.
+
+	* Lb_ddf function added
+
+	* Version 0.4-1 uploaded
+
+2014-08-11 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Extended documentation of PBmodcomp
+
+	* model2restrictionMatrix and restrictionMatrix2model functions
+	have been added.
+
+	* CITATION file added; references updated to include JSS paper
+
+	* Version 0.4-0 uploaded
+
+2013-11-19 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* get_ddf_Lb and ddf_Lb functions added. They provide adjusted
+	degrees of freedom for testing L'beta=0
+
+	* Version 0.3-8 uploaded
+
+2013-09-26 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Major reorganizing of KR-related code; preparing for the new
+	version of lme4 getting on CRAN
+
+	* Package no longer Depends on Matrix, but Imports instead
+
+	* Version 0.3-6 uploaded
+
+2013-07-03 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Plot method for parametric bootstrap tests improved
+
+	* Vignette improved
+
+	* Version 0.3-5 uploaded
+
+2012-12-03 Ulrich Halekoh <ulrich.halekoh@agrsci.dk>
+
+	* .get_indices() corrected nn.groupFaclevels the number of the
+	levels for each random-term-factor
+	was erroneoulsy only returned once if a grouping factor
+	occurred several times as in
+	(1|Subject) + (0+Days|Subject)
+
+     	* furthermore, the calculation of the number of
+	random-term-factors n.groupFac was rolled back, due to an
+	inconsistency in its definition via (getME(model,'n_rtrms') which
+	yieled for the above random term 2 (CRAN) and 1 (FORGE)
+
+	* compiled to Version 0.3-4
+
+2012-11-20 Ulrich Halekoh <ulrich.halekoh@agrsci.dk>
+
+	* LMM_Sigma_G() added. Computes Sigma and the components of G
+
+	* vcovAdj() rewritten  for correct extraction of the
+	submatrices of Zt for random effects for different grouping factors.
+
+	* getKR function for extracting slots from KRmodcomp object
+
+	* compiled to Version 0.3-3
+
+2012-08-25 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Now uses the parallel package instead of snow
+
+	* seed can be supplied to the random number generator
+
+	* Version 0.3-2 uploaded.
+
+
+2012-04-24 Søren Højsgaard <sorenh@math.aau.dk>
+
+	* Version 0.3-1 uploaded.
+
+2012-02-26 Ulrich Halekoh <ulrich.halekoh@agrsci.dk>
+
+	* function vcovAdj() refits the large model if fitted with REML=FALSE and prints a warning
+
+	* function KRmodcomp() refits the large model if fitted with REML=FALSE and prints a warning
+
+2012-02-26 Ulrich Halekoh <ulrich.halekoh@agrsci.dk>
+
+	* function for linear algebra .fatBL changed to .matrixNullSpace and improved
+
+	* function for linear algebra: .orthComplement simplified
+
+	* function for linear algebra added .colSpaceCompare
+
+
+2011-02-17 Søren Højsgaard <sorenh@mail.dk>
+
+	* Parametric bootstrap methods for lm/glm added
+
+	* Minor changes in KR-code to meet requests of John Fox
+
+	* Version 0.3.0 uploaded.
+
+2011-01-17 Søren Højsgaard <sorenh@mail.dk>
+
+	* F-distribution estimate of reference distribution for parametric
+	bootstrap corrected.
+
+	* Version 0.2.1 uploaded.
+
+2011-12-30 Søren Højsgaard <sorenh@mail.dk>
+
+ 	* F-distribution estimate of reference distribution for parametric
+	bootstrap added.
+
+	* Version 0.2.0 uploaded.
+
+2011-12-08 Søren Højsgaard <sorenh@mail.dk>
+
+	* Density estimate of reference distribution for parametric
+	bootstrap added.
+
+	* Version 0.1.3 uploaded.
+
+2011-12-03 Søren Højsgaard <sorenh@mail.dk>
+
+	* Important speedup of KRmodcomp
+
+	* Version 0.1.2 uploaded.
+
+2011-11-11 Søren Højsgaard <sorenh@mail.dk>
+
+	* Various changes
+
+	* Version 0.1.1 uploaded
+
+2011-10-23 Søren Højsgaard <sorenh@mail.dk>
+
+	* Version 0.1.0 uploaded

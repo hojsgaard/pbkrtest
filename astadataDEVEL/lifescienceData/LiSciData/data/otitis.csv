@@ -1,0 +1,21 @@
+Table 11.9 Otitis media,,,
+
+age,treatment,number clear,frequency
+< 2,CEF,0,8
+< 2,CEF,1,2
+< 2,CEF,2,8
+< 2,AMO,0,11
+< 2,AMO,1,2
+< 2,AMO,2,2
+2 to 5,CEF,0,6
+2 to 5,CEF,1,6
+2 to 5,CEF,2,10
+2 to 5,AMO,0,3
+2 to 5,AMO,1,1
+2 to 5,AMO,2,5
+>= 6,CEF,0,0
+>= 6,CEF,1,1
+>= 6,CEF,2,3
+>= 6,AMO,0,1
+>= 6,AMO,1,0
+>= 6,AMO,2,6

@@ -1,0 +1,55 @@
+\documentclass[]{article}
+\usepackage{a4wide}
+\RequirePackage{amsmath}
+
+
+%% almost as usual
+\author{Ulrich Halekoh\\ Aarhus University \And 
+  Søren Højsgaard \\ Aalborg University}
+\title{
+  Tools for Applied Statistics -- the \doby\ Package
+}
+ 
+\usepackage{color,url}
+% \usepackage[inline,nomargin,draft]{fixme}
+% \newcommand\FXInline[2]{\textbf{\color{blue}#1}:
+%   \emph{\color{blue} - #2}}
+
+\def\pkg#1{{\em #1}}
+\def\proglang#1{{\em #1}}
+
+\usepackage{doBy-JSS}
+
+\usepackage{Sweave}
+\begin{document}
+
+%\renewenvironment{Schunk}{\linespread{.85}\small}{}
+ 
+\setkeys{Gin}{width=0.5\textwidth} %sæt figurstørrelse i Sweave
+
+
+\maketitle
+
+%\fxnote{where should this line be placesd?}
+
+\section{Introduction}
+\label{sec:intro}
+
+% \SweaveInput{src-doBy.Rnw}
+% \SweaveInput{src-popMeans.Rnw}
+
+\section{Discussion}
+\label{sec:discussion}
+
+ 
+\section{Acknowledgements}
+
+This work was supported by the Danish National Advanced Technology
+Foundation through the ILSORM project.
+
+\bibliography{doBy-JSS}
+
+\end{document}
+
+
+

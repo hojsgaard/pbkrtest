@@ -1,0 +1,15 @@
+sub2
+<<fig=T>>=
+y <- rnorm(19)
+plot(y)
+@
+
+@ 
+<<fig=T>>=
+plot(rnorm(200))
+@ %def 
+
+@ 
+<<fig=T>>=
+plot(rnorm(2000))
+@ %def 

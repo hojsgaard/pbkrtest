@@ -1,0 +1,12 @@
+race genotype count
+rdm     ZZ   4
+sdm     ZZ   0
+jersey  ZZ  10
+rdm     Zz 105
+sdm     Zz  14
+jersey  Zz  30
+rdm     zz 290
+sdm     zz  75
+jersey  zz  14
+
+

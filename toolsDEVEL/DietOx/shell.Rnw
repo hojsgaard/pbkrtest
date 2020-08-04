@@ -1,0 +1,135 @@
+\documentclass[10pt]{article}
+\usepackage{url,a4}
+\usepackage{SHmathnot,graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[authoryear,round,longnamesfirst]{natbib}
+\parskip5pt
+\parindent0pt
+\def\R{\texttt{R}}
+\def\SAS{\texttt{SAS}}
+
+\RequirePackage{boxedminipage}
+
+\begin{document}
+
+\renewenvironment{Schunk}{\begin{center}
+    \begin{boxedminipage}{0.95\textwidth}}{
+    \end{boxedminipage}\end{center}}
+
+\RecustomVerbatimEnvironment{Sinput}{Verbatim}%
+{fontsize=\small,formatcom=\color{black},frame=single,framerule=1pt}
+\RecustomVerbatimEnvironment{Soutput}{Verbatim}%
+{fontsize=\scriptsize, formatcom=\color{black},frame=single,framerule=0.1pt}
+
+\title{Some aspects of practical data analysis of ``glm-type''
+data  using
+\R.}
+\author{        
+    Søren Højsgaard\\
+    {\normalfont Biometry Research Unit}\\
+    {\normalfont Danish Institute of Agricultural Sciences} \\
+    \url{sorenh@agrsci.dk} 
+  }
+\maketitle
+\SweaveOpts{prefix.string=fig/dietox}
+%\setkeys{Gin}{width=0.5\textwidth}
+
+\def\shfig#1#2#3{
+\begin{figure}[ht]
+  \centering
+  \includegraphics[#3]{fig/#1}
+  \caption{FILENAME: #1}
+  \label{fig:#1}
+\end{figure}
+}
+\def\newslide{}
+
+\tableofcontents
+%\newpage
+@ 
+<<echo=F,results=hide>>=
+f <- list.files("../SHtools/R",pattern="\\.R",full.names=T)
+f <- f[(1:length(f))[-grep("~",f)]]
+sapply(f,source)
+library(geepack)
+@ %def 
+
+<<echo=FALSE>>=
+options(width=70,prompt='>',continue=' ')
+@
+
+
+
+
+
+
+\section{Introduction} 
+
+This note illustrates some aspects of practical data analysis of ``glm-type''
+data  using
+\R. Thus we do not claim that this is THE appropriate analysis of the specific
+data. In the note, \R\ code is put into boxes with thick lines while 
+outout is put into boxes with thin lines, e.g.\
+
+@ 
+<<>>=
+x <- 1:10
+x
+@ %def 
+
+
+\subsection{\R\ Packages used}
+
+\begin{itemize}
+\item In this note we use the package \texttt{geepack} which are on
+CRAN, \url{www.R-project.org}. 
+
+\item In addition we use the package \texttt{doBy} which is NOT on CRAN. \texttt{doBy}
+can be downloaded from
+\url{http://genetics.agrsci.dk/~sorenh/misc}. 
+
+\item Finally we use the \texttt{pda} package (which is also not on CRAN,
+but available from Brian Yandells homepage,
+\url{http://www.stat.wisc.edu/~yandell/}.) Note that \texttt{pda} is planned to
+go on CRAN (hopefully later this year). The future of \texttt{doBy} is more
+uncertain. Perhaps someone will incorporate in one of these general utilities
+packages on CRAN. 
+
+\end{itemize}
+
+The \texttt{doBy} package contains various facilities for making group wise
+plots (surely other -- and better -- facilities are available for this in R. We
+have just found that the facilities in \texttt{doBy} are simple to use for
+novices.) In addition the package contains facilities for working with
+generalized estimating equations (GEE)s through the function
+\texttt{geeglm()}. This function is not much more than a ``glm--like'' front end to
+the \texttt{geese()} function in the \texttt{geepack} package. Finally the
+package contains the \texttt{esticon()} function by which one can specify quite
+general contrasts.
+The \texttt{pda}
+package contains lots of material. Here we only focus on using the
+\texttt{lsmean()} function. 
+
+
+
+
+\input{PigGrowth.Rnw}
+%\input{DietOx-source.Rnw}
+@ 
+<<echo=F>>=
+options(width=140,prompt='> ')
+@ %def 
+
+\bibliographystyle{plainnat}
+\bibliography{fulldef,stat}
+
+\end{document}
+
+
+
+
+
+
+
+

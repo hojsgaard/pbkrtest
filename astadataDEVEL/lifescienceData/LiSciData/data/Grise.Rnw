@@ -1,0 +1,18 @@
+Growth<-read.table(file='Grise.txt',header=TRUE)
+Growth
+summary(Growth$StartWgt)
+
+Growth$gain<-Growth$FinalWgt-Growth$StartWgt
+Growth$PctGain=100*Growth$gain/Growth$StartWgt
+Growth2<-Growth[Growth$Pig<=5000,c("Pig","StartWgt","FinalWgt")]
+dim(Growth2)
+StartW<-as.vector(Growth2$StartWgt)
+FinalW<-as.vector(Growth2$FinalWgt)
+Weight<-as.matrix(cbind(StartW,FinalW))
+nr<-nrow(Weight)
+nr
+V1<-matrix(data=1,nrow=nr,ncol=1)
+t(V1) %*% StartW
+
+plot(Growth$Consump,Growth$FinalWgt)
+

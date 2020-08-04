@@ -1,0 +1,577 @@
+---
+title: Inferens i mixed models i R - hinsides det sædvanlige likelihood ratio test
+subtitle: Inference in mixed models in R - beyond the usual asymptotic likelihood ratio test
+author: | 
+  | Søren Højsgaard
+  | \url{http://people.math.aau.dk/~sorenh/}
+  | University of Aalborg, Denmark
+date: "28. Januar, 2019"
+#output:
+#  html_document:
+#    standalone: true
+#    self-contained: true
+#  pdf_document:
+#    includes:
+#      in_header: beyond-preamble.txt
+#    toc: true
+#    toc_depth: 3
+#    keep_tex: true
+output:
+  beamer_presentation:
+    includes:  
+      in_header: beyond-preamble.txt
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE, cache=TRUE)
+##knitr::opts_chunk$set(dev.args=list(bg="transparent"), fig.width=16, fig.height=7)
+knitr::opts_chunk$set(echo = FALSE, fig.height = 3.5, fig.width=10, message=FALSE)
+fmt <- "html"
+options("warn"=-1)
+knitr::opts_chunk$set(echo = TRUE, size="small", message=FALSE,
+                      warning=FALSE, cache=TRUE)
+
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
+
+## def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+## knitr::knit_hooks$set(chunk = function(x, options) {
+##     x <- def.chunk.hook(x, options)
+##     ifelse(options$size != "normalsize",
+##            paste0("\\", options$size,"\n\n", x, "\n\n \\normalsize"),
+##            x)
+## })
+library(lme4)
+library(doBy)
+library(broom)
+library(magrittr)
+library(pbkrtest)
+##library(knitr)
+library(kableExtra)
+library(tidyverse)
+options("digits"=3)
+options("show.signif.stars"=FALSE)
+```
+
+## Outline and take-home message
+
+* Mixed models (random effects, random regression etc.) models handled
+	by `lme4` package in R.
+
+* Tests are by default based on $\chi^2$ approximation of LR test statistic.
+
+	+ Works fine with "large samples" / "large dataset", but not with
+      small samples.
+
+	+ Main concern: Effects can appear to be "more significant than
+      they really are".
+
+	+ Source of confusion: A dataset can be large with respect to some
+      aspect of a model while small with respect to other.
+
+---
+
+* The R package `pbkrtest` provides some remedies:
+
+	+ Base test on F-statistic, where denominator degrees of freedom
+      are estimated from data.
+	+ Base test on parametric bootstrap where data are simulated under
+      the model (carries over to e.g. generalized linear
+      mixed models).
+
+* Look at simulated and real data
+
+
+* Notice: Talk and paper (with correction) available at \url{http://people.math.aau.dk/~sorenh/}
+  
+---
+
+## History: The degree-of-freedom police
+
+* SH raised issue about calculating degrees of freedom on R-help -
+  2006: \texttt{[R] how calculation degrees freedom}
+  [see](https://stat.ethz.ch/pipermail/r-help/2006-January/087013.html):
+
+    + SH: Along similar lines ...  probably in recognition of the
+      degree of freedom problem. It could be nice, however, if anova()
+      produced ...
+
+	+ Doug Bates: I don't think the "degrees of freedom police" would
+      find that to be a suitable compromise. :-)
+
+* In reply to related question:
+
+	+ Doug Bates: I will defer to any of the "degrees of freedom
+	police" who post to this list to give you an explanation of why there
+	should be different degrees of freedom.
+
+* Main point: Quite different views on whether the degree-of-freedom issue
+      really is an issue or not.
+
+---
+
+## Example: Double registration in labs
+
+
+```{r echo=FALSE}
+dub=
+structure(list(y1 = c(67, 72, 140, 13, 27, 37, -76, -66, -56,  
+26, 45, 90, 48, 53, 95, 70, 99, 131), y2 = c(1L, 1L, 1L, 1L,  
+2L, 1L, 0L, 2L, 3L, 2L, 1L, 0L, 2L, 3L, 2L, 2L, 0L, 0L), grp = structure(c(1L,  
+1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L,  
+ 2L), .Label = c("ctrl", "trt1"), class = "factor"), subj = structure(c(1L,  
+1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 5L, 5L, 5L, 6L, 6L,  
+ 6L), .Label = c("subj1", "subj2", "subj3", "subj4", "subj5",  
+ "subj6"), class = "factor")), row.names = c(2L, 3L, 1L, 4L, 6L,  
+                                             5L, 8L, 7L, 9L, 11L, 10L, 12L, 15L, 13L, 14L, 17L, 18L, 16L), class = "data.frame") 
+```
+
+![](img/190108-dish-full.jpg){height=150px}
+
+
+
+
+
+Clustered data:
+
+* Compare two groups (treatment with a control);
+
+* M units (petri plates, persons, animals...) per group;
+
+* Each unit is measured R times. Measurements on same unit are positively correlated.
+
+---
+
+Simulated data: Two groups, $N=3$ subjects per group, $R=3$ replicated measurements per subject.
+
+
+```{r petrisim1, echo=F}
+ddd <- dub
+ddd$y2 <- NULL
+ddd <- cbind(ddd[1:9,], ddd[-(1:9),])
+kable(ddd, booktabs=TRUE, linesep="", row.names=F)
+```
+---
+
+Problem/issues: If we ignore  clustering/positive correlation:
+
+* Pretend to have more information than we have
+* Standard errors of estimates become too small
+* $p$ values become too small
+* Effects appear stronger than they really are.
+
+Notice:
+
+* Measuring the same unit many many times will make the dataset
+  larger, but will not really add many more chunks of information
+  (depending on the size of the within-subject correlation, of
+  course).
+* Instead, more units are needed.
+
+---
+
+### Ignore clustering
+
+Simple regression model
+
+$$
+y_{gir} = \mu + \beta_g + e_{gir}
+$$
+
+```{r petri2, echo=F}
+lg1 <- lm(y1 ~ grp, data=dub)
+lg1 %>% summary %>% coef %>% as.data.frame -> tb1
+tb1$"Pr(>X2)" = 1 - pchisq(tb1[,3]^2, df=1)
+kable(tb1, booktabs=T) %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+Notice: the $t$-test "accounts for" the uncertainty in the estimate of
+the standard error; gives larger $p$ values.
+
+
+---
+
+### Analyse average
+
+Compute average for each subject and consider model
+$$
+\bar y_{gi} = \mu + \beta_g + e_{gi}, 
+$$
+
+```{r petri1, echo=F}
+duba <- aggregate(y1 ~ grp + subj, FUN=mean, data=dub)
+lm(y1 ~ grp, data=duba) %>% summary %>% coef %>% as.data.frame -> tb2
+tb2$"Pr(>X2)" = 1 - pchisq(tb2[,3]^2, df=1)
+kable(tb2, booktabs=T) %>%
+    kable_styling(latex_options =c("hold_position"))
+```
+
+Notice: Both tests give large $p$-values suggesting no effect at all.
+
+---
+    
+### Model with random effects
+
+Consider variance component model
+
+$$
+y_{gir} = \mu + \beta_g + U_{gi} + e_{gir}
+$$
+
+
+```{r petri3, echo=F}
+lg2 <- lmer(y1 ~ grp + (1|subj), data=dub)
+sm2 <- update(lg2, .~. -grp)
+tab  <- tidy(lg2)[1:2,]
+tab$group <- NULL
+ss<- tab$statistic
+tab$"Pr(>X2)" <- 1-pchisq(ss^2, df=1)
+kable(tab, booktabs=T)  %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+Notice: $p$-values (for $\chi^2$-test) same as when analyzing
+average. No $t$-test available.
+
+
+---
+
+## The Kenward--Roger approach
+
+* Multivariate normal model
+\[
+  Y \sim  N( X \beta, \Sigma)
+\]
+
+* Test of the hypothesis
+\[
+  \Lb (\betab -\bm \beta_0) = 0
+\]
+where $\Lb$ is a regular matrix of estimable functions of $\bm \beta$. 
+
+* With $\hat \betab \sim N_d(\betab, \bm\Phi)$, a Wald statistic is
+$$
+  W = [\Lb(\hat\betab - \betab_0)]\transp [L\bm\Phi L\transp]\inv [\Lb(\hat\betab - \betab_0)]
+$$
+which is asymptotically $W \sim \chi^2_d$ under the null hypothesis.
+
+
+
+---
+
+Consider scaled version of $W$:
+
+\begin{displaymath}
+  F = \frac{1}{d} W = \frac{1}{d}(\hat \betab - \betab_0)\transp \Lb\transp [\Lb\transp \bm \Phi(\ssb) \Lb]^{-1}
+ \Lb (\hat \betab - \betab_0).
+\end{displaymath}
+
+In the computations:
+
+* $\ssb$ is vector of REML estimates for elements in  $\Sigma=\var(Y)$ and
+
+* $\hat  \betab$ is REML estimate for $\betab$.
+
+* $\bm \Phi (\sigma) = (\bm X' \bm \Sigma(\sigma) \bm X)^{-1} \approx
+\cov(\hat \betab)$, 
+
+* Asymptotically $F \sim \frac{1}{d} \chi^2_d$
+under the null hypothesis
+
+* Think of $\frac{1}{d} \chi^2_d$ as the limiting distribution
+of an $F_{d,m}$--distribution as $m\rightarrow \infty$
+
+
+## Kenward and Roger's modification
+
+To account for the fact that $\bm\Phi=\var(\hat\beta)$
+is estimated from data, we must come up with a better estimate of the
+denominator degrees of freedom $m$ (better than $m=\infty$).
+
+Kenward and Roger (1997)
+
+* replaced $\bm \Phi$ by an improved small sample approximation $\bm \Phi_A$
+
+* derived formulas for mean $E^*$ and variance $V^*$ of $F$ (based on 1. order Taylor expansion)
+
+* scaled $F$ by a factor $\lambda$
+
+* determined denominator degrees of freedom $m$ by matching moments of $F/\lambda$ with an $F_{d,m}$ distribution.
+
+
+---
+
+Consider variance component model
+
+$$
+y_{gir} = \mu + \beta_g + U_{gi} + e_{gir}
+$$
+
+
+```{r petri4, echo=F}
+a <- KRmodcomp(lg2, sm2)
+a<-a$test[1,,drop=F]
+names(a)[1] <- "statistic"
+kable(a, booktabs=T)  %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+Notice: Same $p$-value as when averages are analysed. 
+
+However, analysing averages is not always an option.
+
+---
+
+## Parametrisk bootstrap
+
+Consider two competing models: A large model $f_1(y; \theta)$ and a simpler sub model $f_0(y; \theta_0)$.
+
+The test statistic for testing the simpler model under the larger is  $t_{obs}$. 
+
+The $p$-value becomes:
+
+$$
+ p = \sup_{\theta \in \Theta_0} Pr_{\theta}(T \ge t_{obs}),
+$$
+where supremum is under the hypothesis.
+
+Usually supremum can not be computed. Instead we base $p$ value on the parameter estimate:
+$$
+ p^{PB} = Pr_{\hat\theta}(T \ge t_{obs}),
+$$
+
+---
+
+In praxis, $p^{PB}$ is approximated as:
+
+1. Draw $B$ parametric bootstrap datasets $D^1, \dots D^B$ from the fitted 
+   null model $f_0(\cdot; \hat \theta_0)$.
+
+1. Fit the large and the null model to each of these datasets.
+
+1. Compute the likelihood ratio (LR) test statistic for each simulated dataset. This gives the reference distribution for the test statistic.
+
+1. Compute how extreme the observed test statistic is in the reference distribution; this gives the  $p$ value.
+
+
+---
+
+Consider variance component model
+
+$$
+y_{gir} = \mu + \beta_g + U_{gi} + e_{gir}
+$$
+
+
+```{r petri5, echo=F}
+b <- PBmodcomp(lg2, sm2)
+b <- as.data.frame(b)
+names(b)[1]<-"statistic"
+kable(b, booktabs=T)  %>% 
+    kable_styling(latex_options =c("hold_position"))
+```
+
+Notice: $p$-values close to those based on Kenward-Roger approximation.
+
+---
+
+```{r, echo=F, include=FALSE}
+lg2 <- update(lg2, REML=FALSE)
+sm2 <- update(sm2, REML=FALSE)
+# Observed test statistic:
+t.obs <- 2 * (logLik(lg2) - logLik(sm2))
+t.obs
+# Reference distribution
+set.seed(121315)
+t.sim <- PBrefdist(lg2, sm2, nsim=1999)
+# p-value
+head(t.sim)
+sum(t.sim >= t.obs) / length(t.sim)
+# compare with X^2 dist
+1 - pchisq(t.obs, df=1)
+```
+
+```{r overlay, echo=FALSE, fig.width=6, fig.height=3, fig.cap="$\\chi^2$ distribution and simulated reference distribution."}
+par(mfrow=c(1,2))
+t.sim2 <- t.sim[t.sim<10]
+hist(t.sim2, breaks=40, prob=T, main="", xlab="")
+abline(v=t.obs, lwd=3)
+f <- function(x){dchisq(x, df=1)}
+curve(f, 0, 20, add=TRUE, lwd=2)
+thres <- 1
+t.sim3 <-  t.sim2[t.sim2>=thres]
+hist(t.sim3, breaks=30, prob=T, main="", xlab="")
+abline(v=t.obs, lwd=3)
+f3 <- function(x){dchisq(x, df=1)/pchisq(thres, df=1, lower.tail = F)}
+curve(f3, 0, 20, add=TRUE, lwd=2)
+```
+
+
+
+
+
+---
+
+# Simulation study
+
+
+
+```{r echo=F}
+ddd <- dub
+ddd$y2 <- NULL
+ddd <- cbind(ddd[1:9,], ddd[-(1:9),])
+kable(ddd, booktabs=TRUE, linesep="", row.names=F)
+```
+---
+
+
+* Task: Test the hypothesis that there is no effect of treatment. How
+  good are the various tests?
+
+* Simulate data $1000$ times with divine insight: there is no effect of treatment.
+
+* Test the hypothesis e.g. at level $5\%$. If test
+  has correct nominal level we shall reject about $50$ times.
+
+* If hypothesis is rejected e.g. $100$ times then $p$ values are
+  anti-conservative: Effects appear more significant than the really
+  are. That is we draw "too strong" conclusions.
+
+---
+
+```{r testtab1, echo=F}
+ntab <-
+    structure(list(`0.01` = c(0.206, 0.244, 0.01, 0.066, 0.054, 0.01, 
+0.006), `0.05` = c(0.314, 0.352, 0.056, 0.128, 0.144, 0.056, 
+0.054), `0.10` = c(0.408, 0.424, 0.108, 0.188, 0.226, 0.108, 
+0.1)), class = "data.frame", row.names = c("lm+F", "lm+X2", "avg_lm+F", 
+                                           "avg_lm+X2", "mixed+X2", "mixed+F", "mixed+PB"))
+ntab <- round(ntab, 2)
+kable(ntab, booktabs=T,
+      linesep="")  %>% 
+    kable_styling(latex_options =c("hold_position")) %>% 
+    row_spec(c(3, 6,7), underline = T)
+```
+
+---
+
+# Sugar beets - A split--plot experiment
+
+* Model how sugar percentage in sugar beets depends on
+   harvest time and sowing time.
+* Five sowing times ($s$) and two harvesting times ($h$).
+* Experiment was laid out in three blocks ($b$).
+
+---
+
+Experimental plan for sugar beets experiment
+
+```{r, echo=T, size="scriptsize", cache=FALSE}
+# Plot allocation:
+#       |  Block 1       |  Block 2       |  Block 3       |
+#       +----------------|----------------|----------------+
+# Plot  | h1 h1 h1 h1 h1 | h2 h2 h2 h2 h2 | h1 h1 h1 h1 h1 | Harvest time
+# 1-15  | s3 s4 s5 s2 s1 | s3 s2 s4 s5 s1 | s5 s2 s3 s4 s1 | Sowing time
+#       |----------------|----------------|----------------|
+# Plot  | h2 h2 h2 h2 h2 | h1 h1 h1 h1 h1 | h2 h2 h2 h2 h2 | Harvest time
+# 16-30 | s2 s1 s5 s4 s3 | s4 s1 s3 s2 s5 | s1 s4 s3 s2 s5 | Sowing time
+#       +----------------|----------------|----------------+
+```
+
+
+
+---
+
+## beets data
+
+```{r, size="small"}
+data(beets, package='pbkrtest')
+head(beets, 4)
+```
+
+* A typical model for such an experiment would be:
+    \begin{equation}
+      \label{eq:beetsmodel1}
+      y_{hbs} = \mu + \alpha_h + \beta_b + \gamma_s + U_{hb} + \epsilon_{hbs},
+    \end{equation}
+    where $U_{hb} \sim N(0,\omega^2)$ and $\epsilon_{hbs}\sim
+    N(0,\sigma^2)$.
+    
+
+* Notice that $U_{hb}$ describes the random variation
+between whole--plots (within blocks).
+
+
+
+---
+
+Using `lmer()` from lme4 we can
+ test for no effect of sowing and harvest time as:
+
+```{r, size="small"}
+beet.lg <- lmer(sugpct ~ block + sow + harvest +
+                      (1 | block:harvest), data=beets, REML=FALSE)
+beet.noh <- update(beet.lg, .~. - harvest)
+beet.nos  <- update(beet.lg, .~. - sow) 
+```
+
+---
+
+Both factors appear highly significant
+
+```{r, size="footnotesize"}
+anova(beet.lg, beet.noh)  %>% as.data.frame 
+anova(beet.lg, beet.nos)  %>% as.data.frame
+```
+
+However, the LRT based $p$--values are anti--conservative: the effect
+of harvest appears stronger than it is.
+
+---
+
+```{r, size="footnotesize"}
+set.seed("260618")
+KRmodcomp(beet.lg, beet.noh)
+PBmodcomp(beet.lg, beet.noh)
+```
+
+---
+
+As the design is balanced we may make F--tests for each of the effects
+as:
+
+```{r, size="footnotesize"}
+beets$bh <- with(beets, interaction(block, harvest))
+summary(aov(sugpct ~ block + sow + harvest +
+                Error(bh), data=beets))
+```
+
+<!-- Notice: the F--statistics are $F_{1,2}$ for harvest time and $F_{4,20}$ for -->
+<!-- sowing time. -->
+
+
+---
+
+# Final remarks
+
+* Satterthwaite approximation of degrees of freedom on its way in
+  `pbkrtest`. Faster to compute than Kenward-Roger scales to larger
+  problems.
+
+* `pbkrtest` available on CRAN [https://cran.r-project.org/package=pbkrtest](https://cran.r-project.org/package=pbkrtest)
+
+* devel version on github: `devtools::install_github(hojsgaard/pbkrtest)`
+
+---
+
+* `pbkrtest` described in Ulrich Halekoh and SH (2014) [A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest](https://www.jstatsoft.org/article/view/v059i09); Journal of Statistical Software, Vol 59. Please cite if you publish results 
+using the package.
+
+
+
+Thanks for your attention!

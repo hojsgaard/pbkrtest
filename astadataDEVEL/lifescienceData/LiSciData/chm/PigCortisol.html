@@ -1,0 +1,76 @@
+<html><head><title>Diurnal rythm of cortisol in pigs on two different treatments</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>PigCortisol(dataRep)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   PigCortisol">
+<param name="keyword" value=" Diurnal rythm of cortisol in pigs on two different treatments">
+</object>
+
+
+<h2>Diurnal rythm of cortisol in pigs on two different treatments</h2>
+
+
+<h3>Description</h3>
+
+<p>
+In an experiment investigating the effect of stress on pigs (control
+vs. intermittent stress), the cortisol level
+in the blood was sampled every half hour from 12 to 36 hours after implantation of
+a catheter. Cortisol is a hormone involved in the stress response.
+The pigs were blocked according to litter.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>data(PigCortisol)</pre>
+
+
+<h3>Format</h3>
+
+<p>
+A data frame with 900 observations on the following 7 variables.
+<dl>
+<dt><code>time</code></dt><dd>Time in hours post operation, a numeric vector</dd>
+<dt><code>cortisol</code></dt><dd>The cortisol level, a numeric vector</dd>
+<dt><code>sint</code></dt><dd>sin(time*2*pi/24), a numeric vector</dd>
+<dt><code>cost</code></dt><dd>cos(time*2*pi/24), a numeric vector</dd>
+<dt><code>pig</code></dt><dd>The ID of the pig, a factor with a level for each pig </dd>
+<dt><code>litter</code></dt><dd>The Litter of the pig, a factor with levels <code>1</code>,...,<code>8</code></dd>
+<dt><code>treat</code></dt><dd>The treatment of the pig, a factor with levels <code>1</code> <code>2</code></dd>
+</dl>
+
+<h3>Details</h3>
+
+
+
+
+<h3>Source</h3>
+
+<p>
+Jensen, K.H., Pedersen, L.J., Heller, K.E., Ladewig, J.
+and Jørgensen, E. (1996). Intermittent Stress in pigs: effects on
+behavior, pituarity-adrenocortical axis, growth and gastric ulceration.
+Physiology &amp; Behaviour, (59), p 741-748,
+</p>
+
+
+<h3>References</h3>
+
+
+
+
+<h3>Examples</h3>
+
+<pre>
+data(PigCortisol)
+with(PigCortisol,plot(time, cortisol,log="y"))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>dataRep</em> version 0.0-2 <a href="00Index.html">Index]</a></div>
+
+</body></html>

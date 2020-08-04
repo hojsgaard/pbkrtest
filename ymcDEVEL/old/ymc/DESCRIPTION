@@ -1,0 +1,7 @@
+Package: rmc
+Title: A simple editor for R - R Mini Commander
+Version: 1.0
+Author: Søren Højsgaard <sorenh@agrsci.dk>
+Description:   A simple editor for R - R Mini Commander
+Maintainer: Søren Højsgaard <sorenh@agrsci.dk>
+License: GPL

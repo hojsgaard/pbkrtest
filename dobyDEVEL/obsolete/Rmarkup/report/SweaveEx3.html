@@ -1,0 +1,49 @@
+== Rmarkup Example 1 ==
+=== Søren Højsgaard ===
+%%date
+<br>
+In this example we embed parts of the examples from the
+<span style="font-family: Courier New;">kruskal.test</span> help page into a LaTeX document :
+<br>
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><PRE>&gt data(airquality)</pre></p>
+
+
+
+<p><PRE>&gt kruskal.test(Ozone ~ Month, data = airquality)</pre></p>
+
+
+<!--end{Sinput}!-->
+
+<p class='character'><tt>  </tt>
+<br>
+<tt> 	Kruskal-Wallis&nbsp;rank&nbsp;sum&nbsp;test </tt>
+<br>
+<tt>  </tt>
+<br>
+<tt> data:&nbsp;&nbsp;Ozone&nbsp;by&nbsp;Month&nbsp; </tt>
+<br>
+<tt> Kruskal-Wallis&nbsp;chi-squared&nbsp;=&nbsp;29.2666,&nbsp;df&nbsp;=&nbsp;4,&nbsp;p-value&nbsp;=&nbsp;6.901e-06 </tt>
+<br>
+<tt>  </tt></p>
+
+<!--end{Schunk}!-->
+<br>
+which shows that the location parameter of the Ozone
+distribution varies significantly from month to month. Finally we
+include a boxplot of the data :
+<br>
+<!-- begin{Schunk} !-->
+<!-- begin{Sinput} !-->
+
+<p><PRE>&gt boxplot(Ozone ~ Month, data = airquality)</pre></p>
+
+
+<!--end{Sinput}!-->
+
+<!--end{Schunk}!-->
+<p align= left ><img height=500 width=500 src='SweaveEx3-002.png'></p><br>
+<br>
+<br>

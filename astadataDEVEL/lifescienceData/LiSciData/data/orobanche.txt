@@ -1,0 +1,29 @@
+extract   seed     r           total
+bean      o73      8                16
+bean      o73     10                30
+bean      o73      8                28
+bean      o73     23                45
+bean      o73      0                 4
+cucumber  o73      3                12
+cucumber  o73     22                41
+cucumber  o73     15                30
+cucumber  o73     32                51
+cucumber  o73      3                 7
+bean      o75     10                39
+bean      o75     23                62
+bean      o75     23                81
+bean      o75     26                51
+bean      o75     17                39
+cucumber  o75      5                 6
+cucumber  o75     53                74
+cucumber  o75     55                72
+cucumber  o75     32                51
+cucumber  o75     46                79
+cucumber  o75     10                13
+
+
+
+
+
+ 
+

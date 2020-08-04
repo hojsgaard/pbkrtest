@@ -1,0 +1,14 @@
+Package: geepack
+Version: 1.2-1
+Title: Generalized Estimating Equation Package
+Author: Søren Højsgaard <sorenh@math.aau.dk>, Ulrich Halekoh <uhalekoh@health.sdu.dk>, Jun Yan <jun.yan@uconn.edu>, 
+Maintainer: Søren Højsgaard <sorenh@math.aau.dk>
+Description: Generalized estimating equations solver for parameters in
+        mean, scale, and correlation structures, through mean link,
+        scale link, and correlation link. Can also handle clustered
+        categorical responses.
+Encoding: latin1
+License: GPL (>= 3)
+NeedsCompilation: yes
+Repository: CRAN
+Date/Publication: 2016-07-05 17:59:21

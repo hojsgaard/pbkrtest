@@ -1,0 +1,87 @@
+\documentclass[12pt]{article}
+
+\usepackage{a4wide,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{url,a4}
+\usepackage{boxedminipage,color,xcolor}
+\usepackage{shortvrb}
+\usepackage{framed}
+\usepackage{comment}
+
+\SweaveInput{../STY/practicals.sty}
+
+%%\excludecomment{topics}
+%%\excludecomment{solution}
+
+\begin{document}
+
+\SweaveInput{../STY/Rmarkup}
+
+\parindent0pt
+\parskip5pt
+
+
+{Final Projects for ``Introduction to Statistical Modelling in Life
+  Sciences'' (ISMLS)}
+
+{Søren Højsgaard \hfill Created: \today}
+
+\hrule
+
+\SweaveOpts{prefix.string=fig/PRACS, keep.source=T}
+\setkeys{Gin}{width=4in,height=3in}
+
+
+The final project report has to be 
+delivered no later than \footnote{The document should be delivered either as a Word 
+document
+or a PDF-file to Søren Højsgaard (e-mail: {\tt sorenh@agrsci.dk}). Make sure 
+that your name appears on the document.}
+\begin{center}
+Monday, December 5.\ at 9:00 AM
+\end{center}
+
+\begin{itemize}
+\item There will be no grades of your report; it is either pass or fail.
+\item There will be an external examiner evaluating the reports.
+\item The project reports must be handed in on an individual basis.
+\item The project reports must be no more than 30 pages long (but
+  preferably shorter).
+\item Please write the report in a 12pt font.
+\item Please remember that this is a statistics course; not an
+  R-course. This means that we are interested in that you document
+  that you have understood the ideas of statistical modelling and
+  inference. We are not particularly interested in your R-code. 
+\item If you wish to include R-code in your report (and you are welcome
+  to do so), please put the R-code in an appendix.
+\item Please think carefully about the amount of R-output that you
+  present in the report. 
+\end{itemize}
+
+\newpage
+\tableofcontents
+
+\SweaveInput{../SHD/MilkMan.Rnw}
+
+\SweaveInput{../src/SitkaSpruceTrees.Rnw}
+
+\SweaveInput{../src/EsophagealCancer.Rnw}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

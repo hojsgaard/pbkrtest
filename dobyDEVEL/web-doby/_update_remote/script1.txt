@@ -1,0 +1,3 @@
+open sorenh@Web01.math.aau.dk 
+synchronize remote C:\Users\sorenh\documents\stat\Rdevel\doByDEVEL\doBy-web /srv/users/sorenh@MATH/public_html/software/doBy  
+exit 
