@@ -83,10 +83,11 @@ Model comparison of nested models using parametric bootstrap
 }
 \details{
 The model \code{object} must be fitted with maximum likelihood
-    (i.e. with \code{REML=FALSE}). If the object is fitted with restricted
-    maximum likelihood (i.e. with \code{REML=TRUE}) then the model is
-    refitted with \code{REML=FALSE} before the p-values are calculated. Put
-    differently, the user needs not worry about this issue.
+    (i.e. with \code{REML=FALSE}). If the object is fitted with
+    restricted maximum likelihood (i.e. with \code{REML=TRUE}) then
+    the model is refitted with \code{REML=FALSE} before the
+    p-values are calculated. Put differently, the user needs not
+    worry about this issue.
 
 Under the fitted hypothesis (i.e. under the fitted small model) \code{nsim}
 samples of the likelihood ratio test statistic (LRT) are generetated.
