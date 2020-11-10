@@ -1,93 +1,27 @@
 load_all("pbkrtest")
-
-m11 <- lm(dist ~ speed + I(speed^2), data=cars)
-m10 <- update(m11, ~.-I(speed^2))
-anova(m11, m10)
-
-PBmodcomp(m11, m10)
-PBmodcomp(m11, ~.-I(speed^2))
-PBmodcomp(m11, c(0, 0, 1))
-
-m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
-m20 <- update(m21, ~.-I(speed^2))
-anova(m21, m20, test="Chisq")
-
-PBmodcomp(m21, m20, cl=1)
-PBmodcomp(m21, ~.-I(speed^2), cl=1)
-PBmodcomp(m21, c(0, 0, 1), cl=1)
-
-
-
-
-
-m21
-
-load_all("pbkrtest"); PBmodcomp(m1, matrix(c(0, 0, 1), nr=1))
-
-
-m2 <- remat2model(m1, c(0, 0, 1))
-
-.do_sampling(m1, m2, nsim=10, cl=1, get_fun=get_refdist(m1))
-
-
-
-
-.get_refdist_lm(m1, m2, nsim=10)
-traceback()
-
-
-dat <- data.frame(y=rnorm(10), x=1:10)
-mm <- lm(y~x, data=dat)
-rm(dat)
-
-simdata <- simulate(mm, 5)
-ff <- update(formula(mm), simdata[,1]~.)
-
-ee <- new.env()
-ee$dat <- dat
-environment(ff)  <- ee
-
-cl <- getCall(mm)
-cl$formula <- ff
-logLik(eval(cl))
-
-
-m1 <- lm(y~x, data=data.frame(y=rnorm(10), x=1:10))
-m2 <- lm(y~x, data=dat)
-
-cl <- getCall(m2)
-cl$data <- eval(dat)
-eval(cl)
-
-
-m2 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"),
-           data=cars)
-
-
-cl$start=c(-1.4, 1.5, 0.8)
-eval(cl)
-
-
-
-
-dat <- data.frame(y=rnorm(10), x=1:10)
-f <- y~x
-mm <- lm(f, data=eval(dat))
-
-
-ee <- new.env()
-ee$dat <- dat
-environment(f)  <- ee
-lm(f)
-
-logLik(eval(f))
-
-
-
-
 data(beets)
 
-(fit1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+dd <- sleepstudy[sample.int(nrow(sleepstudy), 100),]
+             
+(fit1 <- lmer(Reaction ~ Days + (Days|Subject), dd))
+
+load_all("pbkrtest")
+ss <- SATmodcomp(fit1, c(0,1))
+kk <- KRmodcomp(fit1, c(0,1))
+pp <- PBmodcomp(fit1, c(0,1))
+
+str(ss)
+str(kk)
+str(pp)
+
+
+vcov(fit1)
+vcovAdj(fit1)
+compute_auxillary(fit1)$vcov_beta
+
+
+
+
 
 ## These are the same models;
 ## FIXME why are there warnings in fit0b
