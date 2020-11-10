@@ -44,7 +44,9 @@
 #' @param eps A small number.
 #' @param details If larger than 0 some timing details are printed.
 #'
-#' @note This code is greatly inspired by code in the lmerTest package.
+#' @note This code is greatly inspired by code in the lmerTest
+#'     package. This is a recent addition to the pbkrtest package;
+#'     please report unexpected behaviour.
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
@@ -141,19 +143,20 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
 
-    out <- list(Fvalue=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf),
+    out <- list(test=data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf)),
                 sigma=getME(largeModel, "sigma"),
-                formula.large=formula(largeModel)
+                formula.large=formula(largeModel),
+                formula.small=L,
+                ctime=(proc.time() - t0)[3],
+                L=L
                 )
-    out$ctime   <- (proc.time() - t0)[3]
-    out$L       <- L
     class(out) <- "SATmodcomp"
     out
 }
 
 print.SATmodcomp <- function(x, ...){
     print(x$formula.large)
-    dd <- as.data.frame(x[c("Fvalue", "ndf", "ddf", "p.value")])
+    dd <- as.data.frame(x$test[c("statistic", "ndf", "ddf", "p.value")])
     printCoefmat(dd, has.Pvalue=TRUE)
     invisible(x)
 }

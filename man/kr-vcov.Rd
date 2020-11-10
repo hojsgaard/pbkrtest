@@ -18,8 +18,6 @@
 vcovAdj(object, details = 0)
 
 \method{vcovAdj}{lmerMod}(object, details = 0)
-
-\method{vcovAdj}{mer}(object, details = 0)
 }
 \arguments{
 \item{object}{An \code{lmer} model}
