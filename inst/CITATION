@@ -9,12 +9,12 @@ citEntry(entry = "Article",
   volume       = "59",
   number       = "9",
   pages        = "1--30",
-  url          = "http://www.jstatsoft.org/v59/i09/",
+  url          = "https://www.jstatsoft.org/v59/i09/",
 
   textVersion  =
   paste("Ulrich Halekoh, Søren Højsgaard (2014).",
         "A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models - The R Package pbkrtest.",
         "Journal of Statistical Software, 59(9), 1-30.",
-        "URL http://www.jstatsoft.org/v59/i09/.")
+        "URL https://www.jstatsoft.org/v59/i09/.")
 )
 

@@ -98,7 +98,7 @@
 #' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
 #'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
 #'     Models - The R Package pbkrtest., Journal of Statistical Software,
-#'     58(10), 1-30., \url{http://www.jstatsoft.org/v59/i09/}
+#'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 #' @keywords models inference
 #' @examples
 #' 
@@ -192,17 +192,17 @@
 #' m10 <- update(m11, ~.-I(speed^2))
 #' anova(m11, m10)
 #' 
-#' PBmodcomp(m11, m10, cl=1, nsim=499)
-#' PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=499)
-#' PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=499)
+#' PBmodcomp(m11, m10, cl=1, nsim=199)
+#' PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=199)
+#' PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=199)
 #' 
 #' m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
 #' m20 <- update(m21, ~.-I(speed^2))
 #' anova(m21, m20, test="Chisq")
 #' 
-#' PBmodcomp(m21, m20, cl=1, nsim=499)
-#' PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=499)
-#' PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=499)
+#' PBmodcomp(m21, m20, cl=1, nsim=199)
+#' PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=199)
+#' PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=199)
 #' 
 #' @export PBmodcomp
 

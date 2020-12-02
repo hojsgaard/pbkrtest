@@ -38,7 +38,9 @@ Notice: It cannot be guaranteed that the results agree with other
 implementations of the Satterthwaite approach!
 }
 \note{
-This code is greatly inspired by code in the lmerTest package.
+This code is greatly inspired by code in the lmerTest
+    package. This is a recent addition to the pbkrtest package;
+    please report unexpected behaviour.
 }
 \examples{
 
