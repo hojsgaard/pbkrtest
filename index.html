@@ -71,10 +71,39 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="pbkrtest" class="section level1">
+<div id="dlmextra-extra-functionality-for-the-dlm-package" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#pbkrtest" class="anchor"></a>pbkrtest</h1></div>
-<p>Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model Comparison</p>
+<a href="#dlmextra-extra-functionality-for-the-dlm-package" class="anchor"></a><code>dlmextra</code>: Extra functionality for the <code>dlm</code> package</h1></div>
+<!-- badges: start -->
+
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p><code>pbkrtest</code> is available on CRAN and can be installed as usual:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">'pbkrtest'</span>)</span></code></pre></div>
+<p>To build and install from Github with vignettes run this command from within <code>R</code> (please install <code>remotes</code> first if not already installed):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># install.packages('remotes')</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"hojsgaard/pbkrtest"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>You can also install the package without vignettes if needed as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"hojsgaard/pbkrtest"</span>, <span class="dt">build_vignettes =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<!-- ## Configuring the Python environment -->
+<!-- The `caracas` package uses the [`reticulate`](https://github.com/rstudio/reticulate) package (to run Python code). Thus, if you wish to configure your Python environment, you need to 1) load `reticulate`, 2) configure the Python environment, and 3) load `caracas`. The Python environment can be configured as described [here](https://rstudio.github.io/reticulate/articles/versions.html). Again, this need to be done *before* loading `caracas`. -->
+</div>
+<div id="development-site" class="section level2">
+<h2 class="hasAnchor">
+<a href="#development-site" class="anchor"></a>Development site</h2>
+<p>See <a href="https://github.com/hojsgaard/pbkrtest" class="uri">https://github.com/hojsgaard/pbkrtest</a>.</p>
+</div>
+<div id="online-documentation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#online-documentation" class="anchor"></a>Online documentation</h2>
+<p>See <a href="https://hojsgaard.github.io/pbkrtest/" class="uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
+<!-- ## Brief introduction -->
+<!-- ```{r, message=FALSE} -->
+<!-- library(dlmextra) -->
+<!-- ``` -->
+<p>Please find more examples in the other vignettes available at <a href="https://hojsgaard.github.io/pbkrtest/" class="uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
+</div>
 </div>
   </div>
 
@@ -106,7 +135,14 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/hojsgaard/dlmextra/actions"><img src="https://github.com/hojsgaard/dlmextra/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://codecov.io/gh/hojsgaard/dlmextra?branch=master"><img src="https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg" alt="codecov.io"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
