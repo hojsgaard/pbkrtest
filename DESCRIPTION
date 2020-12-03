@@ -36,4 +36,5 @@ ZipData: no
 License: GPL (>= 2)
 ByteCompile: Yes
 RoxygenNote: 7.1.1
+VignetteBuilder:
 LazyData: true
