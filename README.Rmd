@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 <!-- # dlmextra -->
 <!-- Extra functionality for the dlm package (for dynamic linear models) -->
 
-# `dlmextra`: Extra functionality for the `dlm` package
+# `pbkrtest`: 
 
 <!-- badges: start -->
 [![R build status](https://github.com/hojsgaard/dlmextra/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/dlmextra/actions) 

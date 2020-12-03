@@ -5,7 +5,7 @@
 
 <!-- Extra functionality for the dlm package (for dynamic linear models) -->
 
-# `dlmextra`: Extra functionality for the `dlm` package
+# `pbkrtest`:
 
 <!-- badges: start -->
 
