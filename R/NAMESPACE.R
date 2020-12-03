@@ -22,6 +22,9 @@
 #'     model.matrix pchisq pf pgamma printCoefmat quantile simulate
 #'     terms update update.formula var vcov sigma
 #'
+#' @importFrom tinytex pdflatex
+
+
 
 .dumfunction_afterimportFrom <- function(){}
 
