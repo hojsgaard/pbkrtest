@@ -68,6 +68,9 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("tinytex")
+          tinytex::tlmgr_install('ae')
+          tinytex::tlmgr_install('anysize')
+          tinytex::tlmgr_install('grfext')
         shell: Rscript {0}
 
       - name: Check
