@@ -1,8 +1,6 @@
 pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
-articles:
-  dummy: dummy.html
-  foo: foo.html
-last_built: 2020-12-04T12:39Z
+articles: {}
+last_built: 2020-12-04T17:21Z
 
