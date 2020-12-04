@@ -66,7 +66,7 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
-	  remotes::install_cran("rcmdcheck")
+          remotes::install_cran("rcmdcheck")
           remotes::install_cran("tinytex")
         shell: Rscript {0}
 
@@ -82,3 +82,4 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: check
+	  
