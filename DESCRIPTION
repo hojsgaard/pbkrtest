@@ -30,7 +30,6 @@ Imports:
     magrittr,
     MASS,
     numDeriv,
-    tinytex,
     methods,
     knitr
 Encoding: UTF-8
