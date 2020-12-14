@@ -5,13 +5,13 @@
 
 <!-- Extra functionality for the dlm package (for dynamic linear models) -->
 
-# `pbkrtest`:
+# `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/hojsgaard/dlmextra/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/dlmextra/actions)
-[![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master)
+status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions)
+<!-- [![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master) -->
 <!-- badges: end -->
 
 ## Installation
@@ -29,10 +29,6 @@ within `R` (please install `remotes` first if not already installed):
 You can also install the package without vignettes if needed as follows:
 
     remotes::install_github("hojsgaard/pbkrtest", build_vignettes = FALSE)
-
-<!-- ## Configuring the Python environment -->
-
-<!-- The `caracas` package uses the [`reticulate`](https://github.com/rstudio/reticulate) package (to run Python code). Thus, if you wish to configure your Python environment, you need to 1) load `reticulate`, 2) configure the Python environment, and 3) load `caracas`. The Python environment can be configured as described [here](https://rstudio.github.io/reticulate/articles/versions.html). Again, this need to be done *before* loading `caracas`. -->
 
 ## Development site
 
