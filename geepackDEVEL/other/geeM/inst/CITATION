@@ -1,0 +1,11 @@
+citHeader("To cite the geeM package in publications use:")
+citEntry(entry = "Article", 
+    author = personList(as.person("Lee S. McDaniel"), 
+        as.person("Nicholas C. Henderson"), as.person("Paul J. Rathouz")),
+		title = "Fast pure {R} implementation of {GEE}: application of the {M}atrix package", 
+    journal = "The {R} Journal", year = 2013, 
+    volume = 5, issue = 1, pages = "181--187", 
+    url = "https://journal.r-project.org/archive/2013-1/mcdaniel-henderson-rathouz.pdf", 
+    textVersion = paste("McDaniel, L. S., Henderson, N. C., and Rathouz, P. J. (2013)", 
+        "Fast pure R implementation of GEE: application of the Matrix package", 
+        "The R Journal, 5/1:181--187"))
