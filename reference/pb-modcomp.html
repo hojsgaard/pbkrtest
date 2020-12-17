@@ -73,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">pbkrtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4-9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5-0.0</span>
       </span>
     </div>
 
@@ -270,6 +270,8 @@ the case when only the originally positive values are used).</p>
 #&gt; 4   harv1 block1 sow2 131.0   17.0
 #&gt; 5   harv1 block1 sow1 136.5   17.0
 #&gt; 6   harv2 block2 sow3 136.5   17.0</div><div class='input'>
+<span class='va'>NSIM</span> <span class='op'>&lt;-</span> <span class='fl'>50</span> <span class='co'>## Simulations in parametric bootstrap</span>
+
 <span class='co'>## Linear mixed effects model:</span>
 <span class='va'>sug</span>   <span class='op'>&lt;-</span> <span class='fu'>lmer</span><span class='op'>(</span><span class='va'>sugpct</span> <span class='op'>~</span> <span class='va'>block</span> <span class='op'>+</span> <span class='va'>sow</span> <span class='op'>+</span> <span class='va'>harvest</span> <span class='op'>+</span> <span class='op'>(</span><span class='fl'>1</span><span class='op'>|</span><span class='va'>block</span><span class='op'>:</span><span class='va'>harvest</span><span class='op'>)</span>,
               data<span class='op'>=</span><span class='va'>beets</span>, REML<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
@@ -285,8 +287,8 @@ the case when only the originally positive values are used).</p>
 #&gt; sug.h    9 -69.084 -56.473 43.542  -87.084                         
 #&gt; sug     10 -79.998 -65.986 49.999  -99.998 12.914  1  0.0003261 ***
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.h</span>, nsim<span class='op'>=</span><span class='fl'>50</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 1.32 sec; samples: 50; extremes: 3;
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.h</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 1.63 sec; samples: 50; extremes: 3;
 #&gt; large : sugpct ~ block + sow + harvest + (1 | block:harvest)
 #&gt; sugpct ~ block + sow + (1 | block:harvest)
 #&gt;          stat df   p.value    
@@ -302,8 +304,8 @@ the case when only the originally positive values are used).</p>
 #&gt; sug.h    9 -69.084 -56.473 43.542  -87.084                         
 #&gt; sug     10 -79.998 -65.986 49.999  -99.998 12.914  1  0.0003261 ***
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.s</span>, nsim<span class='op'>=</span><span class='fl'>50</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 1.24 sec; samples: 50; extremes: 0;
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.s</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 1.36 sec; samples: 50; extremes: 0;
 #&gt; large : sugpct ~ block + sow + harvest + (1 | block:harvest)
 #&gt; sugpct ~ block + harvest + (1 | block:harvest)
 #&gt;          stat df p.value    
@@ -325,8 +327,8 @@ the case when only the originally positive values are used).</p>
 #&gt; 1     22 0.062667                                  
 #&gt; 2     23 0.159000 -1 -0.096333 33.819 7.508e-06 ***
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.h</span>, nsim<span class='op'>=</span><span class='fl'>50</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.18 sec; samples: 50; extremes: 0;
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.h</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.17 sec; samples: 50; extremes: 0;
 #&gt; large : sugpct ~ block + sow + harvest
 #&gt; sugpct ~ block + sow
 #&gt;          stat df   p.value    
@@ -342,8 +344,8 @@ the case when only the originally positive values are used).</p>
 #&gt; 1     22 0.06267                                  
 #&gt; 2     26 1.07267 -4     -1.01 88.644 3.073e-13 ***
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.s</span>, nsim<span class='op'>=</span><span class='fl'>50</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.19 sec; samples: 50; extremes: 0;
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>sug</span>, <span class='va'>sug.s</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.17 sec; samples: 50; extremes: 0;
 #&gt; large : sugpct ~ block + sow + harvest
 #&gt; sugpct ~ block + harvest
 #&gt;          stat df p.value    
@@ -352,9 +354,9 @@ the case when only the originally positive values are used).</p>
 #&gt; ---
 #&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'>
 <span class='co'>## Generalized linear model</span>
-<span class='va'>counts</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>18</span>,<span class='fl'>17</span>,<span class='fl'>15</span>,<span class='fl'>20</span>,<span class='fl'>10</span>,<span class='fl'>20</span>,<span class='fl'>25</span>,<span class='fl'>13</span>,<span class='fl'>12</span><span class='op'>)</span>
-<span class='va'>outcome</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>1</span>,<span class='fl'>9</span><span class='op'>)</span>
-<span class='va'>treatment</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>3</span><span class='op'>)</span>
+<span class='va'>counts</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>18</span>, <span class='fl'>17</span>, <span class='fl'>15</span>, <span class='fl'>20</span>, <span class='fl'>10</span>, <span class='fl'>20</span>, <span class='fl'>25</span>, <span class='fl'>13</span>, <span class='fl'>12</span><span class='op'>)</span>
+<span class='va'>outcome</span>   <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>1</span>, <span class='fl'>9</span><span class='op'>)</span>
+<span class='va'>treatment</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/gl.html'>gl</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span><span class='op'>)</span>
 <span class='va'>d.AD</span>      <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='va'>treatment</span>, <span class='va'>outcome</span>, <span class='va'>counts</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>d.AD</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;   treatment outcome counts
@@ -376,7 +378,7 @@ the case when only the originally positive values are used).</p>
 #&gt; 1         4     5.1291                       
 #&gt; 2         6    10.5814 -2  -5.4523  0.06547 .
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>glm.D93</span>, <span class='va'>glm.D93.o</span>, nsim<span class='op'>=</span><span class='fl'>50</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>glm.D93</span>, <span class='va'>glm.D93.o</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in eval(predvars, data, env): object 'outcome' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/anova.html'>anova</a></span><span class='op'>(</span><span class='va'>glm.D93</span>, <span class='va'>glm.D93.t</span>, test<span class='op'>=</span><span class='st'>"Chisq"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Analysis of Deviance Table
 #&gt; 
@@ -384,7 +386,7 @@ the case when only the originally positive values are used).</p>
 #&gt; Model 2: counts ~ outcome
 #&gt;   Resid. Df Resid. Dev Df    Deviance Pr(&gt;Chi)
 #&gt; 1         4     5.1291                        
-#&gt; 2         6     5.1291 -2 -2.6645e-15        1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>glm.D93</span>, <span class='va'>glm.D93.t</span>, nsim<span class='op'>=</span><span class='fl'>50</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+#&gt; 2         6     5.1291 -2 -2.6645e-15        1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>glm.D93</span>, <span class='va'>glm.D93.t</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='error'>Error in eval(predvars, data, env): object 'outcome' not found</span></div><div class='input'>
 <span class='co'>## Generalized linear mixed model (it takes a while to fit these)</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
@@ -408,7 +410,7 @@ the case when only the originally positive values are used).</p>
 <span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>fmLarge</span>, <span class='va'>L</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'>## Vanilla</span>
-<span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, nsim<span class='op'>=</span><span class='fl'>499</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'>## Simulate reference distribution separately:</span>
 <span class='va'>refdist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='pb-refdist.html'>PBrefdist</a></span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, nsim<span class='op'>=</span><span class='fl'>1000</span><span class='op'>)</span>
@@ -424,7 +426,7 @@ the case when only the originally positive values are used).</p>
 <span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, cl<span class='op'>=</span><span class='va'>cl</span><span class='op'>)</span>
 
 <span class='co'>## Or in two steps:</span>
-<span class='va'>refdist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='pb-refdist.html'>PBrefdist</a></span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, nsim<span class='op'>=</span><span class='fl'>499</span>, cl<span class='op'>=</span><span class='va'>cl</span><span class='op'>)</span>
+<span class='va'>refdist</span> <span class='op'>&lt;-</span> <span class='fu'><a href='pb-refdist.html'>PBrefdist</a></span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span>, cl<span class='op'>=</span><span class='va'>cl</span><span class='op'>)</span>
 <span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>beet0</span>, <span class='va'>beet_no.harv</span>, ref<span class='op'>=</span><span class='va'>refdist</span><span class='op'>)</span>
 
 <span class='co'>## It is recommended to stop the clusters before quitting R:</span>
@@ -443,27 +445,31 @@ the case when only the originally positive values are used).</p>
 #&gt;   Res.Df   RSS Df Sum of Sq     F Pr(&gt;F)
 #&gt; 1     47 10825                          
 #&gt; 2     48 11354 -1   -528.81 2.296 0.1364</div><div class='input'>
-<span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m11</span>, <span class='va'>m10</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='fl'>199</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.43 sec; samples: 199; extremes: 22;
+<span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m11</span>, <span class='va'>m10</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.12 sec; samples: 50; extremes: 4;
 #&gt; large : dist ~ speed + I(speed^2)
 #&gt; dist ~ speed
-#&gt;          stat df p.value
-#&gt; LRT    2.3848  1  0.1225
-#&gt; PBtest 2.3848     0.1150</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m11</span>, <span class='op'>~</span><span class='va'>.</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>speed</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='fl'>199</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.48 sec; samples: 199; extremes: 35;
+#&gt;          stat df p.value  
+#&gt; LRT    2.3848  1 0.12252  
+#&gt; PBtest 2.3848    0.09804 .
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m11</span>, <span class='op'>~</span><span class='va'>.</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>speed</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.13 sec; samples: 50; extremes: 3;
 #&gt; large : dist ~ speed + I(speed^2)
 #&gt; dist ~ speed
-#&gt;          stat df p.value
-#&gt; LRT    2.3848  1  0.1225
-#&gt; PBtest 2.3848     0.1800</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m11</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='fl'>199</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.48 sec; samples: 199; extremes: 39;
+#&gt;          stat df p.value  
+#&gt; LRT    2.3848  1 0.12252  
+#&gt; PBtest 2.3848    0.07843 .
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m11</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.12 sec; samples: 50; extremes: 6;
 #&gt; large : dist ~ speed + I(speed^2)
 #&gt; small : 
 #&gt;      [,1] [,2] [,3]
 #&gt; [1,]    0    0    1
 #&gt;          stat df p.value
 #&gt; LRT    2.3848  1  0.1225
-#&gt; PBtest 2.3848     0.2000</div><div class='input'>
+#&gt; PBtest 2.3848     0.1373</div><div class='input'>
 <span class='va'>m21</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>dist</span> <span class='op'>~</span> <span class='va'>speed</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>speed</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>, family<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>Gamma</a></span><span class='op'>(</span><span class='st'>"identity"</span><span class='op'>)</span>, data<span class='op'>=</span><span class='va'>cars</span><span class='op'>)</span>
 <span class='va'>m20</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span><span class='op'>(</span><span class='va'>m21</span>, <span class='op'>~</span><span class='va'>.</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>speed</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/anova.html'>anova</a></span><span class='op'>(</span><span class='va'>m21</span>, <span class='va'>m20</span>, test<span class='op'>=</span><span class='st'>"Chisq"</span><span class='op'>)</span>
@@ -474,31 +480,31 @@ the case when only the originally positive values are used).</p>
 #&gt;   Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)
 #&gt; 1        47     7.6741                     
 #&gt; 2        48     8.0945 -1 -0.42037    0.106</div><div class='input'>
-<span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m21</span>, <span class='va'>m20</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='fl'>199</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.80 sec; samples: 199; extremes: 11;
+<span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m21</span>, <span class='va'>m20</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.21 sec; samples: 50; extremes: 6;
 #&gt; large : dist ~ speed + I(speed^2)
 #&gt; dist ~ speed
 #&gt;          stat df p.value  
 #&gt; LRT    2.7364  1 0.09809 .
-#&gt; PBtest 2.7364    0.06000 .
+#&gt; PBtest 2.7364    0.13725  
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m21</span>, <span class='op'>~</span><span class='va'>.</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>speed</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='fl'>199</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.83 sec; samples: 199; extremes: 31;
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m21</span>, <span class='op'>~</span><span class='va'>.</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>speed</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.23 sec; samples: 50; extremes: 5;
 #&gt; large : dist ~ speed + I(speed^2)
 #&gt; dist ~ speed
 #&gt;          stat df p.value  
 #&gt; LRT    2.7364  1 0.09809 .
-#&gt; PBtest 2.7364    0.16000  
+#&gt; PBtest 2.7364    0.11765  
 #&gt; ---
-#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m21</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='fl'>199</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Bootstrap test; time: 0.82 sec; samples: 199; extremes: 18;
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'><span class='fu'>PBmodcomp</span><span class='op'>(</span><span class='va'>m21</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span>, cl<span class='op'>=</span><span class='fl'>1</span>, nsim<span class='op'>=</span><span class='va'>NSIM</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Bootstrap test; time: 0.24 sec; samples: 50; extremes: 7;
 #&gt; large : dist ~ speed + I(speed^2)
 #&gt; small : 
 #&gt;      [,1] [,2] [,3]
 #&gt; [1,]    0    0    1
 #&gt;          stat df p.value  
 #&gt; LRT    2.7364  1 0.09809 .
-#&gt; PBtest 2.7364    0.09500 .
+#&gt; PBtest 2.7364    0.15686  
 #&gt; ---
 #&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'>
 </div></pre>
