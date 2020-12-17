@@ -51,10 +51,9 @@ fig/*.pdf
 astadataDEVEL/astadatdata/
 
 dobyDEVEL/pkg/
-
 pbkrtestDEVEL/pkg/
+geepackDEVEL/pkg/
 
-geepackDEVEL/geepack/
 mhsmmDEVEL/mhsmm/
 reditorDEVEL/reditor/
 

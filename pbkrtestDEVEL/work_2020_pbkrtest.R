@@ -1,6 +1,84 @@
-load_all("pbkrtest")
+load_all("pkg")
 
-(fm0 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), data=sleepstudy))
+document("pkg")
+
+
+
+
+library(pbkrtest)
+library(ggplot2)
+
+ggplot(sleepstudy) + geom_line(aes(Days, Reaction, group=Subject, color=Subject))
+
+fm0 <- lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
+fm1 <- update(fm0, .~. - Days)
+
+p0 <- anova(fm0, fm1)
+p1 <- PBmodcomp(fm0, fm1)
+p2 <- KRmodcomp(fm0, fm1)
+p3 <- SATmodcomp(fm0, fm1)
+
+p0
+p1
+p2
+p3
+
+tidy(p0)
+tidy(p1)
+tidy(p2)
+tidy(p3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+prmatrix((mat<-p2$formula.small), collab = rep_len("", ncol(mat)), rowlab = rep_len("", ncol(mat)))
+
+print.default(p1)
+
+
+print.default(p2)
+
+
+
+
+set.seed(1213)
+data(sleepstudy)
+SIZE <- 50
+sleepstudy <- sleepstudy[sample(nrow(sleepstudy), size=SIZE), ]
+
+
+
+
+
+
+
+
+Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model Comparison
+
+
 
 
 devfun <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), data=sleepstudy, devFunOnly=T)
