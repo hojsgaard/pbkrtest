@@ -17,11 +17,34 @@ knitr::opts_chunk$set(
 
 # `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 
+Attention is on mixed effects models (as implemented in the 'lme4'
+package). For linear mixed models, 'pbkrtest' implements (1) a
+parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a
+Satterthwaite-type F-test. The parametric bootstrap test is also
+implemented for generalized linear mixed models (as implemented in
+'lme4') and for generalized linear models. The facilities of the
+package are documented in the paper by Halehoh and Højsgaard, (2012,
+\doi{doi:10.18637/jss.v059.i09}). 
 
-<!-- badges: start -->
+Please see 'citation("pbkrtest")' for information about citing the
+paper and the package. If you use the package in your work, please do
+cite the 2012-paper. There are other packages that use 'pbkrtest'
+under the hood. If you use one of those packages, please do also cite
+our 2012 paper.
+
+Documents:
+
+
+
+1. [Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
+1. [Vignette: introduction to 'pbkrtest'](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
+1. [Webpage for the package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html) 
+
+
+<!-- badges: start 
 [![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
-<!-- [![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master) -->
-<!-- badges: end -->
+[![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master)
+badges: end -->
   
 ## Installation
 
@@ -52,11 +75,32 @@ See <https://github.com/hojsgaard/pbkrtest>.
 
 See <https://hojsgaard.github.io/pbkrtest/>.
 
-<!-- ## Brief introduction -->
+## Brief introduction
 
-<!-- ```{r, message=FALSE} -->
-<!-- library(dlmextra) -->
-<!-- ``` -->
+```{r, message=FALSE}
+library(pbkrtest)
+library(ggplot2)
+
+ggplot(sleepstudy) + geom_line(aes(Days, Reaction, group=Subject, color=Subject))
+
+fm0 <- lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
+fm1 <- update(fm0, .~. - Days)
+
+p0 <- anova(fm0, fm1)
+p1 <- PBmodcomp(fm0, fm1)
+p2 <- KRmodcomp(fm0, fm1)
+p3 <- SATmodcomp(fm0, fm1)
+
+p0
+p1
+p2
+p3
+
+tidy(p0)
+tidy(p1)
+tidy(p2)
+tidy(p3)
+``` 
 
 
 Please find more examples in the other vignettes available at <https://hojsgaard.github.io/pbkrtest/>.

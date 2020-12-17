@@ -21,6 +21,12 @@
 #' @importFrom stats as.formula family formula getCall logLik
 #'     model.matrix pchisq pf pgamma printCoefmat quantile simulate
 #'     terms update update.formula var vcov sigma
+#'
+#' @importFrom broom tidy
+#' @export tidy
+#' 
+#' @importFrom dplyr as_tibble
+
 
 
 .dumfunction_afterimportFrom <- function(){}

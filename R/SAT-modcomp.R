@@ -56,7 +56,7 @@
 #' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
 #'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
 #'     Models - The R Package pbkrtest., Journal of Statistical Software,
-#'     58(10), 1-30., \url{http://www.jstatsoft.org/v59/i09/}
+#'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 #' 
 #' @keywords models inference
 #' @examples
@@ -154,12 +154,128 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     out
 }
 
+
+
+#' @export
 print.SATmodcomp <- function(x, ...){
+    cat("large : ")
     print(x$formula.large)
+
+    if (inherits(x$formula.small, "formula")) cat("small : ")
+    else cat("small (restriction matrix) : \n")
+    prform(x$formula.small)
     dd <- as.data.frame(x$test[c("statistic", "ndf", "ddf", "p.value")])
     printCoefmat(dd, has.Pvalue=TRUE)
     invisible(x)
 }
+
+prform  <- function(form){
+    if (!inherits(form, c("formula", "matrix"))) stop("'form' must be formula or matrix")
+    if (inherits(form, "formula"))
+        print(form)
+    else
+        prmatrix(form, collab = rep_len("", ncol(form)), rowlab = rep_len("", ncol(form)))
+    invisible(form)    
+}
+
+
+## #' @export
+## tidy.KRmodcomp <- function (x, conf.int = FALSE, conf.level = 0.95, exponentiate = FALSE, 
+##     ...) 
+## {
+##     ##co <- stats::coef(summary(x))
+##     ## ret <- as_tidy_tibble(co, c("estimate", "std.error", "statistic", 
+##     ##                             "p.value")[1:ncol(co)])
+
+##     ret <- x$test
+##     rr <<- ret
+
+
+##     if (conf.int) {
+##         ci <- broom:::broom_confint_terms(x, level = conf.level)
+##         ret <- dplyr::left_join(ret, ci, by = "term")
+##     }
+##     ## if (exponentiate) {
+##     ##     if (is.null(x$family) || (x$family$link != "logit" && 
+##     ##         x$family$link != "log")) {
+##     ##         warning(paste("Exponentiating coefficients, but model did not use", 
+##     ##             "a log or logit link function"))
+##     ##     }
+##     ##     ret <- exponentiate(ret)
+##     ## }
+##     ret
+## }
+
+
+#' @export 
+tidy.PBmodcomp <- function(x, ...){
+    ret <- x$test    
+    as_tibble(cbind(type=rownames(ret), ret))
+}
+
+#' @export 
+tidy.KRmodcomp <- function(x, ...){
+    ret <- x$test    
+    as_tibble(cbind(type=rownames(ret), ret))
+}
+
+#' @export 
+tidy.SATmodcomp <- function(x, ...){
+    ret <- x$test
+    as_tibble(cbind(type="Ftest", ret))    
+}
+
+#' @export 
+as.data.frame.PBmodcomp <- function(x, ...){
+    x$test
+}
+
+#' @export 
+as.data.frame.KRmodcomp <- function(x, ...){
+    x$test
+}
+
+#' @export 
+as.data.frame.SATmodcomp <- function(x, ...){
+    x$test
+}
+
+
+
+
+
+
+
+
+## #' @export
+## summary.PBmodcomp <- function(object, ...){
+##   ans <- .summarizePB(object$LRTstat, object$ref)
+##   ans$formula.large <- object$formula.large
+##   ans$formula.small <- object$formula.small
+##   class(ans) <- "summaryPB"
+##   ans
+## }
+
+## #' @export
+## print.summaryPB <- function(x, ...){
+##   .PBcommon(x)
+##   ans <- x$test
+##   printCoefmat(ans, tst.ind=1, na.print='', has.Pvalue=TRUE)
+##   cat("\n")
+
+## ##   ci <- x$ci
+## ##   cat(sprintf("95 pct CI for PBtest   : [%s]\n", toString(ci)))
+## ##   mo <- x$moment
+## ##   cat(sprintf("Reference distribution : mean=%f var=%f\n", mo[1], mo[2]))
+## ##   ga <- x$gamma
+## ##   cat(sprintf("Gamma approximation    : scale=%f shape=%f\n", ga[1], ga[2]))
+
+##   return(invisible(x))
+## }
+
+
+
+
 
 ## Returns the deviance function for a linear mixed model.
 get_devfun <- function(model){

@@ -13,6 +13,7 @@
 \alias{KRmodcomp_init.lmerMod}
 \alias{KRmodcomp_init.mer}
 \alias{as.data.frame.XXmodcomp}
+\alias{tidy}
 \title{Internal functions for the pbkrtest package}
 \description{
 These functions are not intended to be called directly.

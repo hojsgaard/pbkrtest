@@ -1,7 +1,6 @@
 Package: pbkrtest
 Version: 0.4-9.0
-Title: Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model
-    Comparison
+Title: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 Authors@R: c(
     person(given = "Ulrich", family = "Halekoh",
         email = "uhalekoh@health.sdu.dk", role = c("aut", "cph")),
@@ -20,17 +19,19 @@ Description: Test in mixed effects models. Attention is on mixed
     paper by Halehoh and Højsgaard, (2012,
     <doi:10.18637/jss.v059.i09>).  Please see 'citation("pbkrtest")'
     for citation details.
-URL: http://people.math.aau.dk/~sorenh/software/pbkrtest/
+URL: https://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
     R (>= 3.5.0),
     lme4 (>= 1.1.10)
 Imports:
-    Matrix (>= 1.2.3),
-    parallel,
-    magrittr,
+    broom,
+    dplyr,
+    magrittr,    
     MASS,
-    numDeriv,
+    Matrix (>= 1.2.3),
     methods,
+    numDeriv,
+    parallel,
     knitr
 Encoding: UTF-8
 ZipData: no

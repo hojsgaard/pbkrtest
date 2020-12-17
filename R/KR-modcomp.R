@@ -273,6 +273,8 @@ print.KRmodcomp <- function(x, ...){
     F.scale <- x$aux['F.scaling']
     tab <- x$test
 
+## ttt <<- tab
+    
     if (max(F.scale) > FF.thresh) i <- 1 else i <- 2
     printCoefmat(tab[i,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
     
@@ -304,6 +306,29 @@ summary.KRmodcomp <- function(object, ...){
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   #stats <- .KRmodcompPrimitive(largeModel, L, betaH, details)

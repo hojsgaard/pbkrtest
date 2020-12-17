@@ -8,6 +8,7 @@
 #'     plot.PBmodcomp summary.KRmodcomp print.KRmodcomp 
 #'     KRmodcomp_init KRmodcomp_init.lmerMod
 #'     KRmodcomp_init.mer as.data.frame.XXmodcomp
+#'     tidy
 #' 
 NULL
 
