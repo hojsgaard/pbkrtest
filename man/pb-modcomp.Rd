@@ -142,6 +142,8 @@ the case when only the originally positive values are used).
 data(beets, package="pbkrtest")
 head(beets)
 
+NSIM <- 50 ## Simulations in parametric bootstrap
+
 ## Linear mixed effects model:
 sug   <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
               data=beets, REML=FALSE)
@@ -149,9 +151,9 @@ sug.h <- update(sug, .~. -harvest)
 sug.s <- update(sug, .~. -sow)
 
 anova(sug, sug.h)
-PBmodcomp(sug, sug.h, nsim=50, cl=1)
+PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
 anova(sug, sug.h)
-PBmodcomp(sug, sug.s, nsim=50, cl=1)
+PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 
 ## Linear normal model:
 sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -159,14 +161,14 @@ sug.h <- update(sug, .~. -harvest)
 sug.s <- update(sug, .~. -sow)
 
 anova(sug, sug.h)
-PBmodcomp(sug, sug.h, nsim=50, cl=1)
+PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
 anova(sug, sug.s)
-PBmodcomp(sug, sug.s, nsim=50, cl=1)
+PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 
 ## Generalized linear model
-counts    <- c(18,17,15,20,10,20,25,13,12)
-outcome   <- gl(3,1,9)
-treatment <- gl(3,3)
+counts    <- c(18, 17, 15, 20, 10, 20, 25, 13, 12)
+outcome   <- gl(3, 1, 9)
+treatment <- gl(3, 3)
 d.AD      <- data.frame(treatment, outcome, counts)
 head(d.AD)
 glm.D93   <- glm(counts ~ outcome + treatment, family = poisson())
@@ -174,9 +176,9 @@ glm.D93.o <- update(glm.D93, .~. -outcome)
 glm.D93.t <- update(glm.D93, .~. -treatment)
 
 anova(glm.D93, glm.D93.o, test="Chisq")
-PBmodcomp(glm.D93, glm.D93.o, nsim=50, cl=1)
+PBmodcomp(glm.D93, glm.D93.o, nsim=NSIM, cl=1)
 anova(glm.D93, glm.D93.t, test="Chisq")
-PBmodcomp(glm.D93, glm.D93.t, nsim=50, cl=1)
+PBmodcomp(glm.D93, glm.D93.t, nsim=NSIM, cl=1)
 
 ## Generalized linear mixed model (it takes a while to fit these)
 \dontrun{
@@ -200,7 +202,7 @@ L <- cbind(0,1)
 PBmodcomp(fmLarge, L, cl=1)
 
 ## Vanilla
-PBmodcomp(beet0, beet_no.harv, nsim=499, cl=1)
+PBmodcomp(beet0, beet_no.harv, nsim=NSIM, cl=1)
 
 ## Simulate reference distribution separately:
 refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000)
@@ -216,7 +218,7 @@ cl <- makeCluster(rep("localhost", nc))
 PBmodcomp(beet0, beet_no.harv, cl=cl)
 
 ## Or in two steps:
-refdist <- PBrefdist(beet0, beet_no.harv, nsim=499, cl=cl)
+refdist <- PBrefdist(beet0, beet_no.harv, nsim=NSIM, cl=cl)
 PBmodcomp(beet0, beet_no.harv, ref=refdist)
 
 ## It is recommended to stop the clusters before quitting R:
@@ -229,17 +231,17 @@ m11 <- lm(dist ~ speed + I(speed^2), data=cars)
 m10 <- update(m11, ~.-I(speed^2))
 anova(m11, m10)
 
-PBmodcomp(m11, m10, cl=1, nsim=199)
-PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=199)
-PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=199)
+PBmodcomp(m11, m10, cl=1, nsim=NSIM)
+PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=NSIM)
+PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=NSIM)
 
 m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
 m20 <- update(m21, ~.-I(speed^2))
 anova(m21, m20, test="Chisq")
 
-PBmodcomp(m21, m20, cl=1, nsim=199)
-PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=199)
-PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=199)
+PBmodcomp(m21, m20, cl=1, nsim=NSIM)
+PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=NSIM)
+PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=NSIM)
 
 }
 \references{

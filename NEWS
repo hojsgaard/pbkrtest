@@ -1,12 +1,11 @@
-pbkrtest v0.4-9.0 (Release date: 2020-08-04)
+pbkrtest v0.5-0.0 (Release date: 2020-08-04)
 ============================================
 
 Changes
 
-* doi added to DESCRIPTION file
-
 * Satterthwaite approximation added via the SATmodcomp function.
 
+* doi added to DESCRIPTION file
 
 
 pbkrtest v0.4-8.6 (Release date: 2020-02-20)

@@ -1,6 +1,6 @@
 Package: pbkrtest
-Version: 0.4-9.0
-Title: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
+Version: 0.5-0.0
+Title: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Test in Mixed Models
 Authors@R: c(
     person(given = "Ulrich", family = "Halekoh",
         email = "uhalekoh@health.sdu.dk", role = c("aut", "cph")),
