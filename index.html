@@ -5,15 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model
-    Comparison • pbkrtest</title>
+<title>Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison • pbkrtest</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model
-    Comparison">
+<script src="pkgdown.js"></script><meta property="og:title" content="Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison">
 <meta property="og:description" content='Test in mixed effects models. Attention is on mixed
     effects models as implemented in the lme4 package. For linear
     mixed models, this package implements (1) a parametric bootstrap
@@ -74,9 +72,18 @@
 <div id="pbkrtest-parametric-bootstrap-kenward-roger-and-satterthwaite-based-methods-for-mixed-model-comparison" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#pbkrtest-parametric-bootstrap-kenward-roger-and-satterthwaite-based-methods-for-mixed-model-comparison" class="anchor"></a><code>pbkrtest</code>: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison</h1></div>
-<!-- badges: start -->
-
-<div id="installation" class="section level2">
+<p>Attention is on mixed effects models (as implemented in the ‘lme4’ package). For linear mixed models, ‘pbkrtest’ implements (1) a parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a Satterthwaite-type F-test. The parametric bootstrap test is also implemented for generalized linear mixed models (as implemented in ‘lme4’) and for generalized linear models. The facilities of the package are documented in the paper by Halehoh and Højsgaard, (2012, ).</p>
+<p>Please see ‘citation(“pbkrtest”)’ for information about citing the paper and the package. If you use the package in your work, please do cite the 2012-paper. There are other packages that use ‘pbkrtest’ under the hood. If you use one of those packages, please do also cite our 2012 paper.</p>
+<p>Documents:</p>
+<ol>
+<li><a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf">Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest</a></li>
+<li><a href="https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf">Vignette: introduction to ‘pbkrtest’</a></li>
+<li><a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html">Webpage for the package</a></li>
+</ol>
+<!-- badges: start 
+[![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
+[![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master)
+badges: end --><div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p><code>pbkrtest</code> is available on CRAN and can be installed as usual:</p>
@@ -96,10 +103,88 @@
 <h2 class="hasAnchor">
 <a href="#online-documentation" class="anchor"></a>Online documentation</h2>
 <p>See <a href="https://hojsgaard.github.io/pbkrtest/" class="uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
-<!-- ## Brief introduction -->
-<!-- ```{r, message=FALSE} -->
-<!-- library(dlmextra) -->
-<!-- ``` -->
+</div>
+<div id="brief-introduction" class="section level2">
+<h2 class="hasAnchor">
+<a href="#brief-introduction" class="anchor"></a>Brief introduction</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/">pbkrtest</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">ggplot2</span><span class="op">)</span>
+
+<span class="fu">ggplot</span><span class="op">(</span><span class="va">sleepstudy</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">Days</span>, <span class="va">Reaction</span>, group<span class="op">=</span><span class="va">Subject</span>, color<span class="op">=</span><span class="va">Subject</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="README_files/figure-gfm/unnamed-chunk-2-1.png"><!-- --></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">fm0</span> <span class="op">&lt;-</span> <span class="fu">lmer</span><span class="op">(</span><span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="va">Days</span><span class="op">|</span><span class="va">Subject</span><span class="op">)</span>, data<span class="op">=</span><span class="va">sleepstudy</span><span class="op">)</span>
+<span class="va">fm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span><span class="op">)</span>
+
+<span class="va">p0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span>
+<span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span>
+<span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span>
+<span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sat-modcomp.html">SATmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span>
+
+<span class="va">p0</span>
+<span class="co">#&gt; Data: sleepstudy</span>
+<span class="co">#&gt; Models:</span>
+<span class="co">#&gt; fm1: Reaction ~ (Days | Subject)</span>
+<span class="co">#&gt; fm0: Reaction ~ Days + (Days | Subject)</span>
+<span class="co">#&gt;     npar    AIC    BIC  logLik deviance  Chisq Df Pr(&gt;Chisq)    </span>
+<span class="co">#&gt; fm1    5 1785.5 1801.4 -887.74   1775.5                         </span>
+<span class="co">#&gt; fm0    6 1763.9 1783.1 -875.97   1751.9 23.537  1  1.226e-06 ***</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="va">p1</span>
+<span class="co">#&gt; Bootstrap test; time: 8.58 sec; samples: 1000; extremes: 0;</span>
+<span class="co">#&gt; Requested samples: 1000 Used samples: 994 Extremes: 0</span>
+<span class="co">#&gt; large : Reaction ~ Days + (Days | Subject)</span>
+<span class="co">#&gt; Reaction ~ (Days | Subject)</span>
+<span class="co">#&gt;          stat df   p.value    </span>
+<span class="co">#&gt; LRT    23.516  1 1.239e-06 ***</span>
+<span class="co">#&gt; PBtest 23.516     0.001005 ** </span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="va">p2</span>
+<span class="co">#&gt; large : Reaction ~ Days + (Days | Subject)</span>
+<span class="co">#&gt; small : Reaction ~ (Days | Subject)</span>
+<span class="co">#&gt;         stat    ndf    ddf F.scaling   p.value    </span>
+<span class="co">#&gt; Ftest 45.853  1.000 17.000         1 3.264e-06 ***</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="va">p3</span>
+<span class="co">#&gt; large : Reaction ~ Days + (Days | Subject)</span>
+<span class="co">#&gt; small (restriction matrix) : </span>
+<span class="co">#&gt;     </span>
+<span class="co">#&gt;  0 1</span>
+<span class="co">#&gt;      statistic    ndf ddf   p.value    </span>
+<span class="co">#&gt; [1,]    45.853  1.000  17 3.264e-06 ***</span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+
+<span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p0</span><span class="op">)</span>
+<span class="co">#&gt; Warning in tidy.anova(p0): The following column names in ANOVA output were not</span>
+<span class="co">#&gt; recognized or transformed: npar</span>
+<span class="co">#&gt; # A tibble: 2 x 9</span>
+<span class="co">#&gt;   term   npar   AIC   BIC logLik deviance statistic    df     p.value</span>
+<span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fm1       5 1785. 1801.  -888.    1775.      NA      NA NA         </span>
+<span class="co">#&gt; 2 fm0       6 1764. 1783.  -876.    1752.      23.5     1  0.00000123</span>
+<span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 x 4</span>
+<span class="co">#&gt;   type    stat    df    p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 LRT     23.5     1 0.00000124</span>
+<span class="co">#&gt; 2 PBtest  23.5    NA 0.00101</span>
+<span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 x 6</span>
+<span class="co">#&gt;   type    stat   ndf   ddf F.scaling    p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 Ftest   45.9     1   17.         1 0.00000326</span>
+<span class="co">#&gt; 2 FtestU  45.9     1   17.        NA 0.00000326</span>
+<span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p3</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt;   type  statistic   ndf   ddf    p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;      &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 Ftest      45.9     1  17.0 0.00000326</span></code></pre></div>
 <p>Please find more examples in the other vignettes available at <a href="https://hojsgaard.github.io/pbkrtest/" class="uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
 </div>
 </div>
@@ -133,13 +218,7 @@
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/hojsgaard/pbkrtest/actions"><img src="https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-</ul>
-</div>
-</div>
+  </div>
 </div>
 
 

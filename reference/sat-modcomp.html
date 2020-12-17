@@ -189,31 +189,15 @@ implementations of the Satterthwaite approach!</p>
 #&gt; (Intercept)         Days  
 #&gt;      251.41        10.47  </div><div class='input'><span class='va'>L1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>1</span><span class='op'>)</span>
 <span class='fu'>SATmodcomp</span><span class='op'>(</span><span class='va'>fm1</span>, <span class='va'>L1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $test
-#&gt;   statistic ndf      ddf      p.value
-#&gt; 1  45.85296   1 16.99998 3.263825e-06
-#&gt; 
-#&gt; $sigma
-#&gt; [1] 25.5918
-#&gt; 
-#&gt; $formula.large
-#&gt; Reaction ~ Days + (Days | Subject)
-#&gt; &lt;environment: 0x7ffa0fee2e80&gt;
-#&gt; 
-#&gt; $formula.small
-#&gt;      [,1] [,2]
-#&gt; [1,]    0    1
-#&gt; 
-#&gt; $ctime
-#&gt; elapsed 
-#&gt;   0.046 
-#&gt; 
-#&gt; $L
-#&gt;      [,1] [,2]
-#&gt; [1,]    0    1
-#&gt; 
-#&gt; attr(,"class")
-#&gt; [1] "SATmodcomp"</div><div class='input'>
+</div><div class='output co'>#&gt; large : Reaction ~ Days + (Days | Subject)
+#&gt; &lt;environment: 0x7fdd18852190&gt;
+#&gt; small (restriction matrix) : 
+#&gt;     
+#&gt;  0 1
+#&gt;      statistic    ndf ddf   p.value    
+#&gt; [1,]    45.853  1.000  17 3.264e-06 ***
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'>
 <span class='op'>(</span><span class='va'>fm2</span> <span class='op'>&lt;-</span> <span class='fu'>lmer</span><span class='op'>(</span><span class='va'>Reaction</span> <span class='op'>~</span> <span class='va'>Days</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>Days</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span> <span class='op'>+</span> <span class='op'>(</span><span class='va'>Days</span><span class='op'>|</span><span class='va'>Subject</span><span class='op'>)</span>, <span class='va'>sleepstudy</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Linear mixed model fit by REML ['lmerMod']
 #&gt; Formula: Reaction ~ Days + I(Days^2) + (Days | Subject)
@@ -234,92 +218,41 @@ implementations of the Satterthwaite approach!</p>
 <span class='co'>## the F-test is on 2 (numerator) df:</span>
 <span class='va'>L2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span>, <span class='fl'>0</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>0</span>, <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'>SATmodcomp</span><span class='op'>(</span><span class='va'>fm2</span>, <span class='va'>L2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $test
-#&gt;   statistic ndf      ddf      p.value
-#&gt; 1  23.75435   2 51.56303 4.876067e-08
-#&gt; 
-#&gt; $sigma
-#&gt; [1] 25.53373
-#&gt; 
-#&gt; $formula.large
-#&gt; Reaction ~ Days + I(Days^2) + (Days | Subject)
-#&gt; &lt;environment: 0x7ffa0fee2e80&gt;
-#&gt; 
-#&gt; $formula.small
-#&gt;      [,1] [,2] [,3]
-#&gt; [1,]    0    1    0
-#&gt; [2,]    0    0    1
-#&gt; 
-#&gt; $ctime
-#&gt; elapsed 
-#&gt;   0.043 
-#&gt; 
-#&gt; $L
-#&gt;      [,1] [,2] [,3]
-#&gt; [1,]    0    1    0
-#&gt; [2,]    0    0    1
-#&gt; 
-#&gt; attr(,"class")
-#&gt; [1] "SATmodcomp"</div><div class='input'>
+</div><div class='output co'>#&gt; large : Reaction ~ Days + I(Days^2) + (Days | Subject)
+#&gt; &lt;environment: 0x7fdd18852190&gt;
+#&gt; small (restriction matrix) : 
+#&gt;       
+#&gt;  0 1 0
+#&gt;  0 0 1
+#&gt;      statistic    ndf    ddf   p.value    
+#&gt; [1,]    23.754  2.000 51.563 4.876e-08 ***
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'>
 <span class='co'>## 2) Use two model objects </span>
 <span class='va'>fm3</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span><span class='op'>(</span><span class='va'>fm2</span>, <span class='op'>~</span><span class='va'>.</span> <span class='op'>-</span> <span class='va'>Days</span> <span class='op'>-</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>Days</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'>SATmodcomp</span><span class='op'>(</span><span class='va'>fm2</span>, <span class='va'>fm3</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $test
-#&gt;   statistic ndf      ddf      p.value
-#&gt; 1  23.75435   2 51.56303 4.876067e-08
-#&gt; 
-#&gt; $sigma
-#&gt; [1] 25.53373
-#&gt; 
-#&gt; $formula.large
-#&gt; Reaction ~ Days + I(Days^2) + (Days | Subject)
-#&gt; &lt;environment: 0x7ffa0fee2e80&gt;
-#&gt; 
-#&gt; $formula.small
-#&gt;               [,1]       [,2]      [,3]
-#&gt; [1,]  0.000000e+00  0.1104315 0.9938837
-#&gt; [2,] -1.249001e-16 -0.9938837 0.1104315
-#&gt; 
-#&gt; $ctime
-#&gt; elapsed 
-#&gt;   0.044 
-#&gt; 
-#&gt; $L
-#&gt;               [,1]       [,2]      [,3]
-#&gt; [1,]  0.000000e+00  0.1104315 0.9938837
-#&gt; [2,] -1.249001e-16 -0.9938837 0.1104315
-#&gt; 
-#&gt; attr(,"class")
-#&gt; [1] "SATmodcomp"</div><div class='input'>
+</div><div class='output co'>#&gt; large : Reaction ~ Days + I(Days^2) + (Days | Subject)
+#&gt; &lt;environment: 0x7fdd18852190&gt;
+#&gt; small (restriction matrix) : 
+#&gt;                                    
+#&gt;   0.000000e+00  0.1104315 0.9938837
+#&gt;  -1.249001e-16 -0.9938837 0.1104315
+#&gt;      statistic    ndf    ddf   p.value    
+#&gt; [1,]    23.754  2.000 51.563 4.876e-08 ***
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div><div class='input'>
 <span class='co'>## 3) Specify restriction as formula</span>
 <span class='fu'>SATmodcomp</span><span class='op'>(</span><span class='va'>fm2</span>, <span class='op'>~</span><span class='va'>.</span> <span class='op'>-</span> <span class='va'>Days</span> <span class='op'>-</span> <span class='fu'><a href='https://rdrr.io/r/base/AsIs.html'>I</a></span><span class='op'>(</span><span class='va'>Days</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $test
-#&gt;   statistic ndf      ddf      p.value
-#&gt; 1  23.75435   2 51.56303 4.876067e-08
-#&gt; 
-#&gt; $sigma
-#&gt; [1] 25.53373
-#&gt; 
-#&gt; $formula.large
-#&gt; Reaction ~ Days + I(Days^2) + (Days | Subject)
-#&gt; &lt;environment: 0x7ffa0fee2e80&gt;
-#&gt; 
-#&gt; $formula.small
-#&gt;               [,1]       [,2]      [,3]
-#&gt; [1,]  0.000000e+00  0.1104315 0.9938837
-#&gt; [2,] -1.249001e-16 -0.9938837 0.1104315
-#&gt; 
-#&gt; $ctime
-#&gt; elapsed 
-#&gt;   0.044 
-#&gt; 
-#&gt; $L
-#&gt;               [,1]       [,2]      [,3]
-#&gt; [1,]  0.000000e+00  0.1104315 0.9938837
-#&gt; [2,] -1.249001e-16 -0.9938837 0.1104315
-#&gt; 
-#&gt; attr(,"class")
-#&gt; [1] "SATmodcomp"</div></pre>
+</div><div class='output co'>#&gt; large : Reaction ~ Days + I(Days^2) + (Days | Subject)
+#&gt; &lt;environment: 0x7fdd18852190&gt;
+#&gt; small (restriction matrix) : 
+#&gt;                                    
+#&gt;   0.000000e+00  0.1104315 0.9938837
+#&gt;  -1.249001e-16 -0.9938837 0.1104315
+#&gt;      statistic    ndf    ddf   p.value    
+#&gt; [1,]    23.754  2.000 51.563 4.876e-08 ***
+#&gt; ---
+#&gt; Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
