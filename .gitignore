@@ -41,8 +41,6 @@ vignettes/*.pdf
 *.dll
 *.zip
 
-
-
 fig/*.pdf
 **/*.tar.gz
 **/*.Rcheck/*
@@ -52,7 +50,6 @@ astadataDEVEL/astadatdata/
 
 dobyDEVEL/pkg/
 pbkrtestDEVEL/pkg/
-geepackDEVEL/pkg/
 
 mhsmmDEVEL/mhsmm/
 reditorDEVEL/reditor/
@@ -63,4 +60,6 @@ symmathDEVEL/ryacas-priv/
 
 ymcDEVEL/ymc/
 
-
+geepackDEVEL/pkg/
+geepackDEVEL/geeM2
+geepackDEVEL/geepack
