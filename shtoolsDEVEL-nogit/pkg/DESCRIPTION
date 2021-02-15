@@ -1,9 +1,0 @@
-Package: shtools
-Version: 1.0
-Title:   shtools
-Author:  Søren Højsgaard <sorenh@math.aau.dk>
-Maintainer: Søren Højsgaard <sorenh@math.aau.dk>
-Description: Sorens collection of tools for R
-Depends: knitr, markdown
-License: GPL
-Encoding: latin1
