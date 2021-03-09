@@ -224,13 +224,18 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
-    w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+    ## ss <<- smallModel
+    ## ll <<- largeModel
 
-    if (w == -1) stop('Models have equal mean stucture or are not nested')
-    if (w == 0){
-        ## First given model is submodel of second; exchange the models
-        tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
-    }
+    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
+
+    ## if (w == 0){
+    ##     ## First given model is submodel of second; exchange the models
+    ##     tmp <- largeModel;
+    ##     largeModel <- smallModel;
+    ##     smallModel <- tmp
+    ## }
 
     if (is.numeric(smallModel) && !is.matrix(smallModel))
         smallModel <- matrix(smallModel, nrow=1)
@@ -259,6 +264,45 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     ans         <- .finalizePB(LRTstat, ref)
     .padPB(ans, LRTstat, ref, formula.large, formula.small)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## #' @export

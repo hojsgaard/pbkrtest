@@ -64,6 +64,10 @@
     inherits(object, "lmerMod")
 }
 
+.is.mm <- function(object) {
+    inherits(object, "merMod")
+}
+
 
 ## .is.lmm <- function(object) {
 ##     ##if (class(object) %in% c("matrix","Matrix")){

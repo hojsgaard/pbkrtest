@@ -147,13 +147,16 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
 #' @export
 PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
 
-    w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+    if (inherits(smallModel, "formula"))
+        smallModel  <- update(largeModel, smallModel)
 
-    if (w == -1) stop('Models have equal mean stucture or are not nested')
-    if (w == 0){
-        ## First given model is submodel of second; exchange the models
-        tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
-    }
+    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+
+    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
+    ## if (w == 0){
+    ##     ## First given model is submodel of second; exchange the models
+    ##     tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
+    ## }
 
     if (is.numeric(smallModel) && !is.matrix(smallModel))
         smallModel <- matrix(smallModel, nrow=1)

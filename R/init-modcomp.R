@@ -2,17 +2,17 @@ modcomp_init <- function(m1, m2, matrixOK=FALSE){
     UseMethod("modcomp_init")
 }
 
-modcomp_init.lmerMod <- function(m1, m2, matrixOK = FALSE) {
+modcomp_init.merMod <- function(m1, m2, matrixOK = FALSE) {
     ## Comparison of the mean structures of the models
-    ## It is tested for that (1) m1 is lmerMod and (2) m2 is either lmerMod or a matrix
+    ## It is tested for that (1) m1 is merMod and (2) m2 is either merMod or a matrix
 
     if (is.numeric(m2) && !is.matrix(m2)) m2 <- matrix(m2, nrow=1)
     
-    if (!.is.lmm(m1))
-        stop("Model m1 ", substitute(m1), " is not lmerMod\n")
+    if (!.is.mm(m1))
+        stop("Model m1 ", substitute(m1), " is not merMod\n")
 
-    if (!(.is.lmm(m2) | is.matrix(m2)))
-        stop("Model m2 ", substitute(m2), " is not lmerMod or restriction matrix\n")
+    if (!(.is.mm(m2) | is.matrix(m2)))
+        stop("Model m2 ", substitute(m2), " is not merMod or restriction matrix\n")
     
     ##checking matrixcOK is FALSE but m2 is a matrix
     if (!matrixOK & is.matrix(m2)) {
@@ -24,7 +24,12 @@ modcomp_init.lmerMod <- function(m1, m2, matrixOK = FALSE) {
     
     Xlarge <- getME(m1, "X")
     rlarge <- rankMatrix(Xlarge)
-    code <- if (.is.lmm(m2)){
+
+    ## -1 : Models have identical mean structures or are not nested
+    ## 0  : m1 is submodel of m2
+    ## 1  : m2 is submodel of m1
+
+    code <- if (.is.mm(m2)){
                 Xsmall <- getME(m2, "X")
                 rsmall <- rankMatrix(Xsmall)
                 rboth  <- rankMatrix(cbind(Xlarge, Xsmall))
