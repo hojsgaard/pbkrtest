@@ -24,9 +24,8 @@ Depends:
     R (>= 3.5.0),
     lme4 (>= 1.1.10)
 Imports:
-    broom,
-    dplyr,
-    magrittr,    
+    generics,
+    tibble,
     MASS,
     Matrix (>= 1.2.3),
     methods,
@@ -38,6 +37,6 @@ Encoding: UTF-8
 ZipData: no
 License: GPL (>= 2)
 ByteCompile: Yes
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 LazyData: true
 VignetteBuilder: knitr

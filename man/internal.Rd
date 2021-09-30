@@ -2,7 +2,6 @@
 % Please edit documentation in R/internal-pbkrtest.R
 \name{internal}
 \alias{internal}
-\alias{\%>\%}
 \alias{print.PBmodcomp}
 \alias{print.summaryPB}
 \alias{summary.PBmodcomp}

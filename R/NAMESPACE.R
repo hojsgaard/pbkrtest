@@ -2,12 +2,10 @@
 #' @import lme4
 #' @importFrom MASS ginv
 
-#' @importFrom magrittr "%>%"
-#' @export  "%>%"
-#'
+
 #' @importFrom utils head
 #' @importFrom stats coef
-#' 
+#'
 #' @importFrom parallel clusterCall clusterExport clusterSetRNGStream
 #'     mclapply detectCores makeCluster
 #'
@@ -21,21 +19,9 @@
 #' @importFrom stats as.formula family formula getCall logLik
 #'     model.matrix pchisq pf pgamma printCoefmat quantile simulate
 #'     terms update update.formula var vcov sigma
-#'
-#' @importFrom broom tidy
-#' @export tidy
-#' 
-#' @importFrom dplyr as_tibble
 
 
 
 .dumfunction_afterimportFrom <- function(){}
 
-
-#' @title pbkrtest internal
-#' @description pbkrtest internal
-#' @name internal-pbkrtest
-#'
-#' @aliases "%>%"
-NULL
 
