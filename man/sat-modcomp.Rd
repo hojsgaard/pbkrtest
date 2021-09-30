@@ -57,7 +57,7 @@ SATmodcomp(fm1, L1)
 L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
 SATmodcomp(fm2, L2)
 
-## 2) Use two model objects 
+## 2) Use two model objects
 fm3 <- update(fm2, ~. - Days - I(Days^2))
 SATmodcomp(fm2, fm3)
 

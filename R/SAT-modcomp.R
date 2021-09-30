@@ -3,7 +3,7 @@
 #' @title F-test and degrees of freedom based on Satterthwaite approximation
 #' @description An approximate F-test based on the Satterthwaite approach.
 #' @name sat-modcomp
-#' 
+#'
 ## ##########################################################################
 
 #' @details
@@ -13,12 +13,12 @@
 ## #'     maximum likelihood (i.e. with \code{REML=FALSE}) then the model is
 ## #'     refitted with \code{REML=TRUE} before the p-values are calculated. Put
 ## #'     differently, the user needs not worry about this issue.
-## #' 
+## #'
 ## #' An F test is calculated according to the approach of Kenward and Roger
 ## #' (1997).  The function works for linear mixed models fitted with the
 ## #' \code{lmer} function of the \pkg{lme4} package. Only models where the
 ## #' covariance structure is a sum of known matrices can be compared.
-## #' 
+## #'
 ## #' The \code{largeModel} may be a model fitted with \code{lmer} either using
 ## #' \code{REML=TRUE} or \code{REML=FALSE}.  The \code{smallModel} can be a model
 ## #' fitted with \code{lmer}. It must have the same covariance structure as
@@ -28,16 +28,16 @@
 ## #' \beta = L \beta_H}, where \eqn{L} is a \eqn{k \times p}{k X p} matrix and
 ## #' \eqn{\beta} is a \eqn{p} column vector the same length as
 ## #' \code{fixef(largeModel)}.
-#' 
+#'
 ## #' The \eqn{\beta_H} is a \eqn{p} column vector.
-## #' 
+## #'
 ## #' Notice: if you want to test a hypothesis \eqn{L \beta = c} with a \eqn{k}
 ## #' vector \eqn{c}, a suitable \eqn{\beta_H} is obtained via \eqn{\beta_H=L c}
 ## #' where \eqn{L_n} is a g-inverse of \eqn{L}.
-#' 
+#'
 #' Notice: It cannot be guaranteed that the results agree with other
 #' implementations of the Satterthwaite approach!
-#' 
+#'
 #' @param largeModel An \code{lmerMod} model.
 #' @param smallModel An \code{lmerMod} model, a restriction matrix or
 #'     a model formula. See example section.
@@ -49,15 +49,15 @@
 #'     please report unexpected behaviour.
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
-#' 
+#'
 #' @seealso \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
 #'     \code{\link{PBmodcomp}}
-#' 
+#'
 #' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
 #'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
 #'     Models - The R Package pbkrtest., Journal of Statistical Software,
 #'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
-#' 
+#'
 #' @keywords models inference
 #' @examples
 #'
@@ -68,13 +68,13 @@
 #' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
 #' ## Test for no effect of Days. There are three ways of using the function:
-#' 
+#'
 #' ## 1) Define 2-df contrast - since L has 2 (linearly independent) rows
 #' ## the F-test is on 2 (numerator) df:
 #' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
 #' SATmodcomp(fm2, L2)
 #'
-#' ## 2) Use two model objects 
+#' ## 2) Use two model objects
 #' fm3 <- update(fm2, ~. - Days - I(Days^2))
 #' SATmodcomp(fm2, fm3)
 #'
@@ -109,10 +109,10 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
 
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
-    
-    t0    <- proc.time()    
+
+    t0    <- proc.time()
     L     <- model2remat(largeModel, smallModel)
-     
+
     beta <- getME(largeModel, "beta")
     aux  <- compute_auxillary(largeModel)
     vcov_Lbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
@@ -123,10 +123,10 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     tol <- max(eps * d[1], 0)
     pos <- d > tol
     qq  <- sum(pos) # rank(vcov_Lbeta)
-    
+
     PtL <- crossprod(P, L)[1:qq,, drop=FALSE]
     ## print(PtL)
-    
+
     t2     <- drop(PtL %*% beta)^2 / d[1:qq]
     Fvalue <- sum(t2) / qq
 
@@ -138,7 +138,7 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     ## 2D_m^2 / g'Ag
     nu_m <- vapply(1:qq, function(m) {
         2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
-    }, numeric(1L)) 
+    }, numeric(1L))
 
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
@@ -175,16 +175,16 @@ prform  <- function(form){
         print(form)
     else
         prmatrix(form, collab = rep_len("", ncol(form)), rowlab = rep_len("", ncol(form)))
-    invisible(form)    
+    invisible(form)
 }
 
 
 ## #' @export
-## tidy.KRmodcomp <- function (x, conf.int = FALSE, conf.level = 0.95, exponentiate = FALSE, 
-##     ...) 
+## tidy.KRmodcomp <- function (x, conf.int = FALSE, conf.level = 0.95, exponentiate = FALSE,
+##     ...)
 ## {
 ##     ##co <- stats::coef(summary(x))
-##     ## ret <- as_tidy_tibble(co, c("estimate", "std.error", "statistic", 
+##     ## ret <- as_tidy_tibble(co, c("estimate", "std.error", "statistic",
 ##     ##                             "p.value")[1:ncol(co)])
 
 ##     ret <- x$test
@@ -196,9 +196,9 @@ prform  <- function(form){
 ##         ret <- dplyr::left_join(ret, ci, by = "term")
 ##     }
 ##     ## if (exponentiate) {
-##     ##     if (is.null(x$family) || (x$family$link != "logit" && 
+##     ##     if (is.null(x$family) || (x$family$link != "logit" &&
 ##     ##         x$family$link != "log")) {
-##     ##         warning(paste("Exponentiating coefficients, but model did not use", 
+##     ##         warning(paste("Exponentiating coefficients, but model did not use",
 ##     ##             "a log or logit link function"))
 ##     ##     }
 ##     ##     ret <- exponentiate(ret)
@@ -207,35 +207,37 @@ prform  <- function(form){
 ## }
 
 
-#' @export 
+
+#' @importFrom generics tidy
+#' @export
 tidy.PBmodcomp <- function(x, ...){
-    ret <- x$test    
-    as_tibble(cbind(type=rownames(ret), ret))
+    ret <- x$test
+    tibble::as_tibble(cbind(type=rownames(ret), ret))
 }
 
-#' @export 
+#' @export
 tidy.KRmodcomp <- function(x, ...){
-    ret <- x$test    
-    as_tibble(cbind(type=rownames(ret), ret))
+    ret <- x$test
+    tibble::as_tibble(cbind(type=rownames(ret), ret))
 }
 
-#' @export 
+#' @export
 tidy.SATmodcomp <- function(x, ...){
     ret <- x$test
-    as_tibble(cbind(type="Ftest", ret))    
+    tibble::as_tibble(cbind(type="Ftest", ret))
 }
 
-#' @export 
+#' @export
 as.data.frame.PBmodcomp <- function(x, ...){
     x$test
 }
 
-#' @export 
+#' @export
 as.data.frame.KRmodcomp <- function(x, ...){
     x$test
 }
 
-#' @export 
+#' @export
 as.data.frame.SATmodcomp <- function(x, ...){
     x$test
 }
@@ -310,18 +312,18 @@ get_devfun <- function(model){
 #' @keywords internal
 
 compute_auxillary <- function(model, tol=1e-6){
-    
+
     if (!inherits(model, "lmerMod")) stop("'model' not an 'lmerMod'")
 
     devfun <- get_devfun(model)
-    
+
     ## tmp <- list(Call=Call, devfun=devfun) ## SH
     ## assign("tmp", tmp, envir=.GlobalEnv)
-    
+
     out <- list(sigma=NULL, vcov_beta=NULL, vcov_varpar=NULL, jacobian_list=NULL)
- 
+
     out$sigma <- sigma(model)
-    out$vcov_beta <- as.matrix(vcov(model))                       
+    out$vcov_beta <- as.matrix(vcov(model))
 
     ## The optimized variance parameters (theta, sigma)
     varpar_opt <- unname(c(getME(model, "theta"), getME(model, "sigma")))
@@ -331,7 +333,7 @@ compute_auxillary <- function(model, tol=1e-6){
     is_reml <- getME(model, "is_REML")
     h <- numDeriv::hessian(func=devfun_vp, x=varpar_opt,
                            devfun=devfun, reml=is_reml)
-    
+
     ## Eigen decompose the Hessian:
     eig_h <- eigen(h, symmetric=TRUE)
     evals <- eig_h$values
@@ -351,7 +353,7 @@ compute_auxillary <- function(model, tol=1e-6){
         warning(sprintf("Model may not have converged with %d eigenvalue(s) close to zero: %s",
                         sum(zero), evals_num))
     }
-    
+
     ## Compute vcov(varpar):
     ## ---------------------
     pos <- eig_h$values > tol
@@ -364,7 +366,7 @@ compute_auxillary <- function(model, tol=1e-6){
 
     out$vcov_varpar <- 2 * h_inv # vcov(varpar)
 
-    
+
     ## Compute Jacobian of cov(beta)
     ## -----------------------------
 
@@ -379,7 +381,7 @@ compute_auxillary <- function(model, tol=1e-6){
 }
 
 qform <- function(x, A) {
-  sum(x * (A %*% x)) 
+  sum(x * (A %*% x))
 }
 
 ## ##############################################
@@ -481,7 +483,7 @@ devfun_vp <- function(varpar, devfun, reml) {
 #' @return cov(beta) at supplied varpar values.
 #' @author Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.
 #' @keywords internal
-#' 
+#'
 get_covbeta <- function(varpar, devfun) {
   nvarpar <- length(varpar)
   sigma <- varpar[nvarpar]        # residual std.dev.
