@@ -1,0 +1,200 @@
+\documentclass[11pt]{article}
+%\VignetteIndexEntry{doBy-lsmeans-etc: LSmeans etc with the doBy package}
+%\VignettePackage{doBy}
+
+\usepackage{hyperref,color,boxedminipage,Sweave,a4wide}
+\usepackage[utf8]{inputenc}
+
+\def\textasciigrave{'}
+
+% \usepackage{a4wide,hyperref}
+% \usepackage[T1]{fontenc}
+% \usepackage{url,a4wide}
+% \usepackage{boxedminipage,color,xcolor}
+
+\RequirePackage{color,fancyvrb,amsmath,amsfonts}
+\DeclareMathOperator{\EE}{\mathbb{E}}
+
+\def\proglang#1{{#1}}
+\def\R{\texttt{R}}
+\def\doby{\pkg{doBy}}
+\def\pkg#1{{\bf #1}}
+\def\code#1{\texttt{#1}}
+
+% \usepackage{framed}
+% \usepackage{comment}
+% \definecolor{shadecolor}{gray}{0.91}
+% \def\popmeans{\code{popMeans()}}
+% \def\popmatrix{\code{popMatrix()}}
+% \def\linmeans{\code{linMeans()}}
+% \def\linmatrix{\code{linMatrix()}}
+% \def\esticon{\code{esticon()}}
+
+<<echo=FALSE>>=
+prettyVersion <- packageDescription("doBy")$Version
+prettyDate <- format(Sys.Date(), "%b %d, %Y")
+@
+
+\title{LSmeans, population means, estimates and contrasts  with the \texttt{doBy} package}
+\author{S{\o}ren H{\o}jsgaard}
+\date{\pkg{doBy} version \Sexpr{prettyVersion} as of \Sexpr{prettyDate}}
+
+% @
+% <<echo=FALSE>>=
+% options(prompt = "R> ", continue = "+  ", width = 80, useFancyQuotes = FALSE)
+% @ %def
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% \parindent0pt\parskip5pt
+% \setkeys{Gin}{height=3in}
+
+
+\section{Introduction}
+\label{sec:xxx}
+
+This is a working document; please feel free to suggest improvements.
+
+
+
+@ 
+<<>>=
+library(doBy)
+@ %def 
+
+\section{Linear functions of parameters, contrasts}
+\label{sec:line-funct-param}
+
+For a regression model with parameters $\beta=(\beta^1, \beta^2,\dots,
+\beta^P)$ we shall refer to a weighted sum of the form
+\begin{displaymath}
+  \sum_j w_j \beta^j
+\end{displaymath}
+as a contrast. Notice that it is common in the litterature to require
+that $\sum_j w_j=0$ for the sum $\sum_j w_j \beta^j$ to be called a
+contrast but we do not follow this tradition here.
+
+% The effect of changing the factor $A$ from \code{A2} to \code{A3} can
+% be found as
+% @
+% <<>>=
+% w <- c(0,-1,1,0,0,0)
+% sum(coef(mm)*w)
+% @ %def
+
+% The \esticon\ function provides this estimate, the standard error
+% etc.\ as follows:
+% @
+% <<>>=
+% esticon(mm, w)
+% @ %def
+
+
+
+\section{The \code{esticon} function}
+\label{esticon}
+
+Consider a linear model which explains \code{Ozone} as a linear
+function of \code{Month} (factor) and \code{Wind} (numeric) and an
+interaction between these effects:
+
+@
+<<>>=
+data(airquality)
+airquality <- transform(airquality, Month=factor(Month))
+m <- lm(Ozone~Month*Wind, data=airquality)
+coef(summary(m))
+@ %def
+
+When a parameter vector $\beta$ of (systematic) effects have been
+estimated, interest is often in a particular estimable function, i.e.\
+linear combination $\lambda^\top \beta$ and/or testing the hypothesis
+$H_0: \lambda^\top \beta=\beta_0$ where $\lambda$ is a specific vector
+defined by the investigator.  Suppose for example we want to calculate
+the expected difference in ozone between consequtive months at wind
+speed 10 mph (which is about the average wind speed over the whole
+period).
+
+The \code{esticon} function provides a way of doing so. We can
+specify several $\lambda$ vectors at the same time. For example
+
+@
+<<echo=T>>=
+Lambda <- rbind(
+  c(0, -1,  0,  0,  0, 0, -10,   0,   0,   0),
+  c(0,  1, -1,  0,  0, 0,  10, -10,   0,   0),
+  c(0,  0,  1, -1,  0, 0,   0,  10, -10,   0),
+  c(0,  0,  0,  1, -1, 0,   0,   0,  10, -10))
+@ %def
+
+Notice that the specification of \code{Lambda} depends on the choice
+of reference level of the factors; if the reference levels are
+changed, \code{Lambda} must be changed too. Estimates and tests are
+obtained with:
+
+@
+<<>>=
+esticon(m, Lambda)
+@ %def
+
+In other cases, interest is in testing a hypothesis of a contrast
+$H_0: \Lambda \beta=\beta_0$ where $\Lambda$ is a matrix as a joint test. For example
+a test of no interaction between \code{Month} and \code{Wind} can be
+made by testing jointly that the last four parameters in \code{m} are
+zero (observe that the test is a Wald test):
+@
+<<echo=T>>=
+Lambda <- rbind(
+  c(0,0,0,0,0,0,1,0,0,0),
+  c(0,0,0,0,0,0,0,1,0,0),
+  c(0,0,0,0,0,0,0,0,1,0),
+  c(0,0,0,0,0,0,0,0,0,1))
+@ %def
+
+
+@
+<<>>=
+esticon(m, Lambda, joint.test=TRUE)
+@ %def
+
+For a linear normal model a more attractice alternative (which is also
+easier to specify) is a likelihood ratio test:
+
+@ 
+<<>>=
+m2 <- update(m, .~.-Month:Wind)
+anova(m, m2)
+@ %def 
+
+However, for generalized estimating equations of glm--type (as dealt
+with in the packages \pkg{geepack} and \pkg{gee}) there is no
+likelihood. In this case \code{esticon} function provides an
+operational alternative. In fact, the \code{anova()} method in
+\pkg{geepack} is based on calling \code{esticon()}.
+
+
+\end{document}
+
+
+
+
+
+% \renewenvironment{Schunk}{\begin{center}
+%     \scriptsize
+%     \begin{boxedminipage}{1.0\textwidth}}{
+%     \end{boxedminipage}\end{center}}
+
+%\renewenvironment{Schunk}{\begin{shaded}\small}{\end{shaded}}
+
+% \SweaveOpts{keep.source=T}
+
+
+
+
+
+
+
+

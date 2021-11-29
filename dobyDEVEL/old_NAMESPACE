@@ -1,0 +1,152 @@
+##exportPattern("^[^\\.]")
+
+import(methods)
+importFrom(MASS, ginv, Null)
+
+importClassesFrom(Matrix, Matrix)
+importFrom(Matrix, Matrix, sparseMatrix)
+importMethodsFrom(Matrix, t, isSymmetric, "%*%", solve, diag)
+
+importFrom("stats", "as.formula", "coef", "delete.response", "family",
+           "fitted", "formula", "lm", "logLik", "median",
+           "model.frame", "model.matrix", "pchisq", "pnorm", "pt",
+           "qnorm", "qt", "residuals", "sd", "summary.lm", "terms",
+           "vcov", "aggregate", "printCoefmat", confint)
+
+importFrom(plyr, dlply)
+importFrom(dplyr, arrange_)
+importFrom("Deriv", Deriv)
+importFrom("tibble", as_tibble)
+importFrom("broom", tidy)
+
+importFrom(magrittr, "%>%")
+export("%>%")
+
+importFrom("utils", "str")
+importFrom(methods, setOldClass) 
+
+export(orderBy, summaryBy, lapplyBy, splitBy, lmBy, subsetBy,
+       transformBy, sampleBy)
+
+export(specialize, descStat, firstobs, lastobs, null_basis,
+       parseGroupFormula, recodeVar, renameCol, which.maxn,
+       which.minn, subSeq, taylor, timeSinceEvent)
+
+export(linest, LE_matrix, esticon, LSmeans)
+
+S3method( coef,             linest_class    )
+S3method( summary,          linest_class    )
+S3method( print,            linest_class    )
+S3method( confint,          linest_class    )
+
+S3method( coef,             esticon_class   )
+S3method( summary,          esticon_class   )
+S3method( print,            esticon_class   )
+S3method( confint,          esticon_class   )
+S3method( tidy,             esticon_class   )
+S3method( vcov,             esticon_class   )
+
+S3method( coef,             lmBy            )
+S3method( coef,             summary_lmBy    )
+
+S3method( esticon,          coxph           )
+S3method( esticon,          geeglm          )
+S3method( esticon,          glm             )
+S3method( esticon,          gls             )
+S3method( esticon,          lm              )
+S3method( esticon,          lme             )
+S3method( esticon,          mer             )
+S3method( esticon,          merMod          )
+
+S3method( firstobs,         default         )
+S3method( firstobs,         formula         )
+S3method( lastobs,          default         )
+S3method( lastobs,          formula         )
+
+
+S3method( fitted,           lmBy            )
+
+S3method( linest,           geeglm          )
+S3method( linest,           glm             )
+S3method( linest,           lm              )
+S3method( linest,           lmerMod         )
+S3method( linest,           merMod          )
+
+S3method( LE_matrix,        default         )
+
+S3method( LSmeans,          default         )
+S3method( LSmeans,          lmerMod         )
+
+
+
+S3method( print,            lmBy            )
+S3method( print,            linest_matrix_class )
+S3method( print,            splitByData     )
+S3method( print,            summary_lmBy    )
+S3method( residuals,        lmBy            )
+S3method( summary,          lmBy            )
+
+S3method( get_contrasts, default)
+S3method( get_contrasts, merMod)
+S3method( get_X, default )
+S3method( get_X, merMod )
+S3method( get_xlevels, default)
+S3method( get_xlevels, mer)
+S3method( get_xlevels, merMod)
+
+S3method(summary, linest_matrix_class)
+
+## S3method( nullBasis,        geeglm          )
+## S3method( nullBasis,        glm             )
+## S3method( nullBasis,        lm              )
+## S3method( nullBasis,        lmerMod         )
+## S3method( nullBasis,        Matrix          )
+## S3method( nullBasis,        matrix          )
+
+## S3method( get_null_basis, default)
+## S3method( get_null_basis, matrix)
+## S3method( get_null_basis, Matrix)
+          
+
+##import(lme4)
+##import(MASS)
+##import(multcomp)
+#import(survival)
+## importFrom(lme4, lmer, fixef)
+## importFrom(pbkrtest, vcovAdj)
+## importMethodsFrom(pbkrtest, vcovAdj)
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
