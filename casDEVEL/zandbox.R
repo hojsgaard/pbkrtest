@@ -1,4 +1,20 @@
-load_all("caracas")
+setwd("casDEVEL/caracas/")
+load_all()
+
+
+
+
+caracas:::as_expr_worker(x)
+
+
+
+
+
+
+x <- as_sym(c("a", "b"))
+
+e <- as_expr(x)
+
 
 s  <- as_sym("[[r1,r2,r3], [u1,u2,u3]]")
 s2 <- apply(as_character_matrix(s), 2, function(x) (paste("1/(", x, ")")))
