@@ -1,5 +1,205 @@
 setwd("casDEVEL/caracas/")
+load_all("caracas")
+
+## Symbol is atomic if it does not start with "[" or "Matrix([".
+symbol_is_atomic <- function(x){
+  z <- as.character(x)
+  !grepl("^\\[|Matrix\\(\\[", z)
+}
+
+
+#' Replicate Elements of 
+rep_ <- function(x, times=1){
+    if (!symbol_is_atomic(x)) stop("'x' must be atomic \n")
+
+    out <- as_sym(rep(as.character(x), times))    
+    ## out <- vector_sym(times)
+    ## for (i in seq_along(out)){
+        ## out <- subs(out, out[i], x)
+    ## }
+    return(out)
+}
+
+
+x <- as_sym("x")
+x = out
+a <- rep(x, 3) 
+a
+b <- sapply(a, as.character)
+b
+out <- as_sym(b)
+rep_(x, 3)
+
+z2 <- remove_mat_prefix(x)
+z3 <- unbracket(unbracket(z2))
+
+z3 %>% as.character
+remove_mat_prefix(z)
+grep("^Matrix\\(\\[.*]\\)", \\1, z)
+
+
+
+x <- matrix_sym(2,2)
+x %>% as.character
+
+x2 <- unbracket(x) 
+x2  %>% as.character
+symbol_is_atomic(x)
+
+x3 <- unbracket(x2)
+x3  %>% as.character
+
+z <- as.character(x)
+
+
+
+
+elt_power <- function(x, power){
+
+    ## If x is matrix and power is atomic things are ok now
+    ## Below: the case where x is atomic and power is matrix.
+    ## Need checks
+
+    if (!symbol_is_atomic(x)) stop("'x' must be atomic\n")
+    if (!symbol_is_matrix(power)) stop("'power' must be matrix\n")
+
+    ## Issue with dim of matrix
+    
+    out <- vector_sym(nrow(power))
+    for (i in 1:nrow(power)){
+        z <- power[i]
+        out <- subs(out, out[i], x^z)
+    }
+    out
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+document()
 load_all()
+install()
+
+library(caracas)
+
+# Create a symbol 'b1' corresponding to an entity called 'a' in SymPy:
+b1 <- symbol("a"); str(b1)
+# A new symbol can be created as:
+b2 <- b1 + 1; str(b2)
+# The \proglang{Python} entity 'a' in the symbol can be modified with:
+b3 <- subs(b2, "a", "k"); str(b3)
+
+m <- as_sym(matrix(4, nr=2, nc=2))
+
+d <- 4
+x <- matrix_sym(d,d)
+cm <- t(sympy_func(x, "cofactor_matrix")) / det(x)
+
+(cm %*% x) %>% simplify()
+
+mmi <- inv(mm)
+
+mmi[1,1] %>% denominator() 
+
+x <- mmi
+
+invcf <- function(x){
+  return(t(sympy_func(x, "cofactor_matrix")) / det(x))
+}
+
+x3 <- matrix_sym(3, 3)
+(inv(x3) - invcf(x3)) %>% simplify()
+
+x4 <- matrix_sym(4, 4)
+(inv(x4) - invcf(x4)) %>% simplify()
+
+microbenchmark::microbenchmark(
+  inv(x3),
+  invcf(x3),
+  inv(x4),
+  invcf(x4),
+  times=4
+)
+
+Unit: milliseconds
+expr         min           lq         mean      median           uq          max neval cld
+inv(x3)    863.4468    920.87706   1021.36414   1030.0806   1121.85123   1161.84857     4  a 
+invcf(x3)     67.1244     72.71165     80.45269     83.0884     88.19373     88.50956     4  a 
+inv(x4) 214497.4624 215083.69876 216498.63827 216698.9180 217913.57778 218099.25464     4   b
+invcf(x4)    191.4365    273.96105    357.29291    397.9659    440.62476    441.80333     4  a 
+
+
+inv2fl <- function(x){
+  xi <- invcf(x)
+  d <- denominator(xi[1,1])
+  as_factor_list(1/d, d * xi)
+}
+
+
+
+
+m <- matrix_sym(d, d)
+mi <- inv(m)
+det_m <- det(m)
+fl <- as_factor_list(1/det_m, det_m * mi)
+tex(fl)
+
+m <- matrix(1:4, nrow=2)
+mi <- solve(m)
+det_m <- det(m)
+fl <- as_factor_list(paste0("1/", det_m), det_m * mi)
+tex(fl)
+
+as_sym()
+
+
+
+
+
+z <- list(as_sym(4), m/4)
+class(z) <- "foo"
+
+
+as_factor_list <- function(...){
+    lst <- list(...)
+    out <- lapply(lst, as_sym)  
+    class(out) <- "factor_list"
+    out
+}
+
+
+x <- factorit(4, m/4)
+
+
+
+tex.factor_list <- function(x){
+    a<- lapply(x, tex)  |> unlist()
+    paste(a, collapse="  ")
+}
+
+factorit(4, m/4) %>% tex()
+
+
+
+
+
+
+
+factor
+
+
+|> paste0(sep=" ")
+
+diag(W)
 
 
 
