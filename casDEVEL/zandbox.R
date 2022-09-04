@@ -1,37 +1,152 @@
 setwd("casDEVEL/caracas/")
+
 load_all("caracas")
+x1 <- as_sym("x")
 
-## Symbol is atomic if it does not start with "[" or "Matrix([".
-symbol_is_atomic <- function(x){
-  z <- as.character(x)
-  !grepl("^\\[|Matrix\\(\\[", z)
-}
+x2
+x2 <- as_sym("[u, v]")
+x3 <- matrix_(c("a", "b", "c", "d"), 2, 2)
+x2 <- as_sym(c("x", "y"))
+
+to_vector(x1)
+to_vector(x2)
+to_vector(x3)
+to_vector(x4)
+
+symbol_class(x1)
+symbol_class(x2)
+symbol_class(x3)
+symbol_class(x4)
+
+z <- as.character(x2)
+
+sympy_func(x4, "tolist")
 
 
-#' Replicate Elements of 
+to_list(x1)
+to_list(x2)
+to_list(x3)
+to_list(x4)
+
+
+
+
+
+x4 <-sympy_func(as_sym("[[u, v]]"), "tolist")
+x5 <- sympy_func(x4, "tolist")
+
+as_sym("[[u, v]]")
+as_sym("[u, v]")
+
+symbol_is_atomic(x1)
+symbol_is_atomic(x2)
+symbol_is_atomic(x3)
+symbol_is_atomic(x4)
+
+symbol_is_vector(x1)
+symbol_is_vector(x2)
+symbol_is_vector(x3)
+symbol_is_vector(x4)
+
+symbol_is_list(x1)
+symbol_is_list(x2)
+symbol_is_list(x3)
+symbol_is_list(x4)
+
+symbol_is_matrix(x1)
+symbol_is_matrix(x2)
+symbol_is_matrix(x3)
+symbol_is_matrix(x4)
+
+
+
+
+
+
+x4 <-sympy_func(as_sym("[[u, v]]"), "tolist")
+z <- as.character(x4)
+
+z <- as.character(x2)
+
+grepl("^\\[[^\\[]", z)
+
+
+
+
+z <- as.character(x1)
+
+
+
+o_list(x1)
+to_list(x2)
+to_list(x3)
+
+
+
+
+
+
+
+## Turn matrix into vector
+
+tolist(t(x3)) %>% unbracket() %>% as.character()
+
+
+#' Replicate elements  
 rep_ <- function(x, times=1){
     if (!symbol_is_atomic(x)) stop("'x' must be atomic \n")
-
     out <- as_sym(rep(as.character(x), times))    
-    ## out <- vector_sym(times)
-    ## for (i in seq_along(out)){
-        ## out <- subs(out, out[i], x)
-    ## }
     return(out)
 }
 
 
-x <- as_sym("x")
-x = out
-a <- rep(x, 3) 
-a
-b <- sapply(a, as.character)
+x1 %>% as.character()
+x2 %>% as.character()
+x3 %>% as.character()
+
+matrify(x1)
+matrify(x1) %>% as.character()
+matrify(x2)
+matrify(x2) %>% as.character()
+matrify(x3)
+matrify(x3) %>% as.character()
+
+
+# rep_atomic
+
+x = x1
+r <- rep(x, 3) 
+r
+b <- sapply(r, as.character)
 b
 out <- as_sym(b)
-rep_(x, 3)
+out
 
+
+x = x2
+r <- rep(x, 3) 
+r
+b <- sapply(r, as.character)
+b
+out <- as_sym(b)
+out
+
+as_sym(sapply(listify(t(out)), as.character))
+
+rep(c("u", "v"), 3)
+
+
+as_sym(sapply(listify(t(x3)), as.character))
+
+x <- x3
 z2 <- remove_mat_prefix(x)
-z3 <- unbracket(unbracket(z2))
+z3 <- unbracket(z2)
+
+
+
+
+
+
 
 z3 %>% as.character
 remove_mat_prefix(z)
