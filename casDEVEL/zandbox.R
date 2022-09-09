@@ -1,10 +1,11 @@
 setwd("casDEVEL/caracas/")
 
 load_all("caracas")
-x1 <- as_sym("x")
+x1 <- as_sym("a")
+x2 <- as_sym(c("u", "v"))
+x3 <- as_sym("[u, v]")
 
-x2
-x2 <- as_sym("[u, v]")
+
 x3 <- matrix_(c("a", "b", "c", "d"), 2, 2)
 x2 <- as_sym(c("x", "y"))
 
