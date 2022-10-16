@@ -1,3 +1,33 @@
+
+library(tidyverse)
+library(geepack)
+
+# Don't need 10000 to see the "problem"; thats why I wrote a "minimal" reproducible example
+N <- 60
+dat <- tibble(ID = Vectorize(digest::sha1)(1:N),
+              var1 = rep(c(0,1),N/2),var2 = rep(c("cat1","cat2"),N/2))
+
+dat$ID  %>% unique %>% length()
+## Same as N - so all clusters have length 1.. Hmmm
+dat$ID2 <- factor(dat$ID)
+
+m1 <- geeglm(var1 ~ var2, data = dat, id =  ID)
+m1
+m2 <- geeglm(var1 ~ var2, data = dat, id =  ID2)
+m2
+
+summary(m1)
+summary(m2)
+## So - would you still claim that geeglm works by turning ID into a factor?
+
+
+
+
+
+
+
+
+
 library(geepack)
 document("pkg")
 load_all("pkg")

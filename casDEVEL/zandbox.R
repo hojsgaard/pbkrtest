@@ -1,6 +1,60 @@
 setwd("casDEVEL/caracas/")
 
-load_all("caracas")
+load_all(".")
+
+def_sym(xx, yy, zz)
+
+uu <- xx + yy
+subs(uu, cbind(xx, yy), c(123, xx^2 + yy))
+
+#x1 <- list("xx"=123, "yy"=xx^2+yy)
+#subs_lst(uu, x1)
+
+x2 <- list("xx"=123, "yy"=(xx^2+yy)$pyobj)
+subs_lst(uu, x2)
+
+x2 <- subs_lst(uu, c(xx, yy), c(123, xx^2 + yy))
+
+x <- c(xx, yy)
+v <- c(123, xx^2 + yy)
+
+l <- as.list(v)
+names(l) <- all_vars(x)
+
+subs_lst(uu, c())
+
+
+
+      p <- vector_sym(3, "p")
+      y <- vector_sym(3, "y")
+      subs_lst(p, list("p1" = 1, "p2" = y[1], "p3" = 0))
+
+def_sym(aa, bb)
+cc <- aa + bb
+
+# Short
+subs_lst(cc, c(aa, bb), c(1122, aa^2+bb))
+
+# Same as
+l <- as.list(c(1122, aa^2+bb))
+names(l) <- all_vars(c(aa, bb))
+subs_lst(cc, l)
+
+def_sym(a,b,c,x)
+y <- a*x^2 + b*x + c
+sol <- solve_sys(y, x)
+
+subs(y, cbind(x), sol[[1]]$x) %>% simplify()
+
+v <- c(123, xx^2 + yy)
+
+nms <- gsub(" *", "", as_character_matrix(c(xx, yy)))
+
+l <- as.list(v)
+names(l) <- nms
+
+subs_lst(v, l)
+
 x1 <- as_sym("a")
 x2 <- as_sym(c("u", "v"))
 x3 <- as_sym("[u, v]")
