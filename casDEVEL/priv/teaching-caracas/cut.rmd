@@ -1,0 +1,1268 @@
+
+<!-- Going back to the first example, we can substitute one symbol with -->
+<!-- another and simplify the result as (where we use \proglang{R}'s native pipe operator, `|>`): -->
+<!-- ```{r} -->
+<!-- s4 <- s3 |> subs("s1", "u + v") |> subs("s2", "u - v"); s4 -->
+<!-- s5 <- expand(s4); s5 -->
+<!-- ``` -->
+
+<!-- A caracas object can be printed in \LaTeX format: -->
+
+<!-- ```{r} -->
+<!-- tex(s5)  -->
+<!-- ``` -->
+
+<!-- It is also possible to convert to and from symbols and standard \proglang{R} expressions: -->
+<!-- ```{r} -->
+<!-- # Coerce from symbol to expression: -->
+<!-- e5 <- as_expr(s5) -->
+<!-- e5 -->
+<!-- # Coerce from expression to symbol: -->
+<!-- as_sym(e5) # identical to s5 -->
+<!-- ``` -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- \bibliography{references} -->
+
+
+<!-- \appendix -->
+
+
+<!-- ## Appendix: Assumptions -->
+
+<!-- It is sometimes required to impose assumptions on variables.  -->
+<!-- There is currently (limited) support for this in \pkg{caracas}: -->
+
+<!-- ```{r} -->
+<!-- x <- symbol("x") -->
+<!-- sol <- solve_sys(x^2 + 1, x); sol -->
+<!-- ``` -->
+
+<!-- Requiring `x` to be real: -->
+
+<!-- ```{r} -->
+<!-- x <- symbol("x", real = TRUE) -->
+<!-- ask(x, 'real') -->
+<!-- sol <- solve_sys(x^2 + 1, x); sol -->
+<!-- ``` -->
+
+<!-- Requiring `x` to be positive: -->
+
+<!-- ```{r} -->
+<!-- x <- symbol("x", positive = TRUE) -->
+<!-- ask(x, 'positive') -->
+<!-- sol <- solve_sys(x^2 - 1, x); sol -->
+<!-- ``` -->
+
+
+
+
+
+<!-- ## Regression -->
+
+<!-- ```{r, eval=FALSE} -->
+<!-- X <- matrix_sym(3, 2, "x") -->
+<!-- X[, 1] <- 1 -->
+<!-- X -->
+
+<!-- XtX <- t(X) %*% X -->
+<!-- XtX -->
+
+<!-- qr <- QRdecomposition(XtX)  -->
+<!-- qq <- qr$Q -->
+<!-- rr <- qr$R  %>% simplify -->
+
+<!-- qq %*% t(qq) -->
+
+<!-- (qq %*% rr)  %>% simplify  -->
+
+<!-- XtX -->
+
+<!-- t(rr) %*% rr -->
+
+<!-- t(qq) %*% qq -->
+
+
+
+<!-- rr <- T -->
+<!-- x11 <- symbol("x11", real = rr) -->
+<!-- x12 <- symbol("x12", real = rr) -->
+<!-- x21 <- symbol("x21", real = rr) -->
+<!-- x22 <- symbol("x22", real = rr) -->
+<!-- x31 <- symbol("x31", real = rr) -->
+<!-- x32 <- symbol("x32", real = rr) -->
+
+<!-- X <- rbind(c(x11, x12), c(x21, x22), c(x31, x32)) -->
+<!-- ask(X, 'real') -->
+
+<!-- QRdecomposition(X) -->
+
+
+
+
+
+
+
+<!-- XX <- matrix(X, nrow=2) -->
+
+<!-- dim(X) <- c(2,2) -->
+
+
+
+
+<!-- symbol(X, real=T) -->
+
+<!-- as_sym(paste0("z", 1:4)) -->
+
+<!-- x <- symbol("x", real = TRUE) -->
+
+<!-- x <- paste0("x_", 1:4) -->
+
+<!-- sapply(x, function(xi){symbol(xi, real=T)}) -->
+<!-- x <- as_sym(x) -->
+
+<!-- ask(x, 'real') -->
+
+
+<!-- ``` -->
+
+
+
+
+
+
+<!-- For comparison we fit the same model with \r's `arima()` function: -->
+<!-- ```{r} -->
+<!-- a1 <- arima(xt, order=c(1,0,0), include.mean = FALSE, method="ML") -->
+<!-- library(broom) -->
+<!-- tidy(a1) -->
+<!-- glance(a1) -->
+<!-- ``` -->
+
+<!-- For a longer time series we get: -->
+<!-- ```{r} -->
+<!-- N <- 10 -->
+<!-- yt <- arima.sim(list(order=c(1,0,0), ar=.5), n=N) |> as.numeric() -->
+<!-- L1 <- diff_mat(N, "-a") -->
+<!-- def_sym(v2) -->
+<!-- K1 <- crossprod_(L1) / v2 -->
+<!-- x <- as_sym(paste0("x", 0:(N-1))) -->
+<!-- logL <- log(det(K1)) - sum(K1 * (x %*% t(x))) -->
+<!-- logL2 <- subs(logL, x, yt)  -->
+<!-- S <- der(logL2, parm) |> simplify() -->
+<!-- sol <- solve_sys(S, parm) -->
+<!-- sol -->
+<!-- ``` -->
+
+<!-- Compare this with -->
+<!-- ```{r} -->
+<!-- a2 <- arima(yt, order=c(1,0,0), include.mean = FALSE, method="ML") -->
+<!-- tidy(a2) -->
+<!-- glance(a2) -->
+<!-- ``` -->
+
+
+
+
+<!-- ### Two way analysis of variance (two-way anova) {#two-way} -->
+
+<!-- [FIXME: Flyt til "Possible topics for students"?] -->
+
+<!-- Similar considerations can be done for other linear models, e.g.  -->
+<!-- a (balanced) two-way analysis of variance (two-way ANOVA) with one observation per cell: -->
+
+<!-- ```{r} -->
+<!-- dat <- expand.grid(a = c("a1", "a2"), b = c("b1", "b2")) -->
+<!-- X <- as_sym(model.matrix(~ a + b, data=dat)) -->
+<!-- y <- c("y11", "y21", "y12", "y22") %>% as_sym() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- Xty <- t(X) %*% y -->
+<!-- XtX <- t(X) %*% X -->
+<!-- XtXinv <- inv(XtX)  -->
+<!-- b_hat <- XtXinv %*% Xty -->
+<!-- y_hat <- X %*% b_hat -->
+<!-- ``` -->
+
+<!-- \[ -->
+<!--     X = `r texr(X)`, \quad -->
+<!-- 	X^\top y = `r tex(Xty)`, \quad -->
+<!-- 	\hat{\bb} = `r tex(mat_factor_div(b_hat, 2))` -->
+<!-- \] -->
+
+<!-- \[ -->
+<!-- 	\hat{y} = `r tex(mat_factor_div(y_hat, 4))` -->
+<!-- \] -->
+
+
+<!-- ### Multinomial model -->
+
+<!-- Consider a multinomial model with three categories with probabilities -->
+<!-- $p_1$, $p_2$ and $p_3$ such that $p_1 + p_2 + p_3 = 1$.  The corresponding counts are denoted  -->
+<!-- $y_1$, $y_2$ and $y_3$ of each category.  The -->
+<!-- multinomial log-likelihood  is -->
+
+<!-- \begin{align} -->
+<!--   l(p) &= y_1 \log(p_1) + y_2 \log(p_2) + y_3 \log(p_3) . -->
+<!-- \end{align} -->
+
+<!-- We wish to maximize $l(p)$ under the constraint that $p_1 + p_2 + p_3 = 1$.  -->
+<!-- This can be achieved using Lagrange multiplier where we instead solve the unconstrained optimization problem $\max_p L(p)$ where -->
+<!-- \begin{align} -->
+<!--   L(p) &= -l(p) + a g(p) \quad \text{under the constraint that} \\ -->
+<!--   g(p) &= p_1 + p_2 + p_3 - 1 = 0. -->
+<!-- \end{align} -->
+<!-- where $a$ is a Lagrange multiplier. -->
+
+
+<!-- ```{r} -->
+<!-- p <- vector_sym(3, "p") -->
+<!-- y <- vector_sym(3, "y") -->
+<!-- def_sym(a)  -->
+<!-- l <- sum(y * log(p)) -->
+<!-- L <- -l + a * (sum(p) - 1) -->
+<!-- L -->
+<!-- ``` -->
+
+<!-- To solve the unconstrained optimization problem we find the critical -->
+<!-- points and afterwards check the eigenvalues of the Hessian (at the -->
+<!-- critical points).  The critical points are found as follows by first -->
+<!-- finding the gradient with `der()` (for derivative) and then equating -->
+<!-- the gradient to zero: -->
+
+<!-- ```{r} -->
+<!-- gL <- der(L, list(p, a)) -->
+<!-- gL -->
+<!-- ``` -->
+
+<!-- Hence, \pkg{caracas} computes the gradient to be -->
+<!-- \[ -->
+<!--   \nabla L (p_1, p_2, p_3, a) = `r texr(gL)` . -->
+<!-- \] -->
+
+<!-- Next we solve $\nabla L (p_1, p_2, p_3, a) = 0$: -->
+
+<!-- ```{r} -->
+<!-- sols <- solve_sys(gL, list(p, a)) -->
+<!-- sols -->
+<!-- ``` -->
+
+<!-- One critical point is found. We verify that we  -->
+<!-- have found a minimum: We find the Hessian as a symbol and evaluate it in the -->
+<!-- critical point:\footnote{Should work with subs()} -->
+
+<!-- ```{r} -->
+<!-- H <- hessian(l, p) -->
+<!-- H_sol <- subs_lst(H, sols[[1]])  -->
+<!-- ``` -->
+
+<!-- \[ -->
+<!--   H = `r texr(H)`, \quad -->
+<!--   H_{\text{sol}} = `r texr(H_sol)` -->
+<!-- \] -->
+
+<!-- The solution is indeed a minimum: -->
+<!-- As $H_{\text{sol}}$ is a diagonal matrix, its eigenvalues are the diagonal entries and these are all negative provided that all $y_i > 0$, so the likelihood reached its maximum.\footnote{H er negativ defint alle steder.} -->
+
+
+
+
+<!-- Another model matrix also spanning $L$ is one without an intercept:  -->
+
+<!-- ```{r} -->
+<!-- X2 <- as_sym(model.matrix(~ -1 + f)) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- X2ty <- t(X2) %*% y -->
+<!-- b2_hat <- inv(t(X2) %*% X2) %*% X2ty -->
+<!-- y_hat <- X2 %*% b2_hat -->
+<!-- ``` -->
+
+<!-- \[ -->
+    <!-- X_2 = `r texr(X2)`, \quad -->
+	<!-- X_2^\top y = `r tex(X2ty)`, \quad -->
+	<!-- \hat{\bb} = `r tex(mat_factor_div(b2_hat, nspg))`, \quad  -->
+	<!-- \hat{y} = `r tex(mat_factor_div(y_hat, nspg))` -->
+<!-- \] -->
+
+## A short primer - sidst
+
+
+Before proceeding, there is one little technicality to notice. First:
+
+```{r}
+def_sym(x, y, z)
+y <- exp(z); x <- y^2; x
+```
+
+Above, $x$ is defined via the composition to be $x = \exp(z)^2 =
+\exp(2z)$ because by the time `x` is defined in terms of `y`, it is
+already known that `y` is defined in terms of `z`. If we reverse the
+order of definition results are different:
+
+```{r}
+def_sym(x, y, z)
+x <- y^2; y <- exp(z); x
+```
+
+In this second case, by the time that `x` is defined in terms of `y`,
+it is not known that `y` will later be defined in terms of `z`. A
+remedy is to substitute the definition of `y` (in terms of `z`) into
+the definition of `x` (in terms of `y`).
+
+```{r}
+x <- subs(x, "y", y); x
+```
+
+A more stringent workaround is to distinguish between free symbols
+(defined e.g.\ via `def_sym()`) and symbols which are explicitly
+defined in terms of free symbols. We suggest the latter 
+symbols are postfixed with an underscore (`_`):
+
+```{r}
+def_sym(x, y, z)
+x_ <- y^2; y_ <- exp(z); x_
+x_ <- subs(x_, y, y_); x_
+```
+
+
+## A matrix approach
+
+```{r logistic}
+N <- 4
+q <- 2
+
+X <- matrix_sym(N, q, "x")
+y <- vector_sym(N, "y")
+n <- vector_sym(N, "n")
+p <- vector_sym(N, "p")
+b <- vector_sym(q, "b")
+```
+
+$$
+ X=`r tex(as_sym(X))`, \quad
+ n=`r tex(as_sym(n))`, \quad
+ y=`r tex(as_sym(y))`
+$$
+
+
+The binomial likelihood (as function of $p) becomes:
+```{r}
+l  <- sum(y * log(p) + (n-y) * log (1-p))
+```
+
+The linear predictor is $s = X b$. When using the logit as
+link, the connection between $p$ and $s$ is $p = 1 / (1+
+\exp(-s))$. We can substitute this expression for $p$ into the
+log-likelihood thereby obtaining a log-likelihood as function of
+$b$:
+
+```{r}
+s_  <- X %*% b
+s_
+```
+
+```{r}
+p_ <- 1 / (1 + exp(-s_))
+l2 <- subs(l, p, p_)
+```
+
+The score and Hessian become are obtained by differentiation:
+```{r}
+## Score and Hessian
+S <- score(l2, b) 
+H <- hessian(l2, b)
+```
+
+
+Take specific numbers and a specific model matrix:
+
+## Numerical evaluation and Newton-Rapson
+
+Take specific numbers and a specific model matrix:
+
+```{r}
+D_ <- data.frame(d = factor(rep(c("a", "b"), each = N/2)))
+X_ <- model.matrix(~., D_)
+colnames(X_) <- c("x1", "x2")
+n_ <- rep(10, N)
+y_ <- 1:N
+```
+
+$$
+ X=`r tex(as_sym(X_))`, \quad
+ n=`r tex(as_sym(n_))`, \quad
+ y=`r tex(as_sym(y_))`
+$$
+
+Substitute values into score and Hessian:
+
+```{r substitute}
+S_ <- subs(S, cbind(n, y, X), cbind(n_, y_, X_)) %>% simplify()
+H_ <- subs(H, cbind(n, y, X), cbind(n_, y_, X_)) %>% simplify()
+```
+
+After these steps score and Hessian depend only on $\beta$. 
+
+\begin{align}
+S &= `r tex(S_)`, \\
+H &= `r tex(H_)`
+\end{align}
+
+
+From here we have all ingredients for Newton-Rapson:
+
+```{r}
+b_ <- c(0, 0)
+for (i in 1:5){
+    S_i <- as_expr(subs(S_, b, b_))
+    H_i <- as_expr(subs(H_, b, b_))  
+    b_ <- b_ - solve(H_i, S_i)
+    ## print(beta_)
+}
+b_
+- solve(H_i)
+```
+
+```{r glm}
+mm <- glm(cbind(y_, n_ - y_) ~ d, data =D_, family = binomial())
+summary(mm) %>% coef()
+vcov(mm)
+```
+
+### Via Jacobian matrices
+
+```{r}
+## Free symbols
+theta <- paste0("theta", seq_len(N)) %>% as_sym()
+eta   <- paste0("eta", seq_len(N)) %>% as_sym()
+beta  <- paste0("beta", seq_len(q)) %>% as_sym()
+
+## Functionally related symbols
+eta_   <- X %*% beta
+theta_ <- 1 / (1 + exp(-eta))
+
+J1 <- jacobian(l_theta, theta)
+J1
+
+J2 <- jacobian(theta_, eta)
+J2  %>% diag()
+
+J3 <- jacobian(eta_, beta)
+J3
+
+
+J22 <- subs(J2, eta, eta_)
+J11 <- subs(J1, theta, subs(theta_, eta, eta_))
+
+Jtotal <- (J11 %*% J22 %*% J3)
+dim(Jtotal)
+```
+
+\[
+J1 = `r tex(Jtotal[1,1])`
+\]
+
+\[
+J2 = `r tex(Jtotal[1,2])`
+\]
+
+# Appendix: Technicalities
+
+To avoid confusion we elaborate on the construction of symbols in the following:
+
+* `as_sym()` converts an \proglang{R} object (or string) to symbol.
+* `symbol()` declares a symbol by string, and allows for assumptions.
+* `def_sym()` declares a symbol (either by string or non-standard
+  evaluation) and assigns to an \proglang{R} variable with same name.
+
+The behaviour of `def_sym()` can be obtained by both `symbol()` and `as_sym()`, but the two latter require an explicit assignment. Thus the following three statements are equivalent:
+```{r}
+a <- as_sym("a")
+a <- symbol("a")
+def_sym(a)
+```
+
+To elaborate, consider a vector in \proglang{R}: Using `symbol` - the following fails 
+because `a` is an `a` object and not a string:
+```{r, error=TRUE}
+a <- c(-1, 1); a
+a <- symbol(a)  
+```
+
+On the other hand, 
+`as_sym` works as expected. Using `def_sym` also works, but not as the user expects: 
+A new variable `a` is created and the old `a` (the vector) is no longer 
+bound to a variable:
+
+```{r}
+a2 <- as_sym(a); t(a2)
+a  ## a is unchanged
+def_sym(a); a
+```
+
+
+
+
+## The interplay between \proglang{R} and SymPy
+
+As mentioned above, \pkg{caracas} provides an interface from \proglang{R} to
+the \proglang{Python} package SymPy. This means that SymPy is "running under the
+hood" of \proglang{R} via the \pkg{reticulate} package. In \pkg{caracas}
+we have symbols, which is an \proglang{R} list with a `pyobj` slot and the class
+`caracas_symbol`.  The `pyobj` refers to an object in \proglang{Python} (often a
+SymPy object).  As such, a symbol (in \proglang{R}) provides a handle to a \proglang{Python}
+object.  In the design of \pkg{caracas} we have tried to make this
+distinction something the user should not be concerned with, but it is
+worthwhile being aware of the distinction.  There are several ways of
+creating symbols; one is with `def_sym()` that both declares the
+symbol in \proglang{R} and in \proglang{Python}:
+```{r}
+# Define symbols and assign in global environment
+def_sym(s1, s2); s1 # Declares 's1'/'s2' in both R and \proglang{Python}
+str(s1)
+# Create new symbol from existing ones
+s3 <- s1 * s2; s3 # 's3' is a symbol in R; no corresponding object in \proglang{Python}
+str(s3)
+```
+
+Note that above `def_sym(s1, s2)` is a short-hand for the following:
+```{r}
+s1 <- symbol("s1")
+s2 <- symbol("s2")
+```
+
+We can further exemplify  that objects in \proglang{R} and \proglang{Python} are not
+necessarily identical. We look into a symbol, and to make the
+distinction clear we use different names. Symbols can be created with
+the `symbol()` function.
+
+```{r}
+# Create a symbol 'b1' corresponding to an entity called 'a' in SymPy:
+b1 <- symbol("a"); str(b1)
+# A new symbol can be created as:
+b2 <- b1 + 1; str(b2)
+# The \proglang{Python} entity 'a' in the symbol can be modified with:
+b3 <- subs(b2, "a", "k"); str(b3)
+```
+
+Going back to the first example, we can substitute one symbol with
+another and simplify the result as (where we use the pipe operator `%>%` from \pkg{magrittr} by \citet{magrittr}):
+```{r}
+s4 <- s3 %>% subs("s1", "u + v") %>% subs("s2", "u - v"); s4
+s5 <- expand(s4); s5
+```
+
+It is also possible to convert to and from symbols and standard \proglang{R} expressions:
+```{r}
+# Coerce from symbol to expression:
+e5 <- as_expr(s5); e5
+# Coerce from expression to symbol:
+as_sym(e5) # identical to s5
+```
+
+
+## NOTE: Remember to also include
+
+
+* Design JSS [mikl]
+* New example with limit
+* Remove t dist
+* Large example 1: Teaching: slides with math
+* Large example 2: Factor analysis with data and parameters (with certain restrictions) [sorenh]
+* Technical issues with Score function / Hessian matrix -- explain;
+  + Non-linear regression (cut-out fil)
+* Exponential smoothing: sums? [sorenh]
+
+
+## Finding a limit - the Euler constant
+
+Define symbols `n` and `f`:
+
+```{r}
+def_sym(n)
+f <- (1 + 1/n)^n
+```
+
+We can calculate the limit of `f` for $n \to \infty$:
+
+```{r}
+lim_f <- lim(f, n, Inf)
+lim_f
+as_expr(lim_f)
+```
+
+We can also tell \pkg{caracas} not to evaluate the limit (with the `doit = FALSE` argument) but only set up 
+the symbol for later evaluation and/or for additional algebraic manipulations:
+
+```{r}
+lim_f_sym <- lim(f, n, Inf, doit = FALSE)
+lim_f_sym
+```
+
+By default \pkg{caracas} uses UTF-8 printing, but in this paper we
+have used pretty ASCII printing which can be set globally by
+`options(caracas.print.prettyascii = TRUE)`.
+
+The unevaluated symbol can be evaluated as follows:
+```{r}
+lim_f <- doit(lim_f_sym) 
+lim_f
+```
+
+
+<!-- ```{r} -->
+<!-- f -->
+<!-- lim_f_sym -->
+<!-- lim_f -->
+<!-- ``` -->
+
+
+Hence, three \pkg{caracas} symbols have been created above: `f`, `lim_f_sym` and `lim_f`.
+Objects can be printed in \TeX\ form using `tex()`, e.g.
+```{r}
+tex(lim_f_sym)
+```
+
+This can be used in a \TeX\ environment as e.g.
+```{r, eval=FALSE, prompt=FALSE}
+\[
+`r tex(f)`, \quad `r tex(lim_f_sym)`, \quad `r tex(lim_f)`.
+\]
+```
+giving
+\[
+`r tex(f)`, \quad `r tex(lim_f_sym)`, \quad `r tex(lim_f)`.
+\]
+
+
+## Differentiation and integration
+
+Consider this function (taken from a vignette for the
+\pkg{mosaicCalc} package \citep{mosaicCalc}). Using the \pkg{Deriv} package, the
+derivative can be found as follows:
+
+```{r}
+f <- function(x){
+  a * x + b * x^2 + c * sin(x^2)
+}
+Deriv::Deriv(f, "x")
+```
+
+The anti-derivative, however, is not easily obtained in \proglang{R}.  Using
+\pkg{caracas} we get derivative and anti-derivative as:
+
+```{r}
+f_c <- as_sym("a * x + b * x^2 + c * sin(x^2)")
+def_sym(x) # To get handle on x in R
+D_f <- der(f_c, x) # Or: der(f_c, "x")
+aD_f <- int(f_c, x) %>% simplify()
+```
+
+$$
+D_f = `r tex(D_f)`, \quad aD_f = `r tex(aD_f)`
+$$
+
+Above, $S()$ is the Fresnel integral $S(z) = \int_0^z \sin \left (\frac{\pi}{2}t^2 \right ) dt$. Evaluation in
+\proglang{R} requires a definition of `fresnels()`:
+```{r}
+as_expr(aD_f) # Evaluation requires user-defined fresnels()
+```
+
+<!---
+Notice: Going from an R function to a \pkg{caracas}
+symbol can be done but it requires some wrangling:
+
+```{r}
+bd <- body(f)[[2]]; bd
+f_c <- as_sym(deparse(bd)); f_c
+vn <- all.vars(bd); vn
+def_sym(charvec = vn) # To get handle on variables in R
+D_f <- der(f_c, x)
+aD_f <- int(f_c, x) %>% simplify()
+```
+--->
+
+## Exact and numerical evaluations
+
+We can make exact as well as numerical evaluations as follows:
+
+```{r}
+def_sym(x)
+f <- exp(x^2)
+subs(f, x, "1/3")
+subs(f, x, 1/3)
+```
+
+In the first case, $1/3$ is regarded as a fraction. In the second
+case, $1/3$ is evaluated numerically in \proglang{R} before \pkg{caracas} gets the value. 
+As a consequence we have:
+```{r}
+subs(f, x, "1/3 + 1/4")
+subs(f, x, 1/3 + 1/4)
+```
+
+An exact evaluation can be evaluated numerically afterwards:
+```{r}
+subs(f, x, "1/3 + 1/4") %>% as_expr()
+subs(f, x, "1/3 + 1/4") %>% N(30) # Exact representation up to 30 decimals
+```
+
+We can also convert the \pkg{caracas} symbol to an \proglang{R} expression 
+that is subsequently evaluated:
+
+```{r}
+f %>% as_expr()
+f %>% as_expr() %>% eval(list(x = 1/3 + 1/4))
+```
+
+
+
+## Taylor expansion
+
+We perform a fourth order Taylor expansion of $f(x) = \cos(x)$ around $x = 0$:
+
+```{r}
+def_sym(x)
+f <- cos(x)
+ft_with_O <- taylor(f, x0 = 0, n = 4+1); ft_with_O
+```
+
+The order term can be removed:
+
+```{r}
+ft <- drop_remainder(ft_with_O); ft
+ft %>% as_expr()
+```
+
+
+## Matrix algebra
+
+We briefly demonstrate the use matrices in \pkg{caracas} (see also 
+<https://r-cas.github.io/caracas/>):
+
+```{r}
+A <- matrix_(c("a", "b", "c", "d"), nrow = 2, ncol = 2) # Note the '_' postfix
+# Or: matrix(c("a", "b", "c", "d"), nrow = 2, ncol = 2) %>% as_sym()
+```
+
+Note that `rbind()` and `cbind()` also works on \pkg{caracas} (vector) symbols:
+
+```{r}
+c1 <- as_sym(c("a", "b"))
+c2 <- as_sym(c("c", "d"))
+A <- cbind(c1, c2); A
+D <- diag_(c("e1", "e2")); D # Note the '_' postfix
+```
+
+Some routines are demonstrated below:
+
+```{r}
+detA <- det(A)
+Ai <- inv(A) # Shorthand for solve_lin(A)
+AD <- A %*% D
+```
+
+$$
+\texttt{detA} = `r tex(detA)`, \quad
+\texttt{Ai} = `r tex(Ai)`, \quad
+\texttt{AD} = `r tex(AD)`
+$$
+
+```{r}
+evec <- eigenvec(A)
+evec1 <-evec[[1]]$eigvec %>% simplify()
+eval <- eigenval(A)
+eval1 <- eval[[1]]$eigval %>% simplify()
+```
+
+$$
+\texttt{evec1} = `r tex(evec1)`, \quad
+\texttt{eval1} = `r tex(eval1)`.
+$$
+
+
+```{r}
+B <- matrix_(c("b", "0", "0", "1"), nrow = 2, ncol = 2)
+qr_res <- QRdecomposition(B)
+Q <- qr_res$Q 
+R <- qr_res$R
+```
+
+$$
+\texttt{Q} = `r tex(Q)`, \quad
+\texttt{R} = `r tex(R)`.
+$$
+
+
+
+
+<!---
+## The limit of Student's $t$ distribution
+
+Consider the density function for Student's $t$ distribution with $d$
+degrees of freedom: 
+\[ p(x; d) = c \left (1 + \frac{x^2}{d} \right)^{\frac{-(d + 1)}{2}} = c h(x; d) 
+\] 
+where $c$ is the normalizing
+constant and $h$ is the kernel. We will use \pkg{caracas} for calculating $\lim_{d \rightarrow
+\infty} h(x; d)$ which can be achieved by using the \pkg{caracas} function `lim()` as follows. 
+
+
+```{r}
+def_sym(x, d)
+h <- (1 + x^2 / d)^(-(d + 1) / 2) # Kernel of the t-distribution density
+lim_h <- lim(h, var = d, val = Inf)
+lim_h
+```
+
+So the limiting distribution of a
+$t$--distribution is the standard normal distribution.
+The normalization constant can be found by integrating with the `int()` function:
+```{r}
+int_h <- int(lim_h, x, -Inf, Inf); int_h
+```
+
+In passing we mention, that \pkg{caracas} can compute the normalization constant for the $t$ distribution, but fails to bring the constant into the standard form $\frac{\Gamma((d + 1)/2)}{\sqrt{\pi d}\Gamma(d/2)}$ presented in text books.
+--->
+
+
+
+
+## Lagrange multiplier and maximizing a likelihood
+
+Here we illustrate how to maximize a multinomial likelihood using Lagrange multiplier. 
+Consider a multinomial model with three categories with probabilities $p_1$, $p_2$ and $p_3$ such that $p_1 + p_2 + p_3 = 1$. 
+We then observe counts $y_1$, $y_2$ and $y_3$ of each category. 
+The multinomial log-likelihood for this model is
+\begin{align}
+  l(p) &= y_1 \log(p_1) + y_2 \log(p_2) + y_3 \log(p_3) .
+\end{align}
+
+We wish to maximize $l(p)$ under the constraint that $p_1 + p_2 + p_3 = 1$. 
+This can be achieved using Lagrange multiplier where we instead solve the unconstrained optimization problem $\max_p L(p)$ where
+\begin{align}
+  L(p) &= -l(p) + \lambda g(p) \quad \text{under the constraint that} \\
+  g(p) &= p_1 + p_2 + p_3 - 1 = 0.
+\end{align}
+
+The function $L$ can be expressed in \pkg{caracas} as follows where 
+we create character vectors in \proglang{R} and convert them to a 
+\pkg{caracas} symbol using `as_sym()`:
+
+```{r}
+p <- as_sym(paste0("p", 1:3))
+y <- as_sym(paste0("y", 1:3))
+def_sym(a) 
+l <- sum(y * log(p))
+L <- -l + a * (sum(p) - 1); L
+```
+
+To solve the unconstrained optimization problem we find the 
+critical points and afterwards check the eigenvalues of the Hessian (at the critical points). 
+The critical points are found as follows by first finding the gradient with `der()` (for derivative) and then equating the gradient to zero:
+
+```{r}
+gL <- der(L, list(p, a))
+```
+
+Hence, \pkg{caracas} computes the gradient to be
+\[
+  \nabla L (p_1, p_2, p_3, a) = `r tex(gL)` .
+\]
+
+Next we solve $\nabla L (p_1, p_2, p_3, a) = 0$:
+
+```{r}
+sols <- solve_sys(gL, list(p, a)) # takes an RHS argument which defaults to zero
+sols
+```
+
+One critical point is found. (Notice that in general it is 
+difficult to know how many critical points a function has.
+We will not go into details about this aspect of the problem.)
+Next we verify that we 
+have found a minimum: We find the Hessian as a symbol and evaluate it in the
+critical point:
+
+```{r}
+H <- der2(l, p) # der2(...) is shorthand for calling der() twice
+H_sol <- subs_lst(H, sols[[1]]) # Substitute solution into H
+```
+
+\[
+  H = `r tex(H)`, \quad
+  H_{\text{sol}} = `r tex(H_sol)`
+\]
+
+We verify that the solution is indeed a minimum:
+As $H_{\text{sol}}$ is a diagonal matrix, its eigenvalues are the diagonal entries. (In general, eigenvalues/eigenvectors
+can be found using `eigenval()`/`eigenvec()`.)
+Provided that all $y_i > 0$, all eigenvalues are negative and the likelihood reached a maximum.
+
+
+
+
+
+
+
+
+## Extending \pkg{caracas} -- calling SymPy functions directly
+
+The \pkg{caracas} can be extended as it is possible to call SymPy
+functions directly with the `sympy_func()` function. Please refer to
+the SymPy documentation at <https://docs.sympy.org/latest/index.html>
+for documentation of SymPy functions.
+
+At the time of writing, the SymPy functions `collect()` and `factor()` are not implemented in \pkg{caracas}, but they can be invoked as shown in the following. For example, we can collect terms in a polynomial expression:
+
+```{r}
+def_sym(x, y, z)
+p <- x*y + x - 3 + 2*x^2 - z*x^2 + x^3
+p %>% sympy_func("collect", x)
+```
+
+We can also expand and factor a polynomial:
+
+```{r}
+def_sym(x)
+p <- (x - 1)^7
+q <- p %>% expand(); q # or p %>% sympy_func("expand")
+q %>% sympy_func("factor")
+```
+
+In passing we illustrate a difference between symbolic and numerical
+mathematics: Floating point arithmetic can lead to catastrophic
+cancelations when nearly identical quantities are subtracted. This can
+be demonstrated as follows. Evaluate `p` and `q` on a range of
+`x`-values near 1, and plot the results in Fig. \ref{fig:pols-pq}.
+
+
+```{r pols-pq, fig=TRUE, echo=FALSE, fig.width=5.5, fig.height=2, fig.cap="Difference between symbolic and numerical mathematics. Left: Plot of polynomial $p(x) = (x-1)^7$. Right: Plot of explansion of same polynomial."}
+library(ggplot2)
+library(patchwork)
+theme_set(theme_bw())
+scientific_10 <- function(x) {
+  parse(text = gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) 
+}
+
+xval <- seq(.988, 1.012, by = 0.0001)
+yp <- eval(as_expr(p), list(x = xval))
+yq <- eval(as_expr(q), list(x = xval))
+ylims <- range(c(range(yp), range(yq)))
+
+pl1 <- ggplot(map = aes(xval, yp)) + geom_line(size = 0.25) + 
+  labs(x = "x", y = "p(x)") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + 
+  scale_y_continuous(label = scientific_10, limits = ylims)
+
+pl2 <- ggplot(map = aes(xval, yq)) + geom_line(size = 0.25) + 
+  labs(x = "x", y = "q(x)") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + 
+  scale_y_continuous(label = scientific_10, limits = ylims)
+
+pl1 + pl2
+```
+
+
+
+
+```{r, eval=FALSE}
+def_sym_vec(c("li", "yi", "ni", "thetai", "xi", "beta"))
+li_theta = yi * log(thetai) + (ni-yi) * log(1-thetai)
+etai = sum(xi * beta)
+thetai = 1 / (1+ exp(etai))
+der(thetai, "beta") 
+```
+
+
+
+
+
+
+## Maximum likelihood, Score, Hessian
+
+Next consider a linear model setting, i.e. $y\sim N(X\beta, \sigma^2 I)$. 
+The score function and Hessian matrix can be derived in closed form as follows: Define residuals $r=y - X \hat{\beta}$ and residual-sum-of-squares as $RSS=\sum_i r_i^2$. The log-likelihood based on $n$ observations is
+$$
+ l = - \frac n 2 \sigma^2 - \frac 1 {2\sigma^2} RSS.
+$$
+
+Here we can find critical points of $l$ for $RSS$ and $\sigma^2$ independently, so 
+we ignore $\sigma^2$ and proceed focusing on $RSS$ as follows:
+
+```{r}
+beta <- as_sym(paste0("beta", 1:3))
+res <- y - X %*% beta
+RSS <- sum(res^2) 
+logL <- - RSS / 2
+```
+
+We find the score function and Hessian matrix by differentiation.
+
+```{r}
+Score <- der(logL, beta) %>% matrify()    # Convert \proglang{Python} list to vector
+Hessian <- der2(logL, beta) %>% matrify() # Convert \proglang{Python} list to matrix
+```
+
+$$
+\texttt{Score}= `r tex(Score)`, \quad 
+\texttt{Hessian}= `r tex(Hessian)`
+$$
+
+Notice the following: The output from `der` and `der2` are lists in \proglang{Python}, and to be able to work with these quantities as we normally do a coercion to matrices is needed. The `matrify()` function does this. We conclude this example by solving the likelihood equations which, fortunately, leads to the same quantity as $\hat\beta$ derived above: 
+
+```{r}
+sol <- solve_sys(Score, beta)
+sol
+```
+
+
+## Probabilistic principal component analysis
+
+A probabilistic principal component analysis (PCA) model arises as follows, see e.g.
+\citet{bishop:06}, pp. 570: There is a latent vector $z$ and it is assumed that
+$z\sim N(0,I)$. There is a vector $x$ of observables and it is assumed
+that $x \mid z \sim N(Wz + \mu, v^2I)$. It is not a restriction to
+assume that $\mu=0$ because we center each variable around its average. 
+We can write the model as
+\begin{align} \label{eq:ppca-model}
+z = e_z \quad \text{and} \quad
+x = Wz + e_x, 
+\end{align}
+where $e_z \sim N(0,I)$ and $e_x\sim N(0,v^2I)$ are error terms that are assumed independent. 
+The $W$ matrix is the model matrix of weights that reflects model assumptions about how $z$ impacts $x$.
+
+In a statistical inference setting, the unknown parameters ($v^2$ and the components of $W$) must be estimated. 
+To do this the covariance matrix and concentration matrix are needed. 
+The first step is to identify the structural form of the covariance matrix $V=\var(z,x)$ and concentration matrix 
+$K=V\inv$, and \pkg{caracas} can do this for us.
+The next step is to use these structural forms in the likelihood function 
+which can then be maximized. 
+
+Define
+\[
+V   = \var(z, x)= \matrxc{V_{zz} & V_{zx} \\ V_{xz} & V_{xx}}, \quad
+K   = V\inv     = \matrxc{K_{zz} & K_{zx} \\ K_{xz} & K_{xx}}, \quad
+V_e = \var(e)   = \matrxc{I & 0 \\ 0 & v^2 I} .
+\]
+Also define 
+\begin{align} \label{eq:ppca-L}
+L = \matrxc{I & 0 \\ -W & I} \mbox{ and note that }
+  L^{-1} = \matrxc{I & 0 \\ W & I}.
+\end{align}
+Isolating error terms in \eqref{eq:ppca-model} gives
+$$
+e 
+= \matrxc{e_z \\ e_x} 
+= \matrxc{I & 0 \\ -W & I} \matrxc{z \\ x} 
+= L \matrxc{z \\ x} .
+$$
+Hence $\var(e) = L \var(z,x) L\transp$ and therefore
+
+\begin{equation}
+V = \var(z,x)=L\inv \var(e) (L\inv)\transp \mbox{ and }
+K = V\inv = L\transp \var(e)\inv L.
+\label{eq:KV}
+\end{equation}
+
+
+Since the error terms are independent, a direct calculation gives
+\begin{align}
+  \label{eq:ppca1}
+  V &= \matrxc{I & W\transp \\ W & WW\transp + v^2I} \mbox{ and }
+  K = \matrxc{I + v^{-2}W\transp W & -v^{-2}W\transp \\ v^{-2}W & v^{-2}I }
+\end{align}
+
+The following observations can be made:
+
+1. First recall a general result on the multivariate normal
+   distribution. Suppose $U=(U_1, \dots, U_d)\sim N(\mu, V)$, and let
+   $K=V\inv$. Then $K_{ij} = 0$ if and only if $U_i$ and $U_j$ are conditionally
+   independent given all other components of $U$.  Next return to the
+   specific setting. The lower right corner, $K_{xx}$, of $K$ is
+   $v^{-2}I$ and the fact that this matrix is diagonal reflects that
+   all pairs of observables $x_u$ and $x_v$ are conditionally
+   independent given the latent variables $z$.
+
+1. The lower right corner, $V_{xx}$, of $V$ is $WW\transp + v^2I$ and
+   this matrix is the covariance matrix of observables $x$. The
+   inverse of $WW\transp + v^2I$ is the concentration matrix of $x$
+   (in the marginal distribution of $x$) and this concentration matrix
+   does not in general contain zeros. There are no conditional
+   independencies among the observables alone; conditional
+   independencies arise from conditioning on the latent variables.
+
+1. To estimate the parameters $W$ and $v^2$ we can maximize the
+   log--likelihood for the observables with covariance matrix
+   $V_{obs}=WW\transp + v^2I$. This can often be done directly using
+   `optim()`. (Notice that we can just center data to eliminate the
+	   parameter $\mu$).
+
+<!-- ```{tikz, ppca2, fig.ext = 'pdf', cache=TRUE, echo = FALSE, fig.align="center", fig.cap="A directed acyclic graph (dag) illustrating probabilistic PCA: The latent variables $z=(z_1, z_2)$ are independent. The observables $x=(x_1, ..., x_4)$ are conditionally indpendent given $z$."} -->
+<!-- \usetikzlibrary{arrows} -->
+<!-- \usetikzlibrary{arrows.meta} -->
+<!-- \begin{tikzpicture}[node distance=2cm,auto,-{Latex[length=3mm, width=3mm]},thick,scale=1.5] -->
+<!-- \begin{scope}[every node/.style={circle,thick,draw,line width=1pt,scale=1.5}] -->
+<!-- \node (x1) {$x_1$}; -->
+<!-- \node (x2) [right of=x1] {$x_2$}; -->
+<!-- \node (x3) [right of=x2] {$x_3$}; -->
+<!-- \node (x4) [right of=x3] {$x_4$}; -->
+<!-- \node (z1) [above of=x2] {$z_1$}; -->
+<!-- \node (z2) [above of=x3] {$z_2$}; -->
+<!-- \end{scope} -->
+<!-- \draw[] (z1) to node {} (x1); -->
+<!-- \draw[] (z1) to node {} (x2); -->
+<!-- \draw[] (z1) to node {} (x3); -->
+<!-- \draw[] (z1) to node {} (x4); -->
+<!-- \draw[] (z2) to node {} (x1); -->
+<!-- \draw[] (z2) to node {} (x2); -->
+<!-- \draw[] (z2) to node {} (x3); -->
+<!-- \draw[] (z2) to node {} (x4); -->
+<!-- \end{tikzpicture} -->
+<!-- ``` -->
+
+```{tikz, ppca1, fig.ext = 'pdf', cache=TRUE, prompt = FALSE, echo = FALSE, fig.align="center", fig.cap="A directed acyclic graph (DAG) illustrating probabilistic PCA:  The observables $x=(x_1, x_2, x_3)$ are conditionally independent given $z$."}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\begin{tikzpicture}[node distance=2cm,auto,-{Latex[length=3mm, width=3mm]},thick,scale=1]
+\begin{scope}[every node/.style={circle,thick,draw,line width=1pt,scale=1}]
+\node (x1) {$x_1$};
+\node (x2) [right of=x1] {$x_2$};
+\node (x3) [right of=x2] {$x_3$};
+\node (z) [above of=x2] {$z$};
+\end{scope}
+\draw[] (z) to node {} (x1);
+\draw[] (z) to node {} (x2);
+\draw[] (z) to node {} (x3);
+\end{tikzpicture}
+```
+
+
+
+
+
+### A simple example
+
+
+```{r ar1, echo=F}
+N <- 3
+L <- diag_("1", N + 1)
+L[cbind(1 + (1:N), 1)] <- "-a"
+```
+
+```{r,vue, echo=FALSE}
+Vue <- matrix_("0", nrow = N + 1, ncol = N + 1)
+diag(Vue) <- c("1", rep("v2", N))
+```
+
+```{r, echo=F}
+e <- as_sym(paste0("e", 1:N))
+x <- as_sym(paste0("x", 1:N))
+def_sym(u, z)
+ue <- rbind(u, e)
+zx <- rbind(z, x)
+```
+
+
+A particularly simple example is the following where $z$ is
+one--dimensional and $x$ is three--dimensional and $W$ is a $3\times 1$
+matrix with $a$ in all entries:
+$$
+x_i = a z + e_i, \quad i=1, \dots, 3, \quad z = u
+$$ 
+All  $e_1, \dots, e_3$ are $N(0,v^2)$ distributed, $u \sim N(0, 1)$ and all error terms are independent. 
+See an illustration of this model in Fig. \ref{fig:ppca1}. 
+Let $e=(e, \dots, e_3)$ and $x=(x_1, \dots x_3)$. Hence $e \sim N(0, v^2 I)$ and  $\var(u,e)$ is a diagonal matrix, 
+$V_{ue}=\diag(1, v^2, \dots, v^2)$.
+Isolating error terms gives
+$$
+(u,e)= `r tex(ue)` = `r tex(L)` `r tex(zx)` = L (z,x), \mbox{ say. }
+$$
+
+```{r, echo=T}
+<<ar1>>
+<<vue>>
+```
+
+
+
+<!-- $$ -->
+<!-- L = `r tex(L)`, \quad V_{ue} = `r tex(Vue)` -->
+<!-- $$ -->
+
+
+
+<!-- We have -->
+<!-- $V_{ue} = \var(u,e) = L \var(z,x) L\transp$ so the covariance matrix of $(z,x)$ is -->
+<!-- $V=\mathbf{Var}(z,x) = L\inv V_{ue} (L\inv)\transp$ -->
+<!--  while the concentration matrix (the inverse covariance matrix) is $K=L\transp V(u,e)\inv L$: -->
+
+Following (\ref{eq:KV}) we find $V$ and $K$ as:
+```{r}
+V <- inv(L) %*% Vue %*% t(inv(L))
+K <- t(L) %*% inv(Vue) %*% L
+```
+
+\[
+V = `r tex(V)`, \quad K = `r tex(K)`
+\]
+
+
+### Introducing data
+
+Let $S$ is the empirical covariance matrix for the observed variables based on $n$ observations. 
+The observed-data log--likelihood is
+$$
+  l 
+  = \frac{n}{2} (\log \det (V_{xx}^{-1}) - \tr(V_{xx}^{-1} S))
+  = \frac{n}{2} (\log \det (K_{xx}) - \tr(K_{xx} S)).
+$$
+
+
+Now $K_{xx}= V_{xx}^{-1}$ can be extracted and used in the likelihood function:
+```{r}
+Vxx_inv <- inv(V[-1, -1])
+```
+
+Alternatively, $K_{xx}$ can be found as
+```{r}
+Kxx <- (K[-1, -1] - K[-1, 1, drop=F] %*% 
+          inv(K[1, 1, drop=F]) %*% K[1, -1, drop=F]) %>% simplify
+```
+
+```{r, echo=FALSE}
+den <- fraction_parts(Kxx[1,1])$denominator
+```
+
+
+$$
+ K_{xx} = `r tex(1/den)` `r tex(den * Kxx)`
+$$
+
+It remains to be investigated in practice whether it is
+computationally more efficient to 
+construct $V_{xx}$ numerically first and then invert $V_{xx}$ to obtain $K_{xx}$ numerically 
+instead of finding $K_{xx}$ symbolically and subsequently evaluating this numerically. 
+
+
+
+<!---
+\setcounter{tocdepth}{4}
+\tableofcontents
+--->

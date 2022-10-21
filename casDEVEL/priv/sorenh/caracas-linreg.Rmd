@@ -1,0 +1,95 @@
+---
+title: "caracas-linear-regression"
+author: "Søren Højsgaard"
+date: "3/31/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(Matrix)
+library(caracas)
+library(magrittr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The matrix algebra approach to linear normal models is convenient but the matrix algebra also darkens the computations. 
+
+Example: Linear regression:
+
+```{r}
+N <- 3
+## Dette virker ikke
+# x <- as_symbol(matrix(paste0("x", 1:N)))
+# one  <- as_symbol(matrix(rep(1, N)))
+# X <- cbind(one, x)
+
+## Dette virker :)
+X <- as_symbol(cbind(rep(1, N), paste0("x", 1:N)))
+y <- as_symbol(matrix(paste0("y", 1:N)))
+```
+
+```{r}
+XtX <- t(X) %*% X
+XtX
+## Not all that intersting:
+inv(XtX) 
+## Just sum and sum of products, but studens don't necessarily realise that
+t(X) %*% y 
+## Can it be unfolded what this really is symbolically?
+bhat <- inv(t(X) %*% X) %*% t(X) %*% y
+bhat
+bhat[1]
+bhat[2]
+
+bhat %>% simplify() %>% simplify()
+
+```
+
+```{r}
+## The projection matrix
+P <- X %*% inv(t(X) %*% X) %*% t(X)
+P
+## Would look nice symbolically
+Py <- P %*% y
+Py
+2*Py
+```
+
+```{r}
+Id <- as_symbol(diag(1, nrow=nrow(P)))
+## RSS - residual sum of squares; would look good symbolically
+t(y) %*% (Id - P) %*% y
+## Alternative formula; maybe easier - probably not:
+W <- y %*% t(y) ## Symmetric
+W
+#(Id - P) %*% W %>% diag %>% sum
+#((Id - P) * W) %>% sum
+```
+
+```{r}
+## Find F-statistic
+```
+
+
+```{r}
+## Can play with other contrasts,
+X2 <- as_symbol(model.matrix(~0+f))
+X2
+```
+
+```{r}
+## Change of basis-matrix; can sympy do so more elegantly?
+S <- inv(t(X2) %*% X2) %*% t(X2) %*% X
+S
+X2 %*% S
+X
+## What is the connection between bhat in the two bases?
+```
+
+
+
+
+
+
+

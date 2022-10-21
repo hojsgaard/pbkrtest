@@ -1,0 +1,129 @@
+---
+title: "Linear models with almost rank deficient model matrix"
+author: "Søren Højsgaard"
+date: "1/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(caracas)
+options(caracas.print.rowvec = FALSE) 
+options("width"=140)
+```
+
+## Task:
+
+Task: Minimize $||y-X\beta||^2$.
+
+
+Here $X$ is almost a rank one model matrix:
+```{r}
+def_sym(eps)
+nr <- 5
+X <- matrix_(1, nr, 2)
+X[1, 2] <- "1 + eps"
+X
+```
+
+```{r}
+y.a <- as_sym(paste0("y", 1:nr))
+y.a
+
+y.b <- y.a;
+y.b[] <- 1
+## @MIKKEL: Not big deal but this fails:
+## y.b[2] <- y.b[2] + "eps" 
+y.b[2] <- "1 + eps"
+y.b
+```
+
+
+## Symbolic calculations
+
+Normal equations to be solved $X' X \beta = X' y$: Notice that quantities depend on `eps`:
+
+
+```{r}
+XtX <- t(X) %*% X
+XtX
+XtXinv <- inv(XtX)
+XtXinv
+Xty.a <- t(X) %*% y.a
+Xty.a
+Xty.b <- t(X) %*% y.b
+Xty.b
+```
+
+Solve normal equations symbolically:
+
+```{r}
+beta.a1 <- solve_lin(XtX, Xty.a) %>% simplify()
+beta.a1
+beta.b1 <- solve_lin(XtX, Xty.b) %>% simplify()
+beta.b1
+```
+
+Verify that we have a solution:
+
+```{r}
+error.a1 <- XtX %*% beta.a1 - Xty.a 
+error.a1 %>% simplify()
+error.b1 <- XtX %*% beta.b1 - Xty.a 
+error.b1 %>% simplify()
+```
+
+Likewise, the brute force text book solution:
+```{r}
+beta.a2 <- inv(XtX) %*% t(X) %*% y.a
+beta.a2
+error.a2 <- XtX %*% beta.a2 - Xty.a 
+error.a2 %>% simplify()
+
+beta.b2 <- inv(XtX) %*% t(X) %*% y.b
+beta.b2
+error.b2 <- XtX %*% beta.b2 - Xty.b 
+error.b2 %>% simplify()
+```
+
+The orthogonal projection matrix onto $span(X)$:
+
+```{r}
+P <- X %*% XtXinv %*% t(X)
+P %>% simplify
+```
+
+## Numerical evaluation
+
+```{r}
+EPS <- 1e-4
+
+## @MIKKEL We could have
+eval_sym <- function(sym, list_args){
+    as_sym(eval(as_expr(sym), list_args))
+}
+## So that instead of
+XtXinv_ <- as_sym(eval(as_expr(XtXinv), list(eps=EPS)))
+## we have
+
+XtXinv_ <- eval_sym(XtXinv, list(eps=EPS))
+XtXinv_
+
+X_ <- eval_sym(X, list(eps=EPS))
+X_
+```
+
+```{r}
+XtXinvXt_ <- eval_sym(XtXinv %*% t(X), list(eps=EPS))
+XtXinvXt_
+beta_ <- XtXinvXt_ %*% y.a
+beta_
+```
+
+Notice: We do not quite solve the normal equations:
+
+```{r}
+error3 <- t(X_) %*% X_ %*% beta_ - t(X_) %*% y.a
+error3 %>% simplify()
+```
+

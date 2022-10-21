@@ -1,0 +1,423 @@
+<!-- ### Hessian for non-linear model -->
+
+<!-- ```{r} -->
+<!-- N <- 3 -->
+<!-- y <- as_sym(matrix(paste0("y", 1:N))) -->
+<!-- x <- as_sym(matrix(paste0("x", 1:N))) -->
+<!-- b <- as_sym(paste0("b", 1:2)) -->
+<!-- y -->
+<!-- x -->
+<!-- b -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- r <- y - b[1] - exp(x*b[2]) -->
+<!-- d <- -sum(r*r)/2 -->
+<!-- ``` -->
+
+<!-- \begin{align} -->
+<!--   r &= `r tex(r)` \\ -->
+<!--   d &= `r tex(d)` -->
+<!-- \end{align} -->
+
+<!-- ```{r} -->
+<!-- gr <- der(d, b) %>% simplify() -->
+<!-- gr <- as(gr, "matrix") -->
+<!-- ``` -->
+
+<!-- <\!-- FIXME -\-> -->
+
+<!-- ```{r} -->
+<!-- H <- der2(d, b) %>% simplify() -->
+<!-- Hmat <- as(H, "matrix") -->
+<!-- dim(Hmat) -->
+<!-- #Hmat <- matrify(H) # Convert to matrix -->
+<!-- Hvec <- vec(Hmat) -->
+<!-- #Hvec <- do.call(rbind, lapply(seq_len(ncol(Hmat)), function(j) Hmat[, j])) -->
+<!-- ``` -->
+
+<!-- <\!-- FIXME -\-> -->
+<!-- We use the frowned-upon `vec` operator that stacks the columns of the matrix: -->
+
+<!-- $$ -->
+<!--  H_{\text{vec}} = `r tex(Hvec)` -->
+<!-- $$ -->
+
+
+
+
+<!-- We illustrate probabilistic PCA with the a subset of the `iris` data. -->
+
+<!-- ```{r} -->
+<!-- d <- subset(iris, Species == "virginica", 1:4) -->
+<!-- d <- scale(d, center = TRUE, scale = TRUE) -->
+<!-- S <- var(d) -->
+<!-- S -->
+<!-- ``` -->
+
+<!-- Notice that the following code section is purely symbolic; no data are -->
+<!-- involved. A $W$ matrix can be constructed as follows: -->
+
+<!-- ```{r} -->
+<!-- ## W <- cbind( -->
+<!-- ##   c("a1", "a2", "a2", 0),  -->
+<!-- ##   c(0, "b2", "b2", "b1")) -->
+<!-- W <- cbind( -->
+<!--   c("w11", "w21", "w31", "w41"),  -->
+<!--   c("w12", "w22", "w32", "w42")) -->
+<!-- W -->
+<!-- #W <- cbind( -->
+<!-- #  c("w11", "w21", "w31", "w41")) -->
+<!-- #W -->
+<!-- ``` -->
+
+<!-- We get $L$ and $V_e$ as: -->
+
+<!-- ```{r} -->
+<!-- nx <- nrow(W) -->
+<!-- nz <- ncol(W) -->
+
+<!-- L <- diag(1, nx + nz) -->
+<!-- L[-(1:nz), 1:nz] <- W -->
+<!-- L <- as_sym(L) -->
+
+<!-- Ve <- diag(1, nx + nz) -->
+<!-- diag(Ve)[-(1:nz)] <- "v2" -->
+<!-- Ve <- as_sym(Ve) -->
+<!-- ``` -->
+
+<!-- \[ -->
+<!-- L = `r tex(L)`, \quad V_e = `r tex(Ve)`  -->
+<!-- \] -->
+
+
+
+
+<!-- Next we construct $V$ and $K$: -->
+
+<!-- ```{r} -->
+<!-- Ve_inv <- inv(Ve) -->
+<!-- L_inv  <- inv(L) -->
+<!-- LT     <- t(L) -->
+<!-- L_invT <- t(L_inv) -->
+<!-- V      <- L_inv %*% Ve %*% L_invT -->
+<!-- K      <- LT %*% Ve_inv %*% L -->
+<!-- ``` -->
+
+<!-- \[ -->
+<!-- K = `r tex(K)` -->
+<!-- \] -->
+
+<!-- \[ -->
+<!-- V = `r tex(V)` -->
+<!-- \] -->
+
+
+<!-- The observed-data log--likelihood is -->
+<!-- $$ -->
+<!--   logL = \frac n 2 (\log det K_{xx} - tr(K_{xx} S))  -->
+<!-- $$ -->
+<!-- where $S$ is the empirical covariance matrix. -->
+
+<!-- ```{r} -->
+<!-- z_idx <- seq_len(nz) -->
+<!-- Vxx <- V[-z_idx, -z_idx] -->
+<!-- det_Vxx_expr <- as_expr(det(Vxx)) -->
+<!-- Vxx_expr <- as_expr(Vxx) -->
+<!-- ``` -->
+
+<!-- The negative log--likelihood up to a proportionality constant computed with: -->
+
+<!-- ```{r} -->
+<!-- neg_logL <- function(parm) { -->
+<!--   parm[1] <- exp(parm[1]) # v2 -->
+<!--   env     <- as.list(parm) -->
+<!--   det_Vxx <- eval(det_Vxx_expr, env) -->
+<!--   Vxx_val <- eval(Vxx_expr, env) -->
+<!--   tr_KxxS <- sum(solve(Vxx_val) * S) -->
+<!--   #print(list(parm=parm, env=env, det_Vxx=det_Vxx, Vxx_val=Vxx_val, trKxxS=tr_KxxS)) -->
+<!--   log(det_Vxx) + tr_KxxS -->
+<!-- } -->
+<!-- ``` -->
+
+<!-- ```{r optimize} -->
+<!-- parm_names <- c("v2", setdiff(unique(c(W)), "0")) -->
+<!-- parm_init  <- rep(0, length(parm_names)) -->
+<!-- names(parm_init) <- parm_names -->
+<!-- ### parm_init -->
+<!-- opt_res     <- optim(parm_init, neg_logL, hessian=TRUE) -->
+<!-- parm_fit    <- opt_res$par -->
+<!-- parm_fit[1] <- exp(parm_fit[1]) # v2 -->
+<!-- parm_fit -->
+<!-- ``` -->
+
+
+<!-- ```{r showresult} -->
+<!-- ## FIXME: Thats a long shot to get W_fit -->
+<!-- W_fit <- eval(as_expr(as_sym(W)), as.list(parm_fit)) -->
+<!-- colnames(W_fit) <- NULL -->
+<!-- W_fit -->
+
+<!-- S_fit      <- eval(Vxx_expr, as.list(parm_fit)) -->
+<!-- dimnames(S_fit) <- dimnames(S) -->
+<!-- cov2cor(S_fit) -->
+<!-- S -->
+<!-- ``` -->
+
+
+
+
+
+<!-- ##Kxx      <- simplify(inv(Vxx)) -->
+<!-- ##Kxx_expr <- as_r(Kxx, first_doit = FALSE) -->
+
+<!-- ## Kxx  <- eval(Kxx_expr, as.list(parm_fit)) -->
+<!-- ## Kxx <- solve(S_fit) -->
+<!-- ## dimnames(Kxx) <- dimnames(S) -->
+
+<!-- ## z | x: -->
+<!-- ## <\!-- pred_coef <- t(t(W_fit) %*% Kobs) -\-> -->
+<!-- ## <\!-- z_hat <- d_centered %*% pred_coef -\-> -->
+<!-- ## <\!-- fit <- list(S_fit = S_fit) -\-> -->
+
+<!-- ```{r} -->
+<!-- pairs(as.data.frame(cbind(d, z_hat = z_hat))) -->
+<!-- ``` -->
+
+
+
+<!-- <\!-- ```{r} -\-> -->
+
+<!-- ## Vobs    <- V[-z_idx, -z_idx] -->
+<!-- ## detVobs_expr <- as_r(determinant(Vobs)) -->
+<!-- ## detVobs_expr -->
+
+<!-- ## Vobs_expr <- as_r(Vobs, first_doit = FALSE) ## Unwildy... -->
+<!-- ## Kobs      <- simplify(inv(Vobs)) -->
+<!-- ## Kobs_expr <- as_r(Kobs, first_doit = FALSE) -->
+
+<!-- <\!-- # Predict -\-> -->
+<!-- <\!-- a_min <- par["a"] -\-> -->
+<!-- <\!-- Kobs <- eval(Kobs_expr, list(a = a_min, b = par["b"], v2 = par["v2"])) -\-> -->
+<!-- <\!-- pred_coef <- t(rep(a_min, 4) %*% Kobs) -\-> -->
+<!-- <\!-- z.hat <- as.matrix(d) %*% pred_coef -\-> -->
+<!-- <\!-- pairs(as.data.frame(cbind(d, z.hat = z.hat))) -\-> -->
+<!-- <\!-- ``` -\-> -->
+
+<!-- ### A simple example -->
+
+<!-- A particularly simple example is the following where $z$ is -->
+<!-- one--dimensional, $x$ is four--dimensional and $W$ is $3\times 1$ -->
+<!-- with $a$ in all entries (we have used this as a starting point for -->
+<!-- students who can then go on experimenting with other forms of $W$ on their own): -->
+
+<!-- ```{r} -->
+<!-- L <- as_symbol(diag(5)) -->
+<!-- L[2:5, 1] <- "-a" -->
+<!-- Ve <- as_symbol(diag(5)) -->
+<!-- diag(Ve)[-1] <- "v2" -->
+<!-- ``` -->
+
+
+<!-- $$ -->
+<!-- L = `r tex(L)`, \quad V_e = `r tex(Ve)` -->
+<!-- $$ -->
+
+
+
+
+<!-- ```{tikz, ppca1, fig.ext = 'pdf', cache=TRUE, echo = FALSE, fig.align="center"} -->
+<!-- \usetikzlibrary{arrows} -->
+<!-- \usetikzlibrary{arrows.meta} -->
+<!-- \begin{tikzpicture}[node distance=2cm,auto,-{Latex[length=3mm, width=3mm]},thick,scale=1.5] -->
+<!-- \begin{scope}[every node/.style={circle,thick,draw,line width=1pt,scale=1.5}] -->
+<!-- \node (y1) {$y_1$}; -->
+<!-- \node (y2) [right of=y1] {$y_2$}; -->
+<!-- \node (y3) [right of=y2] {$y_3$}; -->
+<!-- \node (y4) [right of=y3] {$y_4$}; -->
+<!-- \node (z1) [above of=y2] {$z_1$}; -->
+<!-- \end{scope} -->
+<!-- \draw[] (z1) to node {} (y1); -->
+<!-- \draw[] (z1) to node {} (y2); -->
+<!-- \draw[] (z1) to node {} (y3); -->
+<!-- \draw[] (z1) to node {} (y4); -->
+<!-- \end{tikzpicture} -->
+<!-- ``` -->
+
+
+<!-- Now we repeat the computations described above in `Ryacas`: -->
+
+
+<!-- ```{r} -->
+<!-- Ve_inv <- inv(Ve) -->
+<!-- L_inv  <- inv(L) -->
+<!-- LT     <- t(L) -->
+<!-- L_invT <- t(L_inv) -->
+<!-- V      <- L_inv %*% Ve %*% L_invT -->
+<!-- K      <- LT %*% Ve_inv %*% L -->
+<!-- ``` -->
+
+<!-- Now, $V_e\inv$ is a diagonal matrix with the reciprocal elements of the diagonal of $V$ on its diagonal. The structure of $L\inv$ follows from that  -->
+<!-- the inverse of a matrix of the form $\matrxc{I & 0 \\ A & I}$ is $\matrxr{I & 0 \\ -A & I}$, so $L\inv$ is the same as $L$ except for at change of sign in the regression coefficients. The structure of $V$ and $K$ are: -->
+
+<!-- \[ -->
+<!-- V = `r tex(V)`, \quad K = `r tex(K)` -->
+<!-- \] -->
+
+
+<!-- Notice that zeros in $K$ arise where they are supposed to: They correspond to the conditional independence restrictions. -->
+
+<!-- ### Maximizing the likelihood for the observables -->
+
+<!-- To estimate the unknown parameters, we need the marginal distribution of the observables: For the covariance, $V_{obs}$ is just the lower right $3 \times 3$ matrix of $V$. The corresponding concentration matrix $K_{obs}$ is a long and intangible expression. -->
+<!-- Letting $S$ denote the empirical covariance matrix, the log--likelihood to maximize is -->
+<!-- $$ -->
+<!--   \log L  -->
+<!-- 	=  - \log \text{det} V_{obs} - \text{tr} (V_{obs}\inv S)    -->
+<!--     =  - \log \text{det} V_{obs} - \text{tr} (K_{obs} S).  -->
+<!-- $$ -->
+
+<!-- The covariance matrix for the observables becomes (marginalisation in the normal distribution can be done by removing the the rows and columns corresponding to the variable that are marginalised out): -->
+<!-- ```{r} -->
+<!-- Vobs <- V[-1, -1] -->
+<!-- ``` -->
+
+<!-- ### Numerical evaluation -->
+
+
+<!-- <!-- ```{r} --> -->
+<!-- <!-- ##head(iris, 4) --> -->
+<!-- <!-- dorg <- subset(iris, Species == "virginica", 1:4) --> -->
+<!-- <!-- d <- scale(dorg, center = TRUE, scale = FALSE) --> -->
+<!-- <!-- S <- var(d) --> -->
+<!-- <!-- S --> -->
+<!-- <!-- ``` --> -->
+
+
+<!-- where $S$ is the empirical covariance matrix. So we need -->
+<!-- to evaluate the terms involving $V_{obs}$ (or $K_{obs}$) numerically. -->
+
+
+<!-- ```{r} -->
+<!-- ## Determinant of Vobs: -->
+<!-- detVobs_expr <- as_r(determinant(Vobs)) -->
+<!-- detVobs_expr -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- Vobs_expr <- as_r(Vobs) -->
+<!-- Vobs_expr -->
+<!-- Kobs <- simplify(inv(Vobs)) -->
+<!-- a  <- symbol("a") -->
+<!-- v2 <- symbol("v2") -->
+<!-- ZZ <- (v2 * (4*a^2 + v2)) * Kobs  -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- Kobs_expr <- as_r(Kobs, first_doit = FALSE) -->
+<!-- ## Notice: Kobs_expr is a long and unpleasant expression -->
+<!-- ``` -->
+
+<!-- We minimize the negative log likelihood and to avoid boundary issues -->
+<!-- we reparameterize the variance so that $v^2=\exp(\psi)$ where $\psi$ -->
+<!-- varies freely: -->
+
+<!-- ```{r} -->
+<!-- min_logL <- function(parm) { -->
+<!--     a <- parm[1] -->
+<!--     v2 <- exp(parm[2]) ## Reparametrizing -->
+<!--     det_Vobs <- eval(detVobs_expr, list(a = a, v2 = v2)) -->
+<!--     Kobs <- eval(Kobs_expr, list(a = a, v2 = v2)) -->
+<!--     tr_KobsS <- sum(Kobs * S) # symmetric, equivalent to sum(diag(Kobs %*% S)) -->
+<!--     log(det_Vobs) + tr_KobsS -->
+<!-- } -->
+<!-- opt_res <- optim(c(0, 0), min_logL) -->
+<!-- par <- opt_res$par -->
+<!-- par[2] <- exp(par[2]) -->
+<!-- names(par) <- c("a", "v2") -->
+<!-- par -->
+<!-- ``` -->
+
+<!-- Notice that for other choices of $W$, students will have to modify the -->
+<!-- function above to facilitate estimation of additional parameters. -->
+<!-- Compare estimated covariance matrix with observed: -->
+
+<!-- ```{r} -->
+<!-- S_fit <- eval(Vobs_expr, list(a = par[1], v2 = par[2])) -->
+<!-- dimnames(S_fit) <- dimnames(S) -->
+<!-- S_fit -->
+<!-- ``` -->
+
+
+<!-- Conditional mean of $y_1$ given $y_2, y_3, y_4$ is  -->
+<!-- mean of $y_1$ plus covariance between $y_1$ and $y_2, y_3, y_4$ (vector with $a = `r par[1]`$ of length 4) multiplied by $K_{obs}$: -->
+
+<!---
+\fxnote{Rewrite this}
+--->
+
+<!-- ```{r} -->
+<!-- a_min <- par[1] -->
+<!-- Kobs  <- eval(Kobs_expr, list(a = a_min, v2 = par[2])) -->
+<!-- pred_coef <- t(rep(a_min, 4) %*% Kobs) -->
+<!-- z.hat <- d %*% pred_coef -->
+<!-- pairs(as.data.frame(cbind(d, z.hat = z.hat))) -->
+<!-- ``` -->
+
+
+ 
+
+
+
+
+<!-- Bishop s. 12.2 -->
+
+
+<!-- ```{tikz, ppca2, fig.ext = 'pdf', cache=TRUE, echo = FALSE, fig.align="center"} -->
+<!-- \usetikzlibrary{arrows} -->
+<!-- \usetikzlibrary{arrows.meta} -->
+<!-- \begin{tikzpicture}[node distance=2cm,auto,-{Latex[length=3mm, width=3mm]},thick,scale=1.5] -->
+<!-- \begin{scope}[every node/.style={circle,thick,draw,line width=1pt,scale=1.5}] -->
+<!-- \node (y1) {$y_1$}; -->
+<!-- \node (y2) [right of=y1] {$y_2$}; -->
+<!-- \node (y3) [right of=y2] {$y_3$}; -->
+<!-- \node (y4) [right of=y3] {$y_4$}; -->
+<!-- \node (z1) [above of=y2] {$z_1$}; -->
+<!-- \node (z2) [above of=y3] {$z_2$}; -->
+<!-- \end{scope} -->
+<!-- \draw[] (z1) to node {} (y1); -->
+<!-- \draw[] (z1) to node {} (y2); -->
+<!-- \draw[] (z1) to node {} (y3); -->
+<!-- \draw[] (z2) to node {} (y2); -->
+<!-- \draw[] (z2) to node {} (y3); -->
+<!-- \draw[] (z2) to node {} (y4); -->
+<!-- \end{tikzpicture} -->
+<!-- ``` -->
+
+
+<!-- ### Printing mathematical expressions as tex code -->
+
+<!-- We can revisit the previous example to illustrate that `caracas`  -->
+<!-- can be used to print mathematical expressions.  -->
+<!-- As before define `h`, but this time we change the default `doit = TRUE` to `doit = FALSE`: -->
+
+<!-- ```{r} -->
+<!-- h <- limf((1 + x^2/nu)^(-(nu + 1)/2),  -->
+<!--           var = nu,  -->
+<!--           val = Inf,  -->
+<!--           doit = FALSE) # do not evaluate the limit yet -->
+<!-- ``` -->
+
+<!-- The object `h` is now a `caracas` expression and `doit = FALSE` means that the expression is not evaluated yet.  -->
+<!-- We can obtain the \TeX code containing the mathematical limit expression using `tex(h)`.  -->
+<!-- `caracas` expression can be evaluated with the `doit()` function.  -->
+<!-- Using unevaluated `caracas` expression can hence be useful for  -->
+<!-- printing mathematical expressions, e.g. limits, sums, products and integrals. -->
+
+<!-- ```{r} -->
+<!-- # h -->
+<!-- # tex(h) # gives "\\lim_{\\nu \\to \\infty} \\left(1 +\\frac{x^{2}}{\\nu} ... -->
+<!-- doit(h) -->
+<!-- ``` -->
+
+

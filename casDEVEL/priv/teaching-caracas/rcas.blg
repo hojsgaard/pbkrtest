@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: rcas.aux
+The style file: plainnat.bst
+Database file #1: references.bib
+Warning--I didn't find a database entry for "reference-linear-models"
+Warning--I didn't find a database entry for "reference-lagrange"
+Warning--I didn't find a database entry for "reference-time-series"
+Warning--I didn't find a database entry for "reference-conditional-independence"
+Warning--empty title in mccullagh:etal:89
+Warning--empty publisher in mccullagh:etal:89
+Warning--empty year in mccullagh:etal:89
+Warning--empty year in mccullagh:etal:89
+You've used 11 entries,
+            2773 wiz_defined-function locations,
+            670 strings with 7191 characters,
+and the built_in function-call counts, 5971 in all, are:
+= -- 480
+> -- 542
+< -- 5
++ -- 182
+- -- 171
+* -- 544
+:= -- 998
+add.period$ -- 47
+call.type$ -- 11
+change.case$ -- 83
+chr.to.int$ -- 11
+cite$ -- 26
+duplicate$ -- 211
+empty$ -- 346
+format.name$ -- 188
+if$ -- 1181
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 11
+newline$ -- 76
+num.names$ -- 44
+pop$ -- 174
+preamble$ -- 1
+purify$ -- 79
+quote$ -- 0
+skip$ -- 187
+stack$ -- 0
+substring$ -- 46
+swap$ -- 14
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 101
+warning$ -- 4
+while$ -- 35
+width$ -- 0
+write$ -- 171
+(There were 8 warnings)

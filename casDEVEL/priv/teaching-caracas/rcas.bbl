@@ -1,0 +1,88 @@
+\begin{thebibliography}{11}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Allaire et~al.(2021)Allaire, Xie, McPherson, Luraschi, Ushey, Atkins,
+  Wickham, Cheng, Chang, and Iannone]{rmarkdown}
+JJ~Allaire, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron
+  Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and Richard Iannone.
+\newblock \emph{rmarkdown: Dynamic Documents for R}, 2021.
+\newblock URL \url{https://github.com/rstudio/rmarkdown}.
+\newblock R package version 2.7.
+
+\bibitem[Andersen and Højsgaard(2019)]{ryacas}
+Mikkel~Meyer Andersen and Søren Højsgaard.
+\newblock {Ryacas: A computer algebra system in R}.
+\newblock \emph{Journal of Open Source Software}, 4\penalty0 (42), 2019.
+\newblock URL \url{https://doi.org/10.21105/joss.01763}.
+
+\bibitem[Andersen and Højsgaard(2021)]{caracas:21}
+Mikkel~Meyer Andersen and Søren Højsgaard.
+\newblock caracas: Computer algebra in r.
+\newblock \emph{Journal of Open Source Software}, 6\penalty0 (63):\penalty0
+  3438, 2021.
+\newblock \doi{10.21105/joss.03438}.
+\newblock URL \url{https://doi.org/10.21105/joss.03438}.
+
+\bibitem[McCullagh and Nelder()]{mccullagh:etal:89}
+P.~McCullagh and J.~A. Nelder.
+\newblock London.
+
+\bibitem[Meurer et~al.(2017)Meurer, Smith, Paprocki, \v{C}ert\'{i}k, Kirpichev,
+  Rocklin, Kumar, Ivanov, Moore, Singh, Rathnayake, Vig, Granger, Muller,
+  Bonazzi, Gupta, Vats, Johansson, Pedregosa, Curry, Terrel, Rou\v{c}ka, Saboo,
+  Fernando, Kulal, Cimrman, and Scopatz]{sympy}
+Aaron Meurer, Christopher~P. Smith, Mateusz Paprocki, Ond\v{r}ej
+  \v{C}ert\'{i}k, Sergey~B. Kirpichev, Matthew Rocklin, AMiT Kumar, Sergiu
+  Ivanov, Jason~K. Moore, Sartaj Singh, Thilina Rathnayake, Sean Vig, Brian~E.
+  Granger, Richard~P. Muller, Francesco Bonazzi, Harsh Gupta, Shivam Vats,
+  Fredrik Johansson, Fabian Pedregosa, Matthew~J. Curry, Andy~R. Terrel,
+  \v{S}t\v{e}p\'{a}n Rou\v{c}ka, Ashutosh Saboo, Isuru Fernando, Sumith Kulal,
+  Robert Cimrman, and Anthony Scopatz.
+\newblock Sympy: symbolic computing in python.
+\newblock \emph{PeerJ Computer Science}, 3:\penalty0 e103, January 2017.
+\newblock ISSN 2376-5992.
+\newblock \doi{10.7717/peerj-cs.103}.
+\newblock URL \url{https://doi.org/10.7717/peerj-cs.103}.
+
+\bibitem[Petris et~al.(2009)Petris, Petrone, and Campagnoli]{petris:etal:09}
+Giovanni Petris, Sonia Petrone, and Patrizia Campagnoli.
+\newblock \emph{Dynamic Linear Models with R}.
+\newblock useR! Springer-Verlag, New York, 2009.
+
+\bibitem[{R Core Team}(2021)]{R}
+{R Core Team}.
+\newblock \emph{R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria, 2021.
+\newblock URL \url{http://www.R-project.org/}.
+\newblock {ISBN} 3-900051-07-0.
+
+\bibitem[{United Nations General Assembly}(2015)]{UN17}
+{United Nations General Assembly}.
+\newblock Sustainable development goals, 2015.
+\newblock \url{https://sdgs.un.org/}.
+
+\bibitem[Ushey et~al.(2020)Ushey, Allaire, and Tang]{reticulate}
+Kevin Ushey, JJ~Allaire, and Yuan Tang.
+\newblock \emph{reticulate: Interface to 'Python'}, 2020.
+\newblock URL \url{https://CRAN.R-project.org/package=reticulate}.
+\newblock R package version 1.18.
+
+\bibitem[Xie et~al.(2018)Xie, Allaire, and Grolemund]{RMarkdownDefinitiveGuide}
+Yihui Xie, J.J. Allaire, and Garrett Grolemund.
+\newblock \emph{R Markdown: The Definitive Guide}.
+\newblock Chapman and Hall/CRC, Boca Raton, Florida, 2018.
+\newblock URL \url{https://bookdown.org/yihui/rmarkdown}.
+\newblock ISBN 9781138359338.
+
+\bibitem[Xie et~al.(2020)Xie, Dervieux, and Riederer]{RMarkdownCookbook}
+Yihui Xie, Christophe Dervieux, and Emily Riederer.
+\newblock \emph{R Markdown Cookbook}.
+\newblock Chapman and Hall/CRC, Boca Raton, Florida, 2020.
+\newblock URL \url{https://bookdown.org/yihui/rmarkdown-cookbook}.
+\newblock ISBN 9780367563837.
+
+\end{thebibliography}
