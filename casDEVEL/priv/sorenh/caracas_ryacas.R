@@ -1,11 +1,16 @@
-
-library(Ryacas)
 library(caracas)
+
+Amat <- toeplitz(letters[1:4])
+Amat
+Ac <- as_sym(Amat)
+Ac
 
 ## Matrix inversions; various alternatives to inv()
 
-inv_yac <- function(x){   
-    require(Ryacas)
+inv_yac <- function(x){
+    ##Ai <- as_y(Amat) %>% y_fn("Inverse") %>% yac_str()
+    caracas:::stopifnot_symbol(x)
+    stopifnot(caracas:::symbol_is_matrix(x))
     A_ <- as_character_matrix(x)
     Ay <- as_y(A_)
     Ai <- Ay %>% y_fn("Inverse") %>% yac_str()
@@ -14,12 +19,29 @@ inv_yac <- function(x){
 }
 
 inv_cf <- function(x){
-  return(t(sympy_func(x, "cofactor_matrix")) / det(x))
+    caracas:::stopifnot_symbol(x)
+    stopifnot(caracas:::symbol_is_matrix(x))
+    return(t(sympy_func(x, "cofactor_matrix")) / det(x))
 }
 
 inv_lu <- function(x){
+    caracas:::stopifnot_symbol(x)
+    stopifnot(caracas:::symbol_is_matrix(x))
     caracas:::construct_symbol_from_pyobj(x$pyobj$inv(method="LU"))
 }
+
+
+Ai1 <- inv(Ac)
+Ai2 <- inv_cf(Ac)
+Ai3 <- inv_lu(Ac)
+Ai4 <- inv_yac(Ac)
+
+(Ai1 - Ai2)
+(Ai1 - Ai3) %>% simplify()
+(Ai1 - Ai4) %>% simplify()
+
+Ac %*% Ai1
+
 
 ## Hard coding of inverse of 1x1, 2x2, 3x3 matrices:
 

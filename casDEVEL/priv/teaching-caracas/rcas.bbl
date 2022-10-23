@@ -1,4 +1,4 @@
-\begin{thebibliography}{11}
+\begin{thebibliography}{10}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -47,11 +47,6 @@ Aaron Meurer, Christopher~P. Smith, Mateusz Paprocki, Ond\v{r}ej
 \newblock ISSN 2376-5992.
 \newblock \doi{10.7717/peerj-cs.103}.
 \newblock URL \url{https://doi.org/10.7717/peerj-cs.103}.
-
-\bibitem[Petris et~al.(2009)Petris, Petrone, and Campagnoli]{petris:etal:09}
-Giovanni Petris, Sonia Petrone, and Patrizia Campagnoli.
-\newblock \emph{Dynamic Linear Models with R}.
-\newblock useR! Springer-Verlag, New York, 2009.
 
 \bibitem[{R Core Team}(2021)]{R}
 {R Core Team}.

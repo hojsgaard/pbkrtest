@@ -992,7 +992,8 @@ sol <- sol[[1]]
 
 ### Autoregressive model, $AR(1)$ {#sec:ar1}
 
-```{r, echo=F}
+
+```{r}
 e <- as_sym(paste0("e", 0:3))
 x <- as_sym(paste0("x", 0:3))
 u <- vector_sym(3, "u")
@@ -1003,6 +1004,8 @@ xy <- rbind(x, y)
 
 ```{r, echo=FALSE}
 L <- diff_mat(4, "-a")
+```
+```{r, echo=F}
 ```
 
 Consider the auto regressive model of order $1$ (an AR(1) model), see e.g. [@reference-time-series] for details:\footnote{REFERENCE is needed} 
@@ -1027,6 +1030,7 @@ Linv <- inv(L)
 K <- crossprod_(L) / v
 V <- tcrossprod_(Linv) * v
 ```
+```{r}
 
 ```{r, echo=F, results="asis"}
 cat(
@@ -1044,18 +1048,19 @@ given all other variables, see e.g. [@reference-conditional-independence] for de
 
 Next, we take the step from symbolic computations to numerical
 evaluations.  The joint distribution of $x$ is multivariate normal
-distribution, $x\sim N(0, K\inv)$. Let $W=x x\transp$ denote the
+distribution, $x\sim N(0, K\inv)$. Let $S=x x\transp$ denote the
 matrix of (cross) products.  The log-likelihood is therefore (ignoring
 multiplicative constants) 
 $$ 
-\log L = \log \det(K) - x\transp K x = \log \det(K) - \trace(K W), 
+\log L = \log \det(K) - x\transp K x = \log \det(K) - \trace(K S), 
 $$ 
-where we note that $\trace(KW)$ is the
-sum of the elementwise products of $K$ and $W$ since both matrices are
+where we note that $\trace(KS)$ is the
+sum of the elementwise products of $K$ and $S$ since both matrices are
 symmetrical.
 
 ```{r}
 logL <- log(det(K)) - sum(K * (x %*% t(x))) %>% simplify()
+```
 ```
 
 $$
@@ -1092,55 +1097,75 @@ g_wrap <- function(par){
     g(exp(par[1]), par[2])
 }
 par <- optim(c(0, 0), g_wrap, control=list(fnscale=-1))$par
+par
 par[1] <- exp(par[1])
 names(par) <- names(formals(g))
 par
 ```
 
-```{r, include = FALSE}
-# lm(xt[-1] ~ 0 + xt[1:3])
-```
-
-
-
-For comparison we fit the same model with \r's `arima()` function:
 ```{r}
-a1 <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
-a1
-unname(coef(a1) - par["a"])
-a1$sigma2
-unname(a1$sigma2 - par["v"])
+<!-- A1 <- ARIMA(XT, ORDER=C(1,0,0), INCLUDE.MEAN = FALSE, METHOD="ML") -->
+<!-- LIBRARY(BROOM) -->
+## <!-- tidy(a1) -->
+## <!-- glance(a1) -->
+## <!-- ``` -->
+
+
+
+
+
+
+
+### Dynamic linear model {#sec:dlm}
+
+```{r, echo=F, result='hide'}
+L2 <-
+    cbind(rbind(diff_mat(4, "-a"),
+                diff_mat(4, "-b")[-1,]),
+          rbind(zeros(4, 3),
+                eye(3, 3)))
 ```
 
-[FIXME: Why do they not agree?]
+An extension of the $AR(1)$ process above is a dynamic linear model (dlm), see e.g. [@petris:etal:09]:
+Augment the $AR(1)$ process above with $y_i=b x_i + u_i$ for
+$i=1,2,3$.  Suppose $u_i\sim N(0, w^2)$ and all $u_i$ are independent
+and independent of $e$.
+Then
+$(e,u)$ can be expressed in terms of $(x,y)$ as
+$$
+(e,u) = `r inline_code(tex(eu))` = `r inline_code(texr(L2))` `r inline_code(tex(xy))` = L_2 (x,y)
+$$
 
-
-For a longer time series we get:
 ```{r}
-N <- 50
-set.seed(20221231)
-xt <- arima.sim(list(order = c(1, 0, 0), ar = 0.5), n = N) |> as.numeric()
-L <- diff_mat(N, "-a")
-def_sym(v)
-K <- crossprod_(L) / v
-K. <- as_expr(K)
-
-W <- xt %*% t(xt)
-logL.func <- function(par) {
-  K.par <- eval(K., list(a = par[1], v = par[2]))
-  -(log(det(K.par)) - sum(K.par * W))
-}
-optim(c(1, 1), logL.func)$par
+Veu <- diag_(c(rep("v2", 4), rep("w2", 3)))
+L2inv <- inv(L2) 
+V2 <- L2inv %*% Veu %*% t(L2inv) 
+K2 <- t(L2) %*% inv(Veu) %*% L2
 ```
 
-Compare this with
+
+```{r, echo=F, results="asis"}
+cat(
+  "\\begin{align} 
+    L_2\\inv &= ", texr(L2inv), " \\\\ 
+    K_2 &= ", texr(K2), " 
+  \\end{align}", sep = "")
+```
+
+
+Notice the pattern of zeros which correspond to conditional
+independence restrictions as mentioned above.
+
+
 ```{r}
-a2 <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
-a2
+i1 <- 1:4
+i2 <- 5:7
+K22 <- K2[i2, i2] %>% simplify()
+K21 <- K2[i2, i1] %>% simplify()
+K11 <- K2[i1, i1] %>% simplify()
 ```
 
-
-### Possible topics for students [FIXME: Need more work]
+### Possible topics for students 
 
 1. Related to Sec. \ref{sec:ar1}: An alternative to solving the
    likelihood equations using \pkg{caracas} is to convert the \sympy
@@ -1149,8 +1174,11 @@ a2
    Modify the model by setting $x_0 = a x_3 + e_0$. Do the same for a
    longer time series and see what happens to the pattern of zeros in
    the concentration matrix.
-1. [FIXME: Højere orden]
-1. [FIXME: Lade $n$ gå mod uendelig, og evt. wrappe enderne rundt]
+
+1. Related to Sec. \ref{sec:dlm}: Find covariance / concentration for
+   observables, i.e. for $(y_1, y_2, y_3)$. Use this for maximizing the
+   likelihood. How feasible is this approach for a longer data vector?
+   
 
 # Discussion and future work{#sec:discussion}
 

@@ -1,3 +1,66 @@
+#DLM
+
+
+<!-- ### Dynamic linear model {#sec:dlm} -->
+
+<!-- ```{r, echo=F, result='hide'} -->
+<!-- L <- -->
+<!--     cbind(rbind(diff_mat(4, "-a"), -->
+<!--                 diff_mat(4, "-b")[-1,]), -->
+<!--           rbind(zeros(4, 3), -->
+<!--                 eye(3, 3))) -->
+<!-- ``` -->
+
+<!-- An extension of the $AR(1)$ process above is a dynamic linear model (dlm), see e.g. [@petris:etal:09]: -->
+<!-- Augment the $AR(1)$ process above with $y_i=b x_i + u_i$ for -->
+<!-- $i=1,2,3$.  Suppose $u_i\sim N(0, w)$ and all $u_i$ are independent -->
+<!-- and independent of $e$. Note again that $w$ is the variance. -->
+<!-- Then -->
+<!-- $(e,u)$ can be expressed in terms of $(x,y)$ as -->
+<!-- $$ -->
+<!-- (e,u) = `r inline_code(tex(eu))` = `r inline_code(texr(L))` `r inline_code(tex(xy))` = L (x,y) -->
+<!-- $$ -->
+
+<!-- ```{r} -->
+<!-- V <- diag_(c(rep("v", 4), rep("w", 3))) -->
+<!-- Linv <- inv(L)  -->
+<!-- V <- Linv %*% V %*% t(Linv)  -->
+<!-- K <- t(L) %*% inv(V) %*% L -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=F, results="asis"} -->
+<!-- cat( -->
+<!--   "\\begin{align}  -->
+<!--     L\\inv &= ", texr(Linv), " \\\\  -->
+<!--     K &= ", texr(K), "  -->
+<!--   \\end{align}", sep = "") -->
+<!-- ``` -->
+
+
+<!-- Notice the pattern of zeros which correspond to conditional -->
+<!-- independence restrictions as mentioned above. -->
+
+
+<!-- ```{r} -->
+<!-- i1 <- 1:4 -->
+<!-- i2 <- 5:7 -->
+<!-- K22 <- K[i2, i2] %>% simplify() -->
+<!-- K21 <- K[i2, i1] %>% simplify() -->
+<!-- K11 <- K[i1, i1] %>% simplify() -->
+<!-- #K22 - K21 %*% inv(K11) %*% t(K21) -->
+<!-- ``` -->
+
+
+
+<!-- ### Possible topics for students  -->
+
+<!-- 1. Related to Sec. \ref{sec:dlm}: Find covariance / concentration for -->
+<!--    observables, i.e. for $(y_1, y_2, y_3)$. Use this for maximizing the -->
+<!--    likelihood. How feasible is this approach for a longer data vector? -->
+
+
+###########################
 
 <!-- Going back to the first example, we can substitute one symbol with -->
 <!-- another and simplify the result as (where we use \proglang{R}'s native pipe operator, `|>`): -->

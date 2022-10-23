@@ -11,45 +11,45 @@ Warning--empty title in mccullagh:etal:89
 Warning--empty publisher in mccullagh:etal:89
 Warning--empty year in mccullagh:etal:89
 Warning--empty year in mccullagh:etal:89
-You've used 11 entries,
+You've used 10 entries,
             2773 wiz_defined-function locations,
-            670 strings with 7191 characters,
-and the built_in function-call counts, 5971 in all, are:
-= -- 480
-> -- 542
+            664 strings with 7058 characters,
+and the built_in function-call counts, 5552 in all, are:
+= -- 446
+> -- 512
 < -- 5
-+ -- 182
-- -- 171
-* -- 544
-:= -- 998
-add.period$ -- 47
-call.type$ -- 11
-change.case$ -- 83
-chr.to.int$ -- 11
-cite$ -- 26
-duplicate$ -- 211
-empty$ -- 346
-format.name$ -- 188
-if$ -- 1181
++ -- 172
+- -- 162
+* -- 509
+:= -- 929
+add.period$ -- 43
+call.type$ -- 10
+change.case$ -- 78
+chr.to.int$ -- 10
+cite$ -- 24
+duplicate$ -- 190
+empty$ -- 313
+format.name$ -- 178
+if$ -- 1094
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 11
-newline$ -- 76
-num.names$ -- 44
-pop$ -- 174
+missing$ -- 9
+newline$ -- 71
+num.names$ -- 40
+pop$ -- 161
 preamble$ -- 1
-purify$ -- 79
+purify$ -- 74
 quote$ -- 0
-skip$ -- 187
+skip$ -- 173
 stack$ -- 0
-substring$ -- 46
-swap$ -- 14
+substring$ -- 44
+swap$ -- 13
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 101
+type$ -- 95
 warning$ -- 4
-while$ -- 35
+while$ -- 32
 width$ -- 0
-write$ -- 171
+write$ -- 158
 (There were 8 warnings)
