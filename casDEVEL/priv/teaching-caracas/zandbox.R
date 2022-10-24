@@ -1,5 +1,29 @@
-
 library(caracas)
+
+
+DD <- cbind(as_sym(c("-a", 0, 0)), diff_mat(3, "-a"))
+
+y <- vector_sym(4, "y")
+
+DD %*% y
+
+(t(DD) %*% DD)  %>% inv
+
+
+n <- 4
+x <- vector_sym(n, "x")
+def_sym(a)
+
+x[1:(n-1)]
+
+
+
+r <- x[2:n] - a * x[1:(n-1)]
+
+r %*% t(r)
+
+
+
 def_sym(xx, yy, zz)
 s <- xx + yy + zz
 subs(s, c(xx,yy), c(2,3)) ## Slow
