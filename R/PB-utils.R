@@ -12,8 +12,8 @@ getLRT <- function(largeModel, smallModel){
 getLRT.merMod <-
     getLRT.mer <-
         function(largeModel, smallModel){
-    ll.small <- logLik(smallModel, REML=FALSE)
-    ll.large <- logLik(largeModel, REML=FALSE)
+    ll.small <- logLik(update(smallModel, REML=FALSE))
+    ll.large <- logLik(update(largeModel, REML=FALSE))
     tobs     <- 2 * (ll.large - ll.small)
     df11     <- attr(ll.large, "df") - attr(ll.small, "df")
     p.X2     <- 1 - pchisq(tobs, df11)

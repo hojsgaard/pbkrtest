@@ -150,14 +150,6 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
-    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
-
-    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
-    ## if (w == 0){
-    ##     ## First given model is submodel of second; exchange the models
-    ##     tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
-    ## }
-
     if (is.numeric(smallModel) && !is.matrix(smallModel))
         smallModel <- matrix(smallModel, nrow=1)
             
@@ -168,9 +160,16 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
         formula.small <- formula(smallModel)
         attributes(formula.small) <- NULL
     }
+
+    ## From here: largeModel and smallModel are both model objects.
     
-    if (getME(smallModel, "is_REML")) smallModel <- update(smallModel, REML=FALSE)
-    if (getME(largeModel, "is_REML")) largeModel <- update(largeModel, REML=FALSE)
+    if (getME(smallModel, "is_REML")) {
+        smallModel <- update(smallModel, REML=FALSE)
+    }
+
+    if (getME(largeModel, "is_REML")){
+        largeModel <- update(largeModel, REML=FALSE)  
+    } 
 
     t0 <- proc.time()
 
@@ -179,9 +178,10 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     LRTstat     <- getLRT(largeModel, smallModel)
 
     attr(ref, "stat")    <- LRTstat
-    attr(ref, "samples") <- c(nsim=nsim, npos=sum(ref > 0),
-                              n.extreme=sum(ref > LRTstat["tobs"]),
-                              pPB=(1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
+    attr(ref, "samples") <- c(nsim      = nsim,
+                              npos      = sum(ref > 0),
+                              n.extreme = sum(ref > LRTstat["tobs"]),
+                              pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
     class(ref) <- "refdist"
     if (details>0)
         cat(sprintf("Reference distribution with %5i samples; computing time: %5.2f secs. \n",
@@ -329,3 +329,13 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
     ref
 
 }
+
+
+
+    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+
+    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
+    ## if (w == 0){
+    ##     ## First given model is submodel of second; exchange the models
+    ##     tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
+    ## }

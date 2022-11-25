@@ -1,9 +1,3 @@
-##########################################################
-###
-### 
-###
-##########################################################
-
 #' @title Model comparison using parametric bootstrap methods.
 #' 
 #' @description Model comparison of nested models using parametric bootstrap
@@ -21,7 +15,7 @@
 #'     worry about this issue.
 #' 
 #' Under the fitted hypothesis (i.e. under the fitted small model) \code{nsim}
-#' samples of the likelihood ratio test statistic (LRT) are generetated.
+#' samples of the likelihood ratio test statistic (LRT) are generated.
 #' 
 #' Then p-values are calculated as follows:
 #' 
@@ -60,7 +54,7 @@
 #'     datasets.
 #' @param h For sequential computing for bootstrap p-values: The
 #'     number of extreme cases needed to generate before the sampling
-#'     proces stops.
+#'     process stops.
 #' @param cl A vector identifying a cluster; used for calculating the
 #'     reference distribution using several cores. See examples below.
 #' @param details The amount of output produced. Mainly relevant for
@@ -75,7 +69,7 @@
 #' practice on can: We speculate that the reason is as follows: We simulate data
 #' under the small model and fit both the small and the large model to the
 #' simulated data. Therefore the large model represents - by definition - an
-#' overfit; the model has superfluous parameters in it. Therefore the fit of the
+#' over fit; the model has superfluous parameters in it. Therefore the fit of the
 #' two models will for some simulated datasets be very similar resulting in
 #' similar values of the log-likelihood. There is no guarantee that the the
 #' log-likelihood for the large model in practice always will be larger than for
@@ -224,19 +218,6 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
-    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
-    ## ss <<- smallModel
-    ## ll <<- largeModel
-
-    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
-
-    ## if (w == 0){
-    ##     ## First given model is submodel of second; exchange the models
-    ##     tmp <- largeModel;
-    ##     largeModel <- smallModel;
-    ##     smallModel <- tmp
-    ## }
-
     if (is.numeric(smallModel) && !is.matrix(smallModel))
         smallModel <- matrix(smallModel, nrow=1)
             
@@ -249,18 +230,35 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     }
 
     ##cat("PBmodcomp.lmerMod\n")
+    ## cat("largeModel\n"); print(largeModel)
+    ## cat("smallModel\n"); print(smallModel)
+
     formula.large <- formula(largeModel)
     attributes(formula.large) <- NULL
     
     ## All computations are based on 'largeModel' and 'smallModel'
+    ## which at this point are both model objects.
     ## -----------------------------------------------------------
     
     if (is.null(ref)){
         ref <- PBrefdist(largeModel, smallModel, nsim=nsim,
                          seed=seed, cl=cl, details=details)
     }
+    ## cat("ref\n"); print(ref)
+    ## largeModel <<- largeModel
+    ## smallModel <<- smallModel
+    
+    ## dd <- logLik(largeModel) - logLik(smallModel)
+    ## cat("dd:\n"); print(dd)
+
+    ## ll.small <- logLik(smallModel, REML=FALSE)
+    ## ll.large <- logLik(largeModel, REML=FALSE)
+    ## dd <- ll.large - ll.small
+    ## cat("dd:\n"); print(dd)
     
     LRTstat     <- getLRT(largeModel, smallModel)
+    ## cat("LRTstat\n"); print(LRTstat)
+
     ans         <- .finalizePB(LRTstat, ref)
     .padPB(ans, LRTstat, ref, formula.large, formula.small)
 }
@@ -274,6 +272,19 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 
 
 
+
+    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+    ## ss <<- smallModel
+    ## ll <<- largeModel
+
+    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
+
+    ## if (w == 0){
+    ##     ## First given model is submodel of second; exchange the models
+    ##     tmp <- largeModel;
+    ##     largeModel <- smallModel;
+    ##     smallModel <- tmp
+    ## }
 
 
 

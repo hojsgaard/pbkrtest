@@ -1,9 +1,8 @@
 #' budworm data
 #' 
-#' Effect of Insecticide on survivial of tobacco budworms
-#' number of killed budworms exposed to an insecticidepp
-#' mortality of the moth tobacco budworm 'Heliothis virescens' for 6 doses of
-#' the pyrethroid trans-cypermethrin differentiated with respect to sex
+#' Effect of Insecticide on survival of tobacco budworms 'Helio virescens'.
+#' Number of killed budworms exposed to an insecticide for 6 doses of
+#' the pyrethroid trans-cypermethrin differentiated with respect to sex.
 #'
 #' @name data-budworm
 #' @docType data

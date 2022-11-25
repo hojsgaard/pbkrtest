@@ -101,7 +101,7 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
 
     w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
 
-    if (w == -1) stop('Models have equal mean stucture or are not nested')
+    if (w == -1) stop('Models have equal mean stucture or are not nested...')
     if (w == 0){
         ## First given model is submodel of second; exchange the models
         tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
@@ -114,7 +114,7 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     L     <- model2remat(largeModel, smallModel)
      
     beta <- getME(largeModel, "beta")
-    aux  <- compute_auxillary(largeModel)
+    aux  <- compute_auxiliary(largeModel)
     vcov_Lbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
 
     eig_vcov_Lbeta <- eigen(vcov_Lbeta)
@@ -293,7 +293,7 @@ get_devfun <- function(model){
 ## ####### compute_auxillary
 ## ####### ################################################ #'
 #'
-#' Compute_auxillary quantities needed for the Satterthwaite
+#' Compute_auxiliary quantities needed for the Satterthwaite
 #' approximation.
 #'
 #' Computes vcov of variance parameters (theta, sigma), jacobian of
@@ -309,7 +309,7 @@ get_devfun <- function(model){
 #'     package.
 #' @keywords internal
 
-compute_auxillary <- function(model, tol=1e-6){
+compute_auxiliary <- function(model, tol=1e-6){
     
     if (!inherits(model, "lmerMod")) stop("'model' not an 'lmerMod'")
 
@@ -395,7 +395,7 @@ qform <- function(x, A) {
 #' This is to avoid downward bias.
 #'
 #' @param nu vector of denominator df for the t-statistics
-#' @param tol tolerance on the consequtive differences between elements of nu to
+#' @param tol tolerance on the consecutive differences between elements of nu to
 #' determine if mean(nu) should be returned
 #'
 #' @author Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.

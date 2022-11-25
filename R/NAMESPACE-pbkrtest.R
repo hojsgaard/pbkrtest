@@ -29,7 +29,7 @@
 
 
 
-.dumfunction_afterimportFrom <- function(){}
+## .dumfunction_afterimportFrom <- function(){}
 
 
 #' @title pbkrtest internal

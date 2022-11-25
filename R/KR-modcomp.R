@@ -66,11 +66,11 @@
 #' (fmLarge <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 #' ## removing Days
 #' (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
-#' anova(fmLarge,fmSmall)
-#' KRmodcomp(fmLarge,fmSmall)
+#' anova(fmLarge, fmSmall)
+#' KRmodcomp(fmLarge, fmSmall)
 #' 
 #' ## The same test using a restriction matrix
-#' L <- cbind(0,1)
+#' L <- cbind(0, 1)
 #' KRmodcomp(fmLarge, L)
 #' 
 #' ## Same example, but with independent intercept and slope effects:
@@ -97,7 +97,7 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
             
     w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
 
-    if (w == -1) stop('Models have equal mean stucture or are not nested')
+    if (w == -1) stop('Models have equal mean stucture or are not nested!')
     if (w == 0){
         ## First given model is submodel of second; exchange the models
         tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
@@ -223,7 +223,7 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
   F.scaling <- ifelse( abs(df2 - 2) < 1e-2, 1 , df2 * (1 - A2 / q) / (df2 - 2))
   ##cat(sprintf("KR: rho=%f, df2=%f F.scaling=%f\n", rho, df2, F.scaling))
 
-  ## Vector of auxilary values; just for checking etc...
+  ## Vector of auxiliary values; just for checking etc...
   aux <- c(A1=A1, A2=A2, V0=V0, V1=V1, V2=V2, rho=rho, F.scaling=F.scaling)
 
 ### The F-statistic; scaled and unscaled

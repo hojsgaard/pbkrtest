@@ -58,8 +58,6 @@
     else x / y
 }
 
-
-
 .is.lmm <- function(object) {
     inherits(object, "lmerMod")
 }
@@ -67,6 +65,13 @@
 .is.mm <- function(object) {
     inherits(object, "merMod")
 }
+
+rankMatrix_ <- function(X){
+    rankMatrix(X, method="qr.R")
+}
+
+
+
 
 
 ## .is.lmm <- function(object) {

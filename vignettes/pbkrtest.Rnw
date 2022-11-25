@@ -2,7 +2,7 @@
 %\VignettePackage{pbkrtest}
 
 \documentclass[11pt]{article}
-\usepackage{url,a4}
+\usepackage{url}
 
 \usepackage[latin1]{inputenc}
 %\usepackage{inputenx}

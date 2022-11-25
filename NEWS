@@ -1,11 +1,19 @@
-pbkrtest v0.5.1 (Release date: 2021-03-09)
+pbkrtest 0.5.2 (Release date: 2022-11-24)
+============================================
+
+Changes
+
+* Fixed bug in computation of LRTstatistic. Thanks to Helle Sorensen for pointing it out.
+
+
+pbkrtest 0.5.1 (Release date: 2021-03-09)
 ============================================
 
 Changes
 
 * Improved documentation
 
-pbkrtest v0.5-0.0 (Release date: 2020-08-04)
+pbkrtest 0.5-0.0 (Release date: 2020-08-04)
 ============================================
 
 Changes
@@ -19,7 +27,7 @@ Changes
 * doi added to DESCRIPTION file
 
 
-pbkrtest v0.4-8.6 (Release date: 2020-02-20)
+pbkrtest 0.4-8.6 (Release date: 2020-02-20)
 ============================================
 
 Bug fixes:
@@ -32,7 +40,7 @@ Bug fixes:
   to make emmeans used generic function vcovAdj.
 
 
-pbkrtest v0.4-8 (Release date: 2020-02-20)
+pbkrtest 0.4-8 (Release date: 2020-02-20)
 ==========================================
 
 Bug fixes:

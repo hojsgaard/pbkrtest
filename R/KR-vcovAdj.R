@@ -1,8 +1,8 @@
 ################################################################################
 #'
-#' @title Ajusted covariance matrix for linear mixed models according
+#' @title Adjusted covariance matrix for linear mixed models according
 #'     to Kenward and Roger
-#' @description Kenward and Roger (1997) describbe an improved small
+#' @description Kenward and Roger (1997) describe an improved small
 #'     sample approximation to the covariance matrix estimate of the
 #'     fixed parameters in a linear mixed model.
 #' @name kr-vcov
@@ -17,7 +17,7 @@
 #' @param details If larger than 0 some timing details are printed.
 #' @return \item{phiA}{the estimated covariance matrix, this has attributed P, a
 #'     list of matrices used in \code{KR_adjust} and the estimated matrix W of
-#'     the variances of the covariance parameters of the random effetcs}
+#'     the variances of the covariance parameters of the random effects}
 #' 
 #' \item{SigmaG}{list: Sigma: the covariance matrix of Y; G: the G matrices that
 #' sum up to Sigma; n.ggamma: the number (called M in the article) of G

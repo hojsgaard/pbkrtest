@@ -7,7 +7,7 @@
 \alias{Lb_ddf}
 \alias{get_ddf_Lb.lmerMod}
 \alias{ddf_Lb}
-\title{Adjusted denomintor degress freedom for linear estimate for linear
+\title{Adjusted denominator degrees of freedom for linear estimate for linear
     mixed model.}
 \usage{
 get_Lb_ddf(object, L)
@@ -31,7 +31,7 @@ with the same number of columns as the length of \code{fixef(object)}}
 \item{Lcoef}{Linear contrast matrix}
 
 \item{V0, Vadj}{Unadjusted and adjusted covariance matrix for the fixed
-effects parameters. Undjusted covariance matrix is obtained with
+effects parameters. Unadjusted covariance matrix is obtained with
 \code{vcov()} and adjusted with \code{vcovAdj()}.}
 
 \item{VVa}{Adjusted covariance matrix}
@@ -39,11 +39,11 @@ effects parameters. Undjusted covariance matrix is obtained with
 \item{VV0}{Unadjusted covariance matrix}
 }
 \value{
-Adjusted degrees of freedom (adjusment made by a Kenward-Roger
+Adjusted degrees of freedom (adjustment made by a Kenward-Roger
     approximation).
 }
 \description{
-Get adjusted denomintor degress freedom for testing Lb=0 in a
+Get adjusted denominator degrees freedom for testing Lb=0 in a
     linear mixed model where L is a restriction matrix.
 }
 \examples{
@@ -51,10 +51,10 @@ Get adjusted denomintor degress freedom for testing Lb=0 in a
 (fmLarge <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 ## removing Days
 (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
-anova(fmLarge,fmSmall)
+anova(fmLarge, fmSmall)
 
 KRmodcomp(fmLarge, fmSmall)  ## 17 denominator df's
-get_Lb_ddf(fmLarge, c(0,1))  ## 17 denominator df's
+get_Lb_ddf(fmLarge, c(0, 1)) ## 17 denominator df's
 
 # Notice: The restriction matrix L corresponding to the test above
 # can be found with

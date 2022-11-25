@@ -23,7 +23,7 @@ parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a
 Satterthwaite-type F-test. The parametric bootstrap test is also
 implemented for generalized linear mixed models (as implemented in
 'lme4') and for generalized linear models. The facilities of the
-package are documented in the paper by Halehoh and Højsgaard, (2012,
+package are documented in the paper by Halekoh and Højsgaard, (2012,
 \doi{doi:10.18637/jss.v059.i09}). 
 
 Please see 'citation("pbkrtest")' for information about citing the

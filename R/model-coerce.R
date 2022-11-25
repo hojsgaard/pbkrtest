@@ -194,12 +194,12 @@ make_modelmat <- function(X, L) {
 make_remat <- function(X, X2) {
   ## <X2> in <X>
   ## determine L such that  <X2>={Xb| b in Lb=0}
-  d <- rankMatrix(cbind(X2, X)) - rankMatrix(X)
+  d <- rankMatrix_(cbind(X2, X)) - rankMatrix_(X)
   if (d > 0) {
     stop('Error: <X2> not subspace of <X> \n')
   }
   Q  <- qr.Q(qr(cbind(X2, X)))
-  Q2 <- Q[, (rankMatrix(X2) + 1) : rankMatrix(X)]
+  Q2 <- Q[, (rankMatrix_(X2) + 1) : rankMatrix_(X)]
   L  <- t(Q2) %*% X
   ## Make rows of L2 orthogonal
   L <- t(qr.Q(qr(t(L))))
@@ -211,7 +211,7 @@ force_full_rank <- function(L){
     ## ensures that restriction matrix L is of full row rank:
     if (is.numeric(L) && !is.matrix(L))
         L <- matrix(L, nrow=1)
-    q  <- rankMatrix(L)
+    q  <- rankMatrix_(L)
     if (q < nrow(L)){
         t(qr.Q(qr(t(L)))[ ,1:qr(L)$rank])
     } else {
@@ -244,6 +244,63 @@ force_full_rank <- function(L){
               rhs.ran=rane)
   ans
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

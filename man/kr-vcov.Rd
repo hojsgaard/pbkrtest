@@ -12,7 +12,7 @@
 \alias{get_SigmaG}
 \alias{get_SigmaG.lmerMod}
 \alias{get_SigmaG.mer}
-\title{Ajusted covariance matrix for linear mixed models according
+\title{Adjusted covariance matrix for linear mixed models according
     to Kenward and Roger}
 \usage{
 vcovAdj(object, details = 0)
@@ -27,14 +27,14 @@ vcovAdj(object, details = 0)
 \value{
 \item{phiA}{the estimated covariance matrix, this has attributed P, a
     list of matrices used in \code{KR_adjust} and the estimated matrix W of
-    the variances of the covariance parameters of the random effetcs}
+    the variances of the covariance parameters of the random effects}
 
 \item{SigmaG}{list: Sigma: the covariance matrix of Y; G: the G matrices that
 sum up to Sigma; n.ggamma: the number (called M in the article) of G
 matrices) }
 }
 \description{
-Kenward and Roger (1997) describbe an improved small
+Kenward and Roger (1997) describe an improved small
     sample approximation to the covariance matrix estimate of the
     fixed parameters in a linear mixed model.
 }

@@ -75,7 +75,7 @@ debugging purposes.}
 
 \item{h}{For sequential computing for bootstrap p-values: The
 number of extreme cases needed to generate before the sampling
-proces stops.}
+process stops.}
 }
 \description{
 Model comparison of nested models using parametric bootstrap
@@ -90,7 +90,7 @@ The model \code{object} must be fitted with maximum likelihood
     worry about this issue.
 
 Under the fitted hypothesis (i.e. under the fitted small model) \code{nsim}
-samples of the likelihood ratio test statistic (LRT) are generetated.
+samples of the likelihood ratio test statistic (LRT) are generated.
 
 Then p-values are calculated as follows:
 
@@ -121,7 +121,7 @@ In theory one can not have a negative value of the LRT statistic but in
 practice on can: We speculate that the reason is as follows: We simulate data
 under the small model and fit both the small and the large model to the
 simulated data. Therefore the large model represents - by definition - an
-overfit; the model has superfluous parameters in it. Therefore the fit of the
+over fit; the model has superfluous parameters in it. Therefore the fit of the
 two models will for some simulated datasets be very similar resulting in
 similar values of the log-likelihood. There is no guarantee that the the
 log-likelihood for the large model in practice always will be larger than for

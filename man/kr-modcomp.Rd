@@ -65,11 +65,11 @@ This functionality is not thoroughly tested and should be used with
 (fmLarge <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 ## removing Days
 (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
-anova(fmLarge,fmSmall)
-KRmodcomp(fmLarge,fmSmall)
+anova(fmLarge, fmSmall)
+KRmodcomp(fmLarge, fmSmall)
 
 ## The same test using a restriction matrix
-L <- cbind(0,1)
+L <- cbind(0, 1)
 KRmodcomp(fmLarge, L)
 
 ## Same example, but with independent intercept and slope effects:

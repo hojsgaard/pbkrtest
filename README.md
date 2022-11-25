@@ -7,17 +7,17 @@
 
 # `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 
-Attention is on mixed effects models (as implemented in the ‘lme4’
-package). For linear mixed models, ‘pbkrtest’ implements (1) a
+Attention is on mixed effects models (as implemented in the `lme4`
+package). For linear mixed models, `pbkrtest` implements (1) a
 parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a
 Satterthwaite-type F-test. The parametric bootstrap test is also
 implemented for generalized linear mixed models (as implemented in
-‘lme4’) and for generalized linear models. The facilities of the
-package are documented in the paper by Halehoh and Højsgaard, (2012, ).
+`lme4`) and for generalized linear models. The facilities of the
+package are documented in the paper by Halekoh and Højsgaard, (2012, ).
 
-Please see ‘citation(“pbkrtest”)’ for information about citing the paper
+Please see `citation("pbkrtest")` for information about citing the paper
 and the package. If you use the package in your work, please do cite the
-2012-paper. There are other packages that use ‘pbkrtest’ under the hood.
+2012-paper. There are other packages that use `pbkrtest` under the hood.
 If you use one of those packages, please do also cite our 2012 paper.
 
 Documents:
@@ -27,7 +27,7 @@ Documents:
     Package
     pbkrtest](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
 2.  [Vignette: introduction to
-    ‘pbkrtest’](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
+    `pbkrtest`](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
 3.  [Webpage for the
     package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html)
 

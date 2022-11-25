@@ -9,7 +9,7 @@ get_Fstat_ddf(nu, tol = 1e-08)
 \arguments{
 \item{nu}{vector of denominator df for the t-statistics}
 
-\item{tol}{tolerance on the consequtive differences between elements of nu to
+\item{tol}{tolerance on the consecutive differences between elements of nu to
 determine if mean(nu) should be returned}
 }
 \value{
