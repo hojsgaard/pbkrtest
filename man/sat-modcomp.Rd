@@ -37,11 +37,6 @@ An approximate F-test based on the Satterthwaite approach.
 Notice: It cannot be guaranteed that the results agree with other
 implementations of the Satterthwaite approach!
 }
-\note{
-This code is greatly inspired by code in the lmerTest
-    package. This is a recent addition to the pbkrtest package;
-    please report unexpected behaviour.
-}
 \examples{
 
 (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
@@ -66,13 +61,13 @@ SATmodcomp(fm2, ~. - Days - I(Days^2))
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
-    Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
-    Models - The R Package pbkrtest., Journal of Statistical Software,
-    58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+Models - The R Package pbkrtest., Journal of Statistical Software,
+58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 }
 \seealso{
 \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
-    \code{\link{PBmodcomp}}
+\code{\link{PBmodcomp}}
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

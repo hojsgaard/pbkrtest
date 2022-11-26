@@ -1,24 +1,29 @@
-#' budworm data
+#' @title budworm data
 #' 
-#' Effect of Insecticide on survival of tobacco budworms 'Helio virescens'.
-#' Number of killed budworms exposed to an insecticide for 6 doses of
-#' the pyrethroid trans-cypermethrin differentiated with respect to sex.
-#'
+#' @description Experiment on the toxicity to the tobacco budworm
+#'     Heliothis virescens of doses of the pyrethroid
+#'     trans-cypermethrin to which the moths were beginning to show
+#'     resistance. Batches of 20 moths of each sex were exposed for
+#'     three days to the pyrethroid and the number in each batch that
+#'     were dead or knocked down was recorded. Data is reported in
+#'     Collett (1991, p. 75).
+#' 
 #' @name data-budworm
 #' @docType data
 #' 
 #' @format This data frame contains 12 rows and 4 columns:
+#'
 #' \describe{
-#' \item{sex:}{sex of the budworm}
-#' \item{dose:}{dose of the insecticide trans-cypermethrin in [\eqn{\mu}{mu}g]}
-#' \item{ndead:}{budworms killed in a trial}
-#' \item{ntotal:}{total number of budworms exposed per trial }
+#' \item{sex:}{sex of the budworm.}
+#' \item{dose:}{dose of the insecticide trans-cypermethrin (in micro grams)}.
+#' \item{ndead:}{budworms killed in a trial.}
+#' \item{ntotal:}{total number of budworms exposed per trial.}
 #' }
 #'
 #' @references Venables, W.N; Ripley, B.D.(1999) Modern Applied Statistics with
 #' S-Plus, Heidelberg, Springer, 3rd edition, chapter 7.2
 #'
-#' @source Collet, D. (1991) Modelling Binary Data, Chapman & Hall, London,
+#' @source Collett, D. (1991) Modelling Binary Data, Chapman & Hall, London,
 #' Example 3.7
 #'
 #' @keywords datasets

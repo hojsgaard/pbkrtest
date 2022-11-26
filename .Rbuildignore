@@ -1,8 +1,11 @@
 .travis.yml
 .gitignore
 LICENSE
-old_NAMESPACE
 devel/
 README.Rmd
 .github
 README_files/
+vignette/figures
+^doc$
+^CRAN-SUBMISSION$
+^cran-comments\.md$

@@ -8,7 +8,7 @@
 \alias{get_ddf_Lb.lmerMod}
 \alias{ddf_Lb}
 \title{Adjusted denominator degrees of freedom for linear estimate for linear
-    mixed model.}
+mixed model.}
 \usage{
 get_Lb_ddf(object, L)
 
@@ -30,8 +30,8 @@ with the same number of columns as the length of \code{fixef(object)}}
 
 \item{Lcoef}{Linear contrast matrix}
 
-\item{V0, Vadj}{Unadjusted and adjusted covariance matrix for the fixed
-effects parameters. Unadjusted covariance matrix is obtained with
+\item{V0, Vadj}{The unadjusted and the adjusted covariance matrices for the fixed
+effects parameters. The unadjusted covariance matrix is obtained with
 \code{vcov()} and adjusted with \code{vcovAdj()}.}
 
 \item{VVa}{Adjusted covariance matrix}
@@ -40,11 +40,11 @@ effects parameters. Unadjusted covariance matrix is obtained with
 }
 \value{
 Adjusted degrees of freedom (adjustment made by a Kenward-Roger
-    approximation).
+approximation).
 }
 \description{
 Get adjusted denominator degrees freedom for testing Lb=0 in a
-    linear mixed model where L is a restriction matrix.
+linear mixed model where L is a restriction matrix.
 }
 \examples{
 
@@ -58,20 +58,20 @@ get_Lb_ddf(fmLarge, c(0, 1)) ## 17 denominator df's
 
 # Notice: The restriction matrix L corresponding to the test above
 # can be found with
-L <- model2remat(fmLarge, fmSmall)
+L <- model2restriction_matrix(fmLarge, fmSmall)
 L
 
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
-    Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
-    Models - The R Package pbkrtest., Journal of Statistical Software,
-    58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+Models - The R Package pbkrtest., Journal of Statistical Software,
+58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 }
 \seealso{
 \code{\link{KRmodcomp}}, \code{\link{vcovAdj}},
-    \code{\link{model2remat}},
-    \code{\link{remat2model}}
+\code{\link{model2restriction_matrix}},
+\code{\link{restriction_matrix2model}}
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

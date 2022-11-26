@@ -19,10 +19,6 @@ A list
 Computes vcov of variance parameters (theta, sigma), jacobian of
 each variance parameter etc.
 }
-\details{
-The code is greatly inspired by code from the lmerTest
-    package.
-}
 \author{
 Søren Højsgaard
 }

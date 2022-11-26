@@ -1,3 +1,14 @@
+pbkrtest 0.5.3 (Release date: 2022-11-26)
+============================================
+
+Changes
+
+* remat changed to restriction_matrix for increased readability
+* WORDLIST file added
+* Changes in reference to JSS paper
+* Various changes in documentation
+* Satterthwaite approximation now illustrated in vignette
+
 pbkrtest 0.5.2 (Release date: 2022-11-24)
 ============================================
 

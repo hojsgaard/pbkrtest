@@ -13,7 +13,7 @@
 \alias{get_SigmaG.lmerMod}
 \alias{get_SigmaG.mer}
 \title{Adjusted covariance matrix for linear mixed models according
-    to Kenward and Roger}
+to Kenward and Roger}
 \usage{
 vcovAdj(object, details = 0)
 
@@ -26,8 +26,8 @@ vcovAdj(object, details = 0)
 }
 \value{
 \item{phiA}{the estimated covariance matrix, this has attributed P, a
-    list of matrices used in \code{KR_adjust} and the estimated matrix W of
-    the variances of the covariance parameters of the random effects}
+list of matrices used in \code{KR_adjust} and the estimated matrix W of
+the variances of the covariance parameters of the random effects}
 
 \item{SigmaG}{list: Sigma: the covariance matrix of Y; G: the G matrices that
 sum up to Sigma; n.ggamma: the number (called M in the article) of G
@@ -35,13 +35,13 @@ matrices) }
 }
 \description{
 Kenward and Roger (1997) describe an improved small
-    sample approximation to the covariance matrix estimate of the
-    fixed parameters in a linear mixed model.
+sample approximation to the covariance matrix estimate of the
+fixed parameters in a linear mixed model.
 }
 \note{
 If $N$ is the number of observations, then the \code{vcovAdj()}
-    function involves inversion of an $N x N$ matrix, so the computations can
-    be relatively slow.
+function involves inversion of an $N x N$ matrix, so the computations can
+be relatively slow.
 }
 \examples{
 
@@ -74,20 +74,20 @@ v3/v1
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
-    Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
-    Models - The R Package pbkrtest., Journal of Statistical Software,
-    58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+Models - The R Package pbkrtest., Journal of Statistical Software,
+58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 
 Kenward, M. G. and Roger, J. H. (1997), \emph{Small Sample Inference for
 Fixed Effects from Restricted Maximum Likelihood}, Biometrics 53: 983-997.
 }
 \seealso{
 \code{\link{getKR}}, \code{\link{KRmodcomp}}, \code{\link{lmer}},
-    \code{\link{PBmodcomp}}, \code{\link{vcovAdj}}
+\code{\link{PBmodcomp}}, \code{\link{vcovAdj}}
 }
 \author{
 Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
-    \email{sorenh@math.aau.dk}
+\email{sorenh@math.aau.dk}
 }
 \keyword{inference}
 \keyword{models}

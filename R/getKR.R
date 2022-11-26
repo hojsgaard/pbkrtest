@@ -3,7 +3,7 @@
 #' @description Extract (or "get") components from a \code{KRmodcomp} object,
 #'     which is the result of the \code{KRmodcomp} function.
 #'
-#' @name getkr
+#' @name get_modcomp
 #' 
 #' @param object A \code{KRmodcomp} object, which is the result of the
 #'     \code{KRmodcomp} function
@@ -29,7 +29,7 @@
 #' 
 
 #' @export
-#' @rdname getkr
+#' @rdname get_modcomp
 getKR <- function (object, name = c("ndf", "ddf", "Fstat", "p.value", "F.scaling", "FstatU", "p.valueU", "aux")) 
 {	
   stopifnot(is(object, "KRmodcomp"))
@@ -39,5 +39,20 @@ getKR <- function (object, name = c("ndf", "ddf", "Fstat", "p.value", "F.scaling
     stopifnot(length(name <- as.character(name)) == 1)
     name <- match.arg(name)
     object$stats[[name]]
+  }
+}
+
+
+#' @export
+#' @rdname get_modcomp
+getSAT <- function (object, name = c("ndf", "ddf", "Fstat", "p.value")) 
+{	
+  stopifnot(is(object, "SATmodcomp"))
+  if (missing(name) || is.null(name)){
+    return(object$test) ## FIXME Should be stats
+  } else {
+    stopifnot(length(name <- as.character(name)) == 1)
+    name <- match.arg(name)
+    object$test[[name]] ## FIXME Should be stats
   }
 }

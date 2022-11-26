@@ -25,7 +25,7 @@ Documents:
 1.  [Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and
     Parametric Bootstrap Methods for Tests in Linear Mixed Models The R
     Package
-    pbkrtest](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
+    pbkrtest](https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper)
 2.  [Vignette: introduction to
     `pbkrtest`](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
 3.  [Webpage for the

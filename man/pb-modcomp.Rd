@@ -79,15 +79,15 @@ process stops.}
 }
 \description{
 Model comparison of nested models using parametric bootstrap
-    methods.  Implemented for some commonly applied model types.
+methods.  Implemented for some commonly applied model types.
 }
 \details{
 The model \code{object} must be fitted with maximum likelihood
-    (i.e. with \code{REML=FALSE}). If the object is fitted with
-    restricted maximum likelihood (i.e. with \code{REML=TRUE}) then
-    the model is refitted with \code{REML=FALSE} before the
-    p-values are calculated. Put differently, the user needs not
-    worry about this issue.
+(i.e. with \code{REML=FALSE}). If the object is fitted with
+restricted maximum likelihood (i.e. with \code{REML=TRUE}) then
+the model is refitted with \code{REML=FALSE} before the
+p-values are calculated. Put differently, the user needs not
+worry about this issue.
 
 Under the fitted hypothesis (i.e. under the fitted small model) \code{nsim}
 samples of the likelihood ratio test statistic (LRT) are generated.
@@ -112,10 +112,10 @@ matching the first moment of the reference distribution.
 }
 \note{
 It can happen that some values of the LRT statistic in the
-    reference distribution are negative. When this happens one will
-    see that the number of used samples (those where the LRT is
-    positive) are reported (this number is smaller than the
-    requested number of samples).
+reference distribution are negative. When this happens one will
+see that the number of used samples (those where the LRT is
+positive) are reported (this number is smaller than the
+requested number of samples).
 
 In theory one can not have a negative value of the LRT statistic but in
 practice on can: We speculate that the reason is as follows: We simulate data
@@ -246,9 +246,9 @@ PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=NSIM)
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
-    Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
-    Models - The R Package pbkrtest., Journal of Statistical Software,
-    58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+Models - The R Package pbkrtest., Journal of Statistical Software,
+58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 }
 \seealso{
 \code{\link{KRmodcomp}}, \code{\link{PBrefdist}}

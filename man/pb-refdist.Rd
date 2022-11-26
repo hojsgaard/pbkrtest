@@ -58,33 +58,34 @@ A numeric vector
 }
 \description{
 Calculate reference distribution of likelihood ratio statistic
-    in mixed effects models using parametric bootstrap
+in mixed effects models using parametric bootstrap
 }
 \details{
 The model \code{object} must be fitted with maximum likelihood
-    (i.e. with \code{REML=FALSE}). If the object is fitted with restricted
-    maximum likelihood (i.e. with \code{REML=TRUE}) then the model is
-    refitted with \code{REML=FALSE} before the p-values are calculated. Put
-    differently, the user needs not worry about this issue.
+(i.e. with \code{REML=FALSE}). If the object is fitted with restricted
+maximum likelihood (i.e. with \code{REML=TRUE}) then the model is
+refitted with \code{REML=FALSE} before the p-values are calculated. Put
+differently, the user needs not worry about this issue.
 
-    The argument 'cl' (originally short for 'cluster') is used for
-    controlling parallel computations. 'cl' can be NULL (default),
-    positive integer or a list of clusters.
-
+\if{html}{\out{<div class="sourceCode">}}\preformatted{The argument 'cl' (originally short for 'cluster') is used for
+controlling parallel computations. 'cl' can be NULL (default),
+positive integer or a list of clusters.
+}\if{html}{\out{</div>}}
 
 Special care must be taken
-    on Windows platforms (described below) but the general picture
-    is this:
+on Windows platforms (described below) but the general picture
+is this:
 
-    The recommended way of controlling cl is to specify the
-    component \code{pbcl} in options() with
-    e.g. \code{options("pbcl"=4)}.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{The recommended way of controlling cl is to specify the
+component \code{pbcl} in options() with
+e.g. \code{options("pbcl"=4)}.
 
-    If cl is NULL, the function will look at if the pbcl has been set
-    in the options list with \code{getOption("pbcl")}
+If cl is NULL, the function will look at if the pbcl has been set
+in the options list with \code{getOption("pbcl")}
 
-    If cl=N then N cores will be used in the computations. If cl is
-    NULL then the function will look for
+If cl=N then N cores will be used in the computations. If cl is
+NULL then the function will look for
+}\if{html}{\out{</div>}}
 }
 \examples{
 
@@ -140,9 +141,9 @@ stopCluster(clus)
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
-    Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
-    Models - The R Package pbkrtest., Journal of Statistical Software,
-    58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+Models - The R Package pbkrtest., Journal of Statistical Software,
+58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 }
 \seealso{
 \code{\link{PBmodcomp}}, \code{\link{KRmodcomp}}

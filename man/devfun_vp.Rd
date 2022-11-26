@@ -19,7 +19,7 @@ the REML or ML deviance.
 }
 \description{
 This function is used for extracting the asymptotic variance-covariance matrix
-  of the variance parameters.
+of the variance parameters.
 }
 \author{
 Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.

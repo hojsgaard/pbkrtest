@@ -44,10 +44,6 @@
 #' @param eps A small number.
 #' @param details If larger than 0 some timing details are printed.
 #'
-#' @note This code is greatly inspired by code in the lmerTest
-#'     package. This is a recent addition to the pbkrtest package;
-#'     please report unexpected behaviour.
-#'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
 #' @seealso \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
@@ -93,7 +89,7 @@ SATmodcomp.lmerMod <- function(largeModel, smallModel, details=0, eps=sqrt(.Mach
     SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, eps=eps)
 }
 
-## SATmodcomp_internal is inspired by code in the lmerTest package
+
 SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double.eps)){
 
     if (inherits(smallModel, "formula"))
@@ -111,7 +107,7 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     ## -------------------------------------------------------------------------
     
     t0    <- proc.time()    
-    L     <- model2remat(largeModel, smallModel)
+    L     <- model2restriction_matrix(largeModel, smallModel)
      
     beta <- getME(largeModel, "beta")
     aux  <- compute_auxiliary(largeModel)
@@ -305,8 +301,6 @@ get_devfun <- function(model){
 #' @author Søren Højsgaard
 #'
 #' @return A list
-#' @details The code is greatly inspired by code from the lmerTest
-#'     package.
 #' @keywords internal
 
 compute_auxiliary <- function(model, tol=1e-6){
