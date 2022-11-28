@@ -1,10 +1,10 @@
 ---
-title: "01 - Introduction to 'pbkrtest'  oooooooooooooo" 
+title: "01 - Introduction to 'pbkrtest'" 
 author: "Søren Højsgaard and Ulrich Halekoh"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{01 - Introduction to 'pbkrtest'  hhhhh}
+  %\VignetteIndexEntry{01 - Introduction to 'pbkrtest'}
   %\VignetteEncoding{UTF-8}
 ---
 
