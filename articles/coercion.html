@@ -71,7 +71,7 @@
       </header><script src="coercion_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Coercion between model objects and restriction matrices in the <code>pbkrtest</code> package</h1>
+      <h1 data-toc-skip>02 - Coercion between model objects and restriction matrices in the <code>pbkrtest</code> package</h1>
                         <h4 data-toc-skip class="author">Søren Højsgaard and Ulrich Halekoh</h4>
             
             <h4 data-toc-skip class="date">Date: 2022-11-28</h4>
@@ -101,7 +101,7 @@
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept)            x       I(x^2)  </span></span>
-<span><span class="co">##     -0.7764       1.2439      -0.3060</span></span></code></pre>
+<span><span class="co">##      3.1593      -1.8961       0.2422</span></span></code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -110,7 +110,7 @@
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept)            x  </span></span>
-<span><span class="co">##      0.7538      -0.2863</span></span></code></pre>
+<span><span class="co">##      1.9485      -0.6853</span></span></code></pre>
 <p>The corresponding model matrices are</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Xlg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">lg</span><span class="op">)</span></span>
@@ -160,14 +160,14 @@
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">## lm(formula = y ~ .X1 + .X2 - 1, data = structure(list(.X1 = c(1, </span></span>
-<span><span class="co">## 2, 3, 4), .X2 = c(1, 1, 1, 1), y = c(0.350639571112963, -0.0805337377833452, </span></span>
-<span><span class="co">## 0.768479564415717, -0.8868550434948), x = 1:4, `I(x^2)` = structure(c(1, </span></span>
+<span><span class="co">## 2, 3, 4), .X2 = c(1, 1, 1, 1), y = c(1.23321615614602, 1.15194176049656, </span></span>
+<span><span class="co">## -1.16595059810136, -0.278573822890171), x = 1:4, `I(x^2)` = structure(c(1, </span></span>
 <span><span class="co">## 4, 9, 16), class = "AsIs")), class = "data.frame", row.names = c(NA, </span></span>
 <span><span class="co">## 4L)))</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##     .X1      .X2  </span></span>
-<span><span class="co">## -0.2863   0.7538</span></span></code></pre>
+<span><span class="co">## -0.6853   1.9485</span></span></code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm_2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   .X1 .X2</span></span>
