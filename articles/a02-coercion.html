@@ -100,7 +100,7 @@
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept)            x       I(x^2)  </span></span>
-<span><span class="co">##     -0.7091       1.7177      -0.3657</span></span></code></pre>
+<span><span class="co">##      2.8671      -2.9347       0.5465</span></span></code></pre>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -109,7 +109,7 @@
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept)            x  </span></span>
-<span><span class="co">##      1.1192      -0.1106</span></span></code></pre>
+<span><span class="co">##      0.1348      -0.2024</span></span></code></pre>
 <p>The corresponding model matrices are</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Xlg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">lg</span><span class="op">)</span></span>
@@ -159,14 +159,14 @@
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">## lm(formula = y ~ .X1 + .X2 - 1, data = structure(list(.X1 = c(1, </span></span>
-<span><span class="co">## 2, 3, 4), .X2 = c(1, 1, 1, 1), y = c(0.573387901013028, 1.47246656352564, </span></span>
-<span><span class="co">## 0.944375455283462, 0.380828036253312), x = 1:4, `I(x^2)` = structure(c(1, </span></span>
+<span><span class="co">## 2, 3, 4), .X2 = c(1, 1, 1, 1), y = c(0.397796491864441, -0.573535170660594, </span></span>
+<span><span class="co">## -1.26199971850348, -0.04749716163438), x = 1:4, `I(x^2)` = structure(c(1, </span></span>
 <span><span class="co">## 4, 9, 16), class = "AsIs")), class = "data.frame", row.names = c(NA, </span></span>
 <span><span class="co">## 4L)))</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##     .X1      .X2  </span></span>
-<span><span class="co">## -0.1106   1.1192</span></span></code></pre>
+<span><span class="co">## -0.2024   0.1348</span></span></code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sm_2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   .X1 .X2</span></span>
