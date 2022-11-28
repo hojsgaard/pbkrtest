@@ -1,19 +1,19 @@
-```{r, echo=FALSE}
-require( pbkrtest )
-prettyVersion <- packageDescription("pbkrtest")$Version
-prettyDate <- format(Sys.Date())
-```
-
 ---
 title: "01 - Introduction to `pbkrtest`" 
 author: "Søren Højsgaard and Ulrich Halekoh"
-date: "Date: `r prettyDate`"
+date: "Date: `r date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{01 - Introduction to pbkrtest}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, echo=FALSE}
+require( pbkrtest )
+prettyVersion <- packageDescription("pbkrtest")$Version
+prettyDate <- format(Sys.Date())
+```
 
 
 ```{r setup, include=FALSE}
