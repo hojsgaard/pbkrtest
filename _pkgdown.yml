@@ -3,12 +3,12 @@ reference:
   desc: >
     Functions for model comparison.
   contents:
-  - has_concepts("model_comparison")
+  - has_concept("model_comparison")
 - title: Data sets
   desc: >
     Data.
   contents:
-  - has_concepts("data")
+  - has_concept("data")
 - title: Others
   desc: > 
     These are functions not mentioned above.
