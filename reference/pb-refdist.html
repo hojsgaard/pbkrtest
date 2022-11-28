@@ -24,9 +24,6 @@ in mixed effects models using parametric bootstrap"><!-- mathjax --><script src=
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
-  <a href="../articles/pbkrtest.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -36,7 +33,10 @@ in mixed effects models using parametric bootstrap"><!-- mathjax --><script src=
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/coercion.html">UNKNOWN TITLE</a>
+      <a href="../articles/a01-pbkrtest.html">UNKNOWN TITLE</a>
+    </li>
+    <li>
+      <a href="../articles/a02-coercion.html">UNKNOWN TITLE</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
@@ -182,21 +182,21 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="va">beet_no.harv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">beet0</span>, <span class="va">.</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span><span class="va">harvest</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rd</span> <span class="op">&lt;-</span> <span class="fu">PBrefdist</span><span class="op">(</span><span class="va">beet0</span>, <span class="va">beet_no.harv</span>, nsim<span class="op">=</span><span class="fl">20</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rd</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.901956418 13.334414688  1.078856935  2.854210659  0.038505511</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  0.046101004 10.176568836  0.021747510  2.143971951  3.949271766</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11]  0.883737364  2.341454719  0.002172584  8.374130590 12.319498066</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16]  3.305496154  6.224174243  0.752969324  0.002997410  5.863116948</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  4.32245840  1.36135131  5.33241892  1.09753843  3.65976684 11.53817438</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  2.99728993  0.01266906  1.05776459  1.91531868  3.10799515 10.22951497</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.68972891  0.12280416  6.45639160  2.81971197  0.35966205  0.18015617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  0.04355803  2.51429612</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cl")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"ctime")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.592 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.572 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"stat")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         tobs           df      p.value </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.291424e+01 1.000000e+00 3.260911e-04 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"samples")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       nsim       npos  n.extreme        pPB </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20.0000000 20.0000000  1.0000000  0.0952381 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        nsim        npos   n.extreme         pPB </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20.00000000 20.00000000  0.00000000  0.04761905 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "refdist"</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>

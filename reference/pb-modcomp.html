@@ -24,9 +24,6 @@ methods.  Implemented for some commonly applied model types."><!-- mathjax --><s
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
-  <a href="../articles/pbkrtest.html">Get started</a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -36,7 +33,10 @@ methods.  Implemented for some commonly applied model types."><!-- mathjax --><s
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/coercion.html">UNKNOWN TITLE</a>
+      <a href="../articles/a01-pbkrtest.html">UNKNOWN TITLE</a>
+    </li>
+    <li>
+      <a href="../articles/a02-coercion.html">UNKNOWN TITLE</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
@@ -240,7 +240,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">sug</span>, <span class="va">sug.h</span>, nsim<span class="op">=</span><span class="va">NSIM</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 1.51 sec; samples: 50; extremes: 2;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 2.03 sec; samples: 50; extremes: 2;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : sugpct ~ block + sow + harvest + (1 | block:harvest)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sugpct ~ block + sow + (1 | block:harvest)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df   p.value    </span>
@@ -261,7 +261,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">sug</span>, <span class="va">sug.s</span>, nsim<span class="op">=</span><span class="va">NSIM</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> boundary (singular) fit: see help('isSingular')</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> boundary (singular) fit: see help('isSingular')</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 1.47 sec; samples: 50; extremes: 0;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 1.39 sec; samples: 50; extremes: 0;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : sugpct ~ block + sow + harvest + (1 | block:harvest)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sugpct ~ block + harvest + (1 | block:harvest)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value    </span>
@@ -286,7 +286,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">sug</span>, <span class="va">sug.h</span>, nsim<span class="op">=</span><span class="va">NSIM</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.18 sec; samples: 50; extremes: 0;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.16 sec; samples: 50; extremes: 0;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : sugpct ~ block + sow + harvest</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sugpct ~ block + sow</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df   p.value    </span>
@@ -305,7 +305,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">sug</span>, <span class="va">sug.s</span>, nsim<span class="op">=</span><span class="va">NSIM</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.18 sec; samples: 50; extremes: 0;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.17 sec; samples: 50; extremes: 0;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : sugpct ~ block + sow + harvest</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sugpct ~ block + harvest</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value    </span>
@@ -413,28 +413,30 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     48 11354 -1   -528.81 2.296 0.1364</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m11</span>, <span class="va">m10</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.11 sec; samples: 50; extremes: 7;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.10 sec; samples: 50; extremes: 4;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> dist ~ speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.3848  1  0.1225</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.3848     0.1569</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.3848  1 0.12252  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.3848    0.09804 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m11</span>, <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">speed</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.12 sec; samples: 50; extremes: 11;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.11 sec; samples: 50; extremes: 8;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> dist ~ speed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.3848  1  0.1225</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.3848     0.2353</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.3848     0.1765</span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m11</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.11 sec; samples: 50; extremes: 5;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.11 sec; samples: 50; extremes: 7;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    0    0    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.3848  1  0.1225</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.3848     0.1176</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.3848     0.1569</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">m21</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">dist</span> <span class="op">~</span> <span class="va">speed</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">speed</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, family<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span><span class="st">"identity"</span><span class="op">)</span>, data<span class="op">=</span><span class="va">cars</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m20</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m21</span>, <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">speed</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -448,7 +450,16 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2        48     8.0945 -1 -0.42037    0.106</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m21</span>, <span class="va">m20</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.21 sec; samples: 50; extremes: 8;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.21 sec; samples: 50; extremes: 6;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dist ~ speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.7364  1 0.09809 .</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.7364    0.13725  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
+<span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m21</span>, <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">speed</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.20 sec; samples: 50; extremes: 8;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> dist ~ speed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value  </span>
@@ -456,24 +467,15 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.7364    0.17647  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
-<span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m21</span>, <span class="op">~</span><span class="va">.</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">speed</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.19 sec; samples: 50; extremes: 5;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> dist ~ speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.7364  1 0.09809 .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.7364    0.11765  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">PBmodcomp</span><span class="op">(</span><span class="va">m21</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, cl<span class="op">=</span><span class="fl">1</span>, nsim<span class="op">=</span><span class="va">NSIM</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.25 sec; samples: 50; extremes: 7;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap test; time: 0.27 sec; samples: 50; extremes: 2;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : dist ~ speed + I(speed^2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    0    0    1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          stat df p.value  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LRT    2.7364  1 0.09809 .</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.7364    0.15686  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> PBtest 2.7364    0.05882 .</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span></span></span>
