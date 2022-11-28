@@ -6,14 +6,14 @@ reference:
   - has_concepts("model_comparison")
 - title: Data
   desc: >
-    Data
+    Data.
   contents:
   - has_concepts("data")
 - title: Others
   desc: > 
     These are functions not mentioned above.
   contents:
-  - lacks_concepts(c("model_comparison", "simple_algebra"))
+  - lacks_concepts(c("model_comparison", "data", "simple_algebra"))
 - title: Complete reference
   desc: ~
   contents:
