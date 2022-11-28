@@ -97,5 +97,6 @@ Fixed Effects from Restricted Maximum Likelihood}, Biometrics 53: 983-997.
 Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
 \email{sorenh@math.aau.dk}
 }
+\concept{model_comparison}
 \keyword{inference}
 \keyword{models}

@@ -3,7 +3,7 @@
 #' @title F-test and degrees of freedom based on Kenward-Roger approximation
 #' 
 #' @description An approximate F-test based on the Kenward-Roger approach.
-#'
+#' @concept model_comparison
 #' @name kr-modcomp
 #' 
 ## ##########################################################################
@@ -59,7 +59,8 @@
 #' 
 #' Kenward, M. G. and Roger, J. H. (1997), \emph{Small Sample Inference for
 #' Fixed Effects from Restricted Maximum Likelihood}, Biometrics 53: 983-997.
-#'
+#' 
+#' 
 #' @keywords models inference
 #' @examples
 #' 

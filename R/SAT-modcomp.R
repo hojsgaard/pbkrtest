@@ -2,6 +2,7 @@
 ##
 #' @title F-test and degrees of freedom based on Satterthwaite approximation
 #' @description An approximate F-test based on the Satterthwaite approach.
+#' @concept model_comparison
 #' @name sat-modcomp
 #' 
 ## ##########################################################################
@@ -53,6 +54,8 @@
 #'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
 #'     Models - The R Package pbkrtest., Journal of Statistical Software,
 #'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+#'
+#' 
 #' 
 #' @keywords models inference
 #' @examples

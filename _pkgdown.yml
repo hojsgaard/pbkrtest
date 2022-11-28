@@ -1,4 +1,9 @@
 reference:
+- title: Model comparisons
+  desc: >
+    Model comparisons.
+  contests:
+  - has_concept("model_comparison")
 - title: Others
   desc: > 
     These are functions not mentioned above.

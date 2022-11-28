@@ -2,7 +2,7 @@
 #' 
 #' @description Model comparison of nested models using parametric bootstrap
 #'     methods.  Implemented for some commonly applied model types.
-#'
+#' @concept model_comparison
 #' @name pb-modcomp
 #' 
 #' @details
@@ -84,6 +84,8 @@
 #' invoke \code{PBmodcomp()} to get some idea about how strong influence there
 #' is on the resulting p-values. (The p-values get smaller this way compared to
 #' the case when only the originally positive values are used).
+#'
+#' 
 #' 
 #' @author Søren Højsgaard \email{sorenh@@math.aau.dk}
 #' 
