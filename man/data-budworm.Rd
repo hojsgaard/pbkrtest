@@ -4,7 +4,7 @@
 \name{data-budworm}
 \alias{data-budworm}
 \alias{budworm}
-\title{budworm data}
+\title{Budworm data}
 \format{
 This data frame contains 12 rows and 4 columns:
 
@@ -68,4 +68,5 @@ run;
 Venables, W.N; Ripley, B.D.(1999) Modern Applied Statistics with
 S-Plus, Heidelberg, Springer, 3rd edition, chapter 7.2
 }
+\concept{data}
 \keyword{datasets}

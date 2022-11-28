@@ -1,4 +1,4 @@
-#' @title budworm data
+#' @title Budworm data
 #' 
 #' @description Experiment on the toxicity to the tobacco budworm
 #'     Heliothis virescens of doses of the pyrethroid
@@ -26,6 +26,7 @@
 #' @source Collett, D. (1991) Modelling Binary Data, Chapman & Hall, London,
 #' Example 3.7
 #'
+#' @concept data
 #' @keywords datasets
 #' @examples
 #' 
