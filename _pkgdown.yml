@@ -8,7 +8,7 @@ reference:
   desc: > 
     These are functions not mentioned above.
   contents:
-  - lacks_concepts(c("simple_algebra"))
+  - lacks_concepts(c("model_comparison", "simple_algebra"))
 - title: Complete reference
   desc: ~
   contents:
