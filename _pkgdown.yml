@@ -1,7 +1,7 @@
 reference:
-- title: Model comparisons
+- title: Model comparison
   desc: >
-    Model comparisons.
+    Model comparison
   contests:
   - has_concept("model_comparison")
 - title: Others
