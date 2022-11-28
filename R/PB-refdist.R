@@ -9,6 +9,7 @@
 #' @description Calculate reference distribution of likelihood ratio statistic
 #'     in mixed effects models using parametric bootstrap
 #'
+#' @concept model_comparison
 #' @name pb-refdist
 #'
 #' @details The model \code{object} must be fitted with maximum likelihood

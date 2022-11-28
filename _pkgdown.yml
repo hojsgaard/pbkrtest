@@ -1,12 +1,12 @@
 reference:
 - title: Model comparison
   desc: >
-    Functions for model comparison.
+    ~ 
   contents:
   - has_concept("model_comparison")
 - title: Data sets
   desc: >
-    Data.
+    ~ 
   contents:
   - has_concept("data")
 - title: Others
