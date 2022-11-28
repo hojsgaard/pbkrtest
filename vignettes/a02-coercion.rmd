@@ -1,9 +1,3 @@
-```{r, echo=FALSE}
-require( pbkrtest )
-prettyVersion <- packageDescription("pbkrtest")$Version
-prettyDate <- format(Sys.Date())
-```
-
 ---
 title: "02 - Coercion between model objects and restriction matrices in 'pbkrtest'"
 author: "Søren Højsgaard and Ulrich Halekoh"
@@ -13,6 +7,12 @@ vignette: >
   %\VignetteIndexEntry{02 - Coercion}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, echo=FALSE}
+require( pbkrtest )
+prettyVersion <- packageDescription("pbkrtest")$Version
+prettyDate <- format(Sys.Date())
+```
 
 
 ```{r setup, include=FALSE}
