@@ -5,13 +5,13 @@ prettyDate <- format(Sys.Date())
 ```
 
 ---
-title: "Coercion between model objects and restriction matrices in the `pbkrtest` package"
+title: "02 - Coercion between model objects and restriction matrices in the `pbkrtest` package"
 author: "Søren Højsgaard and Ulrich Halekoh"
 date: "Date: `r prettyDate`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{coercion}
+  %\VignetteIndexEntry{02 - coercion}
   %\VignetteEncoding{UTF-8}
 ---
 

@@ -5,13 +5,13 @@ prettyDate <- format(Sys.Date())
 ```
 
 ---
-title: "On the usage of the `pbkrtest` package"
+title: "01 - Introduction to `pbkrtest` 
 author: "Søren Højsgaard and Ulrich Halekoh"
 date: "Date: `r prettyDate`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{pbkrtest}
+  %\VignetteIndexEntry{01 - Introduction to pbkrtest}
   %\VignetteEncoding{UTF-8}
 ---
 
