@@ -4,7 +4,7 @@ author: "Søren Højsgaard and Ulrich Halekoh"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{01 - Introduction to 'pbkrtest'}
+  %\VignetteIndexEntry{01 - Introduction to 'pbkrtest'hhhhh}
   %\VignetteEncoding{UTF-8}
 ---
 
