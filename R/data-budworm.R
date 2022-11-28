@@ -7,7 +7,8 @@
 #'     three days to the pyrethroid and the number in each batch that
 #'     were dead or knocked down was recorded. Data is reported in
 #'     Collett (1991, p. 75).
-#' 
+#'
+#' @concept data
 #' @name data-budworm
 #' @docType data
 #' 
@@ -26,7 +27,7 @@
 #' @source Collett, D. (1991) Modelling Binary Data, Chapman & Hall, London,
 #' Example 3.7
 #'
-#' @concept data
+#' 
 #' @keywords datasets
 #' @examples
 #' 
