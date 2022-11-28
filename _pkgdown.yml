@@ -3,7 +3,7 @@ reference:
   desc: >
     Functions for model comparison.
   contents:
-  - has_concept("model_comparison")
+  - has_concepts("model_comparison")
 - title: Others
   desc: > 
     These are functions not mentioned above.
