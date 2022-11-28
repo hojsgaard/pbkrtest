@@ -8,8 +8,7 @@ reference:
   desc: > 
     These are functions not mentioned above.
   contents:
-  - lacks_concepts(c("caracas_symbol", "simple_algebra", "vectors", "simplify", 
-                     "calculus", "linalg", "solve", "output", "lowlevel", "assumptions", "sympy"))
+  - lacks_concepts(c("model_comparison", "simple_algebra"))
 - title: Complete reference
   desc: ~
   contents:
