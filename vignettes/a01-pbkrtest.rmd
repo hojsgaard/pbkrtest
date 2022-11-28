@@ -1,5 +1,5 @@
 ---
-title: "01 - Introduction to 'pbkrtest'" 
+title: "01 - Introduction to 'pbkrtest'oooooooooooooo" 
 author: "Søren Højsgaard and Ulrich Halekoh"
 output: rmarkdown::html_vignette
 vignette: >
