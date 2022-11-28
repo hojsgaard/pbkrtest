@@ -1,11 +1,10 @@
 ---
 title: "01 - Introduction to 'pbkrtest'" 
 author: "Søren Højsgaard and Ulrich Halekoh"
-date: "Date: `r date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{01 - Introduction to pbkrtest}
+  %\VignetteIndexEntry{01 - Introduction to 'pbkrtest'}
   %\VignetteEncoding{UTF-8}
 ---
 
