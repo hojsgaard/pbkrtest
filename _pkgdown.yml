@@ -4,7 +4,7 @@ reference:
     Functions for model comparison.
   contents:
   - has_concepts("model_comparison")
-- title: Data
+- title: Data sets
   desc: >
     Data.
   contents:
