@@ -4,7 +4,7 @@ author: "Søren Højsgaard and Ulrich Halekoh"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{02 - Coercion}
+  %\VignetteIndexEntry{02 - Coercion between model objects and restriction matrices in 'pbkrtest'}
   %\VignetteEncoding{UTF-8}
 ---
 
