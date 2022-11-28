@@ -33,7 +33,7 @@ in mixed effects models using parametric bootstrap"><!-- mathjax --><script src=
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/a01-pbkrtest.html">UNKNOWN TITLE</a>
+      <a href="../articles/a01-pbkrtest.html">01 - Introduction to `pbkrtest`</a>
     </li>
     <li>
       <a href="../articles/a02-coercion.html">UNKNOWN TITLE</a>
@@ -182,21 +182,21 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="va">beet_no.harv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">beet0</span>, <span class="va">.</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span><span class="va">harvest</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rd</span> <span class="op">&lt;-</span> <span class="fu">PBrefdist</span><span class="op">(</span><span class="va">beet0</span>, <span class="va">beet_no.harv</span>, nsim<span class="op">=</span><span class="fl">20</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">rd</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  5.628334621  2.483372177 12.023189712  0.257597526 13.680696769</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  1.398657492  1.208826621  0.093849090  0.914170151  0.007789897</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11]  1.699104330  2.731853427  6.187482797  0.243448381  4.726246143</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16]  0.734952934  3.494746787  0.602521447  1.175046464  3.945273444</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.01932457  0.07162624  1.33865045  4.67877748  5.60411773  5.94693316</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 12.47302943  2.72278502  0.26456890  0.14154842 10.93462174  0.75431363</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.79677294  7.61493241  0.03995360  6.65601809  1.17282835  0.71793893</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19]  0.35400827  1.40716633</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"cl")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"ctime")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.873 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.848 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"stat")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         tobs           df      p.value </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.291424e+01 1.000000e+00 3.260911e-04 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"samples")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       nsim       npos  n.extreme        pPB </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20.0000000 20.0000000  1.0000000  0.0952381 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        nsim        npos   n.extreme         pPB </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20.00000000 20.00000000  0.00000000  0.04761905 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "refdist"</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
