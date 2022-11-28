@@ -105,6 +105,8 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
 
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
+
+    largeModel <- update(largeModel, REML=TRUE) ## FIXME: Almost surely
     
     t0    <- proc.time()    
     L     <- model2restriction_matrix(largeModel, smallModel)
@@ -173,104 +175,6 @@ prform  <- function(form){
         prmatrix(form, collab = rep_len("", ncol(form)), rowlab = rep_len("", ncol(form)))
     invisible(form)    
 }
-
-
-## #' @export
-## tidy.KRmodcomp <- function (x, conf.int = FALSE, conf.level = 0.95, exponentiate = FALSE, 
-##     ...) 
-## {
-##     ##co <- stats::coef(summary(x))
-##     ## ret <- as_tidy_tibble(co, c("estimate", "std.error", "statistic", 
-##     ##                             "p.value")[1:ncol(co)])
-
-##     ret <- x$test
-##     rr <<- ret
-
-
-##     if (conf.int) {
-##         ci <- broom:::broom_confint_terms(x, level = conf.level)
-##         ret <- dplyr::left_join(ret, ci, by = "term")
-##     }
-##     ## if (exponentiate) {
-##     ##     if (is.null(x$family) || (x$family$link != "logit" && 
-##     ##         x$family$link != "log")) {
-##     ##         warning(paste("Exponentiating coefficients, but model did not use", 
-##     ##             "a log or logit link function"))
-##     ##     }
-##     ##     ret <- exponentiate(ret)
-##     ## }
-##     ret
-## }
-
-
-#' @export 
-tidy.PBmodcomp <- function(x, ...){
-    ret <- x$test    
-    as_tibble(cbind(type=rownames(ret), ret))
-}
-
-#' @export 
-tidy.KRmodcomp <- function(x, ...){
-    ret <- x$test    
-    as_tibble(cbind(type=rownames(ret), ret))
-}
-
-#' @export 
-tidy.SATmodcomp <- function(x, ...){
-    ret <- x$test
-    as_tibble(cbind(type="Ftest", ret))    
-}
-
-#' @export 
-as.data.frame.PBmodcomp <- function(x, ...){
-    x$test
-}
-
-#' @export 
-as.data.frame.KRmodcomp <- function(x, ...){
-    x$test
-}
-
-#' @export 
-as.data.frame.SATmodcomp <- function(x, ...){
-    x$test
-}
-
-
-
-
-
-
-
-
-## #' @export
-## summary.PBmodcomp <- function(object, ...){
-##   ans <- .summarizePB(object$LRTstat, object$ref)
-##   ans$formula.large <- object$formula.large
-##   ans$formula.small <- object$formula.small
-##   class(ans) <- "summaryPB"
-##   ans
-## }
-
-## #' @export
-## print.summaryPB <- function(x, ...){
-##   .PBcommon(x)
-##   ans <- x$test
-##   printCoefmat(ans, tst.ind=1, na.print='', has.Pvalue=TRUE)
-##   cat("\n")
-
-## ##   ci <- x$ci
-## ##   cat(sprintf("95 pct CI for PBtest   : [%s]\n", toString(ci)))
-## ##   mo <- x$moment
-## ##   cat(sprintf("Reference distribution : mean=%f var=%f\n", mo[1], mo[2]))
-## ##   ga <- x$gamma
-## ##   cat(sprintf("Gamma approximation    : scale=%f shape=%f\n", ga[1], ga[2]))
-
-##   return(invisible(x))
-## }
-
-
-
 
 
 ## Returns the deviance function for a linear mixed model.
@@ -353,7 +257,7 @@ compute_auxiliary <- function(model, tol=1e-6){
 
     ## Moore-Penrose generalized inverse for h:
     h_inv <- with(eig_h, {
-        vectors[, pos, drop=FALSE] %*% diag(1/values[pos], nrow=q) %*%
+        vectors[, pos, drop=FALSE] %*% diag(1 / values[pos], nrow=q) %*%
             t(vectors[, pos, drop=FALSE]) })
 
     out$vcov_varpar <- 2 * h_inv # vcov(varpar)
@@ -366,9 +270,11 @@ compute_auxiliary <- function(model, tol=1e-6){
     jac <- numDeriv::jacobian(func=get_covbeta, x=varpar_opt, devfun=devfun)
 
     ## List of jacobian matrices
-    out$jacobian_list <- lapply(1:ncol(jac), function(i)
-        array(jac[, i], dim=rep(length(getME(model, "beta")), 2)))
-
+    out$jacobian_list <-
+        lapply(1:ncol(jac),
+               function(i) {
+                   array(jac[, i], dim=rep(length(getME(model, "beta")), 2))
+               })    
     out
 }
 
@@ -415,12 +321,17 @@ get_Fstat_ddf <- function(nu, tol=1e-8) {
       2 * E / (E - (length(nu))) # q = length(nu) : number of t-statistics
     }
   }
-  stopifnot(length(nu) >= 1,
-            # all(nu > 0), # returns 2 if any(nu < 2)
-            all(sapply(nu, is.numeric)))
-  if(length(nu) == 1L) return(nu)
-  if(all(abs(diff(nu)) < tol)) return(mean(nu))
-  if(!is.list(nu)) fun(nu) else vapply(nu, fun, numeric(1L))
+    stopifnot(length(nu) >= 1,
+                                        ## all(nu > 0), # returns 2 if any(nu < 2)
+              all(sapply(nu, is.numeric)))
+    if (length(nu) == 1L)
+        return(nu)
+    if (all(abs(diff(nu)) < tol))
+        return(mean(nu))
+    if (!is.list(nu))
+        fun(nu)
+    else
+        vapply(nu, fun, numeric(1L))
 }
 
 

@@ -109,7 +109,7 @@ restriction_matrix2model.default <- function(largeModel, L, REML=TRUE, ...){
 restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
     form <- as.formula(formula(largeModel))    
     attributes(XX.lg)[-1] <- NULL
-    XX.sm <- make_modelmat(XX.lg, L)
+    XX.sm <- make_model_matrix(XX.lg, L)
     
     ncX.sm  <- ncol(XX.sm)
     colnames(XX.sm) <- paste(".X", 1:ncX.sm, sep='')
@@ -165,7 +165,7 @@ restriction_matrix2model.lm <- function(largeModel, L, ...){
 #' @rdname model-coerce
 #' @param L A restriction matrix; a full rank matrix with as many columns as `X` has.
 #' @export
-make_modelmat <- function(X, L) {
+make_model_matrix <- function(X, L) {
     ##cat("X:\n"); print(X); cat("L:\n"); print(L)
     ## find A such that <A>={X b| b in Lb=0}
 
@@ -176,7 +176,7 @@ make_modelmat <- function(X, L) {
         print(c( ncol(X), ncol(L) ))
         stop('Number of columns of X and L not equal \n')
     }
-    X2 <- X %*% .orthComplement(t(L))
+    X2 <- X %*% orthogonal_complement(t(L))
     X2
 }
 
@@ -194,7 +194,7 @@ make_modelmat <- function(X, L) {
 make_restriction_matrix <- function(X, X2) {
   ## <X2> in <X>
   ## determine L such that  <X2>={Xb| b in Lb=0}
-  d <- rankMatrix_(cbind(X2, X)) - rankMatrix_(X)
+  d <- rankMatrix(cbind(X2, X)) - rankMatrix(X)
   if (d > 0) {
     stop('Error: <X2> not subspace of <X> \n')
   }
@@ -203,7 +203,7 @@ make_restriction_matrix <- function(X, X2) {
   L  <- t(Q2) %*% X
   ## Make rows of L2 orthogonal
   L <- t(qr.Q(qr(t(L))))
-  L
+  zapsmall(L)
 }
 
 
@@ -345,7 +345,7 @@ force_full_rank <- function(L){
     ## ## common
     ## form <- as.formula(formula(largeModel))
     ## attributes(XX.lg)[-1] <- NULL
-    ## XX.sm <- zapsmall(make_modelmat(XX.lg, LL))
+    ## XX.sm <- zapsmall(make_model_matrix(XX.lg, LL))
     
     ## ncX.sm  <- ncol(XX.sm)
     ## colnames(XX.sm) <- paste(".X", 1:ncX.sm, sep='')

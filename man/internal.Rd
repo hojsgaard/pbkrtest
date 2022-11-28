@@ -4,7 +4,7 @@
 \alias{internal}
 \alias{\%>\%}
 \alias{print.PBmodcomp}
-\alias{print.summaryPB}
+\alias{print.summary_PBmodcomp}
 \alias{summary.PBmodcomp}
 \alias{plot.PBmodcomp}
 \alias{summary.KRmodcomp}

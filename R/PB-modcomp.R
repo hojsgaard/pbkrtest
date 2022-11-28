@@ -590,12 +590,12 @@ summary.PBmodcomp <- function(object, ...){
   ans <- .summarizePB(object$LRTstat, object$ref)
   ans$formula.large <- object$formula.large
   ans$formula.small <- object$formula.small
-  class(ans) <- "summaryPB"
+  class(ans) <- "summary_PBmodcomp"
   ans
 }
 
 #' @export
-print.summaryPB <- function(x, ...){
+print.summary_PBmodcomp <- function(x, ...){
   .PBcommon(x)
   ans <- x$test
   printCoefmat(ans, tst.ind=1, na.print='', has.Pvalue=TRUE)

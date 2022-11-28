@@ -187,7 +187,7 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
     }
   }
 
-  q <- rankMatrix(L)
+  q <- rankMatrix_(L)
   B <- (1/(2*q)) * (A1+6*A2)
   g <- ( (q+1)*A1 - (q+4)*A2 )  / ((q+2)*A2)
   c1<- g/(3*q+ 2*(1-g))
@@ -272,10 +272,12 @@ print.KRmodcomp <- function(x, ...){
     FF.thresh <- 0.2
     F.scale <- x$aux['F.scaling']
     tab <- x$test
-
-## ttt <<- tab
     
-    if (max(F.scale) > FF.thresh) i <- 1 else i <- 2
+    if (max(F.scale) > FF.thresh)
+        i <- 1
+    else
+        i <- 2
+
     printCoefmat(tab[i,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
     
     invisible(x)
@@ -289,13 +291,13 @@ summary.KRmodcomp <- function(object, ...){
                 object$ctime))
     
     .KRcommon(object)
-    FF.thresh <- 0.2
-    
-    F.scale <- object$aux['F.scaling']
     tab <- object$test
     
     printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
-    
+
+    FF.thresh <- 0.2
+    F.scale <- object$aux['F.scaling']
+
     if (F.scale < FF.thresh & F.scale > 0) {
         cat('Note: The scaling factor for the F-statistic is smaller than 0.2 \n')
         cat('The Unscaled statistic might be more reliable \n ')
@@ -305,6 +307,10 @@ summary.KRmodcomp <- function(object, ...){
             cat('Use the Unscaled statistic instead. \n ')
         }
     }
+
+    class(tab) <- c("summary_KRmodcomp", "data.frame")
+    invisible(tab)
+    
 }
 
 

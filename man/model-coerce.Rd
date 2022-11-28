@@ -4,7 +4,7 @@
 \alias{model-coerce}
 \alias{model2restriction_matrix}
 \alias{restriction_matrix2model}
-\alias{make_modelmat}
+\alias{make_model_matrix}
 \alias{make_restriction_matrix}
 \title{Conversion between a model object and a restriction matrix}
 \usage{
@@ -12,7 +12,7 @@ model2restriction_matrix(largeModel, smallModel, sparse = FALSE)
 
 restriction_matrix2model(largeModel, L, REML = TRUE, ...)
 
-make_modelmat(X, L)
+make_model_matrix(X, L)
 
 make_restriction_matrix(X, X2)
 }

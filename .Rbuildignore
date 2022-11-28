@@ -5,7 +5,7 @@ devel/
 README.Rmd
 .github
 README_files/
-vignette/figures
+vignettes/figures/
 ^doc$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$

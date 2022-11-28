@@ -1,15 +1,17 @@
-.spur<-function(U){
-    sum(diag(U))
-}
 
-.orthComplement<-function(W) {
+orthogonal_complement<-function(W) {
     ##orthogonal complement of <W>: <W>orth=<Worth>
-    rW    <- rankMatrix(W)
+    rW    <- rankMatrix_(W)
     Worth <- qr.Q(qr(cbind(W)),
                   complete=TRUE)[,-c(1:rW), drop=FALSE]
     Worth
 }
 
+
+
+.spur<-function(U){
+    sum(diag(U))
+}
 
 .makeSparse<-function(X) {
   X <- as.matrix( X )
