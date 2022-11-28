@@ -1,8 +1,8 @@
 reference:
 - title: Model comparison
   desc: >
-    Model comparison
-  contests:
+    Functions for model comparison
+  contents:
   - has_concept("model_comparison")
 - title: Others
   desc: > 
