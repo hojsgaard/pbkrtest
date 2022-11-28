@@ -1,7 +1,7 @@
 reference:
 - title: Model comparison
   desc: >
-    Functions for model comparison
+    Functions for model comparison.
   contents:
   - has_concept("model_comparison")
 - title: Others
