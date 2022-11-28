@@ -23,8 +23,21 @@
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/pbkrtest.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/coercion.html">UNKNOWN TITLE</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -122,7 +135,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm1</span>, <span class="va">L1</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe2cb619c48&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fb8a9c007c8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0 1</span>
@@ -154,7 +167,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm2</span>, <span class="va">L2</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + I(Days^2) + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe2cb619c48&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fb8a9c007c8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0 1 0</span>
@@ -168,11 +181,11 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="va">fm3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fm2</span>, <span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">Days</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm2</span>, <span class="va">fm3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + I(Days^2) + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe2cb619c48&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fb8a9c007c8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.000000e+00  0.1104315 0.9938837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  -1.249001e-16 -0.9938837 0.1104315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0  0.1104315 0.9938837</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0 -0.9938837 0.1104315</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      statistic    ndf    ddf   p.value    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    23.754  2.000 51.563 4.876e-08 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
@@ -181,11 +194,11 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="co">## 3) Specify restriction as formula</span></span></span>
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm2</span>, <span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">Days</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + I(Days^2) + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe2cb619c48&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fb8a9c007c8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.000000e+00  0.1104315 0.9938837</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  -1.249001e-16 -0.9938837 0.1104315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0  0.1104315 0.9938837</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0 -0.9938837 0.1104315</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      statistic    ndf    ddf   p.value    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    23.754  2.000 51.563 4.876e-08 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
