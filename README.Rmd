@@ -76,15 +76,12 @@ ggplot(sleepstudy) + geom_line(aes(Days, Reaction, group=Subject, color=Subject)
 fm0 <- lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
 fm1 <- update(fm0, .~. - Days)
 
+## Is there an effect of Days?
+
 an <- anova(fm0, fm1)
 pb <- PBmodcomp(fm0, fm1)
 kr <- KRmodcomp(fm0, fm1)
 sat <- SATmodcomp(fm0, fm1)
-
-an
-pb
-kr
-sat
 
 tidy(an)
 tidy(pb)
