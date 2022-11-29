@@ -151,5 +151,6 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 \author{
 Søren Højsgaard \email{sorenh@math.aau.dk}
 }
+\concept{model_comparison}
 \keyword{inference}
 \keyword{models}
