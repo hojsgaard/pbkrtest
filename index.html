@@ -84,12 +84,12 @@
 <div class="page-header"><h1 id="pbkrtest-parametric-bootstrap-kenward-roger-and-satterthwaite-based-methods-for-mixed-model-comparison">
 <code>pbkrtest</code>: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison<a class="anchor" aria-label="anchor" href="#pbkrtest-parametric-bootstrap-kenward-roger-and-satterthwaite-based-methods-for-mixed-model-comparison"></a>
 </h1></div>
-<p>Attention is on mixed effects models (as implemented in the <code>lme4</code> package). For linear mixed models, <code>pbkrtest</code> implements (1) a parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a Satterthwaite-type F-test. The parametric bootstrap test is also implemented for generalized linear mixed models (as implemented in <code>lme4</code>) and for generalized linear models. The facilities of the package are documented in the paper by Halekoh and Højsgaard, (2012, ).</p>
-<p>Please see <code>citation("pbkrtest")</code> for information about citing the paper and the package. If you use the package in your work, please do cite the 2012-paper. There are other packages that use <code>pbkrtest</code> under the hood. If you use one of those packages, please do also cite our 2012 paper.</p>
+<p>Attention is on mixed effects models (as implemented in the ‘lme4’ package). For linear mixed models, ‘pbkrtest’ implements (1) a parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a Satterthwaite-type F-test. The parametric bootstrap test is also implemented for generalized linear mixed models (as implemented in ‘lme4’) and for generalized linear models. The facilities of the package are documented in the paper by Halekoh and Højsgaard, (2012, ).</p>
+<p>Please see ‘citation(“pbkrtest”)’ for information about citing the paper and the package. If you use the package in your work, please do cite the 2012-paper. There are other packages that use ‘pbkrtest’ under the hood. If you use one of those packages, please do also cite our 2012 paper.</p>
 <p>Documents:</p>
 <ol style="list-style-type: decimal">
-<li><a href="https://www.jstatsoft.org/htaccess.php?volume=059&amp;type=i&amp;issue=09&amp;filename=paper" class="external-link">Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest</a></li>
-<li><a href="https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf" class="external-link">Vignette: introduction to <code>pbkrtest</code></a></li>
+<li><a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf" class="external-link">Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest</a></li>
+<li><a href="https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf" class="external-link">Vignette: introduction to ‘pbkrtest’</a></li>
 <li><a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html" class="external-link">Webpage for the package</a></li>
 </ol>
 <!-- badges: start 
@@ -103,8 +103,6 @@ badges: end --><div class="section level2">
 <p>To build and install from Github with vignettes run this command from within <code>R</code> (please install <code>remotes</code> first if not already installed):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># install.packages('remotes')</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"hojsgaard/pbkrtest"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
-<p>You can also install the package without vignettes if needed as follows:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"hojsgaard/pbkrtest"</span>, <span class="dt">build_vignettes =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="development-site">Development site<a class="anchor" aria-label="anchor" href="#development-site"></a>
@@ -119,81 +117,46 @@ badges: end --><div class="section level2">
 <div class="section level2">
 <h2 id="brief-introduction">Brief introduction<a class="anchor" aria-label="anchor" href="#brief-introduction"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/" class="external-link">pbkrtest</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sleepstudy</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">Days</span>, <span class="va">Reaction</span>, group<span class="op">=</span><span class="va">Subject</span>, color<span class="op">=</span><span class="va">Subject</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="README_files/figure-gfm/unnamed-chunk-2-1.png"><!-- --></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">fm0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="va">Days</span><span class="op">|</span><span class="va">Subject</span><span class="op">)</span>, data<span class="op">=</span><span class="va">sleepstudy</span><span class="op">)</span></span>
 <span><span class="va">fm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sat-modcomp.html">SATmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
+<span><span class="co">## Is there an effect of Days?</span></span>
 <span></span>
-<span><span class="va">p0</span></span>
-<span><span class="co">#&gt; Data: sleepstudy</span></span>
-<span><span class="co">#&gt; Models:</span></span>
-<span><span class="co">#&gt; fm1: Reaction ~ (Days | Subject)</span></span>
-<span><span class="co">#&gt; fm0: Reaction ~ Days + (Days | Subject)</span></span>
-<span><span class="co">#&gt;     npar    AIC    BIC  logLik deviance  Chisq Df Pr(&gt;Chisq)    </span></span>
-<span><span class="co">#&gt; fm1    5 1785.5 1801.4 -887.74   1775.5                         </span></span>
-<span><span class="co">#&gt; fm0    6 1763.9 1783.1 -875.97   1751.9 23.537  1  1.226e-06 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="va">p1</span></span>
-<span><span class="co">#&gt; Bootstrap test; time: 8.58 sec; samples: 1000; extremes: 0;</span></span>
-<span><span class="co">#&gt; Requested samples: 1000 Used samples: 994 Extremes: 0</span></span>
-<span><span class="co">#&gt; large : Reaction ~ Days + (Days | Subject)</span></span>
-<span><span class="co">#&gt; Reaction ~ (Days | Subject)</span></span>
-<span><span class="co">#&gt;          stat df   p.value    </span></span>
-<span><span class="co">#&gt; LRT    23.516  1 1.239e-06 ***</span></span>
-<span><span class="co">#&gt; PBtest 23.516     0.001005 ** </span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="va">p2</span></span>
-<span><span class="co">#&gt; large : Reaction ~ Days + (Days | Subject)</span></span>
-<span><span class="co">#&gt; small : Reaction ~ (Days | Subject)</span></span>
-<span><span class="co">#&gt;         stat    ndf    ddf F.scaling   p.value    </span></span>
-<span><span class="co">#&gt; Ftest 45.853  1.000 17.000         1 3.264e-06 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span><span class="va">p3</span></span>
-<span><span class="co">#&gt; large : Reaction ~ Days + (Days | Subject)</span></span>
-<span><span class="co">#&gt; small (restriction matrix) : </span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt;  0 1</span></span>
-<span><span class="co">#&gt;      statistic    ndf ddf   p.value    </span></span>
-<span><span class="co">#&gt; [1,]    45.853  1.000  17 3.264e-06 ***</span></span>
-<span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="va">an</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
+<span><span class="va">pb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
+<span><span class="va">kr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in structure(if (useGrad) which.min(diff1) else if (Meth == "qr") {:</span></span>
+<span><span class="co">#&gt; rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span></span>
+<span><span class="va">sat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sat-modcomp.html">SATmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in tidy.anova(p0): The following column names in ANOVA output were not</span></span>
-<span><span class="co">#&gt; recognized or transformed: npar</span></span>
-<span><span class="co">#&gt; # A tibble: 2 x 9</span></span>
+<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">an</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 9</span></span>
 <span><span class="co">#&gt;   term   npar   AIC   BIC logLik deviance statistic    df     p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1 fm1       5 1785. 1801.  -888.    1775.      NA      NA NA         </span></span>
 <span><span class="co">#&gt; 2 fm0       6 1764. 1783.  -876.    1752.      23.5     1  0.00000123</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 x 4</span></span>
+<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">pb</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
 <span><span class="co">#&gt;   type    stat    df    p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 LRT     23.5     1 0.00000124</span></span>
-<span><span class="co">#&gt; 2 PBtest  23.5    NA 0.00101</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 x 6</span></span>
-<span><span class="co">#&gt;   type    stat   ndf   ddf F.scaling    p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Ftest   45.9     1   17.         1 0.00000326</span></span>
-<span><span class="co">#&gt; 2 FtestU  45.9     1   17.        NA 0.00000326</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">p3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 x 5</span></span>
+<span><span class="co">#&gt; 1 LRT     23.5     1 0.00000123</span></span>
+<span><span class="co">#&gt; 2 PBtest  23.5    NA 0.00100</span></span>
+<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">kr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   type    stat   ndf   ddf F.scaling p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Ftest   31.4     1  1.03         1   0.107</span></span>
+<span><span class="co">#&gt; 2 FtestU  31.4     1  1.03        NA   0.107</span></span>
+<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">sat</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
 <span><span class="co">#&gt;   type  statistic   ndf   ddf    p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;      &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1 Ftest      45.9     1  17.0 0.00000326</span></span></code></pre></div>
