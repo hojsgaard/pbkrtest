@@ -16,15 +16,19 @@ knitr::opts_chunk$set(
 # `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 
 Attention is on mixed effects models (as implemented in the 'lme4'
-package). For linear mixed models, 'pbkrtest' implements the following tests for fixed effects
+package). For linear mixed models, 'pbkrtest' implements the following tests for fixed effects:
 
 1. a parametric bootstrap test, 
 1. a Kenward-Roger-type F-test and
 1. a Satterthwaite-type F-test. 
 
-The parametric bootstrap test is also
-implemented for generalized linear mixed models (as implemented in
-'lme4') and for generalized linear models. The facilities of the
+For generalized linear mixed models (as implemented in
+'lme4') and for generalized linear models, 'pbkrtest' implements 
+
+1. a parametric bootstrap test
+
+
+The facilities of the
 package are documented in the paper by Halekoh and Højsgaard, (2012,
 \doi{doi:10.18637/jss.v059.i09}). 
 
@@ -49,18 +53,16 @@ Documents:
   
 ## Installation
 
-`pbkrtest` is available on CRAN and can be installed as usual:
+`pbkrtest` is available on CRAN and development versions can also be found on Github:
 
 ```
+## Install from CRAN:
 install.packages('pbkrtest')
-```
-
-To build and install from Github with vignettes run this command from within `R` (please install `remotes` first if not already installed):
-
-```
+## Install from Github:
 # install.packages('remotes')
 remotes::install_github("hojsgaard/pbkrtest", build_vignettes = TRUE)
 ```
+
 
 ## Development site
 
@@ -71,6 +73,7 @@ See <https://github.com/hojsgaard/pbkrtest>.
 See <https://hojsgaard.github.io/pbkrtest/>.
 
 ## Brief introduction
+
 
 ```{r, message=FALSE}
 library(pbkrtest)
