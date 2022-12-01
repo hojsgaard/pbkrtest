@@ -186,7 +186,7 @@ make_model_matrix <- function(X, L) {
 ## model. Output is restriction matrix L
 
 #' @rdname model-coerce
-#' @param X,X2 Model matrices. Must have same numer of rows.
+#' @param X,X2 Model matrices. Must have same number of rows.
 #' @details `make_restriction_matrix` Make a restriction matrix. If span(X2) is in
 #'     span(X) then the corresponding restriction matrix `L` is
 #'     returned.

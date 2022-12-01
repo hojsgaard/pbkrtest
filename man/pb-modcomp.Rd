@@ -62,7 +62,7 @@ distribution.}
 
 \item{ref}{Vector containing samples from the reference
 distribution. If NULL, this vector will be generated using
-PBrefdist().}
+\code{PBrefdist()}.}
 
 \item{seed}{A seed that will be passed to the simulation of new
 datasets.}

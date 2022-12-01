@@ -146,7 +146,7 @@ c(bal_ddf = getSAT(sat.bal, "ddf"), imbal_ddf = getSAT(sat.imbal, "ddf"))
 
 Parametric bootstrap provides an alternative but many simulations are
 often needed to provide credible results (also many more than shown
-here; in this connection it can be useful to exploit that computings
+here; in this connection it can be useful to exploit that computations
 can be made en parallel, see the documentation):
 
 ```{r}

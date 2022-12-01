@@ -29,7 +29,7 @@ linear models)}
 
 \item{...}{Additional arguments; not used.}
 
-\item{X, X2}{Model matrices. Must have same numer of rows.}
+\item{X, X2}{Model matrices. Must have same number of rows.}
 }
 \value{
 \code{model2restriction_matrix}: A restriction matrix.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/SAT-modcomp.R
 \name{devfun_vp}
 \alias{devfun_vp}
-\title{Compute Deviance of an LMM as a Function of Variance Parameters}
+\title{Compute deviance of a linear mixed model as a function of variance parameters}
 \usage{
 devfun_vp(varpar, devfun, reml)
 }

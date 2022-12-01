@@ -41,7 +41,7 @@
 #' @param largeModel An \code{lmer} model
 #' @param smallModel An \code{lmer} model or a restriction matrix
 #' @param betaH A number or a vector of the beta of the hypothesis, e.g. L
-#'     beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.
+#'     beta=L betaH. betaH=0 if `smallModel` is a model object and not a restriction matrix.
 #' @param details If larger than 0 some timing details are printed.
 #' @note This functionality is not thoroughly tested and should be used with
 #'     care. Please do report bugs etc.

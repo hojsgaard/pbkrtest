@@ -2,7 +2,7 @@
 % Please edit documentation in R/SAT-modcomp.R
 \name{get_covbeta}
 \alias{get_covbeta}
-\title{Compute cov(beta) as a function of varpar of an LMM}
+\title{Compute covariance of fixed effect parameters as a function of variance parameters of a linear mixed model}
 \usage{
 get_covbeta(varpar, devfun)
 }
@@ -12,11 +12,11 @@ get_covbeta(varpar, devfun)
 \item{devfun}{deviance function as a function of theta only.}
 }
 \value{
-cov(beta) at supplied varpar values.
+The covariances matrix of the fixed effects at supplied \code{varpar} values.
 }
 \description{
-At the optimum cov(beta) is available as vcov(lmer-model). This function
-computes cov(beta) at non (RE)ML estimates of \code{varpar}.
+At the optimum the covariance is available as \code{vcov(lmer-model)}. This function
+computes \code{cov(beta)} at non (RE)ML estimates of \code{varpar}.
 }
 \author{
 Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.

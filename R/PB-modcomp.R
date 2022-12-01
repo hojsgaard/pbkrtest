@@ -49,7 +49,7 @@
 #'     distribution.
 #' @param ref Vector containing samples from the reference
 #'     distribution. If NULL, this vector will be generated using
-#'     PBrefdist().
+#'     `PBrefdist()`.
 #' @param seed A seed that will be passed to the simulation of new
 #'     datasets.
 #' @param h For sequential computing for bootstrap p-values: The
@@ -76,7 +76,7 @@
 #' the small (convergence problems and other numerical issues can play a role
 #' here).
 #' 
-#' To look further into the problem, one can use the \code{PBrefdist()} function
+#' To look further into the problem, one can use the `PBrefdist()` function
 #' for simulating the reference distribution (this reference distribution can be
 #' provided as input to \code{PBmodcomp()}). Inspection sometimes reveals that
 #' while many values are negative, they are numerically very small. In this case

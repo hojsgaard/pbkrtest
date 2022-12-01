@@ -2,26 +2,27 @@
 % Please edit documentation in R/SAT-modcomp.R
 \name{get_Fstat_ddf}
 \alias{get_Fstat_ddf}
-\title{Compute denominator df for F-test}
+\title{Compute denominator degrees of freedom for F-test}
 \usage{
 get_Fstat_ddf(nu, tol = 1e-08)
 }
 \arguments{
-\item{nu}{vector of denominator df for the t-statistics}
+\item{nu}{vector of denominator degrees of freedom for the
+t-statistics}
 
-\item{tol}{tolerance on the consecutive differences between elements of nu to
-determine if mean(nu) should be returned}
+\item{tol}{tolerance on the consecutive differences between
+elements of nu to determine if mean(nu) should be returned}
 }
 \value{
-the denominator df; a numerical scalar
+the denominator degrees of freedom; a numerical scalar
 }
 \description{
-From a vector of denominator df from independent t-statistics (\code{nu}),
-the denominator df for the corresponding F-test is computed.
+From a vector of denominator degrees of freedom from independent t-statistics (\code{nu}),
+the denominator degrees of freedom for the corresponding F-test is computed.
 }
 \details{
 Note that if any \code{nu <= 2} then \code{2} is returned. Also, if all nu
-are within tol of each other the simple average of the nu-vector is returned.
+are within \code{tol} of each other the simple average of the nu-vector is returned.
 This is to avoid downward bias.
 }
 \author{

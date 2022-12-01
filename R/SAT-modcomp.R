@@ -201,7 +201,7 @@ get_devfun <- function(model){
 #' Compute_auxiliary quantities needed for the Satterthwaite
 #' approximation.
 #'
-#' Computes vcov of variance parameters (theta, sigma), jacobian of
+#' Computes variance-covariance matrix of variance parameters (theta, sigma), the Jacobian of
 #' each variance parameter etc.
 #'
 #' @param model A linear mixed model object
@@ -290,36 +290,37 @@ qform <- function(x, A) {
 ## ##############################################
 ## ######## get_Fstat_ddf()
 ## ##############################################
-#' Compute denominator df for F-test
+#' Compute denominator degrees of freedom for F-test
 #'
-#' From a vector of denominator df from independent t-statistics (\code{nu}),
-#' the denominator df for the corresponding F-test is computed.
+#' From a vector of denominator degrees of freedom from independent t-statistics (\code{nu}),
+#' the denominator degrees of freedom for the corresponding F-test is computed.
 #'
 #' Note that if any \code{nu <= 2} then \code{2} is returned. Also, if all nu
-#' are within tol of each other the simple average of the nu-vector is returned.
+#' are within `tol` of each other the simple average of the nu-vector is returned.
 #' This is to avoid downward bias.
 #'
-#' @param nu vector of denominator df for the t-statistics
-#' @param tol tolerance on the consecutive differences between elements of nu to
-#' determine if mean(nu) should be returned
+#' @param nu vector of denominator degrees of freedom for the
+#'     t-statistics
+#' @param tol tolerance on the consecutive differences between
+#'     elements of nu to determine if mean(nu) should be returned
 #'
 #' @author Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.
 #'
-#' @return the denominator df; a numerical scalar
+#' @return the denominator degrees of freedom; a numerical scalar
 #' @keywords internal
 
 get_Fstat_ddf <- function(nu, tol=1e-8) {
-  # Computes denominator df for an F-statistic that is derived from a sum of
+  # Computes denominator degrees of freedom for an F-statistic that is derived from a sum of
   # squared t-statistics each with nu_m degrees of freedom.
   #
-  # nu : vector of denominator df for the t-statistics
+  # nu : vector of denominator degrees of freedom for the t-statistics
   # tol: tolerance on the consequtive differences between elements of nu to
   #      determine if mean(nu) should be returned.
   #
   # Result: a numeric scalar
   #
   # Returns nu if length(nu) == 1. Returns mean(nu) if all(abs(diff(nu)) < tol;
-  # otherwise ddf appears to be downward biased.
+  # otherwise denominator degrees of freedom appears to be downward biased.
   fun <- function(nu) {
     if(any(nu <= 2)) 2 else {
       E <- sum(nu / (nu - 2))
@@ -343,7 +344,7 @@ get_Fstat_ddf <- function(nu, tol=1e-8) {
 ##############################################
 ######## devfun_vp()
 ##############################################
-#' Compute Deviance of an LMM as a Function of Variance Parameters
+#' Compute deviance of a linear mixed model as a function of variance parameters
 #'
 #' This function is used for extracting the asymptotic variance-covariance matrix
 #'   of the variance parameters.
@@ -381,14 +382,14 @@ devfun_vp <- function(varpar, devfun, reml) {
 ##############################################
 ######## get_covbeta()
 ##############################################
-#' Compute cov(beta) as a function of varpar of an LMM
+#' Compute covariance of fixed effect parameters as a function of variance parameters of a linear mixed model
 #'
-#' At the optimum cov(beta) is available as vcov(lmer-model). This function
-#' computes cov(beta) at non (RE)ML estimates of \code{varpar}.
+#' At the optimum the covariance is available as `vcov(lmer-model)`. This function
+#' computes `cov(beta)` at non (RE)ML estimates of `varpar`.
 #'
 #' @inheritParams devfun_vp
 #'
-#' @return cov(beta) at supplied varpar values.
+#' @return The covariances matrix of the fixed effects at supplied `varpar` values.
 #' @author Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.
 #' @keywords internal
 #' 

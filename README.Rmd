@@ -15,42 +15,46 @@ knitr::opts_chunk$set(
 
 # `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 
-Attention is on mixed effects models (as implemented in the 'lme4'
-package). For linear mixed models, 'pbkrtest' implements the following tests for fixed effects:
+For linear mixed models (as implemented in the `lme4`
+package), `pbkrtest` implements the following tests for fixed effects:
 
 1. a parametric bootstrap test, 
 1. a Kenward-Roger-type F-test and
 1. a Satterthwaite-type F-test. 
 
-For generalized linear mixed models (as implemented in
-'lme4') and for generalized linear models, 'pbkrtest' implements 
+For generalized linear mixed models (as implemented in `lme4`) and for
+generalized linear models, `pbkrtest` also implements a parametric
+bootstrap test
 
-1. a parametric bootstrap test
+The facilities of the package are documented in the paper by Halekoh
+and Højsgaard, (2012, \doi{doi:10.18637/jss.v059.i09}).
 
-
-The facilities of the
-package are documented in the paper by Halekoh and Højsgaard, (2012,
-\doi{doi:10.18637/jss.v059.i09}). 
-
-Please see 'citation("pbkrtest")' for information about citing the
+Please see `citation("pbkrtest")` for information about citing the
 paper and the package. If you use the package in your work, please do
-cite the 2012-paper. There are other packages that use 'pbkrtest'
+cite the 2012-paper. 
+
+There are other packages that use `pbkrtest`
 under the hood. If you use one of those packages, please do also cite
 our 2012 paper.
 
 Documents:
 
 1. [Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
-1. [Vignette: introduction to 'pbkrtest'](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
+1. [Vignette: introduction to `pbkrtest`](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
 1. [Webpage for the package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html) 
 
 
-
-<!-- badges: start -->
+<!-- badges: 
 [![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
 [![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master)
-<!-- badges: end -->
-  
+badges: end -->
+
+
+## Online documentation
+
+See <https://hojsgaard.github.io/pbkrtest/>.
+
+
 ## Installation
 
 `pbkrtest` is available on CRAN and development versions can also be found on Github:
@@ -63,14 +67,9 @@ install.packages('pbkrtest')
 remotes::install_github("hojsgaard/pbkrtest", build_vignettes = TRUE)
 ```
 
-
 ## Development site
 
 See <https://github.com/hojsgaard/pbkrtest>.
-
-## Online documentation
-
-See <https://hojsgaard.github.io/pbkrtest/>.
 
 ## Brief introduction
 
@@ -88,45 +87,6 @@ fm0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
 fm1 <- update(fm0, .~. -harvest)
 
 ## Is there an effect of harvest time?
-an <- anova(fm0, fm1)
-pb <- PBmodcomp(fm0, fm1)
-kr <- KRmodcomp(fm0, fm1)
-sa <- SATmodcomp(fm0, fm1)
-
-tidy(an)
-tidy(pb)
-tidy(kr)
-tidy(sa)
-
-
-## Sleepstudy: Is there an effect of Days?
-
-sleepstudy |> ggplot(aes(x=Days, y=Reaction, group=Subject)) +
-    geom_point() + geom_line(aes(color=Subject))
-
-fm0 <- lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
-fm1 <- update(fm0, .~. - Days)
-
-an <- anova(fm0, fm1)
-pb <- PBmodcomp(fm0, fm1)
-kr <- KRmodcomp(fm0, fm1)
-sa <- SATmodcomp(fm0, fm1)
-
-tidy(an)
-tidy(pb)
-tidy(kr)
-tidy(sa)
-
-library(ggplot2)
-
-## ChickWeight: Does slope depend on diet?
-
-ChickWeight |> ggplot(aes(x=Time, y=weight, group=Chick)) +
-    geom_point() + geom_line(aes(color=Chick)) + facet_grid(~Diet)
-
-fm0 <- lmer(weight ~ Diet + Time + Diet:Time + (Time|Chick), data=ChickWeight)
-fm1 <- update(fm0, .~. - Diet:Time)
-
 an <- anova(fm0, fm1)
 pb <- PBmodcomp(fm0, fm1)
 kr <- KRmodcomp(fm0, fm1)

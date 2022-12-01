@@ -18,7 +18,7 @@ KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
 \item{smallModel}{An \code{lmer} model or a restriction matrix}
 
 \item{betaH}{A number or a vector of the beta of the hypothesis, e.g. L
-beta=L betaH. betaH=0 if modelSmall is a model not a restriction matrix.}
+beta=L betaH. betaH=0 if \code{smallModel} is a model object and not a restriction matrix.}
 
 \item{details}{If larger than 0 some timing details are printed.}
 }

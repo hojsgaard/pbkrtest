@@ -5,7 +5,7 @@
 #' @description Kenward and Roger (1997) describe an improved small
 #'     sample approximation to the covariance matrix estimate of the
 #'     fixed parameters in a linear mixed model.
-#' @name kr-vcov
+#' @name kr-vcovAdj
 #'
 ################################################################################
 ## Implemented in Banff, august 2013; Søren Højsgaard
@@ -20,7 +20,7 @@
 #'     the variances of the covariance parameters of the random effects}
 #' 
 #' \item{SigmaG}{list: Sigma: the covariance matrix of Y; G: the G matrices that
-#' sum up to Sigma; n.ggamma: the number (called M in the article) of G
+#' sum up to Sigma; `n.ggamma`: the number (called M in the article) of G
 #' matrices) }
 #'
 #' @note If $N$ is the number of observations, then the \code{vcovAdj()}
@@ -69,13 +69,13 @@
 #' 
 #' @export vcovAdj
 #' 
-#' @rdname kr-vcov
+#' @rdname kr-vcovAdj
 vcovAdj <- function(object, details=0){
   UseMethod("vcovAdj")
 }
 
 #' @method vcovAdj lmerMod
-#' @rdname kr-vcov
+#' @rdname kr-vcovAdj
 #' @export vcovAdj.lmerMod
 vcovAdj.lmerMod <- function(object, details=0){
     if (!(getME(object, "is_REML"))) {
@@ -239,7 +239,7 @@ vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
 
 
 ## #' @method vcovAdj mer
-## #' @rdname kr-vcov
+## #' @rdname kr-vcovAdj
 ## #' @export
 ## vcovAdj.mer <- vcovAdj.lmerMod
 

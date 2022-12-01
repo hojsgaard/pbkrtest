@@ -16,7 +16,7 @@ compute_auxiliary(model, tol = 1e-06)
 A list
 }
 \description{
-Computes vcov of variance parameters (theta, sigma), jacobian of
+Computes variance-covariance matrix of variance parameters (theta, sigma), the Jacobian of
 each variance parameter etc.
 }
 \author{
