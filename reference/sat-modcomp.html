@@ -134,7 +134,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="va">L1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm1</span>, <span class="va">L1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe6734e0c78&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7ff6c2757860&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0 1</span>
@@ -165,7 +165,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="va">L2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm2</span>, <span class="va">L2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + I(Days^2) + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe6734e0c78&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7ff6c2757860&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0 1 0</span>
@@ -179,7 +179,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="va">fm3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fm2</span>, <span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">Days</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm2</span>, <span class="va">fm3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + I(Days^2) + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe6734e0c78&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7ff6c2757860&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  0.1104315 0.9938837</span>
@@ -192,7 +192,7 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span><span class="co">## 3) Specify restriction as formula</span></span></span>
 <span class="r-in"><span><span class="fu">SATmodcomp</span><span class="op">(</span><span class="va">fm2</span>, <span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">Days</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + I(Days^2) + (Days | Subject)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7fe6734e0c78&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x7ff6c2757860&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small (restriction matrix) : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  0.1104315 0.9938837</span>
