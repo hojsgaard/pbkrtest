@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: 
+  github_document:
+    toc: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit only README.Rmd! -->
@@ -13,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
+# `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Tests in Mixed Models
 
 For linear mixed models (as implemented in the `lme4`
 package), `pbkrtest` implements the following tests for fixed effects:
@@ -22,18 +24,16 @@ package), `pbkrtest` implements the following tests for fixed effects:
 1. a Kenward-Roger-type F-test and
 1. a Satterthwaite-type F-test. 
 
-For generalized linear mixed models (as implemented in `lme4`) and for
+Moreover, for generalized linear mixed models (as implemented in `lme4`) and for
 generalized linear models, `pbkrtest` also implements a parametric
 bootstrap test
 
 The facilities of the package are documented in the paper by Halekoh
 and Højsgaard, (2012, \doi{doi:10.18637/jss.v059.i09}).
-
 Please see `citation("pbkrtest")` for information about citing the
 paper and the package. If you use the package in your work, please do
 cite the 2012-paper. 
-
-There are other packages that use `pbkrtest`
+Please notice: There are other packages that use `pbkrtest`
 under the hood. If you use one of those packages, please do also cite
 our 2012 paper.
 
