@@ -4,12 +4,17 @@
 # `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
 
 Attention is on mixed effects models (as implemented in the ‘lme4’
-package). For linear mixed models, ‘pbkrtest’ implements (1) a
-parametric bootstrap test, (2) a Kenward-Roger-type F-test and (3) a
-Satterthwaite-type F-test. The parametric bootstrap test is also
-implemented for generalized linear mixed models (as implemented in
-‘lme4’) and for generalized linear models. The facilities of the
-package are documented in the paper by Halekoh and Højsgaard, (2012, ).
+package). For linear mixed models, ‘pbkrtest’ implements the following
+tests for fixed effects
+
+1.  a parametric bootstrap test,
+2.  a Kenward-Roger-type F-test and
+3.  a Satterthwaite-type F-test.
+
+The parametric bootstrap test is also implemented for generalized linear
+mixed models (as implemented in ‘lme4’) and for generalized linear
+models. The facilities of the package are documented in the paper by
+Halekoh and Højsgaard, (2012, ).
 
 Please see ‘citation(“pbkrtest”)’ for information about citing the paper
 and the package. If you use the package in your work, please do cite the
@@ -27,10 +32,12 @@ Documents:
 3.  [Webpage for the
     package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html)
 
-<!-- badges: start 
-[![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
+<!-- badges: start -->
+
+[![R build
+status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions)
 [![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master)
-badges: end -->
+<!-- badges: end -->
 
 ## Installation
 
@@ -88,7 +95,7 @@ tidy(pb)
 #>   type    stat    df  p.value
 #>   <chr>  <dbl> <dbl>    <dbl>
 #> 1 LRT     12.9     1 0.000326
-#> 2 PBtest  12.9    NA 0.0250
+#> 2 PBtest  12.9    NA 0.0290
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value
@@ -130,7 +137,7 @@ tidy(pb)
 #>   type    stat    df    p.value
 #>   <chr>  <dbl> <dbl>      <dbl>
 #> 1 LRT     23.5     1 0.00000123
-#> 2 PBtest  23.5    NA 0.00101
+#> 2 PBtest  23.5    NA 0.00100
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling    p.value
@@ -181,7 +188,7 @@ tidy(pb)
 #>   type    stat    df p.value
 #>   <chr>  <dbl> <dbl>   <dbl>
 #> 1 LRT     15.8     3 0.00122
-#> 2 PBtest  15.8    NA 0.002
+#> 2 PBtest  15.8    NA 0.00300
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value
