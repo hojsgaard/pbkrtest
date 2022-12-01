@@ -84,23 +84,30 @@
 <div class="page-header"><h1 id="pbkrtest-parametric-bootstrap-kenward-roger-and-satterthwaite-based-methods-for-mixed-model-comparison">
 <code>pbkrtest</code>: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison<a class="anchor" aria-label="anchor" href="#pbkrtest-parametric-bootstrap-kenward-roger-and-satterthwaite-based-methods-for-mixed-model-comparison"></a>
 </h1></div>
-<p>Attention is on mixed effects models (as implemented in the ‘lme4’ package). For linear mixed models, ‘pbkrtest’ implements the following tests for fixed effects:</p>
+<p>For linear mixed models (as implemented in the <code>lme4</code> package), <code>pbkrtest</code> implements the following tests for fixed effects:</p>
 <ol style="list-style-type: decimal">
 <li>a parametric bootstrap test,</li>
 <li>a Kenward-Roger-type F-test and</li>
 <li>a Satterthwaite-type F-test.</li>
 </ol>
-<p>For generalized linear mixed models (as implemented in ‘lme4’) and for generalized linear models, ‘pbkrtest’ implements</p>
-<ol style="list-style-type: decimal"><li>a parametric bootstrap test</li></ol>
+<p>For generalized linear mixed models (as implemented in <code>lme4</code>) and for generalized linear models, <code>pbkrtest</code> also implements a parametric bootstrap test</p>
 <p>The facilities of the package are documented in the paper by Halekoh and Højsgaard, (2012, ).</p>
-<p>Please see ‘citation(“pbkrtest”)’ for information about citing the paper and the package. If you use the package in your work, please do cite the 2012-paper. There are other packages that use ‘pbkrtest’ under the hood. If you use one of those packages, please do also cite our 2012 paper.</p>
+<p>Please see <code>citation("pbkrtest")</code> for information about citing the paper and the package. If you use the package in your work, please do cite the 2012-paper.</p>
+<p>There are other packages that use <code>pbkrtest</code> under the hood. If you use one of those packages, please do also cite our 2012 paper.</p>
 <p>Documents:</p>
 <ol style="list-style-type: decimal">
 <li><a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf" class="external-link">Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models The R Package pbkrtest</a></li>
-<li><a href="https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf" class="external-link">Vignette: introduction to ‘pbkrtest’</a></li>
+<li><a href="https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf" class="external-link">Vignette: introduction to <code>pbkrtest</code></a></li>
 <li><a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html" class="external-link">Webpage for the package</a></li>
 </ol>
-<!-- badges: start -->
+<!-- badges: 
+[![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
+[![codecov.io](https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg)](https://codecov.io/gh/hojsgaard/dlmextra?branch=master)
+badges: end --><div class="section level2">
+<h2 id="online-documentation">Online documentation<a class="anchor" aria-label="anchor" href="#online-documentation"></a>
+</h2>
+<p>See <a href="https://hojsgaard.github.io/pbkrtest/" class="external-link uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -115,11 +122,6 @@
 <h2 id="development-site">Development site<a class="anchor" aria-label="anchor" href="#development-site"></a>
 </h2>
 <p>See <a href="https://github.com/hojsgaard/pbkrtest" class="external-link uri">https://github.com/hojsgaard/pbkrtest</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="online-documentation">Online documentation<a class="anchor" aria-label="anchor" href="#online-documentation"></a>
-</h2>
-<p>See <a href="https://hojsgaard.github.io/pbkrtest/" class="external-link uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="brief-introduction">Brief introduction<a class="anchor" aria-label="anchor" href="#brief-introduction"></a>
@@ -155,7 +157,7 @@
 <span><span class="co">#&gt;   type    stat    df  p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1 LRT     12.9     1 0.000326</span></span>
-<span><span class="co">#&gt; 2 PBtest  12.9    NA 0.0340</span></span>
+<span><span class="co">#&gt; 2 PBtest  12.9    NA 0.0360</span></span>
 <span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">kr</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
 <span><span class="co">#&gt;   type   stat   ndf   ddf F.scaling p.value</span></span>
@@ -165,94 +167,7 @@
 <span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
 <span><span class="co">#&gt;   type  statistic   ndf   ddf p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Ftest      15.2     1  2.00  0.0599</span></span>
-<span></span>
-<span></span>
-<span><span class="co">## Sleepstudy: Is there an effect of Days?</span></span>
-<span></span>
-<span><span class="va">sleepstudy</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Days</span>, y<span class="op">=</span><span class="va">Reaction</span>, group<span class="op">=</span><span class="va">Subject</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color<span class="op">=</span><span class="va">Subject</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/unnamed-chunk-2-2.png"><!-- --></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">fm0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">Reaction</span> <span class="op">~</span> <span class="va">Days</span> <span class="op">+</span> <span class="op">(</span><span class="va">Days</span><span class="op">|</span><span class="va">Subject</span><span class="op">)</span>, data<span class="op">=</span><span class="va">sleepstudy</span><span class="op">)</span></span>
-<span><span class="va">fm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Days</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">an</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">pb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">kr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">sa</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sat-modcomp.html">SATmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">an</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 × 9</span></span>
-<span><span class="co">#&gt;   term   npar   AIC   BIC logLik deviance statistic    df     p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 fm1       5 1785. 1801.  -888.    1775.      NA      NA NA         </span></span>
-<span><span class="co">#&gt; 2 fm0       6 1764. 1783.  -876.    1752.      23.5     1  0.00000123</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">pb</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
-<span><span class="co">#&gt;   type    stat    df    p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 LRT     23.5     1 0.00000123</span></span>
-<span><span class="co">#&gt; 2 PBtest  23.5    NA 0.00100</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">kr</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
-<span><span class="co">#&gt;   type   stat   ndf   ddf F.scaling    p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Ftest  45.9     1  17.0         1 0.00000326</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">sa</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
-<span><span class="co">#&gt;   type  statistic   ndf   ddf    p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Ftest      45.9     1  17.0 0.00000326</span></span>
-<span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## ChickWeight: Does slope depend on diet?</span></span>
-<span></span>
-<span><span class="va">ChickWeight</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Time</span>, y<span class="op">=</span><span class="va">weight</span>, group<span class="op">=</span><span class="va">Chick</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color<span class="op">=</span><span class="va">Chick</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="op">~</span><span class="va">Diet</span><span class="op">)</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/unnamed-chunk-2-3.png"><!-- --></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">fm0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">Diet</span> <span class="op">+</span> <span class="va">Time</span> <span class="op">+</span> <span class="va">Diet</span><span class="op">:</span><span class="va">Time</span> <span class="op">+</span> <span class="op">(</span><span class="va">Time</span><span class="op">|</span><span class="va">Chick</span><span class="op">)</span>, data<span class="op">=</span><span class="va">ChickWeight</span><span class="op">)</span></span>
-<span><span class="va">fm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">Diet</span><span class="op">:</span><span class="va">Time</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">an</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">pb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00414529 (tol = 0.002, component 1)</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00414529 (tol = 0.002, component 1)</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00414529 (tol = 0.002, component 1)</span></span>
-<span><span class="va">kr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span><span class="va">sa</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sat-modcomp.html">SATmodcomp</a></span><span class="op">(</span><span class="va">fm0</span>, <span class="va">fm1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">an</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 × 9</span></span>
-<span><span class="co">#&gt;   term   npar   AIC   BIC logLik deviance statistic    df  p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 fm1       9 4834. 4873. -2408.    4816.      NA      NA NA      </span></span>
-<span><span class="co">#&gt; 2 fm0      12 4824. 4877. -2400.    4800.      15.8     3  0.00122</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">pb</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
-<span><span class="co">#&gt;   type    stat    df p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 LRT     15.8     3 0.00122</span></span>
-<span><span class="co">#&gt; 2 PBtest  15.8    NA 0.00400</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">kr</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
-<span><span class="co">#&gt;   type   stat   ndf   ddf F.scaling p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Ftest  5.69     3  45.4      1.00 0.00214</span></span>
-<span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">sa</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
-<span><span class="co">#&gt;   type  statistic   ndf   ddf p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Ftest      5.70     3  45.5 0.00213</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 Ftest      15.2     1  2.00  0.0599</span></span></code></pre></div>
 <p>Please find more examples in the other vignettes available at <a href="https://hojsgaard.github.io/pbkrtest/" class="external-link uri">https://hojsgaard.github.io/pbkrtest/</a>.</p>
 </div>
 </div>
@@ -289,13 +204,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/hojsgaard/pbkrtest/actions" class="external-link"><img src="https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://codecov.io/gh/hojsgaard/dlmextra?branch=master" class="external-link"><img src="https://codecov.io/gh/hojsgaard/dlmextra/branch/master/graphs/badge.svg" alt="codecov.io"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>

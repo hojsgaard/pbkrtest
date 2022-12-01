@@ -168,7 +168,7 @@
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> Ftest  11.2     1  9.00 0.008<span style="text-decoration: underline;">54</span></span></span></code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">kr.bal</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/internal.html">tidy</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
-<pre><code><span><span class="co">## F-test with Kenward-Roger approximation; time: 0.22 sec</span></span>
+<pre><code><span><span class="co">## F-test with Kenward-Roger approximation; time: 0.24 sec</span></span>
 <span><span class="co">## large : wear ~ material + (1 | boyf)</span></span>
 <span><span class="co">## small : wear ~ (1 | boyf)</span></span>
 <span><span class="co">##          stat    ndf    ddf F.scaling  p.value   </span></span>
@@ -191,7 +191,7 @@
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> Ftest  5.99     1  7.02  0.044<span style="text-decoration: underline;">2</span></span></span></code></pre>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">kr.imbal</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/internal.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## F-test with Kenward-Roger approximation; time: 0.21 sec</span></span>
+<pre><code><span><span class="co">## F-test with Kenward-Roger approximation; time: 0.22 sec</span></span>
 <span><span class="co">## large : wear ~ material + (1 | boyf)</span></span>
 <span><span class="co">## small : wear ~ (1 | boyf)</span></span>
 <span><span class="co">##          stat    ndf    ddf F.scaling p.value  </span></span>
@@ -246,7 +246,7 @@
 <div class="section level2">
 <h2 id="parametric-bootstrap">Parametric bootstrap<a class="anchor" aria-label="anchor" href="#parametric-bootstrap"></a>
 </h2>
-<p>Parametric bootstrap provides an alternative but many simulations are often needed to provide credible results (also many more than shown here; in this connection it can be useful to exploit that computings can be made en parallel, see the documentation):</p>
+<p>Parametric bootstrap provides an alternative but many simulations are often needed to provide credible results (also many more than shown here; in this connection it can be useful to exploit that computations can be made en parallel, see the documentation):</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pb.bal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">lmm1.bal</span>, <span class="va">lmm0.bal</span>, nsim<span class="op">=</span><span class="fl">500</span>, cl<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">pb.bal</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/internal.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -254,17 +254,17 @@
 <span><span class="co">##   type    stat    df p.value</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> LRT     8.09     1 0.004<span style="text-decoration: underline;">45</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest  8.09    <span style="color: #BB0000;">NA</span> 0.012<span style="text-decoration: underline;">0</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest  8.09    <span style="color: #BB0000;">NA</span> 0.016<span style="text-decoration: underline;">0</span></span></span></code></pre>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pb.bal</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/internal.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
 <span><span class="co">##   type      stat    df   ddf p.value</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> LRT       8.09     1  <span style="color: #BB0000;">NA</span>   0.004<span style="text-decoration: underline;">45</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest    8.09    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>   0.012<span style="text-decoration: underline;">0</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">3</span> Gamma     8.09    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>   0.013<span style="text-decoration: underline;">7</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">4</span> Bartlett  6.90     1  <span style="color: #BB0000;">NA</span>   0.008<span style="text-decoration: underline;">60</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">5</span> F         8.09     1  13.6 0.013<span style="text-decoration: underline;">3</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest    8.09    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>   0.016<span style="text-decoration: underline;">0</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> Gamma     8.09    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>   0.009<span style="text-decoration: underline;">96</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> Bartlett  7.08     1  <span style="color: #BB0000;">NA</span>   0.007<span style="text-decoration: underline;">81</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> F         8.09     1  15.9 0.011<span style="text-decoration: underline;">7</span></span></span></code></pre>
 <p>For the imbalanced data, the result is similar to the result from the paired <span class="math inline">\(t\)</span>–test.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pb.imbal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pb-modcomp.html">PBmodcomp</a></span><span class="op">(</span><span class="va">lmm1.imbal</span>, <span class="va">lmm0.imbal</span>, nsim<span class="op">=</span><span class="fl">500</span>, cl<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
@@ -273,17 +273,17 @@
 <span><span class="co">##   type    stat    df p.value</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> LRT     5.09     1  0.024<span style="text-decoration: underline;">0</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest  5.09    <span style="color: #BB0000;">NA</span>  0.039<span style="text-decoration: underline;">9</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest  5.09    <span style="color: #BB0000;">NA</span>  0.043<span style="text-decoration: underline;">9</span></span></span></code></pre>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pb.imbal</span><span class="op">)</span>  <span class="op">|&gt;</span> <span class="fu"><a href="../reference/internal.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
 <span><span class="co">##   type      stat    df   ddf p.value</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span> LRT       5.09     1  <span style="color: #BB0000;">NA</span>    0.024<span style="text-decoration: underline;">0</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest    5.09    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>    0.039<span style="text-decoration: underline;">9</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">3</span> Gamma     5.09    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>    0.033<span style="text-decoration: underline;">6</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">4</span> Bartlett  4.44     1  <span style="color: #BB0000;">NA</span>    0.035<span style="text-decoration: underline;">0</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">5</span> F         5.09     1  15.7  0.038<span style="text-decoration: underline;">6</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> LRT       5.09     1 <span style="color: #BB0000;">NA</span>     0.024<span style="text-decoration: underline;">0</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> PBtest    5.09    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>     0.043<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> Gamma     5.09    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>     0.043<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> Bartlett  3.89     1 <span style="color: #BB0000;">NA</span>     0.048<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> F         5.09     1  8.48  0.052<span style="text-decoration: underline;">2</span></span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="matrices-for-random-effects">Matrices for random effects<a class="anchor" aria-label="anchor" href="#matrices-for-random-effects"></a>
@@ -293,7 +293,7 @@
 <code class="sourceCode R"><span><span class="va">shoe3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">shoe.bal</span>, <span class="va">boy</span><span class="op">&lt;=</span><span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">shoe3</span> <span class="op">&lt;-</span> <span class="va">shoe3</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">shoe3</span><span class="op">$</span><span class="va">boy</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">lmm1</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span> <span class="va">wear</span> <span class="op">~</span> <span class="va">material</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span><span class="op">|</span><span class="va">boyf</span><span class="op">)</span>, data<span class="op">=</span><span class="va">shoe3</span> <span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span> <span class="va">SG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kr-vcov.html">get_SigmaG</a></span><span class="op">(</span> <span class="va">lmm1</span> <span class="op">)</span>, max<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span> <span class="va">SG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/kr-vcovAdj.html">get_SigmaG</a></span><span class="op">(</span> <span class="va">lmm1</span> <span class="op">)</span>, max<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of 3</span></span>
 <span><span class="co">##  $ Sigma   :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots</span></span>
 <span><span class="co">##  $ G       :List of 2</span></span>
