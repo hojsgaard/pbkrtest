@@ -112,43 +112,43 @@ get_SigmaG.lmerMod  <- function(object, details=0) {
 ## Modular implementation
 ##
 
-.get_GI_parms <- function( object ){
-  GGamma <- VarCorr(object)
-  parmList <- lapply(GGamma, function(Lii){  Lii[ lower.tri( Lii, diag=TRUE ) ] })
-  parmList <- c( parmList, sigma( object )^2 )
-  parmList
-}
+## .get_GI_parms <- function( object ){
+  ## GGamma <- VarCorr(object)
+  ## parmList <- lapply(GGamma, function(Lii){  Lii[ lower.tri( Lii, diag=TRUE ) ] })
+  ## parmList <- c( parmList, sigma( object )^2 )
+  ## parmList
+## }
 
-.get_GI_matrices <- function( object ){
+## .get_GI_matrices <- function( object ){
 
-  SS     <- .shgetME( object )
-  Zt <- getME( object, "Zt" )
+  ## SS     <- .shgetME( object )
+  ## Zt <- getME( object, "Zt" )
 
-  G  <- NULL
-  G  <- vector("list", SS$n.RT+1)
+  ## G  <- NULL
+  ## G  <- vector("list", SS$n.RT+1)
 
-  for (ss in 1:SS$n.RT) {
-    ZZ    <- .shget_Zt_group( ss, Zt, SS$Gp )
-    n.lev <- SS$n.lev.by.RT2[ ss ] ## ; cat(sprintf("n.lev=%i\n", n.lev))
-    Ig    <- sparseMatrix(1:n.lev, 1:n.lev, x=1)
-    UU <- vector("list", SS$n.parm.by.RT)
-    for (rr in 1:SS$n.parm.by.RT[ ss ]) {
-      ii.jj <- .index2UpperTriEntry( rr, SS$n.comp.by.RT[ ss ] )
-      ii.jj <- unique(ii.jj)
-      if (length(ii.jj)==1){
-        EE <- sparseMatrix(ii.jj, ii.jj, x=1, dims=rep(SS$n.comp.by.RT[ ss ], 2))
-      } else {
-        EE <- sparseMatrix(ii.jj, ii.jj[2:1], dims=rep(SS$n.comp.by.RT[ ss ], 2))
-      }
-      EE <- Ig %x% EE  ## Kronecker product
-      UU[[ rr ]] <- t(ZZ) %*% EE %*% ZZ
-    }
-    G[[ ss ]] <- UU
-  }
-  n.obs <- nrow(getME(object,'X'))
-  G[[ length( G ) ]] <- sparseMatrix(1:n.obs, 1:n.obs, x=1 )
-  G
-}
+  ## for (ss in 1:SS$n.RT) {
+    ## ZZ    <- .shget_Zt_group( ss, Zt, SS$Gp )
+    ## n.lev <- SS$n.lev.by.RT2[ ss ] ## ; cat(sprintf("n.lev=%i\n", n.lev))
+    ## Ig    <- sparseMatrix(1:n.lev, 1:n.lev, x=1)
+    ## UU <- vector("list", SS$n.parm.by.RT)
+    ## for (rr in 1:SS$n.parm.by.RT[ ss ]) {
+      ## ii.jj <- .index2UpperTriEntry( rr, SS$n.comp.by.RT[ ss ] )
+      ## ii.jj <- unique(ii.jj)
+      ## if (length(ii.jj)==1){
+        ## EE <- sparseMatrix(ii.jj, ii.jj, x=1, dims=rep(SS$n.comp.by.RT[ ss ], 2))
+      ## } else {
+        ## EE <- sparseMatrix(ii.jj, ii.jj[2:1], dims=rep(SS$n.comp.by.RT[ ss ], 2))
+      ## }
+      ## EE <- Ig %x% EE  ## Kronecker product
+      ## UU[[ rr ]] <- t(ZZ) %*% EE %*% ZZ
+    ## }
+    ## G[[ ss ]] <- UU
+  ## }
+  ## n.obs <- nrow(getME(object,'X'))
+  ## G[[ length( G ) ]] <- sparseMatrix(1:n.obs, 1:n.obs, x=1 )
+  ## G
+## }
 
 
 

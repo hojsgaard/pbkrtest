@@ -51,6 +51,10 @@ compare_column_space <- function(X1, X2){
 
 
 
+rankMatrix_ <- function(X){
+    rankMatrix(X)
+    ## rankMatrix(crossprod(X), method="qr.R")
+}
 
 
 
@@ -86,7 +90,8 @@ tidy.KRmodcomp <- function(x, ...){
         i <- 2
 
 
-    ret <- x$test[i,,drop=FALSE]    
+    ret <- x$test[i,,drop=FALSE]
+    ret$F.scaling <- NULL
     as_tibble(cbind(type=rownames(ret), ret))
 }
 

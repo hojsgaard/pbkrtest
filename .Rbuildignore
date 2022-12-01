@@ -12,3 +12,4 @@ vignettes/figures/
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+README.html

@@ -30,15 +30,10 @@ modcomp_init.merMod <- function(m1, m2, matrixOK = FALSE) {
     
     Xlarge <- getME(m1, "X")
     rlarge <- rankMatrix_(Xlarge)
-
-    ## print(Xlarge)
     
     ## -1 : Models have identical mean structures or are not nested
     ## 0  : m1 is submodel of m2
     ## 1  : m2 is submodel of m1
-
-    ## Xl <<- Xlarge
-    ## rl <<- rankMatrix(Xl)
     
     code <- if (.is.mm(m2)){
                 Xsmall <- getME(m2, "X")

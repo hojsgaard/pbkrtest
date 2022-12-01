@@ -108,8 +108,6 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     if (!(getME(largeModel, "is_REML"))){
         largeModel <- update(largeModel, .~., REML=TRUE)
     }
-
-    
     
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
@@ -119,7 +117,7 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     PhiA  <- vcovAdj(largeModel, details)
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=fixef(largeModel), betaH)
     stats <- lapply(stats, c) ## To get rid of all sorts of attributes
-
+    
     out   <- .finalizeKR(stats)
     
     formula.small <-
@@ -142,7 +140,6 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
 
 ## #' @rdname kr-modcomp
 ## KRmodcomp.mer <- KRmodcomp.lmerMod
-
 
 .finalizeKR <- function(stats){
     
@@ -175,6 +172,10 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
   P <- attr( PhiA, "P" )
   W <- attr( PhiA, "W" )
 
+  ## print(Theta %*% Phi)
+  ## print(W)
+  ## print(P)
+  
   A1 <- A2 <- 0
   ThetaPhi <- Theta %*% Phi
   n.ggamma <- length(P)
@@ -183,38 +184,42 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
       e  <- ifelse(ii==jj, 1, 2)
       ui <- ThetaPhi %*% P[[ii]] %*% Phi
       uj <- ThetaPhi %*% P[[jj]] %*% Phi
-      A1 <- A1 + e* W[ii,jj] * (.spur(ui) * .spur(uj))
-      A2 <- A2 + e* W[ii,jj] * sum(ui * t(uj))
+      ## print(ui); print(uj)
+      A1 <- A1 + e * W[ii,jj] * (.spur(ui) * .spur(uj))
+      A2 <- A2 + e * W[ii,jj] * sum(ui * t(uj))
     }
   }
 
-  q <- rankMatrix_(L)
+  q <- as.numeric(rankMatrix(L))
   B <- (1/(2*q)) * (A1+6*A2)
   g <- ( (q+1)*A1 - (q+4)*A2 )  / ((q+2)*A2)
   c1<- g/(3*q+ 2*(1-g))
   c2<- (q-g) / (3*q + 2*(1-g))
   c3<- (q+2-g) / ( 3*q+2*(1-g))
-  ##  cat(sprintf("q=%i B=%f A1=%f A2=%f\n", q, B, A1, A2))
-  ##  cat(sprintf("g=%f, c1=%f, c2=%f, c3=%f\n", g, c1, c2, c3))
+  ## cat(sprintf("q=%i B=%f A1=%f A2=%f\n", q, B, A1, A2))
+  ## cat(sprintf("g=%f, c1=%f, c2=%f, c3=%f\n", g, c1, c2, c3))
+
 ###orgDef: E<-1/(1-A2/q)
 ###orgDef: V<- 2/q * (1+c1*B) /  ( (1-c2*B)^2 * (1-c3*B) )
 
   ##EE     <- 1/(1-A2/q)
   ##VV     <- (2/q) * (1+c1*B) /  ( (1-c2*B)^2 * (1-c3*B) )
-  EE     <- 1 + (A2/q)
-  VV     <- (2/q)*(1+B)
-  EEstar <- 1/(1-A2/q)
-  VVstar <- (2/q)*((1+c1*B)/((1-c2*B)^2 * (1-c3*B)))
+  EE     <- 1 + (A2 / q)
+  VV     <- (2 / q) * (1 + B)
+  EEstar <- 1 / (1 - A2 / q)
+  VVstar <- (2 / q) * ((1 + c1 * B) / ((1 - c2 * B)^2 * (1 - c3 * B)))
   ##  cat(sprintf("EE=%f VV=%f EEstar=%f VVstar=%f\n", EE, VV, EEstar, VVstar))
-  V0<-1+c1*B
-  V1<-1-c2*B
-  V2<-1-c3*B
-  V0<-ifelse(abs(V0)<1e-10,0,V0)
+  V0<-1 + c1*B
+  V1<-1 - c2*B
+  V2<-1 - c3*B
+  V0<-ifelse(abs(V0)<1e-10, 0, V0)
+  
   ##  cat(sprintf("V0=%f V1=%f V2=%f\n", V0, V1, V2))
 
 ###orgDef: V<- 2/q* V0 /(V1^2*V2)
 ###orgDef: rho <-  V/(2*E^2)
 
+  ## str(list(q=q, A2=A2, V1=V1, V0=V0, V2=V2))
   rho <- 1/q * (.divZero(1-A2/q,V1))^2 * V0/V2
   df2 <- 4 + (q+2)/ (q*rho-1)          ## Here are the adjusted degrees of freedom.
 
@@ -232,7 +237,7 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
   Wald     <- as.numeric(t(betaDiff) %*% t(L) %*% solve(L %*% PhiA %*% t(L), L %*% betaDiff))
   WaldU    <- as.numeric(t(betaDiff) %*% t(L) %*% solve(L %*% Phi %*% t(L), L %*% betaDiff))
 
-  FstatU <- Wald/q
+  FstatU <- Wald / q
   pvalU  <- pf(FstatU, df1=q, df2=df2, lower.tail=FALSE)
 
   Fstat  <- F.scaling * FstatU
@@ -245,7 +250,6 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
   stats
 
 }
-
 
 .KRcommon <- function(x){
   cat("large : ")

@@ -1,10 +1,6 @@
-
 #' @import lme4
 #' @importFrom MASS ginv
 
-#' @importFrom magrittr "%>%"
-#' @export  "%>%"
-#'
 #' @importFrom utils head
 #' @importFrom stats coef
 #' 
@@ -28,14 +24,9 @@
 #' @importFrom dplyr as_tibble
 
 
-
-## .dumfunction_afterimportFrom <- function(){}
-
-
 #' @title pbkrtest internal
 #' @description pbkrtest internal
 #' @name internal-pbkrtest
 #'
-#' @aliases "%>%"
 NULL
 

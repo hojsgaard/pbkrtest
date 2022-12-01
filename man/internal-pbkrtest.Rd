@@ -2,7 +2,6 @@
 % Please edit documentation in R/NAMESPACE-pbkrtest.R
 \name{internal-pbkrtest}
 \alias{internal-pbkrtest}
-\alias{"\%>\%"}
 \title{pbkrtest internal}
 \description{
 pbkrtest internal

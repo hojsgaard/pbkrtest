@@ -74,11 +74,11 @@ model2restriction_matrix.default <- function (largeModel, smallModel, sparse=FAL
 #' @export
 model2restriction_matrix.merMod <- function (largeModel, smallModel, sparse=FALSE) {
     ## cat("model2restriction_matrix.merMod\n")
-    ## print(smallModel)
+    ## print(largeModel); print(smallModel)
     L <- if (is.numeric(smallModel)) {
              force_full_rank(smallModel)
-         } else  { #smallModel is lmerMod
-             make_restriction_matrix(getME(largeModel, 'X'),  getME(smallModel, 'X'))
+         } else  { ## smallModel is lmerMod
+             make_restriction_matrix(getME(largeModel, 'X'), getME(smallModel, 'X'))
          }
     if (sparse) .makeSparse(L) else L
 }
@@ -132,7 +132,8 @@ restriction_matrix2model.merMod <- function(largeModel, L, REML=TRUE, ...){
                                     "+", zzz$new_form$rhs.ran))
     new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
     ans <- update(largeModel, eval(new.formula), data=new.data)
-    if (!REML) ans <- update(ans, REML=FALSE)
+    if (!REML)
+        ans <- update(ans, REML=FALSE)
     ans
 }
 
@@ -155,7 +156,6 @@ restriction_matrix2model.lm <- function(largeModel, L, ...){
 
 
 
-
 ## ##############################################################
 
 ## X is model matrix for large model; L is a restriction matrix;
@@ -166,7 +166,7 @@ restriction_matrix2model.lm <- function(largeModel, L, ...){
 #' @param L A restriction matrix; a full rank matrix with as many columns as `X` has.
 #' @export
 make_model_matrix <- function(X, L) {
-    ##cat("X:\n"); print(X); cat("L:\n"); print(L)
+    ## cat("X:\n"); print(X); cat("L:\n"); print(L)
     ## find A such that <A>={X b| b in Lb=0}
 
     if (!inherits(L, c("matrix", "Matrix")) )
@@ -194,18 +194,17 @@ make_model_matrix <- function(X, L) {
 make_restriction_matrix <- function(X, X2) {
   ## <X2> in <X>
   ## determine L such that  <X2>={Xb| b in Lb=0}
-  d <- rankMatrix(cbind(X2, X)) - rankMatrix(X)
-  if (d > 0) {
-    stop('Error: <X2> not subspace of <X> \n')
-  }
-  Q  <- qr.Q(qr(cbind(X2, X)))
-  Q2 <- Q[, (rankMatrix_(X2) + 1) : rankMatrix_(X)]
-  L  <- t(Q2) %*% X
-  ## Make rows of L2 orthogonal
-  L <- t(qr.Q(qr(t(L))))
-  zapsmall(L)
+    d <- rankMatrix_(cbind(X2, X)) - rankMatrix_(X)
+    if (d > 0) {
+        stop('Error: <X2> not subspace of <X> \n')
+    }
+    Q  <- qr.Q(qr(cbind(X2, X)))
+    Q2 <- Q[, (rankMatrix_(X2) + 1) : rankMatrix_(X)]
+    L  <- t(Q2) %*% X
+    ## Make rows of L2 orthogonal 
+    L <- t(qr.Q(qr(t(L))))
+    zapsmall(L)
 }
-
 
 force_full_rank <- function(L){
     ## ensures that restriction matrix L is of full row rank:
@@ -218,7 +217,6 @@ force_full_rank <- function(L){
         L
     }
 }
-
 
 .formula2list <- function(form){
   lhs <- form[[2]]

@@ -109,6 +109,8 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
 
+    ## print(largeModel)
+    ## print(smallModel)
     largeModel <- update(largeModel, REML=TRUE) ## FIXME: Almost surely
     
     t0    <- proc.time()    

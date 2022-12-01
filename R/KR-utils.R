@@ -68,9 +68,6 @@ orthogonal_complement<-function(W) {
     inherits(object, "merMod")
 }
 
-rankMatrix_ <- function(X){
-    rankMatrix(X, method="qr.R")
-}
 
 
 
