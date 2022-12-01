@@ -1,39 +1,53 @@
+The `pbkrtest` package: Parametric Bootstrap, Kenward-Roger and
+Satterthwaite Based Methods for Tests in Mixed Models
+================
+
+- <a href="#what-does-pbkrtest-do-for-you"
+  id="toc-what-does-pbkrtest-do-for-you">What does <code>pbkrtest</code>
+  do for you?</a>
+- <a href="#documentation" id="toc-documentation">Documentation</a>
+- <a href="#online-documentation" id="toc-online-documentation">Online
+  documentation</a>
+- <a href="#installation" id="toc-installation">Installation</a>
+- <a href="#development-site" id="toc-development-site">Development
+  site</a>
+- <a href="#brief-introduction" id="toc-brief-introduction">Brief
+  introduction</a>
 
 <!-- README.md is generated from README.Rmd. Please edit only README.Rmd! -->
 
-# `pbkrtest`: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Mixed Model Comparison
+## What does `pbkrtest` do for you?
 
-For linear mixed models (as implemented in the `lme4` package),
-`pbkrtest` implements the following tests for fixed effects:
+Hypothesis test in mixed models (also called random effects models,
+hierarchical models etc) is most commonly based on large sample
+asymptotics: When the amount of information becomes large, a test can be
+based an a $\chi^2$-approximation. In small sample cases, this
+approximation can be very unreliable. The `pbkrtest` provides
+alternatives to this approximation. To be specific: For linear mixed
+models (as implemented in the `lme4` package), `pbkrtest` implements the
+following tests for fixed effects:
 
 1.  a parametric bootstrap test,
 2.  a Kenward-Roger-type F-test and
 3.  a Satterthwaite-type F-test.
 
-For generalized linear mixed models (as implemented in `lme4`) and for
-generalized linear models, `pbkrtest` also implements a parametric
-bootstrap test
+Moreover, for generalized linear mixed models (as implemented in `lme4`)
+and for generalized linear models, `pbkrtest` also implements a
+parametric bootstrap test
 
-The facilities of the package are documented in the paper by Halekoh and
-Højsgaard, (2012, ).
+## Documentation
 
+The facilities of the package are documented in the paper by [Halekoh
+and Højsgaard
+(2012)](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
 Please see `citation("pbkrtest")` for information about citing the paper
 and the package. If you use the package in your work, please do cite the
-2012-paper.
+2012-paper. Please notice: There are other packages that use `pbkrtest`
+under the hood. If you use one of those packages, please do also cite
+our 2012 paper.
 
-There are other packages that use `pbkrtest` under the hood. If you use
-one of those packages, please do also cite our 2012 paper.
-
-Documents:
-
-1.  [Halekoh and Højsgaard (2012) A Kenward-Roger Approximation and
-    Parametric Bootstrap Methods for Tests in Linear Mixed Models The R
-    Package
-    pbkrtest](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
-2.  [Vignette: introduction to
-    `pbkrtest`](https://cran.r-project.org/package=pbkrtest/vignettes/pbkrtest.pdf)
-3.  [Webpage for the
-    package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html)
+We also refer to the [Webpage for the
+package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html)
 
 <!-- badges: 
 [![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
@@ -95,7 +109,7 @@ tidy(pb)
 #>   type    stat    df  p.value
 #>   <chr>  <dbl> <dbl>    <dbl>
 #> 1 LRT     12.9     1 0.000326
-#> 2 PBtest  12.9    NA 0.0360
+#> 2 PBtest  12.9    NA 0.0290
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value
