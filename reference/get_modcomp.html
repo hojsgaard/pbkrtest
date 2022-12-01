@@ -104,7 +104,6 @@ Models - The R Package pbkrtest., Journal of Statistical Software,
 <span class="r-in"><span>              data<span class="op">=</span><span class="va">beets</span>, REML<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">lg</span>, <span class="va">.</span><span class="op">~</span><span class="va">.</span> <span class="op">-</span> <span class="va">harvest</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">modcomp</span> <span class="op">&lt;-</span> <span class="fu"><a href="kr-modcomp.html">KRmodcomp</a></span><span class="op">(</span><span class="va">lg</span>, <span class="va">sm</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
 <span class="r-in"><span><span class="fu">getKR</span><span class="op">(</span><span class="va">modcomp</span>, <span class="st">"ddf"</span><span class="op">)</span> <span class="co"># get denominator degrees of freedom.</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span></span></span>

@@ -178,7 +178,6 @@ Fixed Effects from Restricted Maximum Likelihood</em>, Biometrics 53: 983-997.</
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">KRmodcomp</span><span class="op">(</span><span class="va">fmLarge</span>, <span class="va">fmSmall</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + (Days | Subject)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small : Reaction ~ 1 + (Days | Subject)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         stat    ndf    ddf F.scaling   p.value    </span>
@@ -189,8 +188,6 @@ Fixed Effects from Restricted Maximum Likelihood</em>, Biometrics 53: 983-997.</
 <span class="r-in"><span><span class="co">## The same test using a restriction matrix</span></span></span>
 <span class="r-in"><span><span class="va">L</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">KRmodcomp</span><span class="op">(</span><span class="va">fmLarge</span>, <span class="va">L</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + (Days | Subject)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> L = </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
@@ -215,7 +212,6 @@ Fixed Effects from Restricted Maximum Likelihood</em>, Biometrics 53: 983-997.</
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-in"><span><span class="fu">KRmodcomp</span><span class="op">(</span><span class="va">m.large</span>, <span class="va">m.small</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>rankMatrix(x, method='qr'): computing t(x) as nrow(x) &lt; ncol(x)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> large : Reaction ~ Days + (1 | Subject) + (0 + Days | Subject)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> small : Reaction ~ 1 + (1 | Subject) + (0 + Days | Subject)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         stat    ndf    ddf F.scaling   p.value    </span>
