@@ -60,7 +60,8 @@ library(ggplot2)
 
 ## Sugar beets: Does suger content depend on harvest time?
 
-beets |> ggplot(aes(x=sow, y=sugpct, group=harvest)) + geom_jitter(aes(color=harvest), width=0)
+beets |> ggplot(aes(x=sow, y=sugpct, group=harvest)) +
+    geom_jitter(aes(color=harvest), width=0)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
@@ -87,7 +88,7 @@ tidy(pb)
 #>   type    stat    df  p.value
 #>   <chr>  <dbl> <dbl>    <dbl>
 #> 1 LRT     12.9     1 0.000326
-#> 2 PBtest  12.9    NA 0.0310
+#> 2 PBtest  12.9    NA 0.0250
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value
@@ -102,7 +103,8 @@ tidy(sa)
 
 ## Sleepstudy: Is there an effect of Days?
 
-sleepstudy |> ggplot(aes(x=Days, y=Reaction, group=Subject)) + geom_point() + geom_line(aes(color=Subject))
+sleepstudy |> ggplot(aes(x=Days, y=Reaction, group=Subject)) +
+    geom_point() + geom_line(aes(color=Subject))
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
@@ -128,7 +130,7 @@ tidy(pb)
 #>   type    stat    df    p.value
 #>   <chr>  <dbl> <dbl>      <dbl>
 #> 1 LRT     23.5     1 0.00000123
-#> 2 PBtest  23.5    NA 0.00100
+#> 2 PBtest  23.5    NA 0.00101
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling    p.value
@@ -144,7 +146,8 @@ library(ggplot2)
 
 ## ChickWeight: Does slope depend on diet?
 
-ChickWeight |> ggplot(aes(x=Time, y=weight, group=Chick)) + geom_point() + geom_line(aes(color=Chick)) + facet_grid(~Diet)
+ChickWeight |> ggplot(aes(x=Time, y=weight, group=Chick)) +
+    geom_point() + geom_line(aes(color=Chick)) + facet_grid(~Diet)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-3.png)<!-- -->
@@ -178,7 +181,7 @@ tidy(pb)
 #>   type    stat    df p.value
 #>   <chr>  <dbl> <dbl>   <dbl>
 #> 1 LRT     15.8     3 0.00122
-#> 2 PBtest  15.8    NA 0.00200
+#> 2 PBtest  15.8    NA 0.002
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value

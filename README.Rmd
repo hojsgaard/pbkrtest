@@ -73,7 +73,8 @@ library(ggplot2)
 
 ## Sugar beets: Does suger content depend on harvest time?
 
-beets |> ggplot(aes(x=sow, y=sugpct, group=harvest)) + geom_jitter(aes(color=harvest), width=0)
+beets |> ggplot(aes(x=sow, y=sugpct, group=harvest)) +
+    geom_jitter(aes(color=harvest), width=0)
 
 fm0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
 fm1 <- update(fm0, .~. -harvest)
@@ -92,7 +93,8 @@ tidy(sa)
 
 ## Sleepstudy: Is there an effect of Days?
 
-sleepstudy |> ggplot(aes(x=Days, y=Reaction, group=Subject)) + geom_point() + geom_line(aes(color=Subject))
+sleepstudy |> ggplot(aes(x=Days, y=Reaction, group=Subject)) +
+    geom_point() + geom_line(aes(color=Subject))
 
 fm0 <- lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
 fm1 <- update(fm0, .~. - Days)
@@ -111,7 +113,8 @@ library(ggplot2)
 
 ## ChickWeight: Does slope depend on diet?
 
-ChickWeight |> ggplot(aes(x=Time, y=weight, group=Chick)) + geom_point() + geom_line(aes(color=Chick)) + facet_grid(~Diet)
+ChickWeight |> ggplot(aes(x=Time, y=weight, group=Chick)) +
+    geom_point() + geom_line(aes(color=Chick)) + facet_grid(~Diet)
 
 fm0 <- lmer(weight ~ Diet + Time + Diet:Time + (Time|Chick), data=ChickWeight)
 fm1 <- update(fm0, .~. - Diet:Time)
