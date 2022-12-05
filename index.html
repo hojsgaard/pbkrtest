@@ -79,18 +79,10 @@
   <div class="contents col-md-9">
 
 <p>The <code>pbkrtest</code> package: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Tests in Mixed Models ================</p>
-<ul>
-<li><a href="#what-does-pbkrtest-do-for-you" id="toc-what-does-pbkrtest-do-for-you">What does <code>pbkrtest</code> do for you?</a></li>
-<li><a href="#documentation" id="toc-documentation">Documentation</a></li>
-<li><a href="#online-documentation" id="toc-online-documentation">Online documentation</a></li>
-<li><a href="#installation" id="toc-installation">Installation</a></li>
-<li><a href="#development-site" id="toc-development-site">Development site</a></li>
-<li><a href="#brief-introduction" id="toc-brief-introduction">Brief introduction</a></li>
-</ul>
 <!-- README.md is generated from README.Rmd. Please edit only README.Rmd! --><div class="section level2">
 <h2 id="what-does-pbkrtest-do-for-you">What does <code>pbkrtest</code> do for you?<a class="anchor" aria-label="anchor" href="#what-does-pbkrtest-do-for-you"></a>
 </h2>
-<p>Hypothesis test in mixed models (also called random effects models, hierarchical models etc) is most commonly based on large sample asymptotics: When the amount of information becomes large, a test can be based an a <span class="math inline"><em>χ</em><sup>2</sup></span>-approximation. In small sample cases, this approximation can be very unreliable. The <code>pbkrtest</code> provides alternatives to this approximation. To be specific: For linear mixed models (as implemented in the <code>lme4</code> package), <code>pbkrtest</code> implements the following tests for fixed effects:</p>
+<p>Hypothesis test of fixed effects in mixed models (also called random effects models, hierarchical models etc) is most commonly based on large sample asymptotics: When the amount of information becomes large, a test can be based an a <img src="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5Cchi%5E2%20%22%5Cchi%5E2%22" alt="\chi^2">-approximation. In small sample cases, this approximation can be very unreliable. The <code>pbkrtest</code> provides alternatives to this approximation. To be specific: For linear mixed models (as implemented in the <code>lme4</code> package), <code>pbkrtest</code> implements the following tests for fixed effects:</p>
 <ol style="list-style-type: decimal">
 <li>a parametric bootstrap test,</li>
 <li>a Kenward-Roger-type F-test and</li>
@@ -101,7 +93,7 @@
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p>The facilities of the package are documented in the paper by <a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf" class="external-link">Halekoh and Højsgaard (2012)</a> Please see <code>citation("pbkrtest")</code> for information about citing the paper and the package. If you use the package in your work, please do cite the 2012-paper. Please notice: There are other packages that use <code>pbkrtest</code> under the hood. If you use one of those packages, please do also cite our 2012 paper.</p>
+<p>The facilities of the package are documented in the paper by <a href="https://www.jstatsoft.org/htaccess.php?volume=059&amp;type=i&amp;issue=09&amp;filename=paper" class="external-link">Halekoh and Højsgaard (2014)</a> Please see <code>citation("pbkrtest")</code> for information about citing the paper and the package. If you use the package in your work, please do cite the 2014-paper. Please notice: There are other packages that use <code>pbkrtest</code> under the hood. If you use one of those packages, please do also cite our 2014-paper.</p>
 <p>We also refer to the <a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html" class="external-link">Webpage for the package</a></p>
 <!-- badges: 
 [![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
@@ -119,9 +111,8 @@ badges: end -->
 <p><code>pbkrtest</code> is available on CRAN and development versions can also be found on Github:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">## Install from CRAN:</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="kw">install.packages</span>(<span class="st">'pbkrtest'</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">## Install from Github:</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># install.packages('remotes')</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"hojsgaard/pbkrtest"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">## Install from Github: Use the remotes package:</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"hojsgaard/pbkrtest"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="development-site">Development site<a class="anchor" aria-label="anchor" href="#development-site"></a>
@@ -162,7 +153,7 @@ badges: end -->
 <span><span class="co">#&gt;   type    stat    df  p.value</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1 LRT     12.9     1 0.000326</span></span>
-<span><span class="co">#&gt; 2 PBtest  12.9    NA 0.0290</span></span>
+<span><span class="co">#&gt; 2 PBtest  12.9    NA 0.0260</span></span>
 <span><span class="fu"><a href="reference/internal.html">tidy</a></span><span class="op">(</span><span class="va">kr</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
 <span><span class="co">#&gt;   type   stat   ndf   ddf F.scaling p.value</span></span>
