@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 ## What does `pbkrtest` do for you?
 
-Hypothesis test in mixed models (also called random effects models, hierarchical models etc) is most commonly based on large sample asymptotics: When the amount of information becomes large, a test can be based an a $\chi^2$-approximation. In small sample cases, this approximation can be very unreliable. The `pbkrtest` provides alternatives to this approximation. To be specific: For linear mixed models (as implemented in the `lme4`
+Hypothesis test of fixed effects in mixed models (also called random effects models, hierarchical models etc) is most commonly based on large sample asymptotics: When the amount of information becomes large, a test can be based an a $\chi^2$-approximation. In small sample cases, this approximation can be very unreliable. The `pbkrtest` provides alternatives to this approximation. To be specific: For linear mixed models (as implemented in the `lme4`
 package), `pbkrtest` implements the following tests for fixed effects:
 
 1. a parametric bootstrap test, 
@@ -32,13 +32,13 @@ bootstrap test
 ## Documentation
 
 The facilities of the package are documented in the paper by
-[Halekoh and Højsgaard (2012)](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
+[Halekoh and Højsgaard (2014)](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
 Please see
 `citation("pbkrtest")` for information about citing the paper and the
 package. If you use the package in your work, please do cite the
-2012-paper.  Please notice: There are other packages that use
+2014-paper.  Please notice: There are other packages that use
 `pbkrtest` under the hood. If you use one of those packages, please do
-also cite our 2012 paper. 
+also cite our 2014-paper. 
 
 We also refer to the [Webpage for the package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html) 
 
@@ -61,8 +61,7 @@ See <https://hojsgaard.github.io/pbkrtest/>.
 ```
 ## Install from CRAN:
 install.packages('pbkrtest')
-## Install from Github:
-# install.packages('remotes')
+## Install from Github: Use the remotes package:
 remotes::install_github("hojsgaard/pbkrtest", build_vignettes = TRUE)
 ```
 
