@@ -31,14 +31,14 @@ bootstrap test
 
 ## Documentation
 
-The facilities of the package are documented in the paper by
-[Halekoh and Højsgaard (2014)](https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper)
-Please see
-`citation("pbkrtest")` for information about citing the paper and the
-package. If you use the package in your work, please do cite the
-2014-paper.  Please notice: There are other packages that use
+The facilities of the package are documented in the paper by [Halekoh
+and Højsgaard
+(2014)](https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper)
+Please see `citation("pbkrtest")` for information about citing the
+paper and the package. If you use the package in your work, please do
+cite this paper.  Please notice: There are other packages that use
 `pbkrtest` under the hood. If you use one of those packages, please do
-also cite our 2014-paper. 
+also cite our paper.
 
 We also refer to the [Webpage for the package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html) 
 

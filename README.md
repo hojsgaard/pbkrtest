@@ -2,30 +2,20 @@ The `pbkrtest` package: Parametric Bootstrap, Kenward-Roger and
 Satterthwaite Based Methods for Tests in Mixed Models
 ================
 
-- <a href="#what-does-pbkrtest-do-for-you"
-  id="toc-what-does-pbkrtest-do-for-you">What does <code>pbkrtest</code>
-  do for you?</a>
-- <a href="#documentation" id="toc-documentation">Documentation</a>
-- <a href="#online-documentation" id="toc-online-documentation">Online
-  documentation</a>
-- <a href="#installation" id="toc-installation">Installation</a>
-- <a href="#development-site" id="toc-development-site">Development
-  site</a>
-- <a href="#brief-introduction" id="toc-brief-introduction">Brief
-  introduction</a>
-
 <!-- README.md is generated from README.Rmd. Please edit only README.Rmd! -->
 
 ## What does `pbkrtest` do for you?
 
-Hypothesis test in mixed models (also called random effects models,
-hierarchical models etc) is most commonly based on large sample
-asymptotics: When the amount of information becomes large, a test can be
-based an a $\chi^2$-approximation. In small sample cases, this
-approximation can be very unreliable. The `pbkrtest` provides
-alternatives to this approximation. To be specific: For linear mixed
-models (as implemented in the `lme4` package), `pbkrtest` implements the
-following tests for fixed effects:
+Hypothesis test of fixed effects in mixed models (also called random
+effects models, hierarchical models etc) is most commonly based on large
+sample asymptotics: When the amount of information becomes large, a test
+can be based an a
+![\\chi^2](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%5Cchi%5E2
+"\\chi^2")-approximation. In small sample cases, this approximation can
+be very unreliable. The `pbkrtest` provides alternatives to this
+approximation. To be specific: For linear mixed models (as implemented
+in the `lme4` package), `pbkrtest` implements the following tests for
+fixed effects:
 
 1.  a parametric bootstrap test,
 2.  a Kenward-Roger-type F-test and
@@ -39,12 +29,12 @@ parametric bootstrap test
 
 The facilities of the package are documented in the paper by [Halekoh
 and Højsgaard
-(2012)](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
+(2014)](https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper)
 Please see `citation("pbkrtest")` for information about citing the paper
 and the package. If you use the package in your work, please do cite the
-2012-paper. Please notice: There are other packages that use `pbkrtest`
+2014-paper. Please notice: There are other packages that use `pbkrtest`
 under the hood. If you use one of those packages, please do also cite
-our 2012 paper.
+our 2014-paper.
 
 We also refer to the [Webpage for the
 package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html)
@@ -65,8 +55,7 @@ found on Github:
 
     ## Install from CRAN:
     install.packages('pbkrtest')
-    ## Install from Github:
-    # install.packages('remotes')
+    ## Install from Github: Use the remotes package:
     remotes::install_github("hojsgaard/pbkrtest", build_vignettes = TRUE)
 
 ## Development site
@@ -109,7 +98,7 @@ tidy(pb)
 #>   type    stat    df  p.value
 #>   <chr>  <dbl> <dbl>    <dbl>
 #> 1 LRT     12.9     1 0.000326
-#> 2 PBtest  12.9    NA 0.0290
+#> 2 PBtest  12.9    NA 0.0260
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value
