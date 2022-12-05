@@ -32,7 +32,7 @@ bootstrap test
 ## Documentation
 
 The facilities of the package are documented in the paper by
-[Halekoh and Højsgaard (2014)](https://www.jstatsoft.org/index.php/jss/article/view/v059i09/v59i09.pdf)
+[Halekoh and Højsgaard (2014)](https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper)
 Please see
 `citation("pbkrtest")` for information about citing the paper and the
 package. If you use the package in your work, please do cite the

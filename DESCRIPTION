@@ -8,17 +8,14 @@ Authors@R: c(
         email = "sorenh@math.aau.dk", role = c("aut", "cre", "cph"))
   )
 Maintainer: Søren Højsgaard <sorenh@math.aau.dk>
-Description: Test in mixed effects models. Attention is on mixed
-    effects models as implemented in the 'lme4' package. For linear
-    mixed models, this package implements (1) a parametric bootstrap
-    test, (2) a Kenward-Roger-type modification of F-tests for linear
-    mixed effects models and (3) a Satterthwaite-type modification of
-    F-tests for linear mixed effects models. The package also
-    implements a parametric bootstrap test for generalized linear
-    mixed models.  The facilities of the package are documented in the
-    paper by Halekoh and Højsgaard, (2012,
-    <doi:10.18637/jss.v059.i09>).  Please see 'citation("pbkrtest")'
-    for citation details.
+Description: Computes p-values based on (a) Satterthwaites or
+    Kenward-Rogers degree of freedom methods and (b) parametric bootstrap
+    for mixed effects models as implemented in the 'lme4'
+    package. Implements parametric bootstrap test for generalized linear
+    mixed models as implemented in 'lme4' and generalized linear
+    models. The package is documented in the paper by Halekoh and
+    Højsgaard, (2012, <doi:10.18637/jss.v059.i09>).  Please see
+    'citation("pbkrtest")' for citation details.
 URL: https://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
     R (>= 4.1.0),
