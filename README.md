@@ -27,14 +27,14 @@ parametric bootstrap test
 
 ## Documentation
 
-The facilities of the package are documented in the paper by [Halekoh
-and Højsgaard
-(2014)](https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper)
+The facilities of the package are documented in the paper by \[Halekoh
+and Højsgaard 2014)\]
+(<https://www.jstatsoft.org/htaccess.php?volume=059&type=i&issue=09&filename=paper>)
 Please see `citation("pbkrtest")` for information about citing the paper
-and the package. If you use the package in your work, please do cite the
-2014-paper. Please notice: There are other packages that use `pbkrtest`
+and the package. If you use the package in your work, please do cite
+this paper. Please notice: There are other packages that use `pbkrtest`
 under the hood. If you use one of those packages, please do also cite
-our 2014-paper.
+our paper.
 
 We also refer to the [Webpage for the
 package](https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html)
@@ -98,7 +98,7 @@ tidy(pb)
 #>   type    stat    df  p.value
 #>   <chr>  <dbl> <dbl>    <dbl>
 #> 1 LRT     12.9     1 0.000326
-#> 2 PBtest  12.9    NA 0.0260
+#> 2 PBtest  12.9    NA 0.0300
 tidy(kr)
 #> # A tibble: 1 × 6
 #>   type   stat   ndf   ddf F.scaling p.value

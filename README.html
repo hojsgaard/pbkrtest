@@ -613,7 +613,7 @@ body {
 </ol>
 <p>Moreover, for generalized linear mixed models (as implemented in <code>lme4</code>) and for generalized linear models, <code>pbkrtest</code> also implements a parametric bootstrap test</p>
 <h2 id="documentation">Documentation</h2>
-<p>The facilities of the package are documented in the paper by <a href="https://www.jstatsoft.org/htaccess.php?volume=059&amp;type=i&amp;issue=09&amp;filename=paper">Halekoh and Højsgaard (2014)</a> Please see <code>citation(&quot;pbkrtest&quot;)</code> for information about citing the paper and the package. If you use the package in your work, please do cite the 2014-paper. Please notice: There are other packages that use <code>pbkrtest</code> under the hood. If you use one of those packages, please do also cite our 2014-paper.</p>
+<p>The facilities of the package are documented in the paper by [Halekoh and Højsgaard 2014)] (<a href="https://www.jstatsoft.org/htaccess.php?volume=059&amp;type=i&amp;issue=09&amp;filename=paper">https://www.jstatsoft.org/htaccess.php?volume=059&amp;type=i&amp;issue=09&amp;filename=paper</a>) Please see <code>citation(&quot;pbkrtest&quot;)</code> for information about citing the paper and the package. If you use the package in your work, please do cite this paper. Please notice: There are other packages that use <code>pbkrtest</code> under the hood. If you use one of those packages, please do also cite our paper.</p>
 <p>We also refer to the <a href="https://people.math.aau.dk/~sorenh/software/pbkrtest/index.html">Webpage for the package</a></p>
 <!-- badges: 
 [![R build status](https://github.com/hojsgaard/pbkrtest/workflows/R-CMD-check/badge.svg)](https://github.com/hojsgaard/pbkrtest/actions) 
@@ -661,7 +661,7 @@ remotes::install_github(&quot;hojsgaard/pbkrtest&quot;, build_vignettes = TRUE)
 <a class="sourceLine" id="cb3-19" title="19"><span class="co">#&gt;   type    stat    df  p.value</span></a>
 <a class="sourceLine" id="cb3-20" title="20"><span class="co">#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span></a>
 <a class="sourceLine" id="cb3-21" title="21"><span class="co">#&gt; 1 LRT     12.9     1 0.000326</span></a>
-<a class="sourceLine" id="cb3-22" title="22"><span class="co">#&gt; 2 PBtest  12.9    NA 0.0260</span></a>
+<a class="sourceLine" id="cb3-22" title="22"><span class="co">#&gt; 2 PBtest  12.9    NA 0.0300</span></a>
 <a class="sourceLine" id="cb3-23" title="23"><span class="kw">tidy</span>(kr)</a>
 <a class="sourceLine" id="cb3-24" title="24"><span class="co">#&gt; # A tibble: 1 × 6</span></a>
 <a class="sourceLine" id="cb3-25" title="25"><span class="co">#&gt;   type   stat   ndf   ddf F.scaling p.value</span></a>

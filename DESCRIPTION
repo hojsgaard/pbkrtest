@@ -8,7 +8,7 @@ Authors@R: c(
         email = "sorenh@math.aau.dk", role = c("aut", "cre", "cph"))
   )
 Maintainer: Søren Højsgaard <sorenh@math.aau.dk>
-Description: Computes p-values based on (a) Satterthwaites or
+Description: Computes p-values based on (a) Satterthwaite or
     Kenward-Rogers degree of freedom methods and (b) parametric bootstrap
     for mixed effects models as implemented in the 'lme4'
     package. Implements parametric bootstrap test for generalized linear
