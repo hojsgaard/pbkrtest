@@ -1,72 +1,62 @@
-load_all("pkg")
-library(simr)
-library(testthat)
-helperopts <- simrOptions(nsim=10, progress=FALSE, pbnsim=5)
-simrOptions(helperopts) # b/c helpers are not called by load_all
-
-fm3 <- glmer(z ~ x + (x|g), family=poisson, data=simdata); fixef(fm3) <- fixef(fm3)
-
-t7 <- suppressWarnings(doTest(fm3, rcompare(~ (1|g), "pb")))
-
-
-
-t7
-
-
-ll
-ss
-
-
-
-
-
-
-
-
-
-
-#
-# Useful to have some example models.
-#
-
-fm1 <- lmer(y ~ x + (1|g), data=simdata, control=lmerControl(optimizer="bobyqa"))
-fixef(fm1) <- fixef(fm1)
-
-fm2 <- glmer(z ~ x + (1|g), family=poisson, data=simdata); fixef(fm2) <- fixef(fm2)
-
-
-document("pkg")
-
-
-
-
 library(pbkrtest)
-library(ggplot2)
+load_all("_pbkrtest")
 
-ggplot(sleepstudy) + geom_line(aes(Days, Reaction, group=Subject, color=Subject))
+load_all("pbkrtestDEVEL/_pbkrtest/")
+
+## Sugar beets: Does suger content depend on harvest time?
+
+beets |> ggplot(aes(x=sow, y=sugpct, group=harvest)) + geom_jitter(aes(color=harvest), width=0)
+
+fm0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
+fm1 <- update(fm0, .~. -harvest)
+
+## Is there an effect of harvest time?
+an <- anova(fm0, fm1)
+pb <- PBmodcomp(fm0, fm1)
+kr <- KRmodcomp(fm0, fm1)
+sa <- SATmodcomp(fm0, fm1)
+
+tidy(an)
+tidy(pb)
+tidy(kr)
+tidy(sa)
+
+
+## Sleepstudy: Is there an effect of Days?
+
+sleepstudy |> ggplot(aes(x=Days, y=Reaction, group=Subject)) + geom_point() + geom_line(aes(color=Subject))
 
 fm0 <- lmer(Reaction ~ Days + (Days|Subject), data=sleepstudy)
 fm1 <- update(fm0, .~. - Days)
 
-p0 <- anova(fm0, fm1)
-p1 <- PBmodcomp(fm0, fm1)
-p2 <- KRmodcomp(fm0, fm1)
-p3 <- SATmodcomp(fm0, fm1)
+an <- anova(fm0, fm1)
+pb <- PBmodcomp(fm0, fm1)
+kr <- KRmodcomp(fm0, fm1)
+sa <- SATmodcomp(fm0, fm1)
 
-p0
-p1
-p2
-p3
+tidy(an)
+tidy(pb)
+tidy(kr)
+tidy(sa)
 
-tidy(p0)
-tidy(p1)
-tidy(p2)
-tidy(p3)
+library(ggplot2)
 
+## ChickWeight: Does slope depend on diet?
 
+ChickWeight |> ggplot(aes(x=Time, y=weight, group=Chick)) + geom_point() + geom_line(aes(color=Chick)) + facet_grid(~Diet)
 
+fm0 <- lmer(weight ~ Diet + Time + Diet:Time + (Time|Chick), data=ChickWeight)
+fm1 <- update(fm0, .~. - Diet:Time)
 
+an <- anova(fm0, fm1)
+pb <- PBmodcomp(fm0, fm1)
+kr <- KRmodcomp(fm0, fm1)
+sa <- SATmodcomp(fm0, fm1)
 
+tidy(an)
+tidy(pb)
+tidy(kr)
+tidy(sa)
 
 
 
@@ -76,83 +66,110 @@ tidy(p3)
 
 
 
+## Helle Sørensen
 
 
+library(pbkrtest)
+NSIM <- 50 ## Simulations in parametric bootstrap
+ 
+### Copied from help page: Test statistic, LRT = 12.914, OK
+sug <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=FALSE)
+logLik(sug)
+sug.h <- update(sug, .~. -harvest)
+anova(sug, sug.h)
+PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
+ 
+### Fitted med REML.
+### Help page claims that models are refitted with ML, but that not seem to be the case: LRT = 11.252 != 12.914
+### (What is the test statistic, 11.252?)
+sug.REML <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=TRUE)
+sug.h.REML <- update(sug, .~. -harvest)
+anova(sug.REML, sug.h.REML)
 
+sug.ML <- update(sug.REML, REML=F)
+sug.h.ML <- update(sug.h.REML, REML=F)
 
 
+pbkrtest:::getLRT.merMod(sug.ML, sug.h.ML)
 
+anova(sug.ML, sug.h.ML)
 
 
+setwd("pbkrtestDEVEL/_pbkrtest/")
 
+load_all()
+PBmodcomp(sug.REML, sug.h.REML, nsim=NSIM, cl=1)
 
+logLik(sug.REML)
+logLik(sug.REML, REML=FALSE)
+logLik(update(sug.REML, REML=FALSE))
 
+logLik(sug.h.REML)
+logLik(sug.h.REML, REML=FALSE)
+logLik(update(sug.h.REML, REML=FALSE))
 
 
-prmatrix((mat<-p2$formula.small), collab = rep_len("", ncol(mat)), rowlab = rep_len("", ncol(mat)))
+PBmodcomp(sug.ML, sug.h.ML, nsim=NSIM, cl=1)
 
-print.default(p1)
+PBmodcomp(update(sug.REML, REML=FALSE), update(sug.h.REML, REML=FALSE), nsim=NSIM, cl=1)
 
 
-print.default(p2)
+PBrefdist(sug.ML, sug.h.ML, nsim=NSIM, cl=1)
+PBrefdist(update(sug.REML, REML=FALSE), update(sug.h.REML, REML=FALSE), nsim=NSIM, cl=1)
 
+logLik(largeModel) - logLik(smallModel)
 
 
+2*(logLik(sug.ML) - logLik(sug.h.ML))
 
-set.seed(1213)
-data(sleepstudy)
-SIZE <- 50
-sleepstudy <- sleepstudy[sample(nrow(sleepstudy), size=SIZE), ]
 
+getME(sug.REML, "is_REML")
+update(sug.REML, REML=FALSE) %>% getME("is_REML")
+sug2 <- update(sug.REML, REML=FALSE)
+logLik(sug.REML)
 
+logLik(sug2)
+logLik(sug)
 
 
 
+fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
+logLik(fm1)
+logLik(fm1, REML=FALSE)
+logLik(update(fm1, REML=FALSE))
 
 
 
-Parametric Bootstrap and Kenward Roger Based Methods for Mixed Model Comparison
+data(Orthodont,package="nlme")
+Orthodont$nsex <- as.numeric(Orthodont$Sex=="Male")
+Orthodont$nsexage <- with(Orthodont, nsex*age)
+fm1 <- lmer(distance ~ Sex + age + Sex:age + (age|Subject), data=Orthodont)
+fm0 <- update(fm1, .~. -Sex - Sex:age)
 
+anova(fm1, fm0)
+KRmodcomp(fm1, fm0)
+SATmodcomp(fm1, fm0)
+PBmodcomp(fm1, fm0)
 
 
 
-devfun <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), data=sleepstudy, devFunOnly=T)
+     + (0+nsex|Subject) +
+         (0 + nsexage|Subject), 
 
-theta <- getME(fm0, "theta")
-sigma <- getME(fm0, "sigma")
 
-devfun(c(theta))
 
 
-get_devfun(fm0)
+     summary(fm1)# (with its own print method; see class?merMod % ./merMod-class.Rd
 
 
 
 
 
-L <- rbind(c(0, 1, 0), 
-           c(0, 0, 1))
 
-microbenchmark::microbenchmark(
-                    KRmodcomp(fm0, L), SATmodcomp(fm0, L))
 
 
 
 
-
-
-
-fit2 <- update(fit1, .~. - time)
-    L <- model2remat(fit1, fit2)
-
-
-
-source("sh_satter.R");source("sh_contest.R")
-get_sddf(fm, L)
-
-
-
-data(beets)
 
 
 

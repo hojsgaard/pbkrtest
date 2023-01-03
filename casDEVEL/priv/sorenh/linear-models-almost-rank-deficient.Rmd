@@ -69,7 +69,7 @@ Verify that we have a solution:
 ```{r}
 error.a1 <- XtX %*% beta.a1 - Xty.a 
 error.a1 %>% simplify()
-error.b1 <- XtX %*% beta.b1 - Xty.a 
+error.b1 <- XtX %*% beta.b1 - Xty.b 
 error.b1 %>% simplify()
 ```
 
@@ -85,6 +85,25 @@ beta.b2
 error.b2 <- XtX %*% beta.b2 - Xty.b 
 error.b2 %>% simplify()
 ```
+
+```{r}
+beta.a1 %>% simplify()
+beta.a2 %>% simplify()
+```
+
+
+```{r}
+w1 <- solve(eval(as_expr(XtX), list(eps = 0.00001)))
+w2 <- eval(as_expr(inv(XtX)), list(eps = 0.00001))
+w1 - w2
+sum((w1 - w2)^2)
+```
+
+```{r}
+as_expr(beta.b1)
+```
+
+
 
 The orthogonal projection matrix onto $span(X)$:
 

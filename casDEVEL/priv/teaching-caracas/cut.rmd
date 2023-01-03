@@ -1,3 +1,218 @@
+
+
+<!-- ## Gradient descent -->
+
+<!-- Gradient descent is simple method for minimizing a real value -->
+<!-- function.  [@wiki:gradient_descent:22] illustrates the method as -->
+<!-- follows: Solve $G(x)=0$ where $x=(x_1, x_2, x_3): -->
+
+<!-- ```{r} -->
+<!-- pi_ <- 22 / 7   ## FIXME Issue here -->
+<!-- def_sym(x1, x2, x3) -->
+<!-- x <- cbind(x1, x2, x3) -->
+<!-- g1 <- 3*x1 - cos(x2*x3) - 3/2 -->
+<!-- g2 <- 4 * x1^2 - 625 * x2^2 - 2 * x2 - 1 -->
+<!-- g3 <- exp(-x1 * x2) + 20 * x3 + (10 * pi_ - 3)/3 -->
+<!-- G <- cbind(g1, g2, g3) -->
+<!-- ``` -->
+<!-- $$ -->
+<!-- G = `r tex(t(G))` -->
+<!-- $$ -->
+
+<!-- ```{r, eval=FALSE} -->
+<!-- sol <- solve_sys(G, x) -->
+<!-- ``` -->
+
+<!-- One way to proceed is to turn the problem into a minimization problem: -->
+<!-- Minimize $H(x) = G(x)\transp G(x)$.  -->
+
+<!-- ```{r} -->
+<!-- H <- G %*% t(G) / 2 -->
+<!-- gH <- der(H, x) -->
+<!-- gH |> simplify() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- gH. <- as_func(gH, vec_arg = T) -->
+<!-- H. <- as_func(H, vec_arg=T) -->
+<!-- G. <- as_func(G, vec_arg = T) -->
+<!-- x. <- c(0, 0, 0) -->
+<!-- gamma0 <- 0.0001 -->
+<!-- N <- 300 -->
+<!-- r <- rep(NA, N) -->
+<!-- for (i in 1:N){ -->
+<!--   x. <- x. - gamma0 * gH.(x.) -->
+<!--   r[i] <- H.(x.)|> as.numeric()  -->
+<!-- } -->
+
+<!-- G.(x.) -->
+<!-- plot(1:N, r) -->
+<!-- abline(h=0, col="red") -->
+<!-- ``` -->
+
+<!-- ```{r, echo=FALSE, eval=FALSE} -->
+<!-- X. <- model.matrix(~speed, data=cars) -->
+<!-- X. -->
+<!-- y. <- cars$dist -->
+<!-- b <- vector_sym(2, "b") -->
+
+<!-- X <- as_sym(X.) -->
+<!-- y <- as_sym(y.) -->
+
+<!-- solve(t(X.) %*% X., t(X.) %*% y.) -->
+
+<!-- res <- y-X %*% b -->
+
+<!-- optim(c(0,0), ssd.) -->
+
+<!-- ssd <- t(res) %*% res -->
+<!-- ssd. <- as_func(ssd, vec_arg = T) -->
+<!-- g_ssd <- der(ssd, b) -->
+<!-- g_ssd. <- as_func(g_ssd, vec_arg = T) -->
+<!-- b. <- c(-10, 1) -->
+<!-- N <- 300 -->
+<!-- r <- rep(NA, N) -->
+<!-- gamma0 <- 0.0001 -->
+<!-- for (i in 1:N){ -->
+<!--   b. <- b. - gamma0 * g_ssd.(b.) -->
+<!--   b. -->
+<!--   r[i] <- ssd.(b.)|> as.numeric()  -->
+<!-- } -->
+
+<!-- b. -->
+<!-- ssd.(b.) -->
+<!-- plot(1:N, r) -->
+
+
+<!-- ``` -->
+
+<!-- This can be exploited, e.g. as demonstrated in the following examples: -->
+
+<!-- ```{r} -->
+<!-- Minv <- inv(M) -->
+<!-- denom <- denominator(Minv[1, 1]) -->
+<!-- Minv_fact <- mat_factor_div(Minv, denom) ## FIXME: Over-engineered ??? -->
+<!-- ``` -->
+
+<!-- Typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv)")`$$ `` produces -->
+
+<!-- $$ -->
+<!-- M\inv = `r tex(Minv)` -->
+<!-- $$ -->
+
+<!-- whereas typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv_fact)")`$$ `` produces this: -->
+
+<!-- $$ -->
+<!-- M\inv = `r tex(Minv_fact)` -->
+<!-- $$ -->
+
+<!-- In this situation we could also have defined `Minv_fact` using the -->
+<!-- expression `as_factor_list(1 / denom, Minv * denom)` -->
+<!-- instead. \footnote{FIXME: Maybe more math examples: Limit, integral, -->
+<!-- differential??} -->
+
+<!-- ```{r} -->
+<!-- as_factor_list(1 / denom, Minv * denom) -->
+<!-- ``` -->
+
+<!-- $$ -->
+<!-- M\inv = `r tex(as_factor_list(1 / denom, Minv * denom))` -->
+<!-- $$ -->
+
+
+```{r, echo=FALSE, eval=FALSE}
+invz <- function(z){(exp(z)-1)/(exp(z) +1)}    
+g_wrap <- function(par){
+    p1 <- par[1]
+    p2 <- par[2]
+    ## g(invz(p1), exp(p2))
+    g(p1, p2)
+}
+
+par <- optim(c(a=0, v=0), g_wrap, control=list(fnscale=-1))$par
+par[1] <- invz(par[1])
+par[2] <- exp(par[2])
+par
+```
+
+
+
+
+<!-- In the following we consider linear normal models of the form $y \sim -->
+<!-- N_n(\mu, \sigma^2 I)$ where $y=(y_1, \dots, y_n)$ is a random vector -->
+<!-- and the mean vector $\mu$ is an element in a $q$-dimensional linear -->
+<!-- subspace $L$ of $R^n$.  In practice, $L$ is specified as the -->
+<!-- columnspace $C(X)$ of a (usually full rank) $n\times q$ matrix $X$, so -->
+<!-- the mean has the form $\mu=X\bb$ where $X$ is a model matrix and $\bb$ -->
+<!-- is a vector of regression parameters. See e.g.\ [@reference-linear-models] for -->
+<!-- details.\footnote{REFERENCE to any book on linear normal models.} -->
+
+<!-- A matrix algebra approach to such models can go along the following -->
+<!-- lines: We wish to find the vector $\hat \bb$ that minimizes $||y-X -->
+<!-- \bb||^2$ which leads to the normal equations $(X\transp X)\bb = -->
+<!-- X\transp y$. If $X$ has full rank, the unique solution to the normal -->
+<!-- equations is $\hat \bb = (X^\top X)^{-1} X^\top y$. Hence the -->
+<!-- estimated mean vector is $\hat \mu = X\hat\bb=X(X^\top X)^{-1} X^\top -->
+<!-- y$.  Another (but closely related) approach is geometrical: $\hat \mu$ -->
+<!-- is the orthogonal projection of $y$ onto the column space $C(X)$, -->
+<!-- and the projection matrix is given as $P=X(X^\top X)^{-1} X^\top$, so -->
+<!-- $\hat \mu = P y = X\hat\bb=X(X^\top X)^{-1} X^\top y$ as before.  The -->
+<!-- estimated parameter vector $\hat\bb$ is a linear function of $y$ and -->
+<!-- is normal $\hat\bb \sim N_q(\bb, \sigma^2 (X\transp X)\inv)$.  Since -->
+<!-- $P$ is an orhogonal projection matrix, $P$ is symmetric and idempotent -->
+<!-- with rank $q$. Hence $Py \sim N_n(\mu, \sigma^2 P)$ follows a singular -->
+<!-- $n$ dimensional normal distribution. Similarly, $(I-P)y \sim N(0, -->
+<!-- \sigma^2(I-P))$.\footnote{FIXME: Det er for langt og for krukket} -->
+
+<!-- Such a matrix approach is very brief and concise, but the matrix -->
+<!-- algebra also obscures what is computed. Numerical examples are useful -->
+<!-- for some aspects of the computations but not for other. In this -->
+<!-- respect symbolic computations can be enlightening.  We will -->
+<!-- demonstrate such examples in the following. -->
+
+### Numerical mathematics vs textbook mathematics {#almost-singular}
+
+Instability due to almost-singular matrices.
+
+```{r}
+X <- matrix(1, nr=3, nc=2) |> as_sym()
+X[2,2] <- "1+e"
+y <- c(0, "e", 0) |> as_sym()
+XtX <- t(X) %*% X
+Xty <- t(X) %*% y
+XtX
+Xty
+solve_lin(XtX, Xty) %>% simplify() %>% simplify()
+
+```
+
+```{r}
+X <- matrix(c(1, 0, 0, -1, "e", 0), 3, 2) |> as_sym()
+y <- c(0, "e", 1) |> as_sym()
+XtX <- t(X) %*% X
+Xty <- t(X) %*% y
+```
+
+$$
+`r texr(XtX)` `r texr(vector_sym(2, "beta"))` = `r tex(Xty)`
+$$
+
+```{r}
+beta <- solve_lin(XtX, Xty)
+beta
+```
+
+```{r}
+e. <- 1e-6
+XtX. <- eval(as_expr(XtX), list(e = e.))
+Xty. <- eval(as_expr(Xty), list(e = e.))
+beta_num <- solve(XtX.) %*% Xty.
+beta_num
+```
+
+In practise, $QR$ decomposition is used be default in \r.
+
+
 #DLM
 
 

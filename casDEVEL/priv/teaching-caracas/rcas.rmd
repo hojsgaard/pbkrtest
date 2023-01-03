@@ -1,7 +1,7 @@
 ---
 author: Mikkel Meyer Andersen and Søren Højsgaard
 title:
- "Bridging a gap between mathematics and numbers in teaching statistics with the `R` package `caracas` for computer algebra"
+ "Bridging a gap between mathematics and data in teaching data science and statistics with the `R` package `caracas` for computer algebra"
 header-includes:
   - \usepackage{amsmath}
   - \usepackage{natbib}
@@ -170,29 +170,23 @@ texr <- function(x) {
 The capability of \proglang{R} [@R] to handle symbolic mathematics is
 enhanced by two add-on packages: The \pkg{caracas} package
 [@caracas:21] and the \pkg{Ryacas} package [@ryacas].  In this paper
-we will illustrate the use of the \pkg{caracas} package for a
-particular application: teaching statistics, where symbolic
+we will illustrate the use of the \pkg{caracas} package in connection with 
+teaching statistics, where symbolic
 mathematics is helpful, strongly aided by the packages' ability to
 enter in a reproducible framework (provided by, e.g.\ \pkg{Rmarkdown}
 [@rmarkdown; @RMarkdownDefinitiveGuide; @RMarkdownCookbook]).  Focus
 is on 1) treating statistical models symbolically, 2) on briding the
 gap between symbolic mathematics and numerical computations and 3) on
 preparing teaching material.
-The \pkg{caracas} package is available from CRAN [@R]
-and its open-source development available at
-<https://github.com/r-cas/caracas>.  Several vignettes illustrating
-\pkg{caracas} are provided and they are also available online, see
-<https://r-cas.github.io/caracas/>.
-The reason we chose to focus on the \pkg{caracas} package will 
-be explained below. 
-
-<!-- ## The \pkg{caracas} package versus other computer algebra systems -->
+The \pkg{caracas} package is available from CRAN [@R].
+The open-source development version of \pkg{caracas} is available at
+<https://github.com/r-cas/caracas>.  
 
 Neither \pkg{caracas} nor \pkg{Ryacas} are as powerful as some
-of the large commercial computer algebra systems (CAS).  The virtue of
+of the larger commercial computer algebra systems (CAS).  The virtue of
 \pkg{caracas} and \pkg{Ryacas} lie elsewhere:
-(1) Tools like solving equations, summation, limits, symbolic linear
-   algebra, outputting in tex format etc. are directly available from
+(1) Mathematical tools like equation solving, summation, limits, symbolic linear
+   algebra, outputting in tex format etc.\ are directly available from
    within \proglang{R}.
 (2) The packages enable working with the same language and in the same
    environment as the user does for statistical analyses.
@@ -203,35 +197,48 @@ of the large commercial computer algebra systems (CAS).  The virtue of
    with limited economical means and thus contributing to United
    Nations sustainable development goals, cfr. [@UN17].
 
-With respect to freely available resources in a CAS context, we would
-like to draw attention to `WolframAlpha`, see
-<https://www.wolframalpha.com/>, which provides an online service for
-answering (mathematical) queries.\footnote{Need mention related
-R-packages? "Related Work"-section?}
-
-The paper is organized as follows: To make the paper self contained,
-Sec. \ref{sec:primer} contains a short introduction to
-`caracas`. Sec. \ref{sec:teaching} describes how `caracas` can be used
-in connection with preparing teaching material. In
-Sec. \ref{sec:statistics} we present a sample of statistical models
-where we believe that a symbolic treatment is a valuable supplement to
-a numerical in connection with teaching. In each subsection we make
-suggestions about activities for students. Lastly,
+The paper is organized as follows:\footnote{FINISH LATER} Sec. \ref{sec:primer} contains a
+short introduction to `caracas`. 
+Sec. \ref{sec:teaching} describes how
+`caracas` can be used in connection with preparing texts, e.g.\ teaching
+material. 
+Sec. \ref{sec:statistics} is the main section of the
+paper and here we present a sample of statistical models where we
+believe that a symbolic treatment is a valuable supplement to a
+numerical in connection with teaching. In each subsection we make
+suggestions about activities for students. 
+Lastly,
 Sec. \ref{sec:discussion} contains a discussion of the paper.
- 
+
+
+<!-- Verifying and helping with math derivations and computations -->
+
+<!-- Statistics, calculus and linear algebra -->
+
+<!-- Gradients; Hessians; Newton-rapson. -->
+
+<!-- Gradient descent; compute gradient as alternative to finite difference approach. -->
+
+
+```{r, echo=FALSE}
+get_pyobj <- function(object, ...){ ## WANT THIS?
+    object[[1]]
+}
+```
 
 # A short primer {#sec:primer}
 
-Readers are recommended to study the online documentation at
-<https://r-cas.github.io/caracas/>. However, a very short introduction
-is provided below to make this paper self contained.  The
-\pkg{caracas} package provides an interface from \proglang{R} to the
+This section provides a brief introduction to \caracas to make this
+paper self contained.  Readers are recommended to study the online
+documentation at <https://r-cas.github.io/caracas/>.
+The \caracas
+package provides an interface from \proglang{R} to the
 \proglang{Python} package \sympy\ [@sympy]. This means that SymPy is
 "running under the hood" of \proglang{R} via the \pkg{reticulate}
 package [@reticulate].  The \sympy\ package is mature and robust with
 many users and developers.
 
-A symbol in \caracas\ is a list with a `pyobj` slot and the class
+A  \caracas\ symbol is a list with a `pyobj` slot and the class
 `caracas_symbol`.  The `pyobj` is an an object in \proglang{Python}
 (often a \sympy\ object).  As such, a symbol (in \proglang{R})
 provides a handle to a \proglang{Python} object.  In the design of
@@ -239,82 +246,109 @@ provides a handle to a \proglang{Python} object.  In the design of
 user should not be concerned with, but it is worthwhile being aware of
 the distinction.
 
-There are several ways of creating symbols. One is with `def_sym()` which
-declares the symbol in \proglang{R} and in
-\proglang{Python}:\footnote{Should be stringent: R objects and R
-expressions on one side. Should we call them R-symbols. Is it then
-SymPy objects or Python objects on the other? SymPy documentations
-writes that all objects in SymPy are Python objects. }
-
-
-
+One way of defining a symbol is with `def_sym()` which declares the
+symbol in \proglang{R} and in \proglang{Python}. A symbol can also be 
+ defined in terms of other symbols: 
+Define symbols `s1` and `s2` and define symbol `s3` in terms of `s1` and `s2`:
 ```{r}
-## Define symbols and assign in global environment: 
 def_sym(s1, s2) ## Note: 's1' and 's2' exist in both R and Python
-s1
-## Create new symbol from existing ones
-s3 <- s1 * s2
-s3 ## Note: 's3' is a symbol in R; no corresponding object in Python
+get_pyobj(s1)
+s3_ <- s1 * s2   ## Note: 's3' is a symbol in R; no corresponding object in Python
+get_pyobj(s3_)
 ```
 
-The \caracas\ object `s3` is a list with a `pyobj` slot and the class `caracas_symbol`:
+The underscore in `s3_` indicates that this expression 
+is defined in terms of other symbols. This convention is used through out the paper.
+Next express `s1` and `s2` in terms of symbols `u` and `v` (which are created on the fly):
 ```{r}
-str(s3)
+s4_ <- subs(s3_, c("s1", "s2"), c("u+v", "u-v"))
+s4_
 ```
 
-The call `def_sym(s1, s2)` above is a short-hand for the using 
-the `symbol()` function:
+Another way of creating a `caracas` symbol is from an `R` object:
 ```{r}
-s1 <- symbol("s1") # LHS s1: R object; RHS 's1': Python object
-s2 <- symbol("s2")
+v <- c("v1", "v2")
+as_sym(v) ## A 2 x 1 matrix
 ```
 
-<!-- Note \caracas\ and \sympy\ symbols need not have the same name: -->
-<!-- ```{r, eval=FALSE} -->
-<!-- a <- symbol("b") -->
-<!-- a$pyobj -->
-<!-- b <- symbol("a") -->
-<!-- b$pyobj -->
-<!-- ``` -->
+## Brindging a gap - From caracas to R and vice versa
 
-
-<!-- We can further exemplify that objects in \proglang{R} and \proglang{Python} do not -->
-<!-- necessarily have identical identifiers.  -->
-
-Note \caracas\ and \sympy\ symbols need not have the same name:
-We look into a symbol, and to make the
-distinction clear we use different names. 
+A `caracas` expression can be coerced to an `R` expression and subsequently evaluated numerically.
 
 ```{r}
-# Create a symbol 'b1' corresponding to an entity called 'a' in SymPy:
-b1 <- symbol("a")
-b1
-# A new symbol can be created as:
-b2 <- b1 + 1
-b2
+s4. <- as_expr(s4_)
+s4.
+eval(s4., list(u=1, v=2))
 ```
 
-One \caracas\ symbol can be substituted with another with (which here
-has the side effect that new \caracas\ symbols `u` and `v` are
-created):
+To facilitate the connection between symbolic and numerical mathematics, a `caracas` expression can be coerced to an `R` function:
+```{r}
+f <- as_func(s4_)
+f
+f(1, 2)
+```
+
+
+## Calculus with caracas
+
+
+<!-- # https://math.stackexchange.com/questions/918305/exercise-problem-with-one-maximum-two-minima-and-one-saddle-points/918344#918344 -->
+
+Next we define `p` to be a polynomial in `x` (`p` becomes a symbol because `x` is)
+```{r}
+def_sym(x)
+p <- 1 - x^2 + x^3 + x^4/4 - 3 * x^5 / 5 + x^6 / 6
+p
+```
+
+Notice that there is no corresponding \sympy\ object called `p`; the
+`pyobj` is a polynomial in `x`. 
+The gradient of `p` is
 
 ```{r}
-s4 <- subs(s3, c("s1", "s2"), c("u+v", "u-v"))
-s4
+grad <- der(p, x)
+grad
 ```
 
-Coercion from \caracas\ symbols to \r\ expressions and vice versa is straight forward:
+Stationary points of $p$ can be found by finding roots of the gradient. In this simple case we can factor the gradient
 ```{r}
-as_expr(s4)
-as_sym(as_expr(s4))
+factor_(grad)
+```
+
+which shows that stationary points are $-1$, $0$, $1$ and $2$. To
+investigate if extreme points are local minima, local maxima or saddle
+points, we compute the Hessian and evaluate the Hessian in the
+stationary points.
+
+```{r}
+hessian <- der2(p, x)
+hessian
+stationary_points <- c(-1, 0, 1, 2)
+as_func(hessian) (stationary_points)
 ```
 
 
-# Preparing teaching material {#sec:teaching}
 
-Typing mathematics in lecture notes and slides can be tedious and is
-hence error prone. Here `caracas` is of great help.\footnote{Reference
-to R-markdown etc.}
+The sign of the Hessian in these points gives that $x=-1$ and $x=12$
+are local minima, $x=0$ is a local maximum and $x=1$ is a saddle
+point.
+
+
+In general we can find the stationary symbolically and evaluate the Hessian (output omitted)
+```{r, results='hide'}
+sol <- solve_sys(grad, x)
+lapply(sol, function(s) subs(hessian, s)) 
+```
+
+
+
+# Preparing mathematical documents {#sec:teaching}
+
+
+<!---
+https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#show-a-verbatim-inline-expression
+--->
+
 
 ```{r, echo=F}
 rinline <- function(code){
@@ -323,291 +357,84 @@ rinline <- function(code){
 }
 ```
 
+The packages `Sweave` [@leisch:02] and `Rmarkdown` [@rmarkdown] provide
+integration of \LaTeX\ and other text formatting systems into \r\ helping to produce 
+text document with \r\ content. In a similar vein, \caracas\ provides an integration
+of computer algebra into \r\ and in addition, \caracas\ also facilitates creation
+of documents with mathematical content without e.g.\ typing tedious
+\LaTeX\ instructions.
+
+A \LaTeX\ rendering of the \caracas\ symbol `p` is obtained by typing
+ `` $$p(x) = `r knitr::inline_expr("tex(p)")`$$ `` 
+$$
+p(x) = `r tex(p)`
+$$
+
+Create a symbolic matrix and its inverse:
 ```{r}
 M <- matrix_sym(2, 2, "m")
+Minv <- inv(M)
 ```
 
-<!---
-https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#show-a-verbatim-inline-expression
---->
-
-Typing `` $$M = `r knitr::inline_expr("tex(M)")`$$ ``
+Default printing of `M` is 
+```{r}
+M
+```
+but typing `` $$M = `r knitr::inline_expr("tex(M)")`$$ ``
 produces the result 
 $$
 M = `r tex(M)`
 $$
 
-This can be exploited, e.g. as demonstrated in the following examples:
-
+The inverse of $M$ contains the determinant of $M$ as denominator in each entry. This can be exploited as
 ```{r}
-Minv <- inv(M)
-denom <- denominator(Minv[1, 1])
-Minv_fact <- mat_factor_div(Minv, denom)
+Minv_fact <- as_factor_list(1 / det(M), simplify(Minv * det(M)))
+Minv_fact
 ```
-
-Typing `` $$M\inv = `r knitr::inline_expr("tex(Minv)")`$$ `` produces
-
-$$
-M\inv = `r tex(Minv)`
-$$
-
-whereas typing `` $$M\inv = `r knitr::inline_expr("tex(Minv_fact)")`$$ `` produces this:
+Typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv_fact)")`$$ `` produces this:
 
 $$
 M\inv = `r tex(Minv_fact)`
 $$
 
-In this situation we could also have defined `Minv_fact` using 
-the expression `as_factor_list(1/denom, Minv*denom)` instead. 
+Finally we illustrate creation of additional mathematical expressions:
 
+```{r}
+def_sym(x, n)
+y <- (1 + x/n)^n
+lim(y, n, Inf)
+```
+
+Typing `` $$y = `r knitr::inline_expr("tex(y)")`$$ `` etc.\ gives
+$$
+y = `r tex(y)`, \lim_{n->\infty} y = `r lim(y, n, Inf)`
+$$
 
 
 # Statistics examples {#sec:statistics}
 
 
 
-## Studying a covariance function - and some limitations of `caracas`
-
-As mentioned in Sec.\ \ref{sec:introduction}, `caracas` is not as
-powerful as some of the large commercial computer algebra systems
-(CAS). One obvious restriction is that `caracas` can not operate on
-general $n \times m$ matrices (although \sympy\ has support for 
-symbolic matrices, the best way to implement 
-this in \pkg{caracas} is not yet found). 
-Instead, $n$ and $m$ must be set to
-some integer number. Hence it is difficult to study the asymptotic
-behaviour when a matrix dimension goes to infinity.  
 
 
-### A compound symmetry covariance structure
+## Logistic regression {#sec:logistic}
 
-```{r echo=F}
-n <- 3
-```
-
-To be specific we
-consider the following example: Consider random variables $x_1,\dots, x_n$
-where $\var(x_i)=v^2$ and $\cov(x_i, x_j)=v^2 r$ for $i\not = j$,
-where $|r|\le1$. Suppose interest is in the average $\var(\bar x)$ where $\bar x =
-\sum_i x_i / n$ when $n$ goes to infinity. One approach is as follow:
-Let $1$ denote an $n$-vector of $1$'s and let $V$ be an $n \times
-n$ matrix with $v^2$ on the diagonal and $v^2 r$ outside the
-diagonal. That is, for $n=`r n`$:
-
-```{r echo=F}
-R <- as_sym(toeplitz(c(1, rep("r", n-1))))
-```
-
-\begin{equation}
-  \label{eq:1}
-  V= v^2 R = v^2 `r tex(R)`. 
-\end{equation}
-
-Then $\var(\bar x)=\frac 1 {n^2} 1\transp V 1$. The answer lies
-in studying the behaviour of this expression and `caracas` can not
-handle this directly.
-
-What can be done in `caracas` is the following: The variance of a sum $x. = \sum_i x_i$ 
-is $\var(x.) = \sum_i \var(x_i) + 2 \sum_{ij:i<j} \cov(x_i,
-x_j)$. For the specific model, one must by hand find that 
-$$
-\var(x.) = n v^2 + 2 v^2 r n (n-1) / 2 = n v^2 (1 + r (n-1)),
-\quad
-  \var(\bar x) = v^2 (1 + (n-1)r)/n
-$$
-which follows from that the sum of the upper
-triangle of the covariance matrix is $v^2rn(n-1)/2$. 
-
-```{r}
-def_sym(v2, r, n)
-var_sum <- n * v2 * ( 1 + r * (n - 1))
-var_avg <- var_sum / n^2
-var_avg %>% simplify()
-```
-
-Now we can study the limiting behaviour of the variance $\var(bar x)$ in different situations:
-
-```{r}
-lim_1 <- lim(var_avg, n, Inf)         ## When sample size n goes to infinity
-lim_2 <- lim(var_avg, r, 0, dir='+')  ## When correlation r goes to zero
-lim_3 <- lim(var_avg, r, 1, dir='-')  ## When correlation r goes to one
-```
-
-For a given correlation $r$ it is instructive to investigate how many
-independent variables $k$ the $n$ correlated variables correspond to
-(in the sense of the same variance of the average), because the $k$
-can be seen as a measure of the amount of information in data.  Also,
-one might study how $k$ behaves as function of $n$ when $n \rightarrow
-\infty$. That is we must solve $v^2 (1 + (n-1)r)/n = v^2/k$ for $k$
-and find $\lim_{n\rightarrow\infty} k$:
-
-```{r}
-def_sym(k)
-k <- solve_sys(var_avg - v2 / k, k)[[1]]$k
-#k <- solve_sys(var_avg, v2 / k, k)[[1]]$k  ## FIXME: Fails with three arguments
-l <- lim(k, n, Inf)
-```
-
-The findings above are:
-\[
-\lim_1 = `r tex(lim_1)`, \quad
-\lim_2 = `r tex(lim_2)`, \quad
-\lim_3 = `r tex(lim_3)`, \quad
-k = `r tex(k)`, \quad 
-l = `r tex(l)`
-\]
-
-With respect to $k$, it is illustrate to supplement the symbolic
-computations above with numerical evaluations:
-
-```{r}
-dat <- expand.grid(r=c(.1, .2, .5),
-                   n=c(10, 50))
-k. <- apply(dat, 1,
-            FUN=function(row){
-                subs(k, c("r", "n"), row) |> as_expr()
-            })
-dat$ri <- 1/dat$r
-dat$k <- k.
-dat
-```
-
-### Possible topics for students
-
-It is illustrative to study such behaviours for other covariance
-functions. One choice for students could be e.g.  $\cov(x_i,
-x_j)=v^2 r^{|i-j|}$; another could be  $\cov(x_i,
-x_j)=v^2 r$ if $|i-j| = 1$ and $\cov(x_i,
-x_j)=0$ if $|i-j| > 1$. 
-
-
-
-## Linear models 
-
-
-In the following we consider linear normal models of the form $y \sim
-N_n(\mu, \sigma^2 I)$ where $y=(y_1, \dots, y_n)$ is a random vector
-and the mean vector $\mu$ is an element in a $q$-dimensional linear
-subspace $L$ of $R^n$.  In practice, $L$ is specified as the
-columnspace $C(X)$ of a (usually full rank) $n\times q$ matrix $X$, so
-the mean has the form $\mu=X\bb$ where $X$ is a model matrix and $\bb$
-is a vector of regression parameters. See e.g.\ [@reference-linear-models] for
-details.\footnote{REFERENCE to any book on linear normal models.}
-
-A matrix algebra approach to such models can go along the following
-lines: We wish to find the vector $\hat \bb$ that minimizes $||y-X
-\bb||^2$ which leads to the normal equations $(X\transp X)\bb =
-X\transp y$. If $X$ has full rank, the unique solution to the normal
-equations is $\hat \bb = (X^\top X)^{-1} X^\top y$. Hence the
-estimated mean vector is $\hat \mu = X\hat\bb=X(X^\top X)^{-1} X^\top
-y$.  Another (but closely related) approach is geometrical: $\hat \mu$
-is the orthogonal projection of $y$ onto the column space $C(X)$,
-and the projection matrix is given as $P=X(X^\top X)^{-1} X^\top$, so
-$\hat \mu = P y = X\hat\bb=X(X^\top X)^{-1} X^\top y$ as before.  The
-estimated parameter vector $\hat\bb$ is a linear function of $y$ and
-is normal $\hat\bb \sim N_q(\bb, \sigma^2 (X\transp X)\inv)$.  Since
-$P$ is an orhogonal projection matrix, $P$ is symmetric and idempotent
-with rank $q$. Hence $Py \sim N_n(\mu, \sigma^2 P)$ follows a singular
-$n$ dimensional normal distribution. Similarly, $(I-P)y \sim N(0,
-\sigma^2(I-P))$. 
-
-Such a matrix approach is very brief and concise, but the matrix
-algebra also obscures what is computed. Numerical examples are useful
-for some aspects of the computations but not for other. In this
-respect symbolic computations can be enlightening.  We will
-demonstrate such examples in the following.
-
-
-### One-way analysis of variance (one-way anova) {#one-way}
-
-Consider one-way analysis of variance (ANOVA) with 
-three groups and two replicates per group.
-
-```{r}
-n_grp <- 3 # Number of groups
-n_rpg <- 2 # Number of replicates per group
-grp <- rep(paste0("g", seq_len(n_grp)), each = n_rpg)
-dat <- expand.grid(grp = grp)
-X <- as_sym(model.matrix(~ grp, data = dat))
-y <- vector_sym(nrow(X), "y")
-```
-
-We compute the usual quantities needed for finding the least squares
-estimate of the regression coefficients. 
-Symbolic computations are not needed for quantities involving only the model matrix $X$, but when it comes to computations involving $y$, a symbolic
-treatment of $y$ is useful:
-
-```{r}
-XtX <- t(X) %*% X
-XtXinv <- inv(XtX)
-Xty <- t(X) %*% y
-b_hat <- XtXinv %*% Xty
-y_hat <- X %*% b_hat
-```
-
-<!---
-	X^\top X = `r texr(XtX)`, \quad 
-	(X^\top  X)^{-1} = `r texr(mat_factor_div(XtXinv, n_rpg))`,
---->
-
-\[ 
-	X = `r texr(X)`, \quad 
-  X^\top y = `r tex(Xty)`,
-\]
-\[
-	\hat{\bb} = `r tex(mat_factor_div(b_hat, n_rpg))` ,
-	\quad
-	\hat{y} = `r tex(mat_factor_div(y_hat, n_rpg))`,
-\]
-where dots represent zero. 
-
-
-Hence $X^\top y$ consists of the sum of all observations, the sum of
-observations in group 2 and the sum of observations in group 3.
-Similarly, $\hat\bb$ consists of the average in group 1, the average
-in group 2 minus the average in group 1 and the average in group 3
-minus the average in group 1. Fitted values are simply group
-averages. This can be illustrative for students to see.
-
-The orthogonal projection matrix onto the column space 
-of $X$ is:
-```{r}
-P <- X %*% XtXinv %*% t(X)
-```
-
-\[
-P = `r texr(mat_factor_div(P, n_rpg))`
-\]
-
-### Possible topics for students
-
-1. Related to Sec. \ref{one-way}: Verify that $(I-P)y$ are not all
-	independent and that the correlation between is small and becomes
-	smaller as the number of subjects per group increase. Verify that
-	$P X = X$ and thus $(I - P)X = 0$. Verify also that the rank of
-	$P$ equals the number of groups, which is `r n_grp`. A model matrix
-	also spanning $L$ is `X_2 = model.matrix(~ -1 + f)`. Investigate how
-	the quantities above look for this choice of model matrix.
-
-1. Construct a balanced two way analysis of variance (two-way anova), 
-  first only with main effects and then with an interaction and compare the 
-  estimates.
-
-
-## Logistic regression
-
-In the following we consider a logistic regression model: $y_i \sim
+In the following we go through details of a logistic regression model,
+see e.g.\ [@mccullagh:etal:89] for a classical description of logistic
+regression.  Observables are binomially distributed, $y_i \sim
 \bin(p_i, n_i)$. The probability $p_i$ is connected to a a $q$-vector
 of covariates $x_i=(x_{i1}, \dots, x_{iq})$ and a $q$-vector of
 regression coefficients $b=(b_1, \dots, b_q)$ as follows: Define $s_i
-= x_i \cdot b$ to be the linear predictor. The probability $p_i$ is
-related to $s_i$ as $\logit(p_i) = \log(p_i/(1-p_i)) = s_i$. 
-See e.g.\ [@mccullagh:etal:89] for a classical description of logistic regression.
+= x_i \cdot b$ to be the linear predictor. The probability $p_i$ can
+be related to $s_i$ in different ways, but the most commonly employed
+is as $\logit(p_i) = \log(p_i/(1-p_i)) = s_i$.
 
-As an example, consider the `budworm` data from the `doBy`
-package. The data shows the number of killed moth tobacco budworm
-\emph{Heliothis virescens} for each of 6 doses of the pyrethroid
-trans-cypermethrin differentiated with respect to sex.
+As an example, consider the `budworm` data from the `doBy` package.
+The data shows the number of killed moth tobacco budworm
+\emph{Heliothis virescens}.  Batches of 20 moths of each sex were
+exposed for three days to the pyrethroid and the number in each batch
+that were dead or knocked down was recorded.
+
 
 ```{r}
 budworm <- doBy::budworm
@@ -615,42 +442,42 @@ bud <- subset(budworm, sex == "male")
 bud
 ```
 
-Below we focus only on male budworms and the mortality is illustrated in Fig. \ref{fig:budworm}. 
-On the $y$-axis we have the empirical logits $\log(\text{ndead}/(\text{ntotal}-\text{ndead}))$.\footnote{FIXME: These are not quite empirical logits; need nicer y-axis.}
+Below we focus only on male budworms and the mortality is illustrated
+in Fig. \ref{fig:budworm}.  On the $y$-axis we have the empirical
+logits, i.e. $\log(\text{ndead} + 0.5 /(\text{ntotal}-\text{ndead} + 0.5))$.
 
 ```{r budworm, fig.cap="\\label{fig:budworm}Insecticide mortality of the moth tobacco budworm.", echo=F, fig.height=2, fig.width=6}
 library(ggplot2)
 theme_set(theme_bw())
-p1<-bud  %>% ggplot(aes(x=dose, y=log(ndead / (ntotal - ndead)))) +
-    geom_point() + geom_line()
-p2<-bud  %>% ggplot(aes(x=log2(dose), y=log(ndead / (ntotal - ndead)))) +
-    geom_point() + geom_line()
+p1<-bud  %>% ggplot(aes(x=dose, y=log((ndead+0.5) / (ntotal - ndead + 0.5)))) +
+    geom_point() + geom_line() + labs(y = "Empirical logits")
+p2<-bud  %>% ggplot(aes(x=log2(dose), y=log((ndead + 0.5) / (ntotal - ndead + 0.5)))) +
+    geom_point() + geom_line() + labs(y = "Empirical logits")
 cowplot::plot_grid(p1, p2, nrow=1)
 ```
 
+### Each component of the likelihood {#sec:logistic-each-component}
 
-
-
-### Each component of likelihood {#sec:logistic-each-component}
-
-The log-likelihood is $\log L=\sum_i y_i \log(p_i) + (n_i-y_i) \log(1-p_i) =
-\sum_i \log L_i$, say. With $\log(p_i/(1-p_i)) = s_i$ we have $p_i=1 / (1+
-\exp(-s_i))$ and $\frac d {ds_i} p_i = \frac{\exp(- s_i)}{\left(1 +
-\exp(- s_i)\right)^{2}}$. With $s_i = x_i\cdot b$, we have $\frac d {db}
-s_i = x_i$.
+The log-likelihood is $\log L=\sum_i y_i \log(p_i) + (n_i-y_i)
+\log(1-p_i) = \sum_i \log L_i$, say. With $\log(p_i/(1-p_i)) = s_i$ we
+have $p_i=1 / (1+ \exp(-s_i))$ and $\frac d {ds_i} p_i = \frac{\exp(-
+s_i)}{\left(1 + \exp(- s_i)\right)^{2}}$. With $s_i = x_i\cdot b$, we
+have $\frac d {db} s_i = x_i$.
 
 Consider the contribution to the total log-likelihood from the $i$th
-observation which is $l_i = y_i \log(p_i) + (n_i-y_i) \log(1-p_i)$. 
-Since we are focusing on one observation only, we shall ignore the subscript $i$ 
-in this section. The log-likelihood and its derivative is:
+observation which is $l_i = y_i \log(p_i) + (n_i-y_i) \log(1-p_i)$.
+Since we are focusing on one observation only, we shall ignore the
+subscript $i$ in this section. The log-likelihood and its derivative
+are:
 
 ```{r}
 def_sym(y, n, p, x, s, b)
 logL_ <- y * log(p) + (n - y) * log(1 - p)
-der(logL_, p)
+gp_ <- der(logL_, p)
+gp_
 ```
 
-The underscore in `logL_` indicates that this expression 
+The underscore in `logL_` and elsewhere indicates that this expression 
 is defined in terms of other symbols. This is in contrast 
 to the free variables, e.g.\ `y`, `p`, and `n`.
 With $s = \log(p/(1-p))$ we can find $p$ as:
@@ -660,18 +487,19 @@ p_ <- sol_[[1]]$p
 p_
 ```
 
-Again, notice that `p_` depends on the free symbol `s`, 
-hence the underscore (`_`) in its name.
+<!-- Again, notice that `p_` depends on the free symbol `s`,  -->
+<!-- hence the underscore (`_`) in its name. -->
 The log-likelihood and its derivative as
 functions of $s$ become:
 
 ```{r}
 logL2_ <- subs(logL_, p, p_)
 logL2_
-der(logL2_, s) |> simplify()
+gs_ <- der(logL2_, s) |> simplify()
+gs_
 ```
 
-Lastly we connect $s$ to the regression coefficients and 
+Lastly we connect $s$ to the regression coefficients $b$ and 
 compute the score function, $S$, and the Hessian, $H$:
 
 ```{r}
@@ -686,22 +514,14 @@ S_
 H_
 ```
 
+Since $x$ and $\bb$ are vectors, the term `x*b` above should be read
+ as the inner product $x \cdot \bb$ (or as $x\transp \bb$ in matrix
+ notation). Also, since $x$ is a vector, the term `x^2` above should
+ be read as the outer product $x \otimes x$ (or as $x x\transp$ in
+ matrix notation).  More insight in the structure is obtained by
+ letting $b$ and $x$ be $2$-vectors. (to save space, only the score
+ function is shown in the following):
 
-```{r}
-def_sym(a,b)
-a <- b + b^2
-subs(a, b, 2) ## FAILS
-subs(a, "b", 2) ## WORKS
-subs(a, cbind(b), 2) ## WORKS
-```
-
-Since $x$ and $\bb$ are vectors the term `x*b` above should be
- read as the inner product $x \cdot \bb$ (or as $x\transp \bb$
- in matrix notation). Also, since $x$ is a vector, the term `x^2`
- above should be read as the outer product $x \otimes x$ (or as
- $x x\transp$ in matrix notation). 
-
-More insight in the structure is obtained by letting $b$ and $x$ be $2$-vectors:
 ```{r}
 b <- vector_sym(2, "b")
 x <- vector_sym(2, "x")
@@ -709,95 +529,93 @@ s_ <- sum(x * b)
 logL3_ <- subs(logL2_, s, s_)
 ```
 
-Again, we compute the score function, $S$, and Hessian, $H$:
+Again, we compute the score function $S$ by differentiation with respect to the regression parameters. This gives a vector valued funtion of the regression parameters and data.
 
 ```{r}
 S_ <- score(logL3_, b) |> simplify()
-H_ <- hessian(logL3_, b) |> simplify()
 ```
 
-\begin{align}
-S &= `r texr(S_)`, \\
-H &= `r texr(H_)`
-\end{align}
-
-
-Next, insert data, h e.g.\ $x_{1}=1$, $x_{2}=2$, $y=9$, $n=20$ as
+Next, insert data, e.g.\ $x_{1}=1$, $x_{2}=2$, $y=9$, $n=20$ to obtain a function of the regression parameters only:
 ```{r}
-S. <- subs(S_, c("x1", "x2", "y", "n"), c(1, 2, 9, 20))
-H. <- subs(H_, c("x1", "x2", "y", "n"), c(1, 2, 9, 20))
+nms <- c("x1", "x2", "y", "n")
+vls <- c(1, 2, 9, 20)
+S. <- subs(S_, nms, vls)
 ```
 
-Note, how the expression depending on other symbols, `S_`, is 
-named `S.` to indiciate that data has been inserted.
+Note how the expression depending on other symbols, `S_`, is 
+named `S.` to indiciate that data has been inserted:
 
 \begin{align}
-S &= `r texr(S.)`, \\
-H &= `r texr(H.)`
+\texttt{S\_} = `r texr(S_)`, \quad S. = `r texr(S.)`
 \end{align}
 
-Notice that $S$ and $H$ depend only on the unknown regression
-coefficients. 
+An alternative is to create \r\ functions and subsequently set default values
+```{r}
+S.. <- as_func(S_, order=c("b1", "b2", "x1", "x2", "y", "n"))
+S... <- doBy::set_default(S.., nms, vls)
+args(S...)
+```
+
+
 The score and Hessian for a full data set is the sum of
 such terms and it is a straight forward \proglang{R} task to construct these
-sums. 
+sums.  In either case the result is a function of the regression coefficients
+which can be used in connection with numerical optimization. This
+could be a Newton-Rapson algorithm (which would also require the
+Hessian as function) or a coordinate descent or similar method.
 
 
-### Bridging the gap - Preparing for numerical evaluation
+```{r}
+Sv <- Vectorize(S.., vectorize.args = c("x1", "x2", "y", "n"))
 
-We prepare the full score function, $S$, and Hessian, $H$, for 
-all observations:
+aa <- list(x1=rep(1,nrow(bud)), x2=log2(bud$dose), y=bud$ndead, n=bud$ntotal)
+
+Sv2<-doBy::set_default(Sv, aa)
+
+Sv2(1,1)
+```
+
+
+
+<!--
+
+
+### Bridging the gap - towards numerical evaluation
+
+For illustration, we prepare the full score function, $S$, for 
+all observations. 
+One option is to substitute values into a `caracas` expresion:
+```{r}
+S.list <- lapply(seq_len(nrow(bud)), function(r){
+    vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r])
+    subs(S_, nms, vls)
+})
+
+S. <- Reduce(`+`, S.list)
+S_fun1 <- as_func(S.)
+```
+
+Another option is to substitute values into \r\ functions:
 
 ```{r}
 S.list <- lapply(seq_len(nrow(bud)), function(r){
-    subs(S_, c("x1", "x2", "y", "n"), 
-         c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r]))
+    vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r])
+    doBy::set_default(S.., nms, vls)
 })
-S. <- Reduce(`+`, S.list)
 
-H.list <- lapply(seq_len(nrow(bud)), function(r){
-    subs(H_, c("x1", "x2", "y", "n"), 
-         c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r]))
-})
-H. <- Reduce(`+`, H.list)
-```
-
-These quantities can be used in a numerical optimisation, 
-see Sec. \ref{sec:students-logit}.
-
-<!---
-```{r
-newton_rapson <- function(b., S., H.){
-    it <- 0
-    repeat{
-        S_i <- as_expr(subs(S., b, b.))
-        H_i <- as_expr(subs(H., b, b.))  
-        b2. <- b. - solve(H_i, S_i)
-        if (max(abs(b2. - b.)) < 1e-4) break
-        b. <- b2.
-        it <- it + 1
-    }
-    list(b=as.numeric(b.), Vb=-solve(H_i), H=H_i, it=it)
+S_fun2 <- function(b1, b2){
+  lapply(S.list, function(s) s(b1, b2)) |> Reduce(`+`, x=_)
 }
 ```
 
-
-```{r
-nr <- newton_rapson(c(-3, 1), S., H.)
-nr$b
-nr$Vb
+```{r}
+S_fun1(1,2) |> as.numeric()
+S_fun2(1,2) |> as.numeric()
 ```
-
-```{r
-mm <- glm(cbind(ndead, ntotal - ndead) ~ log2(dose), data = bud, family = binomial())
-summary(mm) %>% coef()
-vcov(mm)
-```
---->
+-->
 
 
-
-### All of the likelihood {#sec:logistic-all-likelihood}
+### The total likelihood {#sec:logistic-all-likelihood}
 
 An alternative to the approach above is to specify the full likelihood directly:
 
@@ -838,6 +656,10 @@ H_ <- hessian(logL3_, b)
 ```
 
 
+
+
+
+
 ```{r, include=FALSE, echo=FALSE}
 # S_1 <- S_
 # S_1 <- subs(S_1, X[, 1], rep(1, N))
@@ -847,6 +669,12 @@ H_ <- hessian(logL3_, b)
 # S_1 - S.
 # simplify(S_1 - S.)
 ```
+
+
+
+
+
+
 
 
 <!---
@@ -867,22 +695,307 @@ nr$b
 ```
 --->
 
+<!--
 ### Possible topics for students {#sec:students-logit}
 
 
-1. Related to Sec. \ref{sec:logistic-each-component}: Implement
+1. Related to Sec.\ \ref{sec:logistic-each-component}: Implement
    Newton-Rapson to solve the likelihood equations and compare your
    solution to the output from `glm()`.
 
-1. Related to Sec. \ref{sec:logistic-all-likelihood}: Used the above
+1. Related to Sec.\ \ref{sec:logistic-all-likelihood}: Used the above
    symbolic computations and substitute data in directly. 
    Compare to `S.` and `H.` from Sec. \ref{sec:logistic-each-component}.
+-->
 
-## Maximum likelihood under constraints
 
-In this section we illustrate constrained optimization using Lagrange multipliers, see e.g. [@reference-lagrange] for details.\footnote{REFERENCE is needed} 
+## Auto regressive models {#sec:ar1}
 
-### Independence model for $2\times 2$ contingency table
+### An $AR(1)$ model 
+
+```{r, echo=F}
+e <- as_sym(paste0("e", 0:3))
+x <- as_sym(paste0("x", 0:3))
+u <- vector_sym(3, "u")
+y <- vector_sym(3, "y")
+eu <- rbind(e, u)
+xy <- rbind(x, y)
+```
+
+```{r, echo=FALSE}
+L <- diff_mat(4, "-a")
+```
+
+In this section we study the auto regressive model of order $1$ (an AR(1) model), see
+e.g. [@shumway:etal:16], p.\ 75 ff.\ for details: 
+Consider random variables $x_1, x_2, \dots, x_n$ following a stationary zero mean AR(1) process
+
+\begin{equation}
+  \label{eq:ar1}
+  x_i = a x_{i-1} + e_i; \quad i=2, \dots, n
+\end{equation}
+
+where $e_i \sim N(0, v)$ and all $e_i$s are independent. Note that $v$ denotes the variance.
+The marginal distribution of $x_1$ is also assumed normal, and for the process to be stationary we must have $\var(x_1) = v / (1-a^2)$. Hence we can write $x_1 = \frac 1 {\sqrt{1-a^2}} e_1$. 
+
+```{r, ar_setup, echo=F}
+n <- 4
+def_sym(a)
+x <- vector_sym(n, "x")
+e <- vector_sym(n, "e")
+L <- diff_mat(n, "-a")
+L[1, 1] <- sqrt(1-a^2)
+```
+
+For simplicity of
+exposition, we set $n=4$. All terms $e_1, \dots, e_4$ are independent
+and $N(0, v)$ distributed.  Let
+$e=(e_1, \dots, e_4)$ and $x=(x_1, \dots x_4)$. Hence $e \sim N(0, v
+I)$.
+Isolating error terms gives
+
+\begin{displaymath}
+  e= `r inline_code(tex(e))` = `r inline_code(texr(L))` `r inline_code(tex(x))` = L x 
+\end{displaymath}
+
+Since
+$\mathbf{Var}(e)=v I$ we have $\mathbf{Var}(e)=v I=L \mathbf{Var}(x)
+L'$ so the covariance matrix of $x$ is $V=\mathbf{Var}(x) = v L^-
+(L^-)\transp$ while the concentration matrix (the inverse covariances
+matrix) is $K=v^{-1}L\transp L$.
+
+```{r, ar_setup}
+```
+
+```{r, include=FALSE}
+#v <- symbol("v", real = TRUE, positive = TRUE)
+## ask(v, "positive")
+## ask(v, "real")
+```
+
+
+```{r}
+def_sym(v)
+Linv <- inv(L)
+K <- crossprod_(L) / v
+V <- tcrossprod_(Linv) * v
+```
+
+```{r, echo=F, results="asis"}
+cat(
+  "\\begin{align} 
+    L\\inv &= ", texr(Linv), " \\\\ 
+    K &= ", texr(mat_factor_div(K, v)), " \\\\ 
+    V &= ", texr(mat_factor_mult(V, v)), " 
+  \\end{align}", sep = "")
+```
+
+The zeros in the concentration matrix $K$ implies a conditional
+independence restrstriction: If the $ij$th element of a concentration
+matrix is zero then $x_i$ and $x_j$ are conditionally independent
+given all other variables, see e.g. [@hojsgaard:etal:12], chap.\ 4 for
+details.\footnote{BETTER REFERENCE; Handbook of graphical models
+perhaps?}
+
+
+
+
+
+
+
+
+
+Next, we take the step from symbolic computations to numerical
+evaluations.  The joint distribution of $x$ is multivariate normal
+distribution, $x\sim N(0, K\inv)$. Let $W=x x\transp$ denote the
+matrix of (cross) products.  The log-likelihood is therefore (ignoring
+multiplicative constants) 
+$$ 
+\log L = \log \det(K) - x\transp K x = \log \det(K) - \trace(K W), 
+$$ 
+where we note that $\trace(KW)$ is the
+sum of the elementwise products of $K$ and $W$ since both matrices are
+symmetrical.
+
+```{r}
+logL <- log(det(K)) - sum(K * (x %*% t(x))) %>% simplify()
+```
+
+$$
+\log L = `r tex(logL)`
+$$
+
+
+### Bridging the gap - towards numerical evaluation 
+
+Next we illustrate how bridge the gap  from symbolic computations to numerical computations based on a dataset:
+For a specific data vector we get
+
+```{r}
+xt <- c(0.1, -0.9, 0.4, .0)
+logL. <- subs(logL, x, xt) 
+```
+
+$$
+\log L = `r tex(logL.)`
+$$
+
+The score function is computed and the score equation is solved with:
+```{r}
+parm <- list(a, v)
+S <- der(logL., parm) |> simplify()
+sol <- solve_sys(S, parm)
+sol
+```
+
+```{r, include=FALSE, eval=FALSE}
+# parm <- list(a, v)
+# S <- der(logL., parm) |> simplify()
+# # To get |a| < 1
+# S2 <- subs(S, a, "(exp(b)-1)/(exp(b)+1)") |> simplify()
+# sol <- solve_sys(S2, c("b", "v"))
+# sol
+# 
+# #b <- log((a-1)/(a+1))
+# #sol <- solve_sys(b, a)
+# 
+# 
+# #sol <- solve_sys(S, parm)
+# sol <- solve_sys(Sb, c("b", "v"))
+# sol
+```
+
+There are some possibilities for putting assumptions on variables
+in `caracas` (see the "Reference" vignette), but 
+it is not possible to restrict variables to only take values in $(-1, 1)$. 
+Hence, here we do that manually by only considering the solution with $|a|<1$:
+```{r}
+valid_sol <- sapply(sol, function(s) abs(as_expr(s$a)) < 1)
+sol <- sol[[which(valid_sol)]]
+sol
+```
+
+Alternatively, one can use \r\ for the numerical optimization, 
+and in \r\ the constraint on the parameter values can be imposed e.g.  
+in the `optim()` function:
+```{r}
+f_wrap <- as_func(logL., vec_arg = TRUE)
+par <- optim(c(a=0, v=1), f_wrap, lower=c(-.99, .01), upper=c(.99, 10),
+             method="L-BFGS-B", control=list(fnscale=-1))$par
+par
+```
+
+
+The same model can be fitted e.g.\ using \r's `arima()` function as
+```{r, eval=FALSE}
+arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
+```
+
+
+<!--
+### Possible topics for students [FIXME: Need more work]
+
+1. Find (approximate) stanard error and confidence interval for the parameter $a$.
+1. Modify the model in \eqref{eq:ar1} by setting $x_1 = a x_n + e_1$ and see what happens to the pattern of zeros in
+   the concentration matrix.
+1. Extend the AR(1) model to and $AR(2)$ model and investigate this model along the same lines as above.
+-->
+
+## Linear models -- one way analysis of variance {#one-way}
+
+
+A matrix algebra approach to e.g.\ linear models is very clear and
+concise. On the other hand, it can also be argued that matrix algebra
+obscures what is being computed. Numerical examples are useful for
+some aspects of the computations but not for other. In this respect
+symbolic computations can be enlightening. 
+
+
+Consider one-way analysis of variance (ANOVA) with 
+three groups and two replicates per group.
+
+```{r}
+n_grp <- 3 # Number of groups
+n_rpg <- 2 # Number of replicates per group
+dat <- expand.grid(rep=1:n_rpg, grp=paste0("g", 1:n_grp))
+X <- as_sym(model.matrix(~ grp, data = dat))
+y <- vector_sym(nrow(X), "y")
+b <- vector_sym(n_grp, "b")
+mu <- X %*% b
+```
+
+For the specific model we have random variables $y_1,\dots y_n$ where
+$n=`r n_grp * n_rpg`$. All $y_i$s are assumed independent and $y_i\sim
+N(\mu_i, v)$. The mean vector $\mu=(\mu_1,\dots,\mu_n)$ has the form given below (dots represent zero).
+
+$$
+y = `r tex(y)`, \quad X=`r texr(X)`, \quad b=`r tex(b)`, \quad  \mu = X b = `r tex(mu)`
+$$
+
+Above and elsewhere, dots represent zero. 
+The least squares estimate of $b$ is the  vector $\hat \bb$ that minimizes $||y-X
+\bb||^2$ which leads to the normal equations $(X\transp X)\bb =
+X\transp y$ to be solved. If $X$ has full rank, the unique solution to the normal
+equations is $\hat \bb = (X^\top X)^{-1} X^\top y$. Hence the
+estimated mean vector is $\hat \mu = X\hat\bb=X(X^\top X)^{-1} X^\top
+y$. Symbolic computations are
+not needed for quantities involving only the model matrix $X$, but
+when it comes to computations involving $y$, a symbolic treatment of
+$y$ is useful:
+
+```{r}
+XtX <- t(X) %*% X
+XtXinv <- inv(XtX)
+Xty <- t(X) %*% y
+b_hat <- XtXinv %*% Xty
+y_hat <- X %*% b_hat
+```
+
+\[
+X^\top y = `r tex(Xty)`,
+\quad
+\hat{\bb} = `r tex(mat_factor_div(b_hat, n_rpg))` ,
+\quad
+\hat{y} = `r tex(mat_factor_div(y_hat, n_rpg))`,
+\]
+
+Hence $X^\top y$ consists of the sum of all observations, the sum of
+observations in group 2 and the sum of observations in group 3.
+Similarly, $\hat\bb$ consists of the average in group 1, the average
+in group 2 minus the average in group 1 and the average in group 3
+minus the average in group 1. Fitted values are simply group
+averages. 
+The orthogonal projection matrix onto the column space 
+of $X$ is:
+```{r}
+P <- X %*% XtXinv %*% t(X)
+```
+
+<!-- \[ -->
+<!-- P = `r texr(mat_factor_div(P, n_rpg))` -->
+<!-- \] -->
+
+
+<!--
+### Possible topics for students
+
+1. Related to Sec. \ref{one-way}: Verify that the residuals $r=(I-P)y$ are not all
+	independent and that the correlation between is small and becomes
+	smaller as the number of subjects per group increase. Verify that
+	$P X = X$ and thus $(I - P)X = 0$. Verify also that the rank of
+	$P$ equals the number of groups, which is `r n_grp`. A model matrix
+	also spanning $L$ is `X_2 = model.matrix(~ -1 + f)`. Investigate how
+	the quantities above look for this choice of model matrix.
+
+1. Construct a balanced two way analysis of variance (two-way anova), 
+   first only with main effects and then with an interaction and compare the 
+   estimates.
+-->
+
+
+## Maximum likelihood under constraints - independence model for two-way contingency table {#sec:cont_tab}
+
+In this section we illustrate constrained optimization using Lagrange multipliers.
 
 ```{r echo=F}
 n_ <- c("n11", "n21", "n12", "n22")
@@ -898,13 +1011,13 @@ counts $n_{ij}$ and cell probabilities $p_{ij}$ for $i=1,2$ and $j=1,2$.
 tt
 ```
 
-The log likelihood is
+Under multinomial sampling, the log likelihood is
 $$
  l = \log L = \sum_{ij} n_{ij} \log(p_{ij}).
 $$
 
 Under the assumption of independence between rows and columns, the cell
-probabilities have the form\footnote{REFERENCE to log-linear models} 
+probabilities have the form, (see e.g.\ [@hojsgaard:etal:12], chap. 2)
 $$
 p_{ij}=u r_i s_j.
 $$ 
@@ -914,23 +1027,23 @@ must be imposed. One possibility is to require that $r_1=s_1=1$. The
 task is then to estimate $u$, $r_2$, $s_2$ by maximizing the log likelihood
 under the constraint that $\sum_{ij} p_{ij} = 1$.  This can be
 achieved using Lagrange multiplier where we instead solve the
-unconstrained optimization problem $\max_p L(p)$ where
+unconstrained optimization problem $\max_p Lag(p)$ where
 \begin{align}
-  L(p) &= -l(p) + a g(p) \quad \text{under the constraint that} \\
+  Lag(p) &= -l(p) + \lambda g(p) \quad \text{under the constraint that} \\
   g(p) &= \sum_{ij} p_{ij} - 1 = 0.
 \end{align}
-where $a$ is a Lagrange multiplier.
+where $a$ is a Lagrange multiplier.\footnote{Another name?}
 
 ```{r}
 n_ <- c("n11", "n21", "n12", "n22")
 n  <- as_sym(n_)
-def_sym(a, u, r2, s2)
+def_sym(u, r2, s2, lam)
 p <- as_sym(c("u", "u*r2", "u*s2", "u*r2*s2"))
 logL  <- sum(n * log(p))
-L  <- -logL + a * (sum(p) - 1) 
-vars <- list(u, r2, s2, a)
-gL <- der(L, vars)
-sol <- solve_sys(to_vector(gL), vars)
+Lag  <- -logL + lam * (sum(p) - 1) 
+vars <- list(u, r2, s2, lam)
+gLag <- der(Lag, vars)
+sol <- solve_sys(to_vector(gLag), vars)
 sol
 sol <- sol[[1]]
 ```
@@ -959,13 +1072,13 @@ H <- hessian(logL, list(u, r2, s2)) |> simplify()
 \]
 
 
-
+<!--
 ### Possible topics for students 
 
 1. A simple task is to consider a multinomial distribution with three categories, counts $y_i$ and cell probabilities $p_i$, $i=1,2,3$ where $\sum_i p_i=1$. For this model, find the maximum likelihood estimate for $p_i$. 
 
 1. Above, identifiability of the parameters was handled by not including $r_1$ and $s_1$ in the specification of $p_{ij}$. An alternative is to impose the restrictions $r_1=1$ and $s_1=1$, and this can also be handled via Lagrange multipliers.
-
+-->
 
 ```{r, echo=F}
 rv <- vector_sym(2, "r")
@@ -988,171 +1101,171 @@ sol <- sol[[1]]
 ```
 
 
-## Auto regressive and dynamic linear models
 
-### Autoregressive model, $AR(1)$ {#sec:ar1}
+## A compound symmetry covariance structure - and some limitations of `caracas` {#sec:cov_fun}
 
-```{r, echo=F}
-e <- as_sym(paste0("e", 0:3))
-x <- as_sym(paste0("x", 0:3))
-u <- vector_sym(3, "u")
-y <- vector_sym(3, "y")
-eu <- rbind(e, u)
-xy <- rbind(x, y)
+As mentioned in Sec.\ \ref{sec:introduction}, `caracas` is not as
+powerful as some of the large commercial computer algebra systems
+(CAS). One obvious restriction is that `caracas` can not operate on
+general $n \times m$ matrices. Actually, \sympy\ has support for 
+symbolic matrices, the best way to implement 
+this in \pkg{caracas} is not yet found. 
+Instead, $n$ and $m$ must be set to
+some integer number. Hence it is difficult to study the asymptotic
+behaviour when a matrix dimension goes to infinity.  
+
+
+```{r echo=F}
+n <- 3
 ```
 
-```{r, echo=FALSE}
-L <- diff_mat(4, "-a")
+To be specific we consider the following example: Consider random
+variables $x_1,\dots, x_n$ where $\var(x_i)=v$ and $\cov(x_i,
+x_j)=v r$ for $i\not = j$, where $0 \le r| \le1$. Suppose interest
+is in the average $\var(\bar x)$ where $\bar x = \sum_i x_i / n$ when
+$n$ goes to infinity. One approach is as follow: Let $1$ denote an
+$n$-vector of $1$'s and let $V$ be an $n \times n$ matrix with $v$
+on the diagonal and $v r$ outside the diagonal. That is, for $n=`r n`$:
+
+```{r echo=F}
+R <- as_sym(toeplitz(c(1, rep("r", n-1))))
 ```
 
-Consider the auto regressive model of order $1$ (an AR(1) model), see e.g. [@reference-time-series] for details:\footnote{REFERENCE is needed} 
+\begin{equation}
+  \label{eq:1}
+  V= v R = v `r tex(R)`. 
+\end{equation}
+
+Then $\var(\bar x)=\frac 1 {n^2} 1\transp V 1$. The answer lies
+in studying the limiting behaviour of this expression when $n\rightarrow \infty$ and `caracas` can not
+handle this directly.
+
+What can be done in `caracas` is the following: The variance of a sum $x. = \sum_i x_i$ 
+is $\var(x.) = \sum_i \var(x_i) + 2 \sum_{ij:i<j} \cov(x_i,
+x_j)$. For the specific model, one must by hand find that 
 $$
-x_i = a x_{i-1} + e_i; \quad i=1, \dots, n; \quad x_0 = e_0.
-$$ 
-For simplicity of exposition, we set $n=3$. All terms $e_0, \dots, e_3$ are independent and $N(0, v)$ distributed. Note that $v$ denotes the variance. 
-Let $e=(e_0, \dots, e_3)$ and $x=(x_0, \dots x_3)$. Hence $e \sim N(0, v I)$.
-Isolating error terms gives
+\var(x.) = n v + 2 v r n (n-1) / 2 = n v (1 + r (n-1)),
+\quad
+  \var(\bar x) = v (1 + (n-1)r)/n
 $$
-e= `r inline_code(tex(e))` = `r inline_code(texr(L))` `r inline_code(tex(x))` = L x
-$$
-Since $\mathbf{Var}(e)=v I$ we have $\mathbf{Var}(e)=v I=L
-\mathbf{Var}(x) L'$ so the covariance matrix of $x$ is
-$V=\mathbf{Var}(x) = v L^- (L^-)\transp$ while the concentration matrix
-(the inverse covariances matrix) is $K=v^{-1}L\transp L$.
+which follows from that the sum of the upper
+triangle of the covariance matrix is $vrn(n-1)/2$. 
+
 
 ```{r}
-L <- diff_mat(4, "-a")
-def_sym(v)
-Linv <- inv(L)
-K <- crossprod_(L) / v
-V <- tcrossprod_(Linv) * v
+def_sym(v, r, n) 
+var_sum <- n * v * ( 1 + r * (n - 1))
+var_avg <- var_sum / n^2
+var_avg %>% simplify()
 ```
 
-```{r, echo=F, results="asis"}
-cat(
-  "\\begin{align} 
-    L\\inv &= ", texr(Linv), " \\\\ 
-    K &= ", texr(mat_factor_div(K, v)), " \\\\ 
-    V &= ", texr(mat_factor_mult(V, v)), " 
-  \\end{align}", sep = "")
-```
-
-The zeros in the concentration matrix $K$ implies a conditional
-independence restrstriction: If the $ij$th element of a concentration
-matrix is zero then $x_i$ and $x_j$ are conditionally independent
-given all other variables, see e.g. [@reference-conditional-independence] for details.\footnote{REFERENCE needed. GMwR?}
-
-Next, we take the step from symbolic computations to numerical
-evaluations.  The joint distribution of $x$ is multivariate normal
-distribution, $x\sim N(0, K\inv)$. Let $W=x x\transp$ denote the
-matrix of (cross) products.  The log-likelihood is therefore (ignoring
-multiplicative constants) 
-$$ 
-\log L = \log \det(K) - x\transp K x = \log \det(K) - \trace(K W), 
-$$ 
-where we note that $\trace(KW)$ is the
-sum of the elementwise products of $K$ and $W$ since both matrices are
-symmetrical.
+Now we can study the limiting behaviour of the variance $\var(\bar x)$ in different situations:
 
 ```{r}
-logL <- log(det(K)) - sum(K * (x %*% t(x))) %>% simplify()
+lim_1 <- lim(var_avg, n, Inf)         ## When sample size n goes to infinity
+lim_2 <- lim(var_avg, r, 0, dir='+')  ## When correlation r goes to zero
+lim_3 <- lim(var_avg, r, 1, dir='-')  ## When correlation r goes to one
 ```
 
-$$
-\log L = `r tex(logL)`
-$$
-
-
-### Bridging the gap - Numerical evaluation 
-
-Next we illustrate how bridge the gap  from symbolic computations to numerical computations based on a dataset:
-For a specific data vector we get
+For a given correlation $r$ it is instructive to investigate how many
+independent variables $k$ the $n$ correlated variables correspond to
+(in the sense of the same variance of the average), because the $k$
+can be seen as a measure of the amount of information in data.  
+Moreover, one might study how $k$ behaves as function of $n$ when $n \rightarrow
+\infty$. That is we must (1) solve $v (1 + (n-1)r)/n = v/k$ for $k$
+and (2) find $\lim_{n\rightarrow\infty} k$:
 
 ```{r}
-xt <- c(0.1, -0.9, 0.4, .0)
-logL. <- subs(logL, x, xt) 
+def_sym(k)
+k <- solve_sys(var_avg - v / k, k)[[1]]$k
+lim_k <- lim(k, n, Inf)
 ```
 
-$$
-\log L = `r tex(logL.)`
-$$
+The findings above are:
+\[
+\lim_1 = `r tex(lim_1)`, \quad
+\lim_2 = `r tex(lim_2)`, \quad
+\lim_3 = `r tex(lim_3)`, \quad
+k = `r tex(k)`, \quad 
+lim_k = `r tex(lim_k)`
+\]
 
-The score function is computed and the score equation is solved with:
+With respect to $k$, it is illustrate to supplement the symbolic
+computations above with numerical evaluations:
+
 ```{r}
-parm <- list(a, v)
-S <- der(logL., parm) |> simplify()
-sol <- solve_sys(S, parm)
-sol
+dat <- expand.grid(r=c(.1, .2, .5), n=c(10, 50))
+k. <- apply(dat, 1,
+            FUN=function(row){
+                subs(k, c("r", "n"), row) |> as_expr()
+            })
+dat$ri <- 1/dat$r
+dat$k <- k.
+dat
 ```
+<!--
 
-Alternatively, one can use \r\ for the numerical optimization:
-```{r}
-g <- doBy::expr_to_fun(as_expr(logL.))
-g_wrap <- function(par){
-    g(exp(par[1]), par[2])
-}
-par <- optim(c(0, 0), g_wrap, control=list(fnscale=-1))$par
-par[1] <- exp(par[1])
-names(par) <- names(formals(g))
-par
-```
+### Possible topics for students
 
-```{r, include = FALSE}
-# lm(xt[-1] ~ 0 + xt[1:3])
-```
+It is illustrative to study such behaviours for other covariance
+functions. For example (1) $\cov(x_i,
+x_j)=v r^{|i-j|}$ and (2)   $\cov(x_i,
+x_j)=v r$ if $|i-j| = 1$ and $\cov(x_i,
+x_j)=0$ if $|i-j| > 1$. 
+
+-->
 
 
 
-For comparison we fit the same model with \r's `arima()` function:
-```{r}
-a1 <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
-a1
-unname(coef(a1) - par["a"])
-a1$sigma2
-unname(a1$sigma2 - par["v"])
-```
 
-[FIXME: Why do they not agree?]
+# Possible topics and smaller projects for students
 
 
-For a longer time series we get:
-```{r}
-N <- 50
-set.seed(20221231)
-xt <- arima.sim(list(order = c(1, 0, 0), ar = 0.5), n = N) |> as.numeric()
-L <- diff_mat(N, "-a")
-def_sym(v)
-K <- crossprod_(L) / v
-K. <- as_expr(K)
-
-W <- xt %*% t(xt)
-logL.func <- function(par) {
-  K.par <- eval(K., list(a = par[1], v = par[2]))
-  -(log(det(K.par)) - sum(K.par * W))
-}
-optim(c(1, 1), logL.func)$par
-```
-
-Compare this with
-```{r}
-a2 <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
-a2
-```
+1. Related to Sec. \ref{one-way}: Verify that the residuals $r=(I-P)y$ are not all
+	independent and that the correlation between is small and becomes
+	smaller as the number of subjects per group increase. Verify that
+	$P X = X$ and thus $(I - P)X = 0$. Verify also that the rank of
+	$P$ equals the number of groups, which is `r n_grp`. A model matrix
+	also spanning $L$ is `X_2 = model.matrix(~ -1 + f)`. Investigate how
+	the quantities above look for this choice of model matrix.
+	Construct a balanced two way analysis of variance (two-way anova), 
+	first only with main effects and then with an interaction and compare the 
+	estimates.
 
 
-### Possible topics for students [FIXME: Need more work]
+1. Related to Sec.\ \ref{sec:logistic-each-component}: Implement
+   Newton-Rapson to solve the likelihood equations and compare your
+   solution to the output from `glm()`. Related to Sec.\
+   \ref{sec:logistic-all-likelihood}: Used the above symbolic
+   computations and substitute data in directly.  Compare to `S.` and
+   `H.` from Sec. \ref{sec:logistic-each-component}.
 
-1. Related to Sec. \ref{sec:ar1}: An alternative to solving the
-   likelihood equations using \pkg{caracas} is to convert the \sympy
-   expression for $\log L$ into an R expression and then use one of Rs
-   built-in optimizer functions.\footnote{Det har jeg vist gjort}
-   Modify the model by setting $x_0 = a x_3 + e_0$. Do the same for a
-   longer time series and see what happens to the pattern of zeros in
-   the concentration matrix.
-1. [FIXME: Højere orden]
-1. [FIXME: Lade $n$ gå mod uendelig, og evt. wrappe enderne rundt]
 
-# Discussion and future work{#sec:discussion}
+1. Related to Sec.\ \ref{sec:cont_tab}: A simple task is to consider a
+   multinomial distribution with three categories, counts $y_i$ and cell
+   probabilities $p_i$, $i=1,2,3$ where $\sum_i p_i=1$. For this model,
+   find the maximum likelihood estimate for $p_i$.  Above,
+   identifiability of the parameters was handled by not including $r_1$
+   and $s_1$ in the specification of $p_{ij}$. An alternative is to
+   impose the restrictions $r_1=1$ and $s_1=1$, and this can also be
+   handled via Lagrange multipliers.
+
+
+1. Related to Sec.\ \ref{sec:ar1}: Find (approximate) stanard error
+   and confidence interval for the parameter $a$.  Modify the model in
+   \eqref{eq:ar1} by setting $x_1 = a x_n + e_1$ and see what happens
+   to the pattern of zeros in the concentration matrix. Extend the
+   AR(1) model to and $AR(2)$ model and investigate this model along
+   the same lines as above.
+
+1. Related to Sec.\ \ref{sec:cov_fun}: It is illustrative to study
+   such behaviours for other covariance functions. For example (1)
+   $\cov(x_i, x_j)=v r^{|i-j|}$ and (2) $\cov(x_i, x_j)=v r$ if $|i-j|
+   = 1$ and $\cov(x_i, x_j)=0$ if $|i-j| > 1$.
+
+
+
+# Discussion and future work {#sec:discussion}
 
 We have presented the \pkg{caracas} package and argued that the
 package extends the functionality of \proglang{R} significantly with respect to
@@ -1161,6 +1274,19 @@ that the package integrates nicely with \pkg{Rmarkdown},
 @rmarkdown, (e.g. with the `tex()` functionality) and thus
 supports creating of scientific documents and teaching material. As
 for the usability in practice we await feedback from users.
+
+
+With respect to freely available resources in a CAS context, we would
+like to draw attention to `WolframAlpha`, see
+<https://www.wolframalpha.com/>, which provides an online service for
+answering (mathematical) queries.
+
+
+
+Several vignettes illustrating
+\pkg{caracas} are provided and they are also available online, see
+<https://r-cas.github.io/caracas/>.
+
 
 # Acknowledgements
 
@@ -1174,4 +1300,121 @@ University, Denmark) for comments on this manuscript.
 
 \tableofcontents
 
+
+
+
+
+<!-- For a longer time series we get: -->
+<!-- ```{r} -->
+<!-- N <- 50 -->
+<!-- set.seed(20221231) -->
+<!-- xt <- arima.sim(list(order = c(1, 0, 0), ar = 0.5), n = N) |> as.numeric() -->
+<!-- L <- diff_mat(N, "-a") -->
+<!-- def_sym(v) -->
+<!-- K <- crossprod_(L) / v -->
+<!-- K. <- as_expr(K) -->
+
+<!-- W <- xt %*% t(xt) -->
+<!-- logL.func <- function(par) { -->
+  <!-- K.par <- eval(K., list(a = par[1], v = par[2])) -->
+  <!-- -(log(det(K.par)) - sum(K.par * W)) -->
+<!-- } -->
+<!-- optim(c(1, 1), logL.func)$par -->
+<!-- ``` -->
+
+<!-- Compare this with -->
+<!-- ```{r} -->
+<!-- a2 <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML") -->
+<!-- a2 -->
+<!-- ``` -->
+
+
+
+<!-- One \caracas\ symbol can be substituted with another with (which here -->
+<!-- has the side effect that new \caracas\ symbols `u` and `v` are -->
+<!-- created): -->
+
+
+
+
+<!-- The \caracas\ object `s3` is a list with a `pyobj` slot and the class `caracas_symbol`: -->
+<!-- ```{r} -->
+<!-- str(s3) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- def_sym(u, v) -->
+<!-- subs(p, x, u+v) -->
+<!-- subs(p, x, u+v) |> expand() |> factor_() -->
+
+<!-- ``` -->
+
+<!-- One \caracas\ symbol can be substituted with another with (which here -->
+<!-- has the side effect that new \caracas\ symbols `u` and `v` are -->
+<!-- created): -->
+
+<!-- ```{r} -->
+<!-- s4 <- subs(s3, c("s1", "s2"), c("u+v", "u-v")) -->
+<!-- s4 -->
+
+<!-- ``` -->
+
+<!-- Coercion from \caracas\ symbols to \r\ expressions and vice versa can be done as follows: -->
+<!-- ```{r} -->
+<!-- as_expr(s4) -->
+<!-- as_sym(as_expr(s4)) -->
+<!-- ``` -->
+
+<!-- The call `def_sym(s1, s2)` above is a short-hand for the using  -->
+<!-- the `symbol()` function: -->
+<!-- ```{r} -->
+<!-- s1 <- symbol("s1") # LHS s1: R object; RHS 's1': Python object -->
+<!-- s2 <- symbol("s2") -->
+<!-- ``` -->
+
+
+
+
+<!---
+```{r
+
+```{r}
+
+H.list <- lapply(seq_len(nrow(bud)), function(r){
+    vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r])
+    subs(H_, nms, vls)
+})
+H. <- Reduce(`+`, H.list)
+
+```
+
+
+
+newton_rapson <- function(b., S., H.){
+    it <- 0
+    repeat{
+        S_i <- as_expr(subs(S., b, b.))
+        H_i <- as_expr(subs(H., b, b.))  
+        b2. <- b. - solve(H_i, S_i)
+        if (max(abs(b2. - b.)) < 1e-4) break
+        b. <- b2.
+        it <- it + 1
+    }
+    list(b=as.numeric(b.), Vb=-solve(H_i), H=H_i, it=it)
+}
+```
+
+
+```{r
+nr <- newton_rapson(c(-3, 1), S., H.)
+nr$b
+nr$Vb
+```
+
+```{r
+mm <- glm(cbind(ndead, ntotal - ndead) ~ log2(dose), data = bud, family = binomial())
+summary(mm) %>% coef()
+vcov(mm)
+```
+--->
 

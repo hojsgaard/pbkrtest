@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{13}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -27,8 +27,24 @@ Mikkel~Meyer Andersen and Søren Højsgaard.
 \newblock \doi{10.21105/joss.03438}.
 \newblock URL \url{https://doi.org/10.21105/joss.03438}.
 
+\bibitem[H{\o}jsgaard et~al.(2012)H{\o}jsgaard, Edwards, and
+  Lauritzen]{hojsgaard:etal:12}
+S{\o}ren H{\o}jsgaard, David Edwards, and Steffen Lauritzen.
+\newblock \emph{Graphical Models with {R}}.
+\newblock Springer, New York, 2012.
+\newblock \doi{10.1007/978-1-4614-2299-0}.
+\newblock ISBN 978-1-4614-2298-3.
+
+\bibitem[Leisch(2002)]{leisch:02}
+Friedrich Leisch.
+\newblock Sweave: Dynamic generation of statistical reports using literate data
+  analysis.
+\newblock In Wolfgang H{\"a}rdle and Bernd R{\"o}nz, editors, \emph{Compstat},
+  pages 575--580, Heidelberg, 2002. Physica-Verlag HD.
+
 \bibitem[McCullagh and Nelder()]{mccullagh:etal:89}
 P.~McCullagh and J.~A. Nelder.
+\newblock \emph{Generalized Linear Models}.
 \newblock London.
 
 \bibitem[Meurer et~al.(2017)Meurer, Smith, Paprocki, \v{C}ert\'{i}k, Kirpichev,
@@ -54,6 +70,11 @@ Aaron Meurer, Christopher~P. Smith, Mateusz Paprocki, Ond\v{r}ej
 \newblock R Foundation for Statistical Computing, Vienna, Austria, 2021.
 \newblock URL \url{http://www.R-project.org/}.
 \newblock {ISBN} 3-900051-07-0.
+
+\bibitem[Shumway and Stoﬀer(2016)]{shumway:etal:16}
+Robert~H. Shumway and David~S. Stoﬀer.
+\newblock \emph{Time Series Analysis and Its Applications}.
+\newblock Springer, fourth edition edition, 2016.
 
 \bibitem[{United Nations General Assembly}(2015)]{UN17}
 {United Nations General Assembly}.
