@@ -111,7 +111,8 @@
 #' 
 #' anova(sug, sug.h)
 #' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
-#' anova(sug, sug.h)
+#'
+#' anova(sug, sug.s)
 #' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 #' 
 #' ## Linear normal model:
@@ -121,6 +122,7 @@
 #' 
 #' anova(sug, sug.h)
 #' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
+#' 
 #' anova(sug, sug.s)
 #' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 #' 
@@ -136,16 +138,18 @@
 #' 
 #' anova(glm.D93, glm.D93.o, test="Chisq")
 #' PBmodcomp(glm.D93, glm.D93.o, nsim=NSIM, cl=1)
+#' 
 #' anova(glm.D93, glm.D93.t, test="Chisq")
 #' PBmodcomp(glm.D93, glm.D93.t, nsim=NSIM, cl=1)
 #' 
 #' ## Generalized linear mixed model (it takes a while to fit these)
+#' 
 #' \dontrun{
 #' (gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
 #'               data = cbpp, family = binomial))
 #' (gm2 <- update(gm1, .~.-period))
 #' anova(gm1, gm2)
-#' PBmodcomp(gm1, gm2, cl=2)
+#' PBmodcomp(gm1, gm2)
 #' }
 #' 
 #' 
@@ -265,28 +269,6 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     .padPB(ans, LRTstat, ref, formula.large, formula.small)
 }
 
-
-
-
-
-
-
-
-
-
-
-    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
-    ## ss <<- smallModel
-    ## ll <<- largeModel
-
-    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
-
-    ## if (w == 0){
-    ##     ## First given model is submodel of second; exchange the models
-    ##     tmp <- largeModel;
-    ##     largeModel <- smallModel;
-    ##     smallModel <- tmp
-    ## }
 
 
 
@@ -666,6 +648,31 @@ as.data.frame.XXmodcomp <- function(x, row.names = NULL, optional = FALSE, ...){
     as.data.frame(do.call(rbind, x[-c(1:3)]))
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
+    ## ss <<- smallModel
+    ## ll <<- largeModel
+
+    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
+
+    ## if (w == 0){
+    ##     ## First given model is submodel of second; exchange the models
+    ##     tmp <- largeModel;
+    ##     largeModel <- smallModel;
+    ##     smallModel <- tmp
+    ## }
 
 
 

@@ -124,7 +124,7 @@ restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
 
 ## #' @rdname model-coerce
 #' @export
-restriction_matrix2model.merMod <- function(largeModel, L, REML=TRUE, ...){
+restriction_matrix2model.lmerMod <- function(largeModel, L, REML=TRUE, ...){
 
     zzz  <- restriction_matrix2model_internal(largeModel, L, getME(largeModel, "X"))
     
@@ -136,6 +136,24 @@ restriction_matrix2model.merMod <- function(largeModel, L, REML=TRUE, ...){
         ans <- update(ans, REML=FALSE)
     ans
 }
+
+## #' @rdname model-coerce
+#' @export
+restriction_matrix2model.glmerMod <- function(largeModel, L, REML=TRUE, ...){
+
+    zzz  <- restriction_matrix2model_internal(largeModel, L, getME(largeModel, "X"))
+    
+    new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
+                                    "+", zzz$new_form$rhs.ran))
+    new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
+    ans <- update(largeModel, eval(new.formula), data=new.data)
+    ## if (!REML)
+        ## ans <- update(ans, REML=FALSE)
+    ans
+}
+
+
+
 
 ## #' @rdname model-coerce
 #' @export

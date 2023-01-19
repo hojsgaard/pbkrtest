@@ -1,5 +1,5 @@
 ---
-title: "The `pbkrtest` package: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Tests in Mixed Models"
+title: "Kenward-Roger, Satterthwaite and Parametric Bootstrap Based Methods for Tests in Mixed Models with the `pbkrtest` package"
 output: 
   github_document:
     toc: true

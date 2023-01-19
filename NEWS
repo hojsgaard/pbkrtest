@@ -1,4 +1,4 @@
-pbkrtest 0.5.3 (Release date: 2022-12-05)
+pbkrtest 0.5.2 (Release date: 2023-01-19)
 ============================================
 
 Changes
@@ -8,12 +8,6 @@ Changes
 * Changes in reference to JSS paper
 * Various changes in documentation
 * Satterthwaite approximation now illustrated in vignette
-
-pbkrtest 0.5.2 (Release date: 2022-11-24)
-============================================
-
-Changes
-
 * Fixed bug in computation of LRTstatistic. Thanks to Helle Sorensen for pointing it out.
 
 

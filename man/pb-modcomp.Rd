@@ -152,7 +152,8 @@ sug.s <- update(sug, .~. -sow)
 
 anova(sug, sug.h)
 PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
-anova(sug, sug.h)
+
+anova(sug, sug.s)
 PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 
 ## Linear normal model:
@@ -162,6 +163,7 @@ sug.s <- update(sug, .~. -sow)
 
 anova(sug, sug.h)
 PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
+
 anova(sug, sug.s)
 PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 
@@ -177,16 +179,18 @@ glm.D93.t <- update(glm.D93, .~. -treatment)
 
 anova(glm.D93, glm.D93.o, test="Chisq")
 PBmodcomp(glm.D93, glm.D93.o, nsim=NSIM, cl=1)
+
 anova(glm.D93, glm.D93.t, test="Chisq")
 PBmodcomp(glm.D93, glm.D93.t, nsim=NSIM, cl=1)
 
 ## Generalized linear mixed model (it takes a while to fit these)
+
 \dontrun{
 (gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
               data = cbpp, family = binomial))
 (gm2 <- update(gm1, .~.-period))
 anova(gm1, gm2)
-PBmodcomp(gm1, gm2, cl=2)
+PBmodcomp(gm1, gm2)
 }
 
 

@@ -306,9 +306,11 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
     cl <- get_cl(cl)
         
     if (is.numeric(cl)){
-        if (!(length(cl) == 1 && cl >= 1)) stop("Invalid numeric cl\n")
+        if (!(length(cl) == 1 && cl >= 1))
+            stop("Invalid numeric cl\n")
 
         .cat(dd>3, "doing mclapply, cl = ", cl, "\n")
+
         nsim.cl <- nsim %/% cl
         ref <- unlist(mclapply(1:cl,
                                function(i) {
@@ -317,7 +319,7 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
 
     } else
         if (inherits(cl, "cluster")){
-            .cat(dd>3,"doing clusterCall, nclusters = ", length(cl), "\n")
+            .cat(dd>3, "doing clusterCall, nclusters = ", length(cl), "\n")
             nsim.cl <- nsim %/% length(cl)
             clusterSetRNGStream(cl)
             ref <- unlist(clusterCall(cl, fun=get_fun,
