@@ -3,6 +3,28 @@ load_all("_pbkrtest")
 
 load_all("pbkrtestDEVEL/_pbkrtest/")
 
+load_all()
+
+fm0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
+fm1 <- update(fm0, .~. -harvest)
+
+## Is there an effect of harvest time?
+an <- anova(fm0, fm1)
+
+getLRT(fm0, fm1)
+pb <- PBmodcomp(fm0, fm1,nsim=40)
+
+
+(gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
+              data = cbpp, family = binomial))
+
+(gm2 <- update(gm1, .~.-period))
+
+load_all()
+anova(gm1, gm2)
+getLRT(gm1, gm2)
+PBmodcomp(gm1, gm2, nsim=30)
+
 ## Sugar beets: Does suger content depend on harvest time?
 
 beets |> ggplot(aes(x=sow, y=sugpct, group=harvest)) + geom_jitter(aes(color=harvest), width=0)
