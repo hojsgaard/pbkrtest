@@ -1,4 +1,16 @@
 
+<!---
+https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#show-a-verbatim-inline-expression
+--->
+
+<!---
+````{r, echo=F}
+# rinline <- function(code){
+#   html <- '<code  class="r">``` `r CODE` ```</code>'
+#   sub("CODE", code, html)
+# }
+```
+--->
 
 <!-- ## Gradient descent -->
 

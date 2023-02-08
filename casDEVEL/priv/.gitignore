@@ -20,3 +20,12 @@ teaching-caracas/*.log
 teaching-caracas/*.pdf
 teaching-caracas/*.tex
 
+
+2023-teaching-caracas-paper/*.tex
+2023-teaching-caracas-paper/*.log
+2023-teaching-caracas-paper/*.aux
+2023-teaching-caracas-paper/*.R
+2023-teaching-caracas-paper/*.pdf
+2023-teaching-caracas-paper/*.png
+2023-teaching-caracas-paper/paper-r00_files/*
+2023-teaching-caracas-paper/*.out

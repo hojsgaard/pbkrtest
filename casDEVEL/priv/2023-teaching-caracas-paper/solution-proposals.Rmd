@@ -1,0 +1,526 @@
+---
+title: "Solution proposals"
+author: "Mikkel Meyer Andersen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+options(prompt = 'R> ', continue = '+ ')
+knitr::opts_chunk$set(echo = TRUE, cache = !TRUE, message = FALSE,
+                      fig.height = 3, fig.width = 5, prompt = TRUE)
+library(caracas)
+options(caracas.print.method = "prettyascii")
+options(caracas.prompt = "[c]: ")
+options("digits" = 3)
+```
+
+
+# Possible topics to study
+
+## Exercise 1
+
+1. Related to Section [Linear models]: 
+   a) The orthoginal projection
+      matrix onto the span of the model matrix $X$ is $P=X (X^\top
+      X)^{-1}X^\top$. The residuals are $r=(I-P)y$. From this one may
+      verify that these are not all independent.
+   b) If one of the factors
+      is ignored, then the model becomes a one-way analysis of variance
+      model, at it is illustrative to redo the computations in Section
+      [Linear models] in this setting. 
+   c) Likewise if an interaction between the two factors 
+      is included in the model. What are the residuals in this case? 
+
+### a)
+
+```{r}
+# Part 1: not all independent
+nr <- 2
+nc <- 2
+y <- matrix_sym(nr, nc, "y")
+dim(y) <- c(nr*nc, 1)
+dat <- expand.grid(r=factor(1:nr), s=factor(1:nc))
+X <- model.matrix(~r+s, data=dat) |> as_sym()
+b <- vector_sym(ncol(X), "b")
+mu <- X %*% b
+XtX <- t(X) %*% X
+XtXinv <- inv(XtX)
+Xty <- t(X) %*% y
+b_hat <- XtXinv %*% Xty
+print(b_hat, rowvec = FALSE)
+```
+
+
+\begin{align}
+  Cov(r) 
+  = Cov((I-P)y) 
+  = (I-P) vI (I-P)^T 
+  = (I-P) v (I-P) 
+  = (I-P) v .
+\end{align}
+
+$I - P$ is proportional to covariance matrix 
+for residuals (and complementary projection of P), hence we 
+see if $I-P$ is a diagonal matrix:
+
+```{r}
+P <- X %*% inv(t(X) %*% X) %*% t(X)
+IP <- eye(nrow(P), ncol(P)) - P
+IP
+```
+
+We see that it is not a diagonal matrix, hence there are non-zero covariances.
+
+
+### b)
+
+```{r}
+# Part 2: one-way analysis of variance
+
+X <- model.matrix(~r, data=dat) |> as_sym()
+b <- vector_sym(ncol(X), "b")
+mu <- X %*% b
+XtX <- t(X) %*% X
+XtXinv <- inv(XtX)
+Xty <- t(X) %*% y
+b_hat <- XtXinv %*% Xty
+print(b_hat, rowvec = FALSE)
+```
+
+### c)
+
+```{r}
+# Part 3: interaction
+
+X <- model.matrix(~r*s, data=dat) |> as_sym()
+b <- vector_sym(ncol(X), "b")
+mu <- X %*% b
+XtX <- t(X) %*% X
+XtXinv <- inv(XtX)
+Xty <- t(X) %*% y
+b_hat <- XtXinv %*% Xty
+print(b_hat, rowvec = FALSE)
+```
+
+```{r}
+X %*% b_hat - y
+```
+
+## Exercise 2
+
+1. Related to Section [Logistic regression]: 
+   a) In [Each component of the
+      likelihood], Newton-Rapson can be implemented to solve the likelihood
+      equations and compared to the output from `glm()`. 
+      Note how sensitive Newton-Rapson is to starting point. 
+      This can be solved by another optimisation scheme, e.g. 
+      Nelder-Mead (optimising the log likelihood) or BFGS 
+      (finding extreme for the score function).
+   b) The example is done as logistic regression with the logit 
+      link function. Try other link functions such as cloglog (complemantary log-log).
+
+### a)
+
+```{r}
+data(budworm, package = "doBy")
+bud <- subset(budworm, sex == "male")
+```
+
+```{r}
+# Part 1: Newton-Rapson to solve the likelihood equations / compare to glm()
+def_sym(y, n, p, s)
+logLp_ <- y * log(p) + (n - y) * log(1 - p)
+p_ <- exp(s) / (exp(s) + 1)
+logLs_ <- subs(logLp_, p, p_)
+
+b <- vector_sym(2, "b")
+x <- vector_sym(2, "x")
+s_ <- sum(x * b)
+logLb_ <- subs(logLs_, s, s_)
+
+nms <- c("x1", "x2", "y", "n")
+logLb_list <- lapply(seq_len(nrow(bud)), function(r){
+  vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r])
+  subs(logLb_, nms, vls) 
+})
+logLb_total <- Reduce(`+`, logLb_list)
+logLb_total_func <- as_func(logLb_total, vec_arg = TRUE)
+```
+
+```{r}
+Sb_ <- score(logLb_, b) |> simplify()
+Sb_list <- lapply(seq_len(nrow(bud)), function(r){
+  vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r])
+  subs(Sb_, nms, vls) 
+})
+Sb_total <- Reduce(`+`, Sb_list)
+Sb_total_func <- as_func(Sb_total, vec_arg = TRUE)
+
+Hb_ <- hessian(logLb_, b) |> simplify()
+Hb_list <- lapply(seq_len(nrow(bud)), function(r){
+  vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r])
+  subs(Hb_, nms, vls) 
+})
+Hb_total <- Reduce(`+`, Hb_list)
+Hb_total_func <- as_func(Hb_total, vec_arg = TRUE) 
+```
+
+```{r}
+# Maximising f
+objf <- function(x) {
+  logLb_total_func(x)
+}
+of <- optim(c(0, 0), objf, control = list(fnscale = -1), hessian = TRUE)
+
+# Finding roots of g = \nabla f
+objg <- function(x) {
+  norm(Sb_total_func(x), type = "2")
+}
+og <- optim(c(0, 0), objg)
+
+of$par
+og$par
+
+m <- glm(cbind(ndead, ntotal - ndead) ~ log2(dose), bud, family = binomial())
+m
+-solve(of$hessian)
+vcov(m)
+cfs <- m |> coef() |> unname()
+of$par - cfs
+```
+
+
+
+```{r}
+onr <- c(0, 0) # Note fragile to starting points, try e.g. c(1, 1)
+for (iter in 1:7) {
+  Hinv <- solve(Hb_total_func(onr))
+  newnr <- onr - Hinv %*% Sb_total_func(onr)
+  print(newnr)
+  print(norm(newnr - onr, type = "2"))
+  onr <- newnr
+}
+```
+
+
+
+Others:
+
+```{r}
+optim(c(0, 0), objf, control = list(fnscale = -1))
+optim(c(0, 0), objf, method = "BFGS", control = list(fnscale = -1), gr = Sb_total_func)
+```
+
+
+### b)
+
+Above we have analysed the logistic regression model with the logit link. 
+If we instead used the complementary log log link, $\eta = \log(-\log(1-p))$
+and find the inverse 
+```{r}
+def_sym(p, s)
+sol_ <- solve_sys(log(-log(1-p)), s, p)
+sol_
+```
+which can be used in the above by specifying
+```{r}
+p_ <- 1 - exp(-exp(s))
+```
+
+
+## Exercise 3
+
+1. Related to Section [Maximum likelihood under constraints]:
+   a) Identifiability of the parameters was handled by not including
+      $r_1$ and $s_1$ in the specification of $p_{ij}$. An alternative is
+      to impose the restrictions $r_1=1$ and $s_1=1$, and this can also
+      be handled via Lagrange multipliers. Another alternative is to regard
+      the model as a log-linear model where $\log p_{ij} = \log u + \log
+      r_i + \log s_j = \tilde{u} + \tilde{r}_i + \tilde{s}_j$. This model
+      is similar in its structure to the two-way ANOVA for Section [Linear
+      models]. This model can be fitted as a generalized linear model
+      with a Poisson likelihood and $\log$ as link function. Hence, one
+      may modify the results in Section [Logistic regression] to
+      provide an alternative way of fitting the model.
+   b) A simpler task is
+      to consider a multinomial distribution with four categories,
+      counts $y_i$ and cell probabilities $p_i$, $i=1,2,3,4$ where $\sum_i
+      p_i=1$. For this model, find the maximum likelihood estimate for
+      $p_i$ (use the Hessian to verify that the critical point is a maximum).
+
+### a)
+
+```{r}
+nr <- 2
+nc <- 2
+dat <- expand.grid(r=factor(1:nr), s=factor(1:nc))
+X <- model.matrix(~r+s, data=dat) |> as_sym()
+y_val <- c(2, 4, 5, 19)
+```
+
+
+```{r}
+XX <- as.data.frame(as_expr(X))
+ddd <- cbind(y = as_expr(y_val), XX)
+fit <- glm(y~-1+V1+V2+V3, family=poisson, data=ddd)
+fit
+predlogn <- predict(fit, type = "link") # FIXME: SH skal tjekke at det er rigtigt
+predn <- exp(predlogn)
+predp <- matrix(predn / sum(predn), nrow = nr, ncol = nc)
+# sum(predn) == sum(y_val)
+```
+
+From paper:
+
+```{r}
+y_ <- c("y_11", "y_21", "y_12", "y_22")
+y  <- as_sym(y_)
+def_sym(u, r2, s2, lambda_)
+p <- as_sym(c("u", "u*r2", "u*s2", "u*r2*s2"))
+logL  <- sum(y * log(p))
+Lag  <- -logL + lambda_ * (sum(p) - 1) 
+vars <- list(u, r2, s2, lambda_)
+gLag <- der(Lag, vars)
+sol <- solve_sys(gLag, vars)
+sol <- sol[[1]]
+p11 <- sol$u
+p21 <- sol$u * sol$r2
+p12 <- sol$u * sol$s2
+p22 <- sol$u * sol$r2 * sol$s2
+p.hat <- matrix_(c(p11, p21, p12, p22), nrow = 2)
+p.hat0 <- subs(p.hat, y_, y_val) |> as_expr()
+p.hat0
+```
+
+```{r}
+predp - p.hat0
+```
+
+Alternatively, with explicit likelihood and `optim()`:
+
+```{r}
+N <- nrow(X)
+q <- ncol(X)
+
+y <- vector_sym(N, "y")
+b <- vector_sym(q, "b")
+m <- vector_sym(N, "m")
+s <- vector_sym(N, "s")
+
+## log-likelihood as function of m
+logLm  <- sum(y * log(m) - m)
+```
+
+```{r}
+## log-likelihood as function of s
+m_ <- exp(s)
+logLs <- subs(logLm, m, m_)
+logLs |> simplify() |> expand_log()
+
+#logLs  <- sum(y*s - exp(s))
+
+## linear predictor as function of regression coefficients:
+s_  <- X %*% b
+## log-Likelihood as function of regression coefficients:
+logLb <- subs(logLs, s, s_)
+
+logLb_ <- subs(logLb, y, y_val)
+logLb_func <- as_func(logLb_, vec_arg = TRUE)
+```
+
+
+```{r}
+o <- optim(c(0, 0, 0), logLb_func, control = list(fnscale = -1))
+o$par
+coef(fit)
+coef(fit) - o$par
+```
+
+
+### b)
+
+```{r}
+p <- as_sym(paste0("p", 1:4))
+y <- as_sym(paste0("y", 1:4))
+def_sym(a) 
+l <- sum(y * log(p))
+L <- -l + a * (sum(p) - 1)
+L
+gL <- der(L, list(p, a))
+sols <- solve_sys(gL, list(p, a)) # takes an RHS argument which defaults to zero
+sols
+H <- hessian(l, p) 
+H_sol <- subs(H, sols[[1]]) 
+H_sol
+eigenval(H_sol)
+```
+
+## Exercise 4
+
+1. Related to Section [Auto regressive models]: 
+<!---   a) Find an approximate standard error
+     and a confidence interval for the parameter $a$.  
+     --->
+   a) Compare the estimated parameter values with those obtained from 
+      the `arima()` function.
+   b) Modify the model in Equation \@ref(eq:ar1) by 
+     setting $x_1 = a x_n + e_1$ ("wrapping around") and see what happens
+     to the pattern of zeros in the concentration matrix. 
+   c) Extend the
+     $AR(1)$ model to an $AR(2)$ model ("wrapping around") and 
+     investigate this model along the same lines. Specifically, 
+     where are the conditional independencies (try at least $n=6$)?
+
+### a)
+
+```{r}
+n <- 4
+L <- diff_mat(n, "-a")
+def_sym(a)
+L[1, 1] <- sqrt(1-a^2)
+def_sym(v)
+Linv <- inv(L)
+K <- crossprod_(L) / v
+V <- tcrossprod_(Linv) * v
+```
+
+```{r}
+x <- vector_sym(n, "x")
+logL <- log(det(K)) - sum(K * (x %*% t(x))) %>% simplify()
+```
+
+```{r}
+xt <- c(0.1, -0.9, 0.4, .0)
+logL. <- subs(logL, x, xt) 
+```
+
+```{r}
+logL_wrap <- as_func(logL., vec_arg = TRUE)
+eps <- 0.01
+o <- optim(c(a=0, v=1), logL_wrap, 
+             lower=c(-(1-eps), eps), upper=c((1-eps), 10),
+             hessian = TRUE,
+             method="L-BFGS-B", control=list(fnscale=-1))
+m <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
+
+c(coef(m), m$sigma2)
+o$par
+```
+
+```{r}
+# logL_wrap <- as_func(logL., vec_arg = TRUE)
+# eps <- 0.01
+# o <- optim(c(a=0, v=1), logL_wrap, 
+#              lower=c(-(1-eps), eps), upper=c((1-eps), 10),
+#              hessian = TRUE,
+#              method="L-BFGS-B", control=list(fnscale=-1))
+# m <- arima(xt, order = c(1, 0, 0), include.mean = FALSE, method = "ML")
+# 
+# c(coef(m), m$sigma2)
+# o$par
+# 
+# #-> New
+# se <- sqrt(diag(-solve(o$hessian)))
+# se
+# vcov(m)
+# 
+# rbind(o$par - 2*se,
+# #      o$par,
+#       o$par + 2*se)[, 1]
+# confint(m)
+```
+
+### b)
+
+```{r}
+n <- 4
+L <- diff_mat(n, "-a")
+L[1, n] <- "-a"
+L
+def_sym(v)
+Linv <- inv(L)
+K <- crossprod_(L) / v
+print(mat_factor_div(K, v))
+```
+
+
+### c)
+
+```{r}
+n <- 6
+L <- eye(n, n)
+for (i in seq_len(n)) {
+  idxs <- c(i-1, i-2)
+  idxs <- (((idxs-1) + n) %% n) + 1 # wrapping
+  L[i, idxs] <- c("-a_1", "-a_2")
+  #L[i, idxs] <- c("-a", "-a")
+}
+L
+def_sym(v)
+Linv <- inv(L)
+K <- crossprod_(L) / v
+print(mat_factor_div(K, v))
+```
+
+## Exercise 5
+
+<!---   
+   a) For example, an auto correlation ($AR(1)$) structure as
+      studied in Section [Auto regressive models] where
+      $\mathbf{Cov}(x_i, x_j)=v r^{|i-j|}$ and [FIXME?]. 
+   b) Alternatively, one may
+      study a covariance structure where $\mathbf{Cov}(x_i, x_i)=v$,
+      $\mathbf{Cov}(x_i, x_j)=v r$ if $|i-j| = 1$ and $\mathbf{Cov}(x_i,
+      x_j)=0$ if $|i-j| > 1$.
+--->
+
+```{r echo=FALSE}
+n <- 4
+R <- as_sym(toeplitz(c(1, "r", rep(0, n-2))))
+```
+
+1. Related to Section [Variance of the average of correlated data]: It
+   is illustrative to study such behaviours for other covariance
+   functions. 
+   Replicate the calculations for the covariance matrix of the form
+\begin{equation}
+  \label{eq:ex5}
+  V = v R = v `r tex(R)`,
+\end{equation}
+  i.e., a special case of a Toeplitz matrix. 
+  How many independent variables, $k$, do 
+  the $n$ correlated variables correspond to?
+  
+```{r}
+def_sym(v, r, a, n, j, i) 
+#var_sum <- v*(n + 2*r*(n-1) + 2*0*(n-2)*(n-1)/2) |> simplify()
+var_sum <- v*(n + 2*r*(n-1)) |> simplify()
+var_sum
+var_avg <- var_sum / n^2
+var_avg
+```
+
+```{r}
+l_1 <- lim(var_avg, n, Inf)         ## when sample size n goes to infinity
+l_1
+l_2 <- lim(var_avg, r, 0, dir='+')  ## when correlation r goes to zero
+l_2
+l_3 <- lim(var_avg, r, 1, dir='-')  ## when correlation r goes to one
+l_3
+```
+
+```{r}
+def_sym(k)
+k <- solve_sys(var_avg - v / k, k)[[1]]$k
+#l_k <- lim(k, n, Inf)
+```
+
+```{r}
+dat <- expand.grid(r=c(.1, .2, .5), n=c(10, 50))
+k_fun <- as_func(k)
+dat$k <- k_fun(r=dat$r, n=dat$n)
+dat$ri <- 1/dat$r
+dat
+```
+
