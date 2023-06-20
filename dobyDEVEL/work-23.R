@@ -1,4 +1,120 @@
 library(doBy)
+load_all("_doby")
+
+f <- function(x,y,z=2){x+y+z}
+
+nms <- c("x", "y")
+vls1 <- c(2, 4)
+
+sf <- section_fun(f, nms, vls1, method="env")
+sf
+
+vls2 <- vls1
+names(vls2) <- nms
+sf <- section_fun(f, vls2)
+sf
+
+vls3 <- as.list(vls2)
+sf <- section_fun(f, vls3)
+sf
+
+sf <- section_fun(f, nms, as.list(vls1))
+sf
+
+vls2 <- as.list(vls)
+names(vls2) <- nms
+
+section_fun(f, vls2)
+
+vls3 <- list(c(1,3), c(2,4), c(3,5))
+
+ff <- lapply(vls3, function(v) section_fun(f, nms, vls=v))
+
+lapply(ff, do.call, list())
+
+vls4 <- lapply(vls3, function(v) setNames(v, nms))
+lapply(vls4, function(v) section_fun(f, v))
+
+vls5 <- lapply(vls3, function(v) as.list(setNames(v, nms)))
+
+vv <- lapply(vls4, function(v) section_fun(f, v))
+
+
+cc <- bquote(.(vv[[1]])())
+
+
+fun_to_call <- function(f){
+    if (!inherits(f, "function")) stop("'f' must be function.\n")
+    bquote(.(f)())
+}
+
+cl <- fun_to_call(f)
+
+f2 <- vv[[1]]
+
+
+
+## GOES TO DOBY
+create_fun_list <- function(fun, list_of_arg_lists, method="def"){
+    if (!inherits(list_of_arg_lists, "list"))
+        stop("list_of_arg_lists must be a list\n")
+    z <- sapply(arg_list, inherits, "list")
+    if (!all(z))
+        stop("not all elements in list_of_arg_lists are lists\n")
+    
+    ff <- lapply(list_of_arg_lists, function(a){
+        doBy::section_fun(fit_ggm, list_of_arg_lists=a, method="def")
+    })
+    out <- bquote_fun_list(ff)
+    out
+}
+
+
+
+
+
+
+out <- bquote_fun_list(ff)
+lapply(out, eval)
+
+
+is_list_of_lists <- function(x){
+    inherits(x, "list") &&
+        all(sapply(x, inherits, "list"))
+}
+
+
+vls4 <- lapply(vls3, function(v){names(v)<-nms;v})
+ff <- lapply(vls4, function(v) section_fun(f, nms=v))
+lapply(ff, eval)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 new_fun <- function(x,y) {}    
 body(new_fun) <- bquote(
