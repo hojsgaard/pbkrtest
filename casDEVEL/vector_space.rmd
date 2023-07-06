@@ -1,0 +1,135 @@
+---
+title: Symbolic linear algebra in R
+author: Søren Højsgaard
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r}
+library(caracas)
+vec <- function(x, entry="v") {
+    if (is_sym(x) && symbol_is_matrix(x)) {
+        b <- vector_sym(ncol(x), entry=entry)
+        return(x %*% b)        
+    }
+    if (is.numeric(x)) {
+        return(vector_sym(x, entry=entry))        
+    }
+}
+
+```
+
+Define the following matrices
+
+```{r}
+L1 <- as_sym(matrix(c(1,1,1,1), byrow=T))
+L2 <- as_sym(matrix(c(1,0,1,0,0,1,0,1), byrow=T, ncol=2))
+L <- cbind(L1, L2)
+```
+
+$$
+L1 = `r tex(L1)`, \quad 
+L2 = `r tex(L2)`, \quad 
+L = `r tex(L)`
+$$
+
+
+## Basis
+
+The span (columnspace) of a matrix $A$ is denoted enoted $C(A)$.
+A basis for $C(L)$ is $B_L$ while $w$ is the generic form of vectors in $L$:
+
+```{r}
+B_L <- columnspace(L)
+v <- vec(B_L, "v")
+```
+
+$$ B_L = `r tex(B_L)`, \quad v = `r tex(v)` $$
+
+<!-- $`r tex(t(v))`$ -->
+
+A basis for the orthogonal complement $W=C(L)^\perp$ can be found as follows:
+$W$ consists of the vectors $v$ that are orthogonal to any vector in
+$C(L)$; that is to any vector of the form $Lx$. In matrix notation,
+$W=\{v|v' L x=0 \quad \forall x\}$. That is $x' L' v=0$. For this to
+be satisfied for all $x$ we must have $L'v=0$, that is $v$ is in the
+null space of $L'$:
+
+```{r}
+B_W <- nullspace(t(L))
+w <- vec(B_W, "w")
+```
+
+$$
+B_W = `r tex(B_W)`, \quad
+w = `r tex(w)`
+$$
+
+Vectors in $L$ and $V$ are indeed orthogonal:
+```{r}
+sum(v * w)
+```
+
+## Null space
+
+The null space of L1 is spanned by
+```{r}
+N <- nullspace(t(L1))
+```
+
+$$
+N=`r tex(N)`, \quad
+n=`r tex(vec(N, "n"))`
+$$
+
+
+
+
+## Intersection of two spaces
+
+Let $U$ and $V$ be bases and matrices. A basis for the intersection can be found as:
+We look for $C(U)\cap C(V)$ ie vectors $z$ of the form
+
+$$
+	z = Ux = Vy
+$$
+
+for $(x,y)$ non-zero. That is, we find the null space of $A=[U | - V]$ because if $A(x,y)´=0$ then $Ux=Vy$. For example
+
+```{r}
+U = nullspace(t(L1))
+V = L2
+A = cbind(U, -V)
+N_A <- nullspace(A)
+```
+
+$$
+A = `r tex(A)`,\quad
+N_A = `r tex(N_A)`
+$$
+
+So the vectors in the intersection $U\cap V$ have the form:
+```{r}
+x <- N_A[1:3,]
+y <- N_A[4:5,]
+U %*% x
+V %*% y
+z <- vec(U %*% x, "z")
+z
+```
+
+$$
+U = `r tex(U)`; \quad
+V = `r tex(V)`; \quad
+z = `r tex(z)`
+$$
+
+##  projections
+
+```{r}
+II <- diag_(1, 4)
+P_L1 <- L1 %*% inv(t(L1) %*% L1) %*% t(L1)
+R <- II-P_L1
+```
