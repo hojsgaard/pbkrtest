@@ -6,7 +6,7 @@
 ##    ff1 <- function(b=2,c=4){1+b+c}
 ## ##########################################################
 
-specialize <- function(ff, vals){
+specialize <- function(ff, vals) {
 	expr1 <- as.expression(body(ff))
 	expr2 <- do.call("substitute", list(expr1[[1]], vals))
 	gg  <- formals(ff)

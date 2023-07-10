@@ -2,7 +2,7 @@ require(dplyr)
 library(magrittr)
 library(ggplot2)
 
-interaction_plot <- function(.data, .formula, interval="conf.int"){
+interaction_plot <- function(.data, .formula, interval="conf.int") { 
 
     interval = match.arg(tolower(interval), c("conf.int", "boxplot", "none"))
 
