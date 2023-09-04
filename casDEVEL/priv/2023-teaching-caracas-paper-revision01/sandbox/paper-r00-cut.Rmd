@@ -1,0 +1,545 @@
+# Technical aspects
+
+
+## Symbols
+
+A `caracas` symbol is a list with a `pyobj` slot and the class
+`caracas_symbol`.  The `pyobj` is an object in `Python` (often a
+`sympy` object).  As such, a symbol (in `R`) provides a handle to a
+`Python` object.  In the design of `caracas` we have tried to make
+this distinction something the user should not be concerned with, but
+it is worthwhile being aware of the distinction.
+
+Sections [Calculus] and [Linear algebra] illustrate that `caracas`
+symbols can be created with `def_sym()` and `as_sym()`. Both declares
+the symbol in `R` and in `Python`. A symbol can also be defined in
+terms of other symbols: Define symbols `s1` and `s2` and define symbol
+`s3` in terms of `s1` and `s2`:
+
+```{r}
+def_sym(s1, s2) ## Note: 's1' and 's2' exist in both R and Python
+s1$pyobj
+s3_ <- s1 * s2  ## Note: 's3' is a symbol in R; no corresponding object in Python
+s3_$pyobj
+```
+
+The underscore in `s3_` indicates that this expression is defined in
+terms of other symbols. This convention is used through out the paper.
+Next express `s1` and `s2` in terms of symbols `u` and `v` (which are
+created on the fly):
+
+```{r}
+s4_ <- subs(s3_, c("s1", "s2"), c("u+v", "u-v"))
+s4_
+```
+
+# Mathematics in `caracas` [better title]
+
+We start by introducing the `caracas` syntax on familiar topics within calculus
+and linear algebra.
+
+## Calculus
+
+First we define a `caracas` symbol `x` (more details can be found
+in Section [Important technical aspects]) and
+subsequently a `caracas` polynomial `p` in `x` (`p` becomes a symbol because `x` is):
+
+```{r}
+library(caracas)
+def_sym(x) ## Declares 'x' as a symbol
+p <- 1 - x^2 + x^3 + x^4/4 - 3 * x^5 / 5 + x^6 / 6
+p
+```
+
+The gradient of `p` is:
+
+```{r}
+grad <- der(p, x) ## 'der' is shorthand for derivative
+grad
+```
+
+Stationary points of $p$ can be found by finding roots of the gradient. In this simple case we can factor the gradient:
+
+```{r}
+factor_(grad)
+```
+
+The factorizations shows that stationary points are $-1$, $0$, $1$ and $2$. To
+investigate if extreme points are local minima, local maxima or saddle
+points, we compute the Hessian and evaluate the Hessian in the
+stationary points:
+
+```{r}
+hess <- der2(p, x)
+hess
+hess_fn <- as_func(hess)
+hess_fn
+stationary_points <- c(-1, 0, 1, 2)
+hess_fn(stationary_points)
+```
+
+Alternatively, we can create an `R` expression and evaluate:
+
+```{r}
+eval(as_expr(hess), list(x = stationary_points))
+```
+
+
+```{r}
+p_fn <- as_func(p)
+grad_fn <- as_func(grad)
+x <- as_sym("x")
+x <- seq(-2,3,0.1)
+
+par(mfrow=c(2,1), mar=c(0,0,0,0))
+curve(p_fn, -1.2, 2.5)
+curve(grad_fn, -1.2, 2.5)
+abline(h=0, lty=2, col='red')
+## curve(hess_fn, -1.5, 2.5)
+abline(v=stationary_points, lty=2, col="blue")
+```
+
+The sign of the Hessian in these points gives that $x=-1$ and $x=12$
+are local minima, $x=0$ is a local maximum and $x=1$ is a saddle
+point.  In general we can find the stationary symbolically and
+evaluate the Hessian as follows (output omitted):
+
+```{r, eval=FALSE}
+sol <- solve_sys(lhs = grad, vars = x) ## finds roots by default
+subs(hess, sol[[1]])                   ## the first solution
+lapply(sol, function(s) subs(hess, s)) ## iterate over all solutions
+```
+
+
+
+
+## Linear algebra
+
+Next, we create a symbolic matrix and find its inverse:
+
+```{r}
+M0 <- toeplitz(c("a", "b", 0)) ## Character matrix
+M <- as_sym(M0)                ## as_sym() converts an R object to caracas symbol
+Minv <- inv(M) %>% simplify()
+```
+
+Default printing of `M` is (the inverse `Minv` is shown below in next section):
+
+```{r}
+M
+```
+
+A vector is a one-column matrix, but it is printed as its transpose to save space:
+
+
+```{r}
+v <- vector_sym(3, "v")
+v
+```
+
+Matrix products are computed using the `%*%` operator:
+
+```{r}
+M %*% v
+```
+
+## Gradient and Hessian [TBW]
+
+
+# Documents containing mathematics
+
+
+In addition to providing integration of computer algebra into `R` and
+in addition, `caracas` also facilitates creation of documents with
+mathematical content without e.g. typing tedious LaTeX
+instructions. This is analogous to the packages `Sweave` [@leisch:02]
+and `Rmarkdown` [@rmarkdown] which provide integration of LaTeX and
+other text formatting systems into `R` helping to produce text
+document with `R` content.
+
+A LaTeX rendering of the `caracas` symbol `p` is obtained by typing
+ `` $$p(x) = `r knitr::inline_expr("tex(p)")`$$ `` which results in the following when the document is compiled:
+
+$$
+p(x) = `r tex(p)`
+$$
+
+Typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv)")`$$ ``
+produces the result:
+
+$$
+M^{-1} = `r tex(Minv)` .
+$$
+
+The determinant of $M$ is $det(M)=`r det(M)`$ and this can be factored out of the matrix by dividing each entry with the determinant and multiplying the new matrix by the determinant which simplifies the appearance of the matrix:
+
+
+```{r}
+Minv_fact <- as_factor_list(1 / factor_(det(M)), simplify(Minv * det(M)))
+```
+
+Typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv_fact)")`$$ `` produces this:
+
+$$
+M^{-1} = `r tex(Minv_fact)`.
+$$
+
+Finally we illustrate creation of additional mathematical expressions:
+
+```{r}
+def_sym(x, n)
+y <- (1 + x/n)^n
+lim(y, n, Inf)
+```
+
+Typing `` $$y = `r knitr::inline_expr("tex(y)")`$$ `` etc. gives
+$$
+y = `r tex(y)`, \lim_{n->\infty} y = `r lim(y, n, Inf)` .
+$$
+
+We can also prepare unevaluated expressions using the `doit`
+argument. That helps making reproducible documents where the changes
+in code appears automatically in the generated formulas.
+This is done as follows:
+
+```{r}
+l <- lim(y, n, Inf, doit = FALSE)
+l
+doit(l)
+```
+
+Typing `` $$`r knitr::inline_expr("tex(l)")` = `r knitr::inline_expr("tex(doit(l))")`$$ `` gives
+$$
+`r tex(l)` = `r tex(doit(l))` .
+$$
+Several functions have the `doit` argument, e.g. `lim()`, `int()` and `sum_()`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--- 2023-08-10 from paper-r00.Rmd --->
+
+
+
+<!-- # Technical aspects -->
+
+
+<!-- ## Symbols -->
+
+<!-- A `caracas` symbol is a list with a `pyobj` slot and the class -->
+<!-- `caracas_symbol`.  The `pyobj` is an object in `Python` (often a -->
+<!-- `sympy` object).  As such, a symbol (in `R`) provides a handle to a -->
+<!-- `Python` object.  In the design of `caracas` we have tried to make -->
+<!-- this distinction something the user should not be concerned with, but -->
+<!-- it is worthwhile being aware of the distinction. -->
+
+<!-- Sections [Calculus] and [Linear algebra] illustrate that `caracas` -->
+<!-- symbols can be created with `def_sym()` and `as_sym()`. Both declares -->
+<!-- the symbol in `R` and in `Python`. A symbol can also be defined in -->
+<!-- terms of other symbols: Define symbols `s1` and `s2` and define symbol -->
+<!-- `s3` in terms of `s1` and `s2`: -->
+
+<!-- ```{r} -->
+<!-- def_sym(s1, s2) ## Note: 's1' and 's2' exist in both R and Python -->
+<!-- s1$pyobj -->
+<!-- s3_ <- s1 * s2  ## Note: 's3' is a symbol in R; no corresponding object in Python -->
+<!-- s3_$pyobj -->
+<!-- ``` -->
+
+<!-- The underscore in `s3_` indicates that this expression is defined in -->
+<!-- terms of other symbols. This convention is used through out the paper. -->
+<!-- Next express `s1` and `s2` in terms of symbols `u` and `v` (which are -->
+<!-- created on the fly): -->
+
+<!-- ```{r} -->
+<!-- s4_ <- subs(s3_, c("s1", "s2"), c("u+v", "u-v")) -->
+<!-- s4_ -->
+<!-- ``` -->
+
+<!-- # Mathematics in `caracas` [better title] -->
+
+<!-- We start by introducing the `caracas` syntax on familiar topics within calculus  -->
+<!-- and linear algebra.  -->
+
+<!-- ## Calculus  -->
+
+<!-- First we define a `caracas` symbol `x` (more details can be found -->
+<!-- in Section [Important technical aspects]) and  -->
+<!-- subsequently a `caracas` polynomial `p` in `x` (`p` becomes a symbol because `x` is): -->
+
+<!-- ```{r} -->
+<!-- library(caracas) -->
+<!-- def_sym(x) ## Declares 'x' as a symbol -->
+<!-- p <- 1 - x^2 + x^3 + x^4/4 - 3 * x^5 / 5 + x^6 / 6 -->
+<!-- p -->
+<!-- ``` -->
+
+<!-- The gradient of `p` is: -->
+
+<!-- ```{r} -->
+<!-- grad <- der(p, x) ## 'der' is shorthand for derivative -->
+<!-- grad -->
+<!-- ``` -->
+
+<!-- Stationary points of $p$ can be found by finding roots of the gradient. In this simple case we can factor the gradient: -->
+
+<!-- ```{r} -->
+<!-- factor_(grad) -->
+<!-- ``` -->
+
+<!-- The factorizations shows that stationary points are $-1$, $0$, $1$ and $2$. To -->
+<!-- investigate if extreme points are local minima, local maxima or saddle -->
+<!-- points, we compute the Hessian and evaluate the Hessian in the -->
+<!-- stationary points: -->
+
+<!-- ```{r} -->
+<!-- hess <- der2(p, x) -->
+<!-- hess -->
+<!-- hess_fn <- as_func(hess) -->
+<!-- hess_fn -->
+<!-- stationary_points <- c(-1, 0, 1, 2) -->
+<!-- hess_fn(stationary_points) -->
+<!-- ``` -->
+
+<!-- Alternatively, we can create an `R` expression and evaluate: -->
+
+<!-- ```{r} -->
+<!-- eval(as_expr(hess), list(x = stationary_points)) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- p_fn <- as_func(p) -->
+<!-- grad_fn <- as_func(grad) -->
+<!-- x <- as_sym("x") -->
+<!-- x <- seq(-2,3,0.1) -->
+
+<!-- par(mfrow=c(2,1), mar=c(0,0,0,0)) -->
+<!-- curve(p_fn, -1.2, 2.5) -->
+<!-- curve(grad_fn, -1.2, 2.5) -->
+<!-- abline(h=0, lty=2, col='red') -->
+<!-- ## curve(hess_fn, -1.5, 2.5) -->
+<!-- abline(v=stationary_points, lty=2, col="blue") -->
+<!-- ``` -->
+
+<!-- The sign of the Hessian in these points gives that $x=-1$ and $x=12$ -->
+<!-- are local minima, $x=0$ is a local maximum and $x=1$ is a saddle -->
+<!-- point.  In general we can find the stationary symbolically and -->
+<!-- evaluate the Hessian as follows (output omitted): -->
+
+<!-- ```{r, eval=FALSE} -->
+<!-- sol <- solve_sys(lhs = grad, vars = x) ## finds roots by default -->
+<!-- subs(hess, sol[[1]])                   ## the first solution -->
+<!-- lapply(sol, function(s) subs(hess, s)) ## iterate over all solutions -->
+<!-- ``` -->
+
+   
+
+
+<!-- ## Linear algebra -->
+
+<!-- Next, we create a symbolic matrix and find its inverse: -->
+
+<!-- ```{r} -->
+<!-- M0 <- toeplitz(c("a", "b", 0)) ## Character matrix -->
+<!-- M <- as_sym(M0)                ## as_sym() converts an R object to caracas symbol -->
+<!-- Minv <- inv(M) %>% simplify() -->
+<!-- ``` -->
+
+<!-- Default printing of `M` is (the inverse `Minv` is shown below in next section): -->
+
+<!-- ```{r} -->
+<!-- M -->
+<!-- ``` -->
+
+<!-- A vector is a one-column matrix, but it is printed as its transpose to save space:  -->
+
+
+<!-- ```{r} -->
+<!-- v <- vector_sym(3, "v") -->
+<!-- v -->
+<!-- ``` -->
+
+<!-- Matrix products are computed using the `%*%` operator: -->
+
+<!-- ```{r} -->
+<!-- M %*% v -->
+<!-- ``` -->
+
+<!-- ## Gradient and Hessian [TBW] -->
+
+
+<!-- # Documents containing mathematics -->
+
+
+<!-- In addition to providing integration of computer algebra into `R` and -->
+<!-- in addition, `caracas` also facilitates creation of documents with -->
+<!-- mathematical content without e.g. typing tedious LaTeX -->
+<!-- instructions. This is analogous to the packages `Sweave` [@leisch:02] -->
+<!-- and `Rmarkdown` [@rmarkdown] which provide integration of LaTeX and -->
+<!-- other text formatting systems into `R` helping to produce text -->
+<!-- document with `R` content. -->
+
+<!-- A LaTeX rendering of the `caracas` symbol `p` is obtained by typing -->
+<!--  `` $$p(x) = `r knitr::inline_expr("tex(p)")`$$ `` which results in the following when the document is compiled:  -->
+
+<!-- $$ -->
+<!-- p(x) = `r tex(p)` -->
+<!-- $$ -->
+
+<!-- Typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv)")`$$ `` -->
+<!-- produces the result: -->
+
+<!-- $$ -->
+<!-- M^{-1} = `r tex(Minv)` . -->
+<!-- $$ -->
+
+<!-- The determinant of $M$ is $det(M)=`r det(M)`$ and this can be factored out of the matrix by dividing each entry with the determinant and multiplying the new matrix by the determinant which simplifies the appearance of the matrix: -->
+
+
+<!-- ```{r} -->
+<!-- Minv_fact <- as_factor_list(1 / factor_(det(M)), simplify(Minv * det(M))) -->
+<!-- ``` -->
+
+<!-- Typing `` $$M^{-1} = `r knitr::inline_expr("tex(Minv_fact)")`$$ `` produces this: -->
+
+<!-- $$ -->
+<!-- M^{-1} = `r tex(Minv_fact)`. -->
+<!-- $$ -->
+
+<!-- Finally we illustrate creation of additional mathematical expressions: -->
+
+<!-- ```{r} -->
+<!-- def_sym(x, n) -->
+<!-- y <- (1 + x/n)^n -->
+<!-- lim(y, n, Inf) -->
+<!-- ``` -->
+
+<!-- Typing `` $$y = `r knitr::inline_expr("tex(y)")`$$ `` etc. gives -->
+<!-- $$ -->
+<!-- y = `r tex(y)`, \lim_{n->\infty} y = `r lim(y, n, Inf)` . -->
+<!-- $$ -->
+
+<!-- We can also prepare unevaluated expressions using the `doit` -->
+<!-- argument. That helps making reproducible documents where the changes  -->
+<!-- in code appears automatically in the generated formulas.  -->
+<!-- This is done as follows:  -->
+
+<!-- ```{r} -->
+<!-- l <- lim(y, n, Inf, doit = FALSE) -->
+<!-- l -->
+<!-- doit(l) -->
+<!-- ``` -->
+
+<!-- Typing `` $$`r knitr::inline_expr("tex(l)")` = `r knitr::inline_expr("tex(doit(l))")`$$ `` gives -->
+<!-- $$ -->
+<!-- `r tex(l)` = `r tex(doit(l))` . -->
+<!-- $$ -->
+<!-- Several functions have the `doit` argument, e.g. `lim()`, `int()` and `sum_()`.  -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Next, insert data, e.g. $x_{1}=1$, $x_{2}=2$, $y=9$, $n=20$ to obtain a function of the regression parameters only. Note how the expression depending on other symbols, `S_`, is  -->
+<!-- named `S.` to indicate that data has been inserted:  -->
+
+
+
+<!-- ```{r} -->
+<!-- logLb. -->
+<!-- as_func(logLb.) -->
+<!-- ``` -->
+
+
+
+<!-- The total score for the entire dataset can be obtained as follows: -->
+
+<!-- ```{r} -->
+<!-- Sb_list <- lapply(seq_len(nrow(bud)), function(r) { -->
+<!--   vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r]) -->
+<!--   subs(Sb_, nms, vls)  -->
+<!-- }) -->
+<!-- Sb_total <- Reduce(`+`, Sb_list) -->
+<!-- ``` -->
+
+<!-- This score can be used as part of an iterative algorithm for solving the score equations.  -->
+<!-- If one wants to use Newton-Rapson, the total Hessian matrix must also be created  -->
+<!-- following lines similar to those above.  -->
+<!-- It is straight forward implement a Newton-Rapson algorithm based on these  -->
+<!-- quantities, one must only note the distinction between the two expressions  -->
+<!-- below (and it is the latter one would use in an iterative algorithm): -->
+
+<!-- ```{r, eval=FALSE} -->
+<!-- subs(Sb_total, b, c(1, 2)) -->
+<!-- subs(Sb_total, b, c(1, 2)) |> as_expr() -->
+<!-- ``` -->
+
+
+<!-- An alternative is to construct the total log-likelihood  -->
+<!-- for the entire dataset as a `caracas` object, convert this  -->
+<!-- object to an `R` function and maximize this  -->
+<!-- function using one of `R`'s optimization methods: -->
+
+<!-- ```{r} -->
+<!-- logLb_list <- lapply(seq_len(nrow(bud)), function(r){ -->
+<!--   vls <- c(1, log2(bud$dose[r]), bud$ndead[r], bud$ntotal[r]) -->
+<!--   subs(logLb_, nms, vls)  -->
+<!-- }) -->
+<!-- logLb_total <- Reduce(`+`, logLb_list) -->
+<!-- logLb_total_func <- as_func(logLb_total, vec_arg = TRUE) -->
+<!-- ``` -->
+
+
+
+
+<!-- (This is in contrast  -->
+<!-- to the free variables, e.g. `y`, `p`, and `n`.): -->
+
+
+
+
+
+<!-- Note  that `x` exists in both `R` and `Python`, whereas `p` -->
+<!-- exists only as a caracas symbol in R; there is no corresponding object -->
+<!-- `p` in Python: -->
+
+<!-- ```{r} -->
+<!-- x$pyobj -->
+<!-- p$pyobj -->
+<!-- ``` -->
+

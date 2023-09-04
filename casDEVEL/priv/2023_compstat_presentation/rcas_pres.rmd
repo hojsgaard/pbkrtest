@@ -1,0 +1,448 @@
+---
+title: "Computer algebra systems in `R:`"
+subtitle: "`caracas` and `Ryacas`"
+author: "Mikkel Meyer Andersen and <br /><u>Søren Højsgaard</u>"
+date: "COMPSTAT 2023 London, UK"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "custom.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+exclude: true
+
+```{r setup, include=FALSE}
+# self_contained: TRUE
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE, message = FALSE)
+
+# devtools::load_all("~/gits/ryacas/ryacas-official/")
+# devtools::install_github("mikldk/ryacas")
+library(here)
+
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+
+library(patchwork)
+```
+
+
+---
+
+class: center, middle, inverse
+
+# Background
+
+---
+
+#### `Ryacas`
+
+* Based on 'Yet Another Computer Algebra system' ([Yacas](http://www.yacas.org/))
+
+--
+* `Ryacas` on CRAN around 2007
+  + Authors: Rob Goedman, Gabor Grothendieck, **Søren Højsgaard**, Ayal Pinkus, Grzegorz Mazur
+  + 2017: **Mikkel Meyer Andersen** became maintainer 
+  + [JOSS paper *Andersen and Højsgaard* (2019)](https://joss.theoj.org/papers/10.21105/joss.01763)
+
+--
+* Links
+  + Stable version: <https://CRAN.R-project.org/package=Ryacas>
+  + Development version: <https://github.com/r-cas/ryacas/>
+  + Online documentation: <http://r-cas.github.io/ryacas/>
+
+--
+
+#### `caracas`
+
+* Based on [SymPy](https://www.sympy.org/) (large computer algebra library for Python), possible with `reticulate`
+
+--
+* '*cara*': face in Spanish (Castellano) / '*cas*': computer algebra system
+
+--
+* Initiated in 2019 by **Søren Højsgaard** and **Mikkel Meyer Andersen**
+  + Supported by a grant from the R Consortium
+
+--
+* Links
+  + Stable version: <https://CRAN.R-project.org/package=caracas>
+  + Development version: <https://github.com/r-cas/caracas/>
+  + Online documentation: <http://r-cas.github.io/caracas/>
+
+---
+
+
+### Pros/cons
+
+#### `Ryacas`
+
+* Tight two-way integration
+* "Easily" extensible
+* Not as feature rich and well-tested as SymPy
+
+--
+
+#### `caracas`
+
+* `SymPy` is a large project with many developers
+* Communication is back-and-forth between R and Python via `reticulate` 
+
+--
+
+#### Similarities
+
+* Both works by creating symbols (`Ryacas::ysym()`/`caracas::symbol()`) and 
+  use S3 generics to use these as normal R objects.
+
+<br />
+
+*We focus on `caracas` in this talk and in the future developments.*
+
+---
+
+class: center, middle, inverse
+
+# Examples
+
+---
+
+### Getting started
+
+```{r, eval = FALSE}
+#devtools::install_github("r-cas/caracas")
+install.packages("caracas")
+```
+
+```{r}
+library(caracas)
+packageVersion("caracas")
+```
+
+* Calculus: derivatives, integrals, sums etc.
+* Linear algebra
+* Solving equations
+
+---
+
+### Symbols
+
+```{r}
+x <- symbol("x") #<<
+y <- symbol("y")
+eq <- x^2 + 3*x + 4*y + y^4
+```
+
+--
+
+```{r}
+der(eq, x) # derivative
+```
+
+--
+
+```{r}
+H <- der2(eq, c(x, y)) # Hessian
+# print() / as.character() / tex() : $$H = `r tex(H)`$$ 
+```
+
+$$H = `r tex(H)`$$
+
+--
+
+
+```{r}
+eval(as_expr(H), list(x = 1, y = 1))
+```
+
+---
+
+
+### Sums
+
+```{r, eval=F}
+sum_(expr, var, [from, to], doit = TRUE)
+```
+
+--
+
+```{r}
+k <- symbol("k")
+res <- sum_(k, k, 0, "n", doit = FALSE)
+res2 <- doit(res)
+```
+
+--
+
+```{r}
+# $$`r tex(res)` = `r tex(res2)`$$
+```
+
+$$`r tex(res)` = `r tex(res2)`$$
+
+--
+
+```{r}
+simplify(res2)
+```
+
+---
+
+### Integrals
+
+```
+intf(expr, var, [from, to], doit = TRUE)
+```
+
+--
+
+```{r}
+res <- int(1/x, x)
+res
+```
+
+--
+
+```{r}
+res <- int(1/x, x, doit = FALSE)
+tex(res)
+```
+
+--
+
+```{r}
+doit(res)
+as_expr(res) # doit() is automatically called
+```
+
+---
+
+### Limits 
+
+```
+lim(expr, [var, to], dir = "-", doit = TRUE)
+```
+
+--
+
+```{r}
+lim(sin(x)/x, x, 0)
+```
+
+--
+
+```{r}
+lim(1/x, x, 0)
+```
+
+--
+
+```{r}
+l <- lim(1/x, x, 0, dir = "-", doit = FALSE)
+tex(l)
+doit(l)
+```
+
+---
+
+### Solving equations
+
+```
+solve_lin(A, b)           # Ax = b; also inv(A) for inverse of A
+solve_sys(lhs, rhs, vars) # lhs = rhs for vars; rhs omitted finds roots
+```
+
+--
+
+```{r}
+lhs <- cbind(3*x*y - y, x); rhs <- cbind(-5*x, y+4)
+```
+
+$$\begin{align}
+`r tex(lhs[, 1L])` &= `r tex(rhs[, 1L])` \\
+`r tex(lhs[, 2L])` &= `r tex(rhs[, 2L])`
+\end{align}$$
+
+--
+
+```{r, eval=F}
+sol <- solve_sys(lhs, rhs, c(x, y))
+sol
+```
+
+--
+
+```{r, eval=F}
+sol[[1]]$x # maybe with as_r(...)
+```
+
+---
+
+
+### Linear algebra
+
+```
+as_symbol() # Converts R object to caracas symbol
+```
+
+--
+
+```{r}
+A <- as_sym(matrix(c(2, 1, 4, "x"), 2, 2))
+A
+```
+
+--
+
+```{r}
+t(A)
+A[1, ]
+```
+
+
+---
+
+```{r}
+det(A)
+```
+
+--
+
+```{r}
+Ai <- inv(A) # or solve_lin(A)
+Ai
+```
+
+--
+
+```{r}
+simplify(Ai)
+```
+
+
+---
+
+## Solving linear systems of equations
+
+```{r}
+b <- as_sym(c("x", 3))
+y <- A %*% b
+y
+```
+
+--
+
+```{r}
+solve_lin(A, y)
+```
+
+--
+
+```{r}
+solve_lin(A, y) %>% simplify() # == b
+```
+
+---
+
+class: inverse, center, middle
+
+# Example: Multinomial likelihood
+
+---
+
+### Multinomial likelihood
+
+The multinomial likelihood for three categories is
+
+$$\text{lik}(p \mid y) \propto p_1^{y_1} p_2^{y_2} p_3^{y_3}.$$
+
+--
+
+Taking $\log$ we get (together with constraint function $g$)
+
+\begin{align}
+  l(p) &= y_1 \log(p_1) + y_2 \log(p_2) + y_3 \log(p_3) \\
+  g(p) &= p_1 + p_2 + p_3 - 1 .
+\end{align}
+
+--
+
+Maximise $l(p)$ for $g(p) = 0$ using Lagrange multipliers to get the unconstrainted optimisation problem
+\begin{align}
+  L = -l(p) + \lambda g(p)
+\end{align}
+
+--
+
+```{r}
+p <- as_sym(c("p1", "p2", "p3"))
+y <- as_sym(c("y1", "y2", "y3"))
+a <- as_sym("a")
+l <- sum(y*log(p))
+L <- -l + a*(sum(p) - 1)
+L
+```
+
+---
+
+### Multinomial likelihood
+
+```{r}
+gL <- der(L, c(p, a)) # gradient
+sol <- solve_sys(gL, c(p, a))
+sol
+```
+
+---
+class: inverse, center, middle
+
+# Example: 1-way ANOVA
+
+---
+
+## 1-way ANOVA 
+
+Design matrix for three groups each with two observations:
+
+```{r}
+groups <- 1:3
+obs_in_each_group <- 2
+f <- factor(rep(groups, each = obs_in_each_group))
+X <- as_sym(model.matrix(~ f))
+X # Design matrix
+```
+
+---
+
+## 1-way ANOVA
+
+```{r}
+y <- as_sym(matrix(paste0("y", seq_along(f))))
+beta_hat <- inv(t(X) %*% X) %*% t(X) %*% y #<<
+print(beta_hat, rowvec = FALSE)
+```
+
+
+---
+class: inverse, center, middle
+
+# Thank you!
+
+<br />
+<br />
+
+Mikkel Meyer Andersen (<mikl@math.aau.dk>) 
+<br />
+Søren Højsgaard (<sorenh@math.aau.dk>)
+
+<br />
+
+## References
+
+`caracas` and `Ryacas`: <https://github.com/r-cas> and CRAN
+
+

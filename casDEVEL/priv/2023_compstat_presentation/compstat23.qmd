@@ -1,0 +1,600 @@
+---
+title: "Computer algebra systems in `R`"
+subtitle: "COMPSTAT 2023 London, UK"
+date: "August 24., 2023"
+author: "Mikkel Meyer Andersen and <br /><u>Søren Højsgaard</u>"
+format:
+  beamer:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    slide-level: 2
+    keep-tex: true
+---
+
+
+```{r setup, include=FALSE}
+# self_contained: TRUE
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE, message = FALSE)
+library(here)
+
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+library(patchwork)
+library(caracas)
+options(caracas.print.method = "prettyascii")
+options(caracas.prompt = "[c]: ")
+options("digits" = 3)
+```
+
+
+
+# Take-home message
+
+
+* The caracas package for R provides computer algebra / symbolic math 
+  - At your fingertips... 
+  - within R... 
+  - using R syntax
+  - Calculus: derivatives, integrals, sums etc.
+  - Linear algebra
+  - Solving equations
+
+* The caracas package can easily be extended
+
+* Easy transition from symbolic expression to numerical expressions 
+
+* Easy generation of math expressions for documents (used in this presentation).
+
+* See <https://r-cas.github.io/caracas/> for vignettes and other info.
+
+
+
+# `caracas`
+
+
+* Initiated in 2019 by **Søren Højsgaard** and **Mikkel Meyer Andersen**
+
+* Supported by a grant from the R Consortium
+
+* Based on [SymPy](https://www.sympy.org/) (large computer algebra library for Python), using `reticulate` package in R.
+
+* '*cara*': face in Spanish (Castellano) / '*cas*': computer algebra system
+
+* Links
+  + Stable version: <https://CRAN.R-project.org/package=caracas>
+  + Development version: <https://github.com/r-cas/caracas/>
+  + Online documentation: <http://r-cas.github.io/caracas/>
+
+
+
+
+
+
+
+
+
+
+
+# Getting started
+
+## Installation
+
+```{r, eval = FALSE}
+#devtools::install_github("r-cas/caracas")
+install.packages("caracas")
+```
+
+```{r}
+library(caracas)
+packageVersion("caracas")
+```
+
+## Symbols
+
+```{r}
+def_sym(x, y)
+p <- x^2 + 3*x + 4*y + y^4
+p
+```
+
+```{r}
+str(x)
+str(p)
+```
+
+
+
+## Documents with mathematical contents
+
+Write the following in LaTeX: 
+
+```{r, eval=F}
+$$
+p = `r tex(p)`
+$$
+```
+
+Gives: 
+
+$$
+p = `r tex(p)`
+$$
+
+Used throughout this presentation :)
+
+
+## From symbols to R expressions and numerical evaluations
+
+
+```{r}
+p_ <- as_expr(p); p_
+eval(p_, list(x = 1, y = 1))
+p_fn <- as_func(p); p_fn
+p_fn(x = 1, y = 1)
+```
+
+# Mathematical examples
+
+
+## Linear algebra
+
+```
+as_sym() # Converts R object to caracas symbol
+```
+
+```{rtex}
+A <- matrix_(c(2, 1, 4, "x"), 2, 2)
+## A <- as_sym(matrix(c(2, 1, 4, "x"), 2, 2)) ## Same
+A
+t(A)
+det(A)
+```
+
+
+<!-- $$ -->
+<!-- A = `r tex(A)`; \; A^\top = `r t(A)`;\; det(A)=`r det(A)` -->
+<!-- $$ -->
+
+---
+
+```{rtex}
+A[2,]
+A %*% A[2,]
+```
+
+	
+
+```{rtex}
+Ai  <- inv(A) |> simplify() 
+Ai
+```
+
+
+## Solving equations
+
+```
+# Solve Ax = b; also inv(A) for inverse of A
+solve_lin(A, b)
+# Solve lhs = rhs for vars; rhs omitted finds roots
+solve_sys(lhs, rhs, vars) 
+```
+
+```{r}
+def_sym(x, y)
+lhs <- cbind(3 * x * y - y, x)
+rhs <- cbind(-5 * x, y + 4)
+```
+
+
+$$
+`r tex(t(lhs))` = `r tex(t(rhs))` 
+$$
+
+---
+
+```{r, eval=!F}
+sol <- solve_sys(lhs, rhs, list(x, y))
+sol
+```
+
+
+
+## Derivatives - gradient and Hessian
+
+```{rtex}
+gp <- der(p, c(x, y))
+gp
+```
+
+```{r}
+H <- der2(p, c(x, y)) # Hessian
+```
+
+$$
+H = `r tex(H)`
+$$
+
+
+## Sums
+
+```{r, eval=F}
+sum_(expr, var, [from, to], doit = TRUE)
+```
+
+Find $\sum_{k=0}^n k^2$.
+
+```{r}
+def_sym(k)
+s1 <- sum_(k^2, k, 0, "n", doit = FALSE)
+s2 <- doit(s1)
+s3 <- s2 |> simplify()
+```
+
+$$
+s1 = `r tex(s1)`; \quad s2 = `r tex(s2)`; \quad s3 = `r tex(s3)`
+$$
+
+
+## Integration
+
+```
+int(expr, var, [from, to], doit = TRUE)
+```
+
+Upper half of unit circle: $y=\sqrt{1-x^2}$ for $-1 \le x \le 1$.
+
+```{r}
+def_sym(x, y)
+y <- sqrt(1 - x^2)
+s1 <- int(y, x)
+s2 <- int(y, x, -1, 1)
+```
+
+
+$$
+y=`r tex(y)`; \: s1 = `r tex(s1)`; \: s2=`r tex(s2)`
+$$
+
+
+
+
+
+
+
+
+# Variance of the average of correlated data
+
+```{r echo=FALSE}
+n <- 3
+```
+
+```{r echo=FALSE}
+R <- as_sym(toeplitz(c(1, rep("r", n-1))))
+```
+
+Consider random
+variables $x_1,\dots, x_n$ where $\mathbf{Var}(x_i)=v$ and $\mathbf{Cov}(x_i,
+x_j)=v r$ for $i\not = j$, where $0 \le |r| \le1$.
+For $n=`r n`$, the covariance matrix of $(x_1,\dots, x_n)$ is therefore
+
+\begin{equation}
+  \label{eq:1}
+  V = v R = v `r tex(R)`.
+\end{equation}
+
+
+Let $\bar x = \sum_i x_i / n$ denote the average. 
+
+
+* What is $\mathbf{Var}(\bar x)$, when $n$ goes to infinity for fixed
+  $r$?
+
+* What is $\mathbf{Var}(\bar x)$, when $r$ goes $0$ and $1$ for fixed $n$?
+
+* How many independent observations do $n$ correlated observations
+  correspond to (in terms of the same variance of the averages)?
+
+---
+
+We need the variance of a sum $x. = \sum_i x_i$ which is
+\begin{align}
+\mathbf{Var}(x.) &= \sum_i \mathbf{Var}(x_i) + 2 \sum_{ij:i<j}
+\mathbf{Cov}(x_i, x_j) \\
+&= v(n + 2 \sum_{i=1}^{n-1}\sum_{j=i+1}^{n} r)
+\end{align}
+
+(i.e., the sum of the elements of the
+covariance matrix).
+We can do this in `caracas` as follows:
+
+```{r}
+def_sym(v, r, n, j, i)
+s1 <- sum_(r, j, i+1, n)
+s2 <- sum_(s1, i, 1, n-1)
+var_sum <- v*(n + 2 * s2) |> simplify()
+var_avg <- var_sum / n^2
+```
+
+\begin{align}
+\texttt{s1} &= `r tex(s1)`; \quad
+\texttt{s2} = `r tex(s2)` 
+\end{align}
+
+---
+
+\begin{align*}
+\mathbf{Var}(x.) &= `r tex(var_sum)`,
+\quad
+\mathbf{Var}(\bar x) &= `r tex(var_avg)`.
+\end{align*}
+
+
+From hereof, we can study the limiting behavior of the variance
+$\mathbf{Var}(\bar x)$ in different situations:
+
+```{r}
+l_1 <- lim(var_avg, n, Inf)        ## n -> infinity
+l_2 <- lim(var_avg, r, 0, dir='+') ## r -> 0
+l_3 <- lim(var_avg, r, 1, dir='-') ## r -> 1
+```
+
+$$
+l_1 = `r tex(l_1)`, \quad
+l_2 = `r tex(l_2)`, \quad
+l_3 = `r tex(l_3)`, \quad
+$$
+
+
+---
+
+For a given correlation $r$,  investigate how many
+independent variables $k_n$ the $n$ correlated variables correspond to
+(in the sense of the same variance of the average).
+
+Moreover,  study how $k_n$ behaves as function of $n$
+when $n \rightarrow \infty$.
+That is we must 
+
+1. solve $v (1 + (n-1)r)/n = v/k_n$ for $k_n$
+and 
+
+1. find $\lim_{n\rightarrow\infty} k$:
+
+```{r}
+def_sym(k_n)
+k_n <- solve_sys(var_avg - v / k_n, k_n)[[1]]$k_n
+l_k <- lim(k_n, n, Inf)
+```
+
+The findings above are:
+$$
+k_n = `r tex(k_n)`, \quad
+l_k = `r tex(l_k)` .
+$$
+
+
+---
+
+It is illustrative to supplement the symbolic
+computations above with numerical evaluations.
+
+```{r}
+dat <- expand.grid(r=c(.1, .2, .5), n=c(10, 50))
+k_fun <- as_func(k_n)
+dat$k_n <- k_fun(r=dat$r, n=dat$n)
+dat$l_k <- 1/dat$r
+dat
+```
+
+Shows that even a moderate correlation reduces the effective sample
+size substantially
+
+
+
+# Extending caracas
+
+Only small part of Sympy is interfaced from `caracas` but it is easy to extend `caracas`. For example: polynomial division
+
+```{r}
+def_sym(x)
+f = 5 * x^2 + 10 * x + 3
+g = 2 * x + 2
+```
+
+$$
+f = `r tex(f)`; \; g=`r tex(g)`
+$$
+
+
+Find $f / g$; that is find $q$ and $r$ such that
+$$
+  f = q g + r
+$$
+
+---
+
+The Sympy function for polynomial division is `div` and it can be invoked via the `caracas` function `sympy_func`. 
+
+```{r}
+v <- sympy_func(f, "div", g)
+v
+```
+
+```{r}
+(v[[1]] * g + v[[2]]) |> simplify()
+```
+
+
+# Wrapping up
+
+
+* The caracas package for R provides computer algebra / symbolic math 
+  - At your fingertips within R using R syntax
+  - For example: derivatives, integration, sums, limits, linear algebra, solving equations
+
+* Package can easily be extended
+
+* Easy transition from symbolic expression to numerical expressions 
+
+* Easy generation of math expressions for documents (used in this presentation).
+
+* See <https://r-cas.github.io/caracas/> for vignettes and other info.
+
+* Thank you for your attention!
+
+
+
+<!-- # Thank you! -->
+
+<!-- <br /> -->
+
+<!-- Mikkel Meyer Andersen (<mikl@math.aau.dk>)  -->
+<!-- <br /> -->
+<!-- Søren Højsgaard (<sorenh@math.aau.dk>) -->
+
+<!-- <br /> -->
+
+<!-- `caracas` and `Ryacas`: <https://github.com/r-cas> and CRAN -->
+
+
+
+
+
+
+
+
+
+
+<!-- ## Big data... -->
+
+<!-- <\!-- ![](images/bigdata1.png) -\-> -->
+
+<!-- ## AI, Machine Learning og Data Science - Hvad er det? -->
+
+<!-- :::: {.columns} -->
+
+<!-- ::: {.column width="50%"} -->
+
+<!-- Some text... -->
+<!-- ```{r fig.asp=1} -->
+<!-- x <- rnorm(1000) -->
+<!-- hist(x) -->
+<!-- ``` -->
+
+<!-- ::: -->
+
+<!-- ::: {.column width="50%"} -->
+
+<!-- Some text -->
+
+<!-- ```{r} -->
+<!-- plot(x) -->
+<!-- ``` -->
+
+<!-- ::: -->
+
+<!-- :::: -->
+
+
+<!-- ## Limits -->
+
+<!-- ``` -->
+<!-- lim(expr, [var, to], dir = "-", doit = TRUE) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- lim(sin(x) / x, x, 0) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- lim(sin(1/x), x, 0) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo=FALSE, fig.height=4} -->
+<!-- f1 <- function(x){sin(1/x)} -->
+<!-- f2 <- function(x){sin(x)/x} -->
+<!-- xx <- seq(-0.01, 0.01, 0.00001) -->
+<!-- par(mfrow=c(1,2)) -->
+<!-- plot(xx, f2(xx), type="l", xlab="", ylab="") -->
+<!-- plot(xx, f1(xx), type="l", xlab="", ylab="") -->
+<!-- ``` -->
+
+
+
+
+
+<!-- # Background -->
+
+
+<!-- ## Two computer algebra systems in R -->
+
+<!-- * `caracas` Initiated by **Søren Højsgaard** and **Mikkel Meyer Andersen** in 2019  -->
+
+<!-- * `Ryacas` Initiated by **Søren Højsgaard** around 2007  -->
+
+<!-- * We focus on `caracas` in this talk and in the future developments. -->
+
+
+
+<!-- * We focus on `caracas` in this talk and in the future developments. -->
+
+<!-- ## `Ryacas`  -->
+
+<!-- * Based on 'Yet Another Computer Algebra system' ([Yacas](http://www.yacas.org/)) -->
+
+<!-- * `Ryacas` on CRAN around 2007 -->
+<!--   + Authors: Rob Goedman, Gabor Grothendieck, **Søren Højsgaard**, Ayal Pinkus, Grzegorz Mazur -->
+<!--   + 2017: **Mikkel Meyer Andersen** became maintainer  -->
+<!--   + [JOSS paper *Andersen and Højsgaard* (2019)](https://joss.theoj.org/papers/10.21105/joss.01763) -->
+
+
+<!-- * Links -->
+<!--   + Stable version: <https://CRAN.R-project.org/package=Ryacas> -->
+<!--   + Development version: <https://github.com/r-cas/ryacas/> -->
+<!--   + Online documentation: <http://r-cas.github.io/ryacas/> -->
+
+
+<!-- ## Pros/cons -->
+
+<!-- *  `caracas` -->
+<!--    + `SymPy` is a large project with many developers -->
+<!--    + Communication is back-and-forth between R and Python via `reticulate`  -->
+
+
+<!-- * `Ryacas` -->
+<!--   + Tight two-way integration -->
+<!--   + "Easily" extensible -->
+<!--   + Not as feature rich and well-tested as SymPy -->
+
+<!-- * Similarities -->
+<!--   + Both works by creating symbols and  -->
+<!--   +  use S3 generics to use these as normal R objects. -->
+
+<!-- * We focus on `caracas` in this talk and in the future developments. -->
+
+
+
+
+<!-- ```{r} -->
+<!-- #| label: setup_mma -->
+<!-- #| include: false -->
+
+<!-- R_engine  <- knitr::knit_engines$get("R") -->
+<!-- knitr::knit_engines$set(caracastex = function(options) { -->
+<!--   options$code <- paste0("cat(paste0('$$', tex(", options$code, "), '$$'))") -->
+<!--   options$results <- "asis" -->
+<!--   y <- R_engine(options) -->
+  
+<!--   if (options$echo) { -->
+<!--     y <- gsub("cat(paste0('$$', tex(", "", y, fixed = TRUE) -->
+<!--     y <- gsub("), '$$'))", "", y, fixed = TRUE) -->
+<!--   } -->
+  
+<!--   y -->
+<!-- }) -->
+<!-- ``` -->

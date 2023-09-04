@@ -21,6 +21,7 @@ teaching-caracas/*.pdf
 teaching-caracas/*.tex
 
 
+
 2023-teaching-caracas-paper/*.tex
 2023-teaching-caracas-paper/*.log
 2023-teaching-caracas-paper/*.aux
@@ -29,3 +30,15 @@ teaching-caracas/*.tex
 2023-teaching-caracas-paper/*.png
 2023-teaching-caracas-paper/paper-r00_files/*
 2023-teaching-caracas-paper/*.out
+
+
+
+2023-teaching-caracas-paper-revision01/*.tex
+2023-teaching-caracas-paper-revision01/*.log
+2023-teaching-caracas-paper-revision01/*.aux
+2023-teaching-caracas-paper-revision01/*.R
+2023-teaching-caracas-paper-revision01/*.pdf
+2023-teaching-caracas-paper-revision01/*.png
+2023-teaching-caracas-paper-revision01/paper-r00_files/*
+2023-teaching-caracas-paper-revision01/paper-r01_files/*
+2023-teaching-caracas-paper-revision01/*.out
