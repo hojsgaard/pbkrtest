@@ -1,5 +1,0 @@
-- Changed title to "Computer Algebra in R with \CRANpkg{caracas}".
-
-- Misspellings of 'polynomial': polynonial, polynomium
-
-

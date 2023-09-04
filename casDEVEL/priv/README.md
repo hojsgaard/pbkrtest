@@ -1,2 +1,0 @@
-# caracas-priv
-Caracas documents
