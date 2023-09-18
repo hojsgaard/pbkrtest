@@ -48,8 +48,8 @@ fig/*.pdf
 
 astadataDEVEL/astadatdata/
 
-dobyDEVEL/_doby/
-pbkrtestDEVEL/pkg/
+doby_devel/_doby/
+
 
 mhsmmDEVEL/mhsmm/
 reditorDEVEL/reditor/
