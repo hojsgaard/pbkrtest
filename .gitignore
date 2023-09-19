@@ -54,10 +54,6 @@ doby_devel/_doby/
 mhsmmDEVEL/mhsmm/
 reditorDEVEL/reditor/
 
-symmathDEVEL/ryacas/
-symmathDEVEL/ryacas0/
-symmathDEVEL/ryacas-priv/
-
 ymcDEVEL/ymc/
 
 geepackDEVEL/pkg/
@@ -65,5 +61,3 @@ geepackDEVEL/other/geeM2
 geepackDEVEL/other/geeM
 geepackDEVEL/geepack
 geeasyDEVEL
-
-shtools/
