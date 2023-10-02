@@ -48,9 +48,10 @@ fig/*.pdf
 
 astadataDEVEL/astadatdata/
 doby_devel/_doby/
-mhsmmDEVEL/mhsmm/
+
 reditorDEVEL/reditor/
 ymcDEVEL/ymc/
 
 geepack_devel/_geepack
 geeasy_devel/_geeasy
+mhsmm_devel/mhsmm/
