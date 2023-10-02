@@ -47,17 +47,10 @@ fig/*.pdf
 **/check-*/*
 
 astadataDEVEL/astadatdata/
-
 doby_devel/_doby/
-
-
 mhsmmDEVEL/mhsmm/
 reditorDEVEL/reditor/
-
 ymcDEVEL/ymc/
 
-geepackDEVEL/pkg/
-geepackDEVEL/other/geeM2
-geepackDEVEL/other/geeM
-geepackDEVEL/geepack
-geeasyDEVEL
+geepack_devel/_geepack
+geeasy_devel/_geeasy

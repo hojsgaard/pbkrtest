@@ -1,5 +1,47 @@
 library(doBy)
-load_all("_doby")
+load_all()
+
+ee <- expression(matrix(c(b1 + (b0 - b1)*exp(-k*x) + b2*x, b0, b1 + (b0 - b1)*exp(-k*x) + b2*x, b0, b1 + (b0 - b1)*exp(-k*x) + b2*x, b0), nrow=2))
+ff <- expr_to_fun(ee)
+
+ff
+
+nms <- all.vars(ee)
+
+
+fun_str <- paste0("function(", paste0(nms, collapse=", "), ")")
+
+ee_str <- expr_to_string(ee)
+
+
+ee_str <- lapply(ee, deparse)
+
+
+    ee_str <-
+        lapply(ee_str,
+               function(e_) {
+                   paste0(e_, collapse="\n")               
+               })
+    ee_str
+
+
+
+    bd <- paste0("\n{ \n", paste0(ee_str, collapse=";\n "), "\n}")
+    ff <- paste0(fun_str, bd)
+    fun <- eval(parse(text=ff))
+
+fun
+
+
+return(fun)
+
+
+
+
+
+
+
+
 
 f <- function(x,y,z=2){x+y+z}
 
@@ -333,8 +375,6 @@ args <- list(A = matrix(1:4, nrow=2), D=4)
 
 
 
-ee <- expression(b1 + (b0 - b1)*exp(-k*x) + b2*x)
-ff <- expr_to_fun(ee)
 
 
 ee2 <- expression(b1 <- exp(b1), b1 + (b0 - b1)*exp(-k*x) + b2*x)
