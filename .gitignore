@@ -46,7 +46,7 @@ fig/*.pdf
 **/*.Rcheck/*
 **/check-*/*
 
-astadataDEVEL/astadatdata/
+astadata_devel/astadatdata/
 doby_devel/_doby/
 
 reditorDEVEL/reditor/
