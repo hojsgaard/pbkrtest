@@ -1,6 +1,59 @@
 library(caracas)
 load_all("caracas")
 
+M <- as_sym(matrix(c(1,0,"a",1), nrow=2, byrow=T))
+II <- diag_(1,2)
+o <- sympy_func(M, "lower_triangular_solve", II)
+
+caracas:::do_la_worker(M, "lower_triangular_solve", II)
+
+lower_triangular_solve <- function(A, b, ...){
+    if (missing(b))
+        b <- diag_(1, nrow(A))
+    ## FIXME: Check that A is lower triangular
+    out <- caracas:::do_la_worker(A, "lower_triangular_solve", b)
+    out <- caracas:::construct_symbol_from_pyobj(out)
+    return(out)
+}
+
+upper_triangular_solve <- function(A, b, ...){
+    if (missing(b))
+        b <- diag_(1, nrow(A))
+    ## FIXME: Check that A is upper triangular
+    out <- caracas:::do_la_worker(A, "upper_triangular_solve", b)
+    out <- caracas:::construct_symbol_from_pyobj(out)
+    return(out)
+}
+
+lower_triangular_solve(M)
+
+
+
+Z <- as_sym(toeplitz(c("a", "b", "0")))
+
+LUdecomposition(Z)
+
+vals <- sympy_func(Z, "LUdecomposition")
+
+
+finalise_QR <- function(vals) {
+    vals <- reticulate::py_to_r(vals)
+    
+    qr_info <- list(
+        Q = construct_symbol_from_pyobj(vals[[1L]]),
+        R = construct_symbol_from_pyobj(vals[[2L]])
+    )  
+    return(qr_info)    
+}
+
+
+
+
+
+
+
+
+
 load_all()
 
 L1 <- as_sym(matrix(c(1,1,1,1), byrow=T))

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Mikkel Meyer Andersen and Søren Højsgaard" />
+
+
+<title>21 - Concentration and covariance matrix in an autoregressive model and in a dynamic linear model</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">21 - Concentration and covariance matrix in an autoregressive model and in a dynamic linear model</h1>
+<h4 class="author">Mikkel Meyer Andersen and Søren Højsgaard</h4>
+<h4 class="date">Fri Dec 8 13:47:25 2023</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#regression"><span class="toc-section-number">0.1</span> Regression</a></li>
+</ul>
+</div>
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>N &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="kw">dag</span>(<span class="kw">lapply</span>(<span class="kw">paste0</span>(<span class="st">&quot;y&quot;</span>, <span class="dv">1</span><span class="op">:</span>N), c, <span class="st">&quot;x&quot;</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>d <span class="op">|</span><span class="er">&gt;</span><span class="st"> </span><span class="kw">myplot</span>()</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><span class="math display">\[
+V = L^{-1} (L^{-1})^\top; K = L^\top L
+\]</span></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>L &lt;-<span class="st"> </span><span class="kw">dag2edge_matrix</span>(d,<span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>L</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">#&gt;    x      y1  y2  y3 </span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">#&gt; x  &quot;1&quot;    &quot;0&quot; &quot;0&quot; &quot;0&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">#&gt; y1 &quot;-b21&quot; &quot;1&quot; &quot;0&quot; &quot;0&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">#&gt; y2 &quot;-b31&quot; &quot;0&quot; &quot;1&quot; &quot;0&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">#&gt; y3 &quot;-b41&quot; &quot;0&quot; &quot;0&quot; &quot;1&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>L1 &lt;-<span class="st"> </span><span class="kw">as_sym</span>(L)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>L1inv &lt;-<span class="st"> </span><span class="kw">solve</span>(L1)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>V &lt;-<span class="st"> </span>L1inv <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L1inv)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>K &lt;-<span class="st"> </span><span class="kw">t</span>(L1) <span class="op">%*%</span><span class="st"> </span>L1</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>idx &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(L1)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="kw">solve_lower_triangular</span>(L1)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="co">#&gt; c: ⎡ 1   0  0  0⎤</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="co">#&gt;    ⎢            ⎥</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="co">#&gt;    ⎢b₂₁  1  0  0⎥</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="co">#&gt;    ⎢            ⎥</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="co">#&gt;    ⎢b₃₁  0  1  0⎥</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="co">#&gt;    ⎢            ⎥</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a><span class="co">#&gt;    ⎣b₄₁  0  0  1⎦</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a><span class="co">## (V, K) er matching par</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a><span class="co">## (V %*% K) |&gt; simplify()</span></span></code></pre></div>
+<p><span class="math display">\[
+\left[\begin{matrix} x &amp; y1 &amp; y2 &amp; y3\\ 1 &amp; 0 &amp; 0 &amp; 0\\ -b21 &amp; 1 &amp; 0 &amp; 0\\ -b31 &amp; 0 &amp; 1 &amp; 0\\ -b41 &amp; 0 &amp; 0 &amp; 1\\ \end{matrix}\right]
+\]</span></p>
+<p><span class="math display">\[\begin{align} K &amp;= \left[\begin{matrix}b_{21}^{2} + b_{31}^{2} + b_{41}^{2} + 1 &amp; - b_{21} &amp; - b_{31} &amp; - b_{41}\\- b_{21} &amp; 1 &amp; 0 &amp; 0\\- b_{31} &amp; 0 &amp; 1 &amp; 0\\- b_{41} &amp; 0 &amp; 0 &amp; 1\end{matrix}\right] \\ 
+                  V &amp;= \left[\begin{matrix}1 &amp; b_{21} &amp; b_{31} &amp; b_{41}\\b_{21} &amp; b_{21}^{2} + 1 &amp; b_{21} b_{31} &amp; b_{21} b_{41}\\b_{31} &amp; b_{21} b_{31} &amp; b_{31}^{2} + 1 &amp; b_{31} b_{41}\\b_{41} &amp; b_{21} b_{41} &amp; b_{31} b_{41} &amp; b_{41}^{2} + 1\end{matrix}\right] \end{align}\]</span></p>
+<p>Marginalize: Marginalize onto <span class="math inline">\(a\)</span></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">:</span><span class="dv">3</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="kw">setdiff</span>(idx, a)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>Vaa &lt;-<span class="st"> </span>V[a,a,drop=F]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>Kaa &lt;-<span class="st"> </span>K[a,a,drop=F] <span class="op">-</span><span class="st"> </span>K[a,b,drop=F] <span class="op">%*%</span><span class="st"> </span><span class="kw">solve</span>(K[b,b,<span class="dt">drop=</span>F], K[b,a,<span class="dt">drop=</span>F])</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">## (Vaa, Kaa) er matching par</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">## (Vaa %*% Kaa) |&gt; simplify()</span></span></code></pre></div>
+<p><span class="math display">\[\begin{align} Kaa &amp;= \left[\begin{matrix}- \frac{b_{21}^{2}}{b_{21}^{2} + b_{31}^{2} + 1} + 1 &amp; - \frac{b_{21} b_{31}}{b_{21}^{2} + b_{31}^{2} + 1}\\- \frac{b_{21} b_{31}}{b_{21}^{2} + b_{31}^{2} + 1} &amp; - \frac{b_{31}^{2}}{b_{21}^{2} + b_{31}^{2} + 1} + 1\end{matrix}\right] \\ 
+                  Vaa &amp;= \left[\begin{matrix}b_{21}^{2} + 1 &amp; b_{21} b_{31}\\b_{21} b_{31} &amp; b_{31}^{2} + 1\end{matrix}\right] \end{align}\]</span></p>
+<p>When can we marginalize directly on the <span class="math inline">\(L\)</span> matrix?</p>
+<p>Suppose <span class="math inline">\(L\)</span> has the structure shown below, it is clear that</p>
+<p><span class="math display">\[
+L= \left[\begin{matrix} I &amp; 0\\ B &amp; I\\ \end{matrix}\right] L^{-1}=\left[\begin{matrix} I &amp; 0\\ -B &amp; I\\ \end{matrix}\right]
+\]</span></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">3</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="kw">setdiff</span>(idx, a)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>L1aa   &lt;-<span class="st"> </span>L1[a,a]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>L1aa.i &lt;-<span class="st"> </span><span class="kw">solve</span>(L1aa)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>Vaa2   &lt;-<span class="st"> </span>L1aa.i <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L1aa.i)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>Vaa    &lt;-<span class="st"> </span>V[a,a,drop=F]</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">:</span><span class="dv">3</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>b &lt;-<span class="st"> </span><span class="kw">setdiff</span>(idx, a)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>L1aa &lt;-<span class="st"> </span>L1[a,a]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>L1aa.i &lt;-<span class="st"> </span><span class="kw">solve</span>(L1aa)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>Vaa2 &lt;-<span class="st"> </span>L1aa.i <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L1aa.i)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>Vaa &lt;-<span class="st"> </span>V[a,a,drop=F]</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>d2 &lt;-<span class="st"> </span><span class="kw">dag</span>(<span class="op">~</span>c<span class="op">|</span>a<span class="op">:</span>b<span class="op">+</span>d<span class="op">:</span>c)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>a &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;a&quot;</span>,<span class="st">&quot;b&quot;</span>,<span class="st">&quot;c&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>ag &lt;-<span class="st"> </span><span class="kw">ancestralGraph</span>(a, d2)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="kw">setequal</span>(<span class="kw">nodes</span>(ag), a)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>ch &lt;-<span class="kw">dag2edge_matrix</span>(d2)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>ch</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt;   a    b    c    d  </span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="co">#&gt; a &quot;1&quot;  &quot;0&quot;  &quot;0&quot;  &quot;0&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="co">#&gt; b &quot;0&quot;  &quot;1&quot;  &quot;0&quot;  &quot;0&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co">#&gt; c &quot;ca&quot; &quot;cb&quot; &quot;1&quot;  &quot;0&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="co">#&gt; d &quot;0&quot;  &quot;0&quot;  &quot;dc&quot; &quot;1&quot;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="kw">edge_matrix2dag</span>(ch) <span class="op">|</span><span class="er">&gt;</span><span class="st"> </span><span class="kw">myplot</span>()</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --> <span class="math display">\[
+\left[\begin{matrix} a &amp; b &amp; c &amp; d\\ 1 &amp; 0 &amp; 0 &amp; 0\\ 0 &amp; 1 &amp; 0 &amp; 0\\ ca &amp; cb &amp; 1 &amp; 0\\ 0 &amp; 0 &amp; dc &amp; 1\\ \end{matrix}\right]
+\]</span></p>
+<div id="regression" class="section level2" number="0.1">
+<h2 number="0.1"><span class="header-section-number">0.1</span> Regression</h2>
+<p>Regress <span class="math inline">\(y_A\)</span> on <span class="math inline">\(y_B\)</span>. Two forms for regression coefficients</p>
+<p><span class="math display">\[
+\beta = V_{AB}(V_{BB})^{-1} = -(K_{AA})^{-1} K_{AB}
+\]</span></p>
+<p>Likewise, two forms for conditional variance</p>
+<p><span class="math display">\[
+V(y_A|y_B)= V_{AA}-V_{AB}(V_{BB})^{-1}V_{BA}=V_{AA}-\beta V_{BA}
+\]</span></p>
+<p><span class="math display">\[
+V(y_A|y_B)= (K_{AA})^{-1}
+\]</span></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>do_sim &lt;-<span class="st"> </span><span class="cf">function</span>(x){caracas<span class="op">::</span><span class="kw">simplify</span>(x)}</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">## Regression, af 1 på 2,3,... to former</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>A &lt;-<span class="st"> </span><span class="dv">1</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>B &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(V), A)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>(V[A, B, <span class="dt">drop=</span>F] <span class="op">%*%</span><span class="st"> </span><span class="kw">solve</span>(V[B, B])) <span class="op">|</span><span class="er">&gt;</span><span class="st"> </span><span class="kw">do_sim</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="co">#&gt; c: ⎡         b₂₁                     b₃₁                     b₄₁          ⎤</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="co">#&gt;    ⎢──────────────────────  ──────────────────────  ──────────────────────⎥</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">#&gt;    ⎢   2      2      2         2      2      2         2      2      2    ⎥</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="co">#&gt;    ⎣b₂₁  + b₃₁  + b₄₁  + 1  b₂₁  + b₃₁  + b₄₁  + 1  b₂₁  + b₃₁  + b₄₁  + 1⎦</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="op">-</span><span class="kw">solve</span>(K[A, A, <span class="dt">drop=</span><span class="ot">FALSE</span>], K[A, B, <span class="dt">drop=</span><span class="ot">FALSE</span>])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">#&gt; c: ⎡         b₂₁                     b₃₁                     b₄₁          ⎤</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="co">#&gt;    ⎢──────────────────────  ──────────────────────  ──────────────────────⎥</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="co">#&gt;    ⎢   2      2      2         2      2      2         2      2      2    ⎥</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="co">#&gt;    ⎣b₂₁  + b₃₁  + b₄₁  + 1  b₂₁  + b₃₁  + b₄₁  + 1  b₂₁  + b₃₁  + b₄₁  + 1⎦</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>V.A_B &lt;-<span class="st"> </span>V[A, A, drop=<span class="ot">FALSE</span>] <span class="op">-</span><span class="st"> </span>V[A, B, drop=<span class="ot">FALSE</span>] <span class="op">%*%</span><span class="st"> </span><span class="kw">solve</span>(V[B, B, <span class="dt">drop=</span><span class="ot">FALSE</span>], V[B, A, <span class="dt">drop=</span><span class="ot">FALSE</span>])</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>V.A_B <span class="op">|</span><span class="er">&gt;</span><span class="st"> </span><span class="kw">do_sim</span>()</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a><span class="co">#&gt; c: ⎡          1           ⎤</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a><span class="co">#&gt;    ⎢──────────────────────⎥</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a><span class="co">#&gt;    ⎢   2      2      2    ⎥</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a><span class="co">#&gt;    ⎣b₂₁  + b₃₁  + b₄₁  + 1⎦</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a><span class="kw">solve</span>(K[A, A, <span class="dt">drop=</span>F])</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a><span class="co">#&gt; c: ⎡          1           ⎤</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a><span class="co">#&gt;    ⎢──────────────────────⎥</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true"></a><span class="co">#&gt;    ⎢   2      2      2    ⎥</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true"></a><span class="co">#&gt;    ⎣b₂₁  + b₃₁  + b₄₁  + 1⎦</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true"></a><span class="co">## Regression, af 1 på 2,3, to former</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true"></a>(Vaa[<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dt">drop=</span>F] <span class="op">%*%</span><span class="st"> </span><span class="kw">solve</span>(Vaa[<span class="op">-</span><span class="dv">1</span>, <span class="dv">-1</span>, <span class="dt">drop=</span><span class="ot">FALSE</span>])) <span class="op">|</span><span class="er">&gt;</span><span class="st"> </span><span class="kw">do_sim</span>()</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true"></a><span class="co">#&gt; c: ⎡b₂₁⋅b₃₁ ⎤</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true"></a><span class="co">#&gt;    ⎢────────⎥</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true"></a><span class="co">#&gt;    ⎢   2    ⎥</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true"></a><span class="co">#&gt;    ⎣b₃₁  + 1⎦</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true"></a><span class="kw">solve</span>(Kaa[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">drop=</span><span class="ot">FALSE</span>], Kaa[<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dt">drop=</span><span class="ot">FALSE</span>])</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true"></a><span class="co">#&gt; c: ⎡-b₂₁⋅b₃₁ ⎤</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true"></a><span class="co">#&gt;    ⎢─────────⎥</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true"></a><span class="co">#&gt;    ⎢    2    ⎥</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true"></a><span class="co">#&gt;    ⎣ b₃₁  + 1⎦</span></span></code></pre></div>
+<!-- ```{r} -->
+<!-- cc <- function (...)  -->
+<!-- { -->
+<!--     dots <- match.call(expand.dots = FALSE)$... -->
+<!--     nms <- lapply(seq_along(dots), function(i) { -->
+<!--         y <- if (is.symbol(dots[[i]])) { -->
+<!--             deparse(dots[[i]]) -->
+<!--         } -->
+<!--         else { -->
+<!--             dots[[i]] -->
+<!--         } -->
+<!--         return(y) -->
+<!--     }) -->
+<!--     unlist(nms, recursive = TRUE) -->
+<!-- } -->
+<!-- cc("a","b","c", list(1,2,3))[[4]] -->
+<!-- c("a","b","c", list(1,2,3))     -->
+<!-- ``` -->
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
