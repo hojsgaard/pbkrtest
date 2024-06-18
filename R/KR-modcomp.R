@@ -93,6 +93,9 @@ KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
 #' @rdname kr-modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
 
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+    
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
             

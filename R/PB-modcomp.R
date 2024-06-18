@@ -221,6 +221,9 @@ PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl
 PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
 
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
@@ -309,6 +312,9 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
     ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
+
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
 
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)

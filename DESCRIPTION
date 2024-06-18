@@ -1,5 +1,5 @@
 Package: pbkrtest
-Version: 0.5.2
+Version: 0.5.2.9002
 Title: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Test in Mixed Models
 Authors@R: c(
     person(given = "Ulrich", family = "Halekoh",
@@ -27,7 +27,7 @@ Imports:
     Matrix (>= 1.2.3),
     methods,
     numDeriv,
-    parallel
+    doBy
 Suggests:
     knitr    
 Encoding: UTF-8

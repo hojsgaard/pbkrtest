@@ -95,6 +95,10 @@ SATmodcomp.lmerMod <- function(largeModel, smallModel, details=0, eps=sqrt(.Mach
 
 SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double.eps)){
 
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+    
+    
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
