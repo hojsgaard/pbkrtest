@@ -63,6 +63,8 @@
 #' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 #' L1 <- cbind(0,1)
 #' SATmodcomp(fm1, L1)
+#' SATmodcomp(fm1, "Days")
+#' SATmodcomp(fm1, ~.-Days)
 #'
 #' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
@@ -79,6 +81,8 @@
 #'
 #' ## 3) Specify restriction as formula
 #' SATmodcomp(fm2, ~. - Days - I(Days^2))
+#' SATmodcomp(fm2, "Days-I(Days^2)")
+#' 
 
 #' @export
 #' @rdname sat-modcomp

@@ -18,13 +18,14 @@
 #' \code{lmer} function of the \pkg{lme4} package. Only models where the
 #' covariance structure is a sum of known matrices can be compared.
 #' 
-#' The \code{largeModel} may be a model fitted with \code{lmer} either using
-#' \code{REML=TRUE} or \code{REML=FALSE}.  The \code{smallModel} can be a model
-#' fitted with \code{lmer}. It must have the same covariance structure as
-#' \code{largeModel}. Furthermore, its linear space of expectation must be a
-#' subspace of the space for \code{largeModel}.  The model \code{smallModel}
-#' can also be a restriction matrix \code{L} specifying the hypothesis \eqn{L
-#' \beta = L \beta_H}, where \eqn{L} is a \eqn{k \times p}{k X p} matrix and
+#' The \code{largeModel} may be a model fitted with \code{lmer} either
+#' using \code{REML=TRUE} or \code{REML=FALSE}.  The \code{smallModel}
+#' can be a model fitted with \code{lmer}. It must have the same
+#' covariance structure as \code{largeModel}. Furthermore, its linear
+#' space of expectation must be a subspace of the space for
+#' \code{largeModel}.  The model \code{smallModel} can also be a
+#' restriction matrix \code{L} specifying the hypothesis \eqn{L \beta
+#' = L \beta_H}, where \eqn{L} is a \eqn{k \times p}{k X p} matrix and
 #' \eqn{\beta} is a \eqn{p} column vector the same length as
 #' \code{fixef(largeModel)}.
 #' 
@@ -65,21 +66,20 @@
 #' @examples
 #' 
 #' (fmLarge <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' ## removing Days
 #' (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
 #' anova(fmLarge, fmSmall)
 #' KRmodcomp(fmLarge, fmSmall)
 #' 
-#' ## The same test using a restriction matrix
+#' ## Alternative: Use a restriction matrix: 0 * Intercept + 1 * Days = 0
 #' L <- cbind(0, 1)
 #' KRmodcomp(fmLarge, L)
-#' 
-#' ## Same example, but with independent intercept and slope effects:
-#' m.large  <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), data = sleepstudy)
-#' m.small  <- lmer(Reaction ~ 1 + (1|Subject) + (0+Days|Subject), data = sleepstudy)
-#' anova(m.large, m.small)
-#' KRmodcomp(m.large, m.small)
-#' 
+#' ## A shortcut since L has only one row here:
+#' KRmodcomp(fmLarge, c(0, 1))
+#'
+#' ## Alternative specify what what is to be removed from the larger
+#' #model to form the smaller:
+#' KRmodcomp(fmLarge, "Days")
+#' KRmodcomp(fmLarge, ~.-Days)
 #' 
 
 #' @export
@@ -366,3 +366,16 @@ summary.KRmodcomp <- function(object, ...){
 ##   shape   <- EE^2/VV
 ##   p.Ga    <- 1-pgamma(Wald, shape=shape, scale=scale)
 ## #  cat(sprintf("shape=%f scale=%f p.Ga=%f\n", shape, scale, p.Ga))
+
+
+
+## ' 
+## ' ## Same example, but with independent intercept and slope effects:
+## ' m.large  <- lmer(Reaction ~ Days + (1|Subject) + (0+Days|Subject), data = sleepstudy)
+## ' m.small  <- lmer(Reaction ~ 1 + (1|Subject) + (0+Days|Subject), data = sleepstudy)
+## ' anova(m.large, m.small)
+## ' KRmodcomp(m.large, m.small)
+## ' KRmodcomp(m.large, c(0, 1))
+## ' KRmodcomp(m.large, "Days")
+## ' KRmodcomp(m.large, ~.-Days)
+## ' 

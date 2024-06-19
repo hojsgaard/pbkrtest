@@ -111,9 +111,11 @@
 #' 
 #' anova(sug, sug.h)
 #' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
-#'
+#' PBmodcomp(sug, "harvest", nsim=NSIM, cl=1)
+#' 
 #' anova(sug, sug.s)
 #' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
+#' PBmodcomp(sug, "sow", nsim=NSIM, cl=1)
 #' 
 #' ## Linear normal model:
 #' sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -122,25 +124,21 @@
 #' 
 #' anova(sug, sug.h)
 #' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
+#' PBmodcomp(sug, "harvest", nsim=NSIM, cl=1)
 #' 
 #' anova(sug, sug.s)
 #' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
+#' PBmodcomp(sug, "sow", nsim=NSIM, cl=1)
 #' 
 #' ## Generalized linear model
-#' counts    <- c(18, 17, 15, 20, 10, 20, 25, 13, 12)
-#' outcome   <- gl(3, 1, 9)
-#' treatment <- gl(3, 3)
-#' d.AD      <- data.frame(treatment, outcome, counts)
-#' head(d.AD)
-#' glm.D93   <- glm(counts ~ outcome + treatment, family = poisson())
-#' glm.D93.o <- update(glm.D93, .~. -outcome)
-#' glm.D93.t <- update(glm.D93, .~. -treatment)
-#' 
-#' anova(glm.D93, glm.D93.o, test="Chisq")
-#' PBmodcomp(glm.D93, glm.D93.o, nsim=NSIM, cl=1)
-#' 
-#' anova(glm.D93, glm.D93.t, test="Chisq")
-#' PBmodcomp(glm.D93, glm.D93.t, nsim=NSIM, cl=1)
+#' mm <- glm(ndead/ntotal ~ sex + log(dose), family=binomial, weight=ntotal, data=budworm)
+#' mm0 <- update(mm, .~. -sex)
+#'
+#' ### Test for no effect of sex
+#' anova(mm, mm0, test="Chisq")
+#' PBmodcomp(mm, mm0)
+#' PBmodcomp(mm, "sex")
+#' ## PBmodcomp(mm, cbind(0, 1, 0)): FIXME
 #' 
 #' ## Generalized linear mixed model (it takes a while to fit these)
 #' 
@@ -149,19 +147,21 @@
 #'               data = cbpp, family = binomial))
 #' (gm2 <- update(gm1, .~.-period))
 #' anova(gm1, gm2)
-#' PBmodcomp(gm1, gm2)
+#' PBmodcomp(gm1, gm2, nsim=NSIM)
+#' PBmodcomp(gm1, "period", nsim=NSIM)
 #' }
 #' 
 #' 
 #' \dontrun{
 #' (fmLarge <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' ## removing Days
 #' (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
 #' anova(fmLarge, fmSmall)
-#' PBmodcomp(fmLarge, fmSmall, cl=1)
+#' PBmodcomp(fmLarge, fmSmall, cl=1, nsim=NSIM)
+#' PBmodcomp(fmLarge, "Days", cl=1, nsim=NSIM)
+#' PBmodcomp(fmLarge, ~.-Days, cl=1, nsim=NSIM)
 #' 
 #' ## The same test using a restriction matrix
-#' L <- cbind(0,1)
+#' L <- cbind(0, 1)
 #' PBmodcomp(fmLarge, L, cl=1)
 #' 
 #' ## Vanilla
