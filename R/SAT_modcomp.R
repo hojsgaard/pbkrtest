@@ -16,7 +16,7 @@
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
-#' @seealso \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
+#' @seealso \code{\link{getKR}}, \code{\link[lme4]{lmer}}, \code{\link{vcovAdj}},
 #'     \code{\link{PBmodcomp}}, \code{\link{KRmodcomp}}
 #' 
 #' @references Ulrich Halekoh, Søren Højsgaard (2014)., A

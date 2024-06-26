@@ -111,7 +111,8 @@
 #' ## PBmodcomp(fm2, L2, cl=1, nsim=NSIM) ## FIXME
 #' PBmodcomp(fm2, fm0, cl=1, nsim=NSIM)
 #' anova(fm2, fm0)
-#' 
+#'
+#' \dontrun{ 
 #' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
 #' PBmodcomp(fm2, "I(Days^2)", cl=1, nsim=NSIM)
 #' PBmodcomp(fm2, ~. - I(Days^2), cl=1, nsim=NSIM)
@@ -119,6 +120,7 @@
 #' ## PBmodcomp(fm2, L3, cl=1, nsim=NSIM) ## FIXME
 #' PBmodcomp(fm2, fm1, cl=1, nsim=NSIM)
 #' anova(fm2, fm1)
+#'
 #' 
 #' ## Linear normal model:
 #' sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -140,7 +142,7 @@
 #' ## PBmodcomp(mm, cbind(0, 1, 0), nsim=NSIM): FIXME
 #' PBmodcomp(mm, mm0, cl=1, nsim=NSIM)
 #' anova(mm, mm0, test="Chisq")
-
+#' }
 #' 
 #' ## Generalized linear mixed model (it takes a while to fit these)
 #' 
