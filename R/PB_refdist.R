@@ -148,6 +148,9 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
 #' @export
 PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
 
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+    
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 

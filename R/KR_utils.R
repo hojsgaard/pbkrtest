@@ -1,4 +1,3 @@
-
 orthogonal_complement<-function(W) {
     ##orthogonal complement of <W>: <W>orth=<Worth>
     rW    <- rankMatrix_(W)
@@ -6,8 +5,6 @@ orthogonal_complement<-function(W) {
                   complete=TRUE)[,-c(1:rW), drop=FALSE]
     Worth
 }
-
-
 
 .spur<-function(U){
     sum(diag(U))
@@ -23,8 +20,8 @@ orthogonal_complement<-function(W) {
 ##if A is a N x N  matrix A[i,j]
 ## and R=c(A[1,1],A[1,2]...A[1,n],A[2,1]..A[2,n],, A[n,n]
 ## A[i,j]=R[r]
-.ij2r<-function(i,j,N)
-  (i-1)*N+j
+## .ij2r<-function(i,j,N)
+##   (i-1)*N+j
 
 .indexSymmat2vec <- function(i,j,N) {
   ## S[i,j] symetric N times N matrix
@@ -60,6 +57,8 @@ orthogonal_complement<-function(W) {
     else x / y
 }
 
+
+## FIXME Get rid of these
 .is.lmm <- function(object) {
     inherits(object, "lmerMod")
 }
@@ -73,34 +72,36 @@ orthogonal_complement<-function(W) {
 
 
 
-## .is.lmm <- function(object) {
-##     ##if (class(object) %in% c("matrix","Matrix")){
-##     if (inherits(object, c("matrix", "Matrix"))){
-##         FALSE
-##     } else {
-##         lme4::isLMM(object)
-##     }
-## }
-## .is.lmm <- function(object) {
-##     ##if (class(object) %in% c("matrix","Matrix")){
-##     if (inherits(object, c("matrix", "Matrix"))){
-##         FALSE
-##     } else {
-##         lme4::isLMM(object)
-##     }
-## }
 
 
-## .is.lmm <- function(object) {
-##   ##checks whether  object is
-##   ## - mer object  AND
-##   ## - linear mixed model
-##   if (class(object) %in% "mer") {
-##     if (length(object@muEta)==0 )
-##       TRUE
-##     else
-## ##       FALSE
-## ##   } else {
-## ##     FALSE
-## ##   }
-## ## }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

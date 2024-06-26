@@ -5,7 +5,7 @@
 #' @importFrom stats coef
 #' 
 #' @importFrom parallel clusterCall clusterExport clusterSetRNGStream
-#'     mclapply detectCores makeCluster
+#'     mclapply detectCores makeCluster stopCluster
 #'
 #' @importClassesFrom Matrix Matrix
 #' @importFrom Matrix Matrix sparseMatrix rankMatrix

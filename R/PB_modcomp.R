@@ -3,7 +3,7 @@
 #' @description Model comparison of nested models using parametric bootstrap
 #'     methods.  Implemented for some commonly applied model types.
 #' @concept model_comparison
-#' @name pb-modcomp
+#' @name pb_modcomp
 #' 
 #' @details
 #'
@@ -37,14 +37,8 @@
 #' 
 #' @aliases PBmodcomp PBmodcomp.lm PBmodcomp.merMod getLRT getLRT.lm
 #'     getLRT.merMod plot.XXmodcomp PBmodcomp.mer getLRT.mer
-#' @param largeModel A model object. Can be a linear mixed effects
-#'     model or generalized linear mixed effects model (as fitted with
-#'     \code{lmer()} and \code{glmer()} function in the \pkg{lme4}
-#'     package) or a linear normal model or a generalized linear
-#'     model. The \code{largeModel} must be larger than
-#'     \code{smallModel} (see below).
-#' @param smallModel A model of the same type as \code{largeModel} or
-#'     a restriction matrix.
+#'
+#' @inheritParams kr_modcomp
 #' @param nsim The number of simulations to form the reference
 #'     distribution.
 #' @param ref Vector containing samples from the reference
@@ -85,8 +79,6 @@
 #' is on the resulting p-values. (The p-values get smaller this way compared to
 #' the case when only the originally positive values are used).
 #'
-#' 
-#' 
 #' @author Søren Højsgaard \email{sorenh@@math.aau.dk}
 #' 
 #' @seealso \code{\link{KRmodcomp}}, \code{\link{PBrefdist}}
@@ -97,12 +89,75 @@
 #'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
 #' @keywords models inference
 #' @examples
+#'
+#' (fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
+#' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
+#'
+#' NSIM <- 50 ## Simulations in parametric bootstrap; default is 1000.
 #' 
-#' data(beets, package="pbkrtest")
-#' head(beets)
+#' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
+#' PBmodcomp(fm1, "Days", cl=1, nsim=NSIM)
+#' PBmodcomp(fm1, ~.-Days, cl=1, nsim=NSIM)
+#' L1 <- cbind(0, 1) 
+#' ## PBmodcomp(fm1, L1, cl=1, nsim=NSIM) ## FIXME
+#' PBmodcomp(fm1, fm0, cl=1, nsim=NSIM)
+#' anova(fm1, fm0)
+#'
+#' ## Test for no effect of Days and Days-squared in fm2, i.e. test fm0 under fm2
+#' PBmodcomp(fm2, "(Days+I(Days^2))", cl=1, nsim=NSIM)
+#' PBmodcomp(fm2, ~. - Days - I(Days^2), cl=1, nsim=NSIM)
+#' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
+#' ## PBmodcomp(fm2, L2, cl=1, nsim=NSIM) ## FIXME
+#' PBmodcomp(fm2, fm0, cl=1, nsim=NSIM)
+#' anova(fm2, fm0)
 #' 
-#' NSIM <- 50 ## Simulations in parametric bootstrap
+#' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
+#' PBmodcomp(fm2, "I(Days^2)", cl=1, nsim=NSIM)
+#' PBmodcomp(fm2, ~. - I(Days^2), cl=1, nsim=NSIM)
+#' L3 <- rbind(c(0, 0, 1))
+#' ## PBmodcomp(fm2, L3, cl=1, nsim=NSIM) ## FIXME
+#' PBmodcomp(fm2, fm1, cl=1, nsim=NSIM)
+#' anova(fm2, fm1)
 #' 
+#' ## Linear normal model:
+#' sug <- lm(sugpct ~ block + sow + harvest, data=beets)
+#' sug.h <- update(sug, .~. -harvest)
+#' sug.s <- update(sug, .~. -sow)
+#' 
+#' PBmodcomp(sug, "harvest", nsim=NSIM, cl=1)
+#' PBmodcomp(sug, ~. - harvest, nsim=NSIM, cl=1)
+#' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
+#' anova(sug, sug.h)
+#' 
+#' ## Generalized linear model
+#' mm <- glm(ndead/ntotal ~ sex + log(dose), family=binomial, weight=ntotal, data=budworm)
+#' mm0 <- update(mm, .~. -sex)
+#'
+#' ### Test for no effect of sex
+#' PBmodcomp(mm, "sex", cl=1, nsim=NSIM)
+#' PBmodcomp(mm, ~.-sex, cl=1, nsim=NSIM)
+#' ## PBmodcomp(mm, cbind(0, 1, 0), nsim=NSIM): FIXME
+#' PBmodcomp(mm, mm0, cl=1, nsim=NSIM)
+#' anova(mm, mm0, test="Chisq")
+
+#' 
+#' ## Generalized linear mixed model (it takes a while to fit these)
+#' 
+#' \dontrun{
+#' (gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
+#'               data = cbpp, family = binomial))
+#' (gm2 <- update(gm1, .~.-period))
+#' 
+#' PBmodcomp(gm1, "period", nsim=NSIM)
+#' PBmodcomp(gm1, ~. -period, nsim=NSIM)
+#' PBmodcomp(gm1, gm2, nsim=NSIM)
+#' anova(gm1, gm2)
+#' }
+#' 
+#' 
+#' \dontrun{
+
 #' ## Linear mixed effects model:
 #' sug   <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
 #'               data=beets, REML=FALSE)
@@ -116,108 +171,38 @@
 #' anova(sug, sug.s)
 #' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
 #' PBmodcomp(sug, "sow", nsim=NSIM, cl=1)
-#' 
-#' ## Linear normal model:
-#' sug <- lm(sugpct ~ block + sow + harvest, data=beets)
-#' sug.h <- update(sug, .~. -harvest)
-#' sug.s <- update(sug, .~. -sow)
-#' 
-#' anova(sug, sug.h)
-#' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
-#' PBmodcomp(sug, "harvest", nsim=NSIM, cl=1)
-#' 
-#' anova(sug, sug.s)
-#' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
-#' PBmodcomp(sug, "sow", nsim=NSIM, cl=1)
-#' 
-#' ## Generalized linear model
-#' mm <- glm(ndead/ntotal ~ sex + log(dose), family=binomial, weight=ntotal, data=budworm)
-#' mm0 <- update(mm, .~. -sex)
 #'
-#' ### Test for no effect of sex
-#' anova(mm, mm0, test="Chisq")
-#' PBmodcomp(mm, mm0)
-#' PBmodcomp(mm, "sex")
-#' ## PBmodcomp(mm, cbind(0, 1, 0)): FIXME
-#' 
-#' ## Generalized linear mixed model (it takes a while to fit these)
-#' 
-#' \dontrun{
-#' (gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
-#'               data = cbpp, family = binomial))
-#' (gm2 <- update(gm1, .~.-period))
-#' anova(gm1, gm2)
-#' PBmodcomp(gm1, gm2, nsim=NSIM)
-#' PBmodcomp(gm1, "period", nsim=NSIM)
-#' }
-#' 
-#' 
-#' \dontrun{
-#' (fmLarge <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' (fmSmall <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
-#' anova(fmLarge, fmSmall)
-#' PBmodcomp(fmLarge, fmSmall, cl=1, nsim=NSIM)
-#' PBmodcomp(fmLarge, "Days", cl=1, nsim=NSIM)
-#' PBmodcomp(fmLarge, ~.-Days, cl=1, nsim=NSIM)
-#' 
-#' ## The same test using a restriction matrix
-#' L <- cbind(0, 1)
-#' PBmodcomp(fmLarge, L, cl=1)
-#' 
-#' ## Vanilla
-#' PBmodcomp(beet0, beet_no.harv, nsim=NSIM, cl=1)
-#' 
 #' ## Simulate reference distribution separately:
-#' refdist <- PBrefdist(beet0, beet_no.harv, nsim=1000)
-#' PBmodcomp(beet0, beet_no.harv, ref=refdist, cl=1)
+#' refdist <- PBrefdist(sug, sug.h, nsim=1000, cl=1)
+#' refdist <- PBrefdist(sug, "harvest", nsim=1000, cl=1)
+#' refdist <- PBrefdist(sug, ~.-harvest, nsim=1000, cl=1)
 #' 
 #' ## Do computations with multiple processors:
 #' ## Number of cores:
+#' 
 #' (nc <- detectCores())
 #' ## Create clusters
 #' cl <- makeCluster(rep("localhost", nc))
 #' 
 #' ## Then do:
-#' PBmodcomp(beet0, beet_no.harv, cl=cl)
-#' 
-#' ## Or in two steps:
-#' refdist <- PBrefdist(beet0, beet_no.harv, nsim=NSIM, cl=cl)
-#' PBmodcomp(beet0, beet_no.harv, ref=refdist)
+#' refdist <- PBrefdist(sug, sug.h, nsim=1000, cl=cl)
 #' 
 #' ## It is recommended to stop the clusters before quitting R:
 #' stopCluster(cl)
 #' }
 #' 
-#' ## Linear and generalized linear models:
-#' 
-#' m11 <- lm(dist ~ speed + I(speed^2), data=cars)
-#' m10 <- update(m11, ~.-I(speed^2))
-#' anova(m11, m10)
-#' 
-#' PBmodcomp(m11, m10, cl=1, nsim=NSIM)
-#' PBmodcomp(m11, ~.-I(speed^2), cl=1, nsim=NSIM)
-#' PBmodcomp(m11, c(0, 0, 1), cl=1, nsim=NSIM)
-#' 
-#' m21 <- glm(dist ~ speed + I(speed^2), family=Gamma("identity"), data=cars)
-#' m20 <- update(m21, ~.-I(speed^2))
-#' anova(m21, m20, test="Chisq")
-#' 
-#' PBmodcomp(m21, m20, cl=1, nsim=NSIM)
-#' PBmodcomp(m21, ~.-I(speed^2), cl=1, nsim=NSIM)
-#' PBmodcomp(m21, c(0, 0, 1), cl=1, nsim=NSIM)
-#' 
 #' @export PBmodcomp
 
 
 #' @export
-#' @rdname pb-modcomp
+#' @rdname pb_modcomp
 PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
   UseMethod("PBmodcomp")
 }
 
 
 #' @export
-#' @rdname pb-modcomp
+#' @rdname pb_modcomp
 PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
 
@@ -308,7 +293,7 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 
 
 #' @export
-#' @rdname pb-modcomp
+#' @rdname pb_modcomp
 PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
     ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
@@ -380,7 +365,7 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 
 
 
-#' @rdname pb-modcomp
+#' @rdname pb_modcomp
 seqPBmodcomp <-
     function(largeModel, smallModel, h = 20, nsim = 1000, cl=1) {
         t.start <- proc.time()

@@ -4,7 +4,7 @@
 #' 
 #' @description An approximate F-test based on the Kenward-Roger approach.
 #' @concept model_comparison
-#' @name kr-modcomp
+#' @name kr_modcomp
 #' 
 ## ##########################################################################
 #' @details
@@ -53,11 +53,8 @@
 #' @param largeModel An \code{lmer} model
 #' @param smallModel An \code{lmer} model or a restriction matrix
 #' @param betaH A number or a vector of the beta of the hypothesis,
-#'     e.g. L beta=L betaH. betaH=0 if `smallModel` is a model object
-#'     and not a restriction matrix.
+#'     e.g. L beta=L betaH. If `smallModel` is a model object then betaH=0.
 #' @param details If larger than 0 some timing details are printed.
-#' @note This functionality is not thoroughly tested and should be
-#'     used with care. Please do report bugs etc.
 #'
 #' @author Ulrich Halekoh \email{uhalekoh@@health.sdu.dk}, Søren Højsgaard
 #'     \email{sorenh@@math.aau.dk}
@@ -79,35 +76,52 @@
 #' @keywords models inference
 #' @examples
 #' 
-#' (m_large <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' (m_small <- lmer(Reaction ~ 1 + (Days|Subject), sleepstudy))
-#' anova(m_large, m_small)
-#' KRmodcomp(m_large, m_small)
-#' 
-#' ## Alternative: Use a restriction matrix: 0 * Intercept + 1 * Days = 0
-#' L <- cbind(0, 1)
-#' KRmodcomp(m_large, L)
-#' ## A shortcut since L has only one row here:
-#' KRmodcomp(m_large, c(0, 1))
-#' SATmodcomp(m_large, c(0, 1))
-#' KRmodcomp(m_large, c(0, 1), betaH=2)
-#' SATmodcomp(m_large, c(0, 1), betaH=2)
+#' (fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
+#' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
-#' ## Alternative specify what what is to be removed from the larger
-#' #model to form the smaller:
-#' KRmodcomp(m_large, "Days")
-#' KRmodcomp(m_large, ~.-Days)
+#' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
+#' KRmodcomp(fm1, "Days")
+#' KRmodcomp(fm1, ~.-Days)
+#' L1 <- cbind(0, 1) 
+#' KRmodcomp(fm1, L1)
+#' KRmodcomp(fm1, fm0)
+#' anova(fm1, fm0)
+#'
+#' ## Test for no effect of Days and Days-squared in fm2, i.e. test fm0 under fm2
+#' KRmodcomp(fm2, "(Days+I(Days^2))")
+#' KRmodcomp(fm2, ~. - Days - I(Days^2))
+#' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
+#' KRmodcomp(fm2, L2)
+#' KRmodcomp(fm2, fm0)
+#' anova(fm2, fm0)
 #' 
+#' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
+#' KRmodcomp(fm2, "I(Days^2)")
+#' KRmodcomp(fm2, ~. - I(Days^2))
+#' L3 <- rbind(c(0, 0, 1))
+#' KRmodcomp(fm2, L3)
+#' KRmodcomp(fm2, fm1)
+#' anova(fm2, fm1)
+
+
+
+
+
+
+
+
+
 
 #' @export
-#' @rdname kr-modcomp
+#' @rdname kr_modcomp
 KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
     UseMethod("KRmodcomp")
 }
 
 
 #' @export
-#' @rdname kr-modcomp
+#' @rdname kr_modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
 
     if (is.character(smallModel))
@@ -158,7 +172,7 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     out
 }
 
-## #' @rdname kr-modcomp
+## #' @rdname kr_modcomp
 ## KRmodcomp.mer <- KRmodcomp.lmerMod
 
 .finalizeKR <- function(stats){
@@ -232,7 +246,7 @@ KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
   V0<-1 + c1*B
   V1<-1 - c2*B
   V2<-1 - c3*B
-  V0<-ifelse(abs(V0)<1e-10, 0, V0)
+  V0<-ifelse(abs(V0) < 1e-10, 0, V0)
   
   ##  cat(sprintf("V0=%f V1=%f V2=%f\n", V0, V1, V2))
 

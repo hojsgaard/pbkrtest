@@ -3,20 +3,16 @@
 #' @title F-test and degrees of freedom based on Satterthwaite approximation
 #' @description An approximate F-test based on the Satterthwaite approach.
 #' @concept model_comparison
-#' @name sat-modcomp
+#' @name sat_modcomp
 #' 
 ## ##########################################################################
-
 #' @details
 #'
 #' Notice: It cannot be guaranteed that the results agree with other
 #' implementations of the Satterthwaite approach!
-#' 
-#' @param largeModel An \code{lmerMod} model.
-#' @param smallModel An \code{lmerMod} model, a restriction matrix or
-#'     a model formula. See example section.
+#'
+#' @inheritParams kr_modcomp
 #' @param eps A small number.
-#' @param details If larger than 0 some timing details are printed.
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
@@ -29,43 +25,45 @@
 #'     Journal of Statistical Software, 58(10), 1-30.,
 #'     \url{https://www.jstatsoft.org/v59/i09/}
 #'
-#' 
-#' 
 #' @keywords models inference
 #' @examples
 #'
+#' (fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
 #' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' L1 <- cbind(0,1)
-#' SATmodcomp(fm1, L1)
-#' SATmodcomp(fm1, "Days")
-#' SATmodcomp(fm1, ~.-Days)
-#'
 #' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
-#' ## Test for no effect of Days. There are three ways of using the function:
-#' 
-#' ## 1) Define 2-df contrast - since L has 2 (linearly independent) rows
-#' ## the F-test is on 2 (numerator) df:
+#' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
+#' SATmodcomp(fm1, "Days")
+#' SATmodcomp(fm1, ~.-Days)
+#' L1 <- cbind(0, 1) 
+#' SATmodcomp(fm1, L1)
+#' SATmodcomp(fm1, fm0)
+#' anova(fm1, fm0)
+#'
+#' ## Test for no effect of Days and Days-squared in fm2, i.e. test fm0 under fm2
+#' SATmodcomp(fm2, "(Days+I(Days^2))")
+#' SATmodcomp(fm2, ~. - Days - I(Days^2))
 #' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
 #' SATmodcomp(fm2, L2)
-#'
-#' ## 2) Use two model objects 
-#' fm3 <- update(fm2, ~. - Days - I(Days^2))
-#' SATmodcomp(fm2, fm3)
-#'
-#' ## 3) Specify restriction as formula
-#' SATmodcomp(fm2, ~. - Days - I(Days^2))
-#' SATmodcomp(fm2, "Days-I(Days^2)")
+#' SATmodcomp(fm2, fm0)
+#' anova(fm2, fm0)
 #' 
+#' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
+#' SATmodcomp(fm2, "I(Days^2)")
+#' SATmodcomp(fm2, ~. - I(Days^2))
+#' L3 <- rbind(c(0, 0, 1))
+#' SATmodcomp(fm2, L3)
+#' SATmodcomp(fm2, fm1)
+#' anova(fm2, fm1)
 
 #' @export
-#' @rdname sat-modcomp
+#' @rdname sat_modcomp
 SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
     UseMethod("SATmodcomp")
 }
 
 #' @export
-#' @rdname sat-modcomp
+#' @rdname sat_modcomp
 SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
     SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, eps=eps)
 }
