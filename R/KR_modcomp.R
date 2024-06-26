@@ -59,7 +59,7 @@
 #' @author Ulrich Halekoh \email{uhalekoh@@health.sdu.dk}, Søren Højsgaard
 #'     \email{sorenh@@math.aau.dk}
 #' 
-#' @seealso \code{\link{getKR}}, \code{\link{lmer}},
+#' @seealso \code{\link{getKR}}, \code{\link[lme4]{lmer}},
 #'     \code{\link{vcovAdj}}, \code{\link{PBmodcomp}},
 #'     \code{\link{SATmodcomp}}
 #' 

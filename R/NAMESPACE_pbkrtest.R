@@ -2,7 +2,7 @@
 #' @importFrom MASS ginv
 
 #' @importFrom utils head
-#' @importFrom stats coef
+#' @importFrom stats coef anova
 #' 
 #' @importFrom parallel clusterCall clusterExport clusterSetRNGStream
 #'     mclapply detectCores makeCluster stopCluster
