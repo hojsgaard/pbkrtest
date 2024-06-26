@@ -9,33 +9,6 @@
 
 #' @details
 #'
-## #' The model \code{object} must be fitted with restricted maximum
-## #'     likelihood (i.e. with \code{REML=TRUE}). If the object is fitted with
-## #'     maximum likelihood (i.e. with \code{REML=FALSE}) then the model is
-## #'     refitted with \code{REML=TRUE} before the p-values are calculated. Put
-## #'     differently, the user needs not worry about this issue.
-## #' 
-## #' An F test is calculated according to the approach of Kenward and Roger
-## #' (1997).  The function works for linear mixed models fitted with the
-## #' \code{lmer} function of the \pkg{lme4} package. Only models where the
-## #' covariance structure is a sum of known matrices can be compared.
-## #' 
-## #' The \code{largeModel} may be a model fitted with \code{lmer} either using
-## #' \code{REML=TRUE} or \code{REML=FALSE}.  The \code{smallModel} can be a model
-## #' fitted with \code{lmer}. It must have the same covariance structure as
-## #' \code{largeModel}. Furthermore, its linear space of expectation must be a
-## #' subspace of the space for \code{largeModel}.  The model \code{smallModel}
-## #' can also be a restriction matrix \code{L} specifying the hypothesis \eqn{L
-## #' \beta = L \beta_H}, where \eqn{L} is a \eqn{k \times p}{k X p} matrix and
-## #' \eqn{\beta} is a \eqn{p} column vector the same length as
-## #' \code{fixef(largeModel)}.
-#' 
-## #' The \eqn{\beta_H} is a \eqn{p} column vector.
-## #' 
-## #' Notice: if you want to test a hypothesis \eqn{L \beta = c} with a \eqn{k}
-## #' vector \eqn{c}, a suitable \eqn{\beta_H} is obtained via \eqn{\beta_H=L c}
-## #' where \eqn{L_n} is a g-inverse of \eqn{L}.
-#' 
 #' Notice: It cannot be guaranteed that the results agree with other
 #' implementations of the Satterthwaite approach!
 #' 
@@ -48,12 +21,13 @@
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
 #' @seealso \code{\link{getKR}}, \code{\link{lmer}}, \code{\link{vcovAdj}},
-#'     \code{\link{PBmodcomp}}
+#'     \code{\link{PBmodcomp}}, \code{\link{KRmodcomp}}
 #' 
-#' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
-#'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
-#'     Models - The R Package pbkrtest., Journal of Statistical Software,
-#'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+#' @references Ulrich Halekoh, Søren Højsgaard (2014)., A
+#'     Kenward-Roger Approximation and Parametric Bootstrap Methods
+#'     for Tests in Linear Mixed Models - The R Package pbkrtest.,
+#'     Journal of Statistical Software, 58(10), 1-30.,
+#'     \url{https://www.jstatsoft.org/v59/i09/}
 #'
 #' 
 #' 
@@ -86,23 +60,22 @@
 
 #' @export
 #' @rdname sat-modcomp
-SATmodcomp <- function(largeModel, smallModel, details=0, eps=sqrt(.Machine$double.eps)){
+SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
     UseMethod("SATmodcomp")
 }
 
 #' @export
 #' @rdname sat-modcomp
-SATmodcomp.lmerMod <- function(largeModel, smallModel, details=0, eps=sqrt(.Machine$double.eps)){
-    SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, eps=eps)
+SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
+    SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, eps=eps)
 }
 
 
-SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double.eps)){
+SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, eps=sqrt(.Machine$double.eps)){
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
-    
-    
+        
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
@@ -137,19 +110,28 @@ SATmodcomp_internal <- function(largeModel, smallModel, eps=sqrt(.Machine$double
     
     PtL <- crossprod(P, L)[1:qq,, drop=FALSE]
     ## print(PtL)
-    
-    t2     <- drop(PtL %*% beta)^2 / d[1:qq]
+
+    ## FIXME: do betaDiff <- beta - betaH
+
+    betaDiff <- beta - betaH
+    ## t2     <- drop(PtL %*% beta)^2 / d[1:qq]
+    t2     <- drop(PtL %*% betaDiff)^2 / d[1:qq]
     Fvalue <- sum(t2) / qq
 
     grad_PLcov <- lapply(1:qq, function(m) {
-        vapply(aux$jacobian_list, function(J)
-            qform(PtL[m, ], J), numeric(1L))
+        vapply(aux$jacobian_list,
+               function(J) {
+                   qform(PtL[m, ], J)
+               }, numeric(1L)
+               )
     })
 
     ## 2D_m^2 / g'Ag
-    nu_m <- vapply(1:qq, function(m) {
-        2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
-    }, numeric(1L)) 
+    nu_m <- vapply(1:qq,
+                   function(m) {
+                       2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
+                   }, numeric(1L)
+    ) 
 
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
