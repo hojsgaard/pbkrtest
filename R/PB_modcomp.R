@@ -90,6 +90,7 @@
 #' @keywords models inference
 #' @examples
 #'
+#' \dontrun{ 
 #' (fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
 #' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 #' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
@@ -112,7 +113,7 @@
 #' PBmodcomp(fm2, fm0, cl=1, nsim=NSIM)
 #' anova(fm2, fm0)
 #'
-#' \dontrun{ 
+#' 
 #' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
 #' PBmodcomp(fm2, "I(Days^2)", cl=1, nsim=NSIM)
 #' PBmodcomp(fm2, ~. - I(Days^2), cl=1, nsim=NSIM)
