@@ -1,0 +1,194 @@
+---
+title: "Stability selection"
+author: "Søren Højsgaard"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{stability: Stability selection}
+  %\VignettePackage{doBy}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options("digits"=3)
+library(doBy)
+library(boot)
+#devtools::load_all()
+```
+
+
+
+
+## Stability selection: differences in models due to different data sets
+
+Suppose we have collection of regression models $M_1, M_2, \ldots,
+M_p$. By a regression model we here mean a set of predictors and a
+model for the response. To asses the predictive ability of the models
+we perform cross validation: Fit each model to one set of data and
+predict another set of data, do so repeatedly. Compute a prediction
+error for each model. The model with the smallest prediction error is
+the best model.
+
+But before we get there, we need to select a model to generate the
+collection of candidate models. One approach is the following:
+
+A model selection method consists of two parts:
+
+1.  A criterion for selecting a model and
+2.  A strategy for generating candidate models, that is a strategy for navigating the
+model space.
+
+If we have $K$ datasets we can perform $K$ model selections, and this
+gives us a collection of candidate models. We can then perform cross
+validation on these models.  Say we want to perform $K$ different
+model selections. We can do this by resampling or by creating
+subgroups. Resampling is done by drawing $n$ observations with
+replacement from the data set. Subgroups are created by dividing the
+data set into $K$ subgroups as follows: Form $K$ subgroups by dividing
+the data set into $K$ equal parts. Then for each $k=1,\ldots,K$ the
+$k$th subgroup is left out and the model is fitted to the remaining
+data. Default below is the subgroup method.
+
+## Generating data sets
+
+Consider this subset of the mtcars dataset:
+
+```{r}
+dat0 <- mtcars[1:6,]
+dat0
+```
+
+Generate a list of data sets by resampling or by creating subgroups.
+
+```{r}
+generate_data_list(dat0, K=3, method="subgroups")
+generate_data_list(dat0, K=3, method="resample")
+```
+
+## Model selection
+
+
+Focus on entire dataset. For evaluation of the predictive ability of the selected model we set 20% of the data aside for validation. Hence we select models based on the remaining 80% of the data.
+Fit a linear model to each data set and select the best model by stepwise regression. This gives an indication of the stability of the model.
+
+```{r}
+set.seed(1411)
+dat <- personality
+train <- sample(1:nrow(dat), 0.6*nrow(dat))
+dat.training <- dat[train, ]
+dat.testing <- dat[-train, ]
+frm <- agreebl ~ .
+mod1 <- glm(frm, data = dat.training)
+```
+
+
+<!-- ```{r} -->
+<!-- dat <- doBy::carcassall -->
+<!-- set.seed(4028) -->
+
+<!-- library(tidymodels) -->
+<!-- sp <- initial_split(dat, strata = LeanMeat) -->
+<!-- dat.training  <- training(sp) -->
+<!-- dat.testing  <- testing(sp) -->
+<!-- frm <- LeanMeat ~ .  -->
+<!-- mod1 <- glm(frm, data = dat.training) -->
+<!-- ``` -->
+
+
+
+
+
+
+For each fold we can select models on the analysis part of the data set.
+
+```{r}
+## set.seed(1411)
+n.searches <- 10
+mod_stab <- model_stability_glm(dat.training, mod1,
+                           n.searches=n.searches, method="subgroups", trace=0, k=6)
+mod_stab2 <- model_stability_glm(dat.training, mod1,
+                           n.searches=n.searches, method="resample", trace=0, k=6)
+
+
+mod_stab
+summary(mod_stab)
+
+mod_stab
+summary(mod_stab2)
+
+```
+
+Specifically, the matrix shows the predictors selected in each model and below is the frequency with which each model is selected.
+
+The outcome of the steps above is a list of models and as it is the same model selection method applied to each group of data, the difference (if any) in models is due to differences in the data in each group.
+
+
+
+We can obtain fitted models as follows
+
+```{r}
+formula(mod_stab, fit=FALSE) [1:2]
+```
+
+This gives us a set of candidate models. 
+
+
+## Predictive performance
+
+We have selected a model based on subgroups of the training data. We can now evaluate the predictive performance of the selected model on the test data.
+
+```{r}
+do_rmse <- function(data., fit_list){
+    cv3 <- sapply(fit_list, 
+                  function(fit) {
+                      modelr::rmse(fit, data.)
+                  }
+                  )
+cv3
+}
+
+```
+
+
+```{r}
+np <- sapply(fit_list, function(x) {length(coef(x))})
+fit_list <- formula(mod_stab, fit=TRUE)
+fit_list |> head(2)
+## set.seed(1411)
+cv.train1 <- cv_glm_fitlist(dat.training, fit_list, K=10)
+## set.seed(1411)
+cv.test1 <- cv_glm_fitlist(dat.testing, fit_list, K=10)
+
+cv.train2 <- do_rmse(dat.training, fit_list)
+cv.test2 <- do_rmse(dat.testing, fit_list)
+
+
+dd <- data.frame(np, cv.train2, cv.test2, cv.train1, cv.test1)
+
+p1 <- dd |> ggplot(aes(np, cv.train2)) + geom_point() + geom_smooth()
+p2 <- dd |> ggplot(aes(np, cv.test2)) + geom_point() + geom_smooth()
+p3 <- dd |> ggplot(aes(np, cv.train1)) + geom_point() + geom_smooth()
+p4 <- dd |> ggplot(aes(np, cv.test1)) + geom_point() + geom_smooth()
+
+library(gridExtra)
+grid.arrange(p1, p3, p2, p4, nrow=2)
+```
+
+We can now evaluate the predictive performance of the selected model on the test data.
+
+```{r}
+par(mfrow=c(1,2))
+plot(sqrt(cv.error), main="Subgroups")
+plot(cv3, main="Subgroups")
+```
+
+The plot on the left shows the cross validation error for the models selected in the subgroups. The plot on the right shows the prediction error for the models on the test data.
+
+## Stability selection

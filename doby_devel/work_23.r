@@ -1,4 +1,112 @@
 library(doBy)
+library(tidyverse)
+load_all()
+BC <- read_delim("https://asta.math.aau.dk/datasets?file=BC0.dat",
+                 col_types = cols(Class = col_factor()))
+mainEffects <- glm(Class ~ ., data = BC, family = binomial)
+ms <- model_stability_glm(BC, mainEffects, method = "resample", trace= 0)
+ms <- model_stability_glm(BC, mainEffects, method = "subgroups", trace= 0)
+
+model <- intEffects <- glm(Class ~ .^2, data = BC, family = binomial())
+ms <- model_stability_glm(BC, intEffects, trace = 0, 
+                          n.searches = 5, method = "subgroups")
+
+
+ms 
+
+library(doBy)
+dat <- cbind(y1=c(1,2,3,4,5), z=c(1,2,3,4,5), g=factor(c(1,1,1,2,2))) |> 
+as.data.frame()
+
+dat <- cbind(y1=c(NA,2,3,4,5), z=c(1,2,NA,4,5), g=factor(c(1,1,1,2,2))) |> 
+  as.data.frame()
+
+dat |> 
+  summaryBy(cbind(y1, z) ~ g , data=_, FUN=mean)
+
+dat |> 
+  aggregate(cbind(y1, z) ~ g , data=_, FUN=mean)
+
+
+
+summary(ms)
+ms
+
+
+sumfun <- function(x, ...){
+ c(m=mean(x, na.rm=TRUE, ...), v=var(x, na.rm=TRUE, ...), l=length(x))
+}
+summaryBy(cbind(Ozone, Temp) ~ Month, data=airquality, FUN=sumfun)
+## Compare with
+aggregate(cbind(Ozone, Temp) ~ Month, data=airquality, FUN=sumfun)
+
+summaryBy(Ozone ~ Month, data=airquality, FUN=sumfun)
+## Compare with
+aggregate(Ozone ~ Month, data=airquality, FUN=sumfun)
+
+
+library(purrr)
+
+
+summaryBy(Ozone ~ Month, data = airquality, FUN=mean2)
+summaryBy(cbind(Ozone, Solar.R) ~ Month, data = airquality, FUN=mean2)
+
+mean2 <- function(x){mean(x, na.rm=TRUE)}
+
+## All good
+aggregate(Ozone ~ Month, data = airquality, FUN=mean2)
+airquality |> group_by(Month) |> summarise(mean2(Ozone))
+split(airquality, airquality$Month) |> 
+  sapply(function(x) mean2(x$Ozone)) |> t() |> t()
+
+## All not good error in aggregate ???
+## There are missing values in Ozone and Solar.R
+aggregate(cbind(Ozone, Solar.R) ~ Month, data = airquality, FUN=mean2)
+airquality |> group_by(Month) |> 
+  summarise(across(c(Ozone, Solar.R), mean2))
+split(airquality, airquality$Month) |> 
+  sapply(function(x) sapply(x[,c("Ozone", "Solar.R")], mean2)) |> t()
+
+## No missing values in Wind and Temp
+aggregate(cbind(Wind, Temp) ~ Month, data = airquality, FUN=mean2)
+airquality |> group_by(Month) |> 
+  summarise(across(c(Wind, Temp), mean2))
+split(airquality, airquality$Month) |> 
+  sapply(function(x) sapply(x[,c("Wind", "Temp")], mean2)) |> t()
+
+
+
+
+
+
+library(doBy)
+# Your list of right hand sides
+rhs_list <- list(
+  c("nuclei", "cromatin", "Size.low", "Size.medium", "Shape.low", "nuclei:Size.low", "nuclei:Size.medium", "cromatin:Size.medium", "Size.low:Shape.low"),
+  c("nuclei", "cromatin", "Size.low", "Size.medium", "Shape.low", "nuclei:Size.low", "nuclei:Size.medium", "cromatin:Size.medium", "Size.low:Shape.low"),
+  c("nuclei", "cromatin", "Size.low", "Size.medium", "Shape.low", "nuclei:Size.low", "nuclei:Size.medium", "cromatin:Size.medium", "Size.low:Shape.low")
+)
+
+# Get unique terms across all lists
+unique_terms <- unique(unlist(rhs_list))
+
+# Create an empty matrix M with 3 rows and columns equal to the number of unique terms
+M <- matrix(0, nrow = length(rhs_list), ncol = length(unique_terms), dimnames = list(NULL, unique_terms))
+
+
+# Iterate over each list and mark the presence of terms in the matrix
+for (i in seq_along(rhs_list)) {
+  M[i, rhs_list[[i]]] <- 1
+}
+
+# Print the resulting matrix
+print(M)
+
+
+
+
+
+
 load_all()
 
 ee <- expression(matrix(c(b1 + (b0 - b1)*exp(-k*x) + b2*x, b0, b1 + (b0 - b1)*exp(-k*x) + b2*x, b0, b1 + (b0 - b1)*exp(-k*x) + b2*x, b0), nrow=2))
