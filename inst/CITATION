@@ -1,9 +1,8 @@
 citHeader("To cite pbkrtest in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   title        = "A Kenward-Roger Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed Models -- The {R} Package {pbkrtest}",
-  author       = personList(as.person("Ulrich Halekoh"),
-                   as.person("S{\\o}ren H{\\o}jsgaard")),
+  author       = c("Ulrich Halekoh", "Søren Højsgaard"),
   journal      = "Journal of Statistical Software",
   year         = "2014",
   volume       = "59",

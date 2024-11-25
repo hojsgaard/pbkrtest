@@ -65,11 +65,11 @@ SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Mac
 #' @export
 #' @rdname sat_modcomp
 SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
-    SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, eps=eps)
+    SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details, eps=eps)
 }
 
 
-SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, eps=sqrt(.Machine$double.eps)){
+SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
@@ -85,9 +85,16 @@ SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, eps=sqrt(.Machi
         tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
     }
 
+    
+    SATmodcomp_worker(largeModel, smallModel, betaH=betaH, details=details, eps=eps)
+}
+
+
+SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e-6) {
+
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
-
+    
     ## print(largeModel)
     ## print(smallModel)
     largeModel <- update(largeModel, REML=TRUE) ## FIXME: Almost surely
@@ -137,14 +144,14 @@ SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, eps=sqrt(.Machi
     out <- list(test=data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf)),
                 sigma=getME(largeModel, "sigma"),
                 formula.large=formula(largeModel),
-                formula.small=L,
+                formula.small=formula(smallModel),
                 ctime=(proc.time() - t0)[3],
                 L=L
                 )
     class(out) <- "SATmodcomp"
     out
+    
 }
-
 
 
 #' @export
@@ -159,6 +166,26 @@ print.SATmodcomp <- function(x, ...){
     printCoefmat(dd, has.Pvalue=TRUE)
     invisible(x)
 }
+
+
+
+#' @export
+summary.SATmodcomp <- function(object, ...){
+
+    cat(sprintf("F-test with Satterthwaite approximation; time: %.2f sec\n",
+                object$ctime))
+    
+    tab <- object$test
+    
+    printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+
+    class(tab) <- c("summary_SATmodcomp", "data.frame")
+    invisible(tab)    
+}
+
+
+
+
 
 prform  <- function(form){
     if (!inherits(form, c("formula", "matrix"))) stop("'form' must be formula or matrix")

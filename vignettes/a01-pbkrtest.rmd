@@ -3,7 +3,7 @@ title: "01 - Introduction to 'pbkrtest'"
 author: "Søren Højsgaard and Ulrich Halekoh"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteIndexEntry{01 - Introduction to 'pbkrtest'}
   %\VignetteEncoding{UTF-8}
 ---

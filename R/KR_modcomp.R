@@ -106,13 +106,6 @@
 
 
 
-
-
-
-
-
-
-
 #' @export
 #' @rdname kr_modcomp
 KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
@@ -120,9 +113,15 @@ KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
 }
 
 
+
 #' @export
 #' @rdname kr_modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
+    KRmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details)
+}
+
+
+KRmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
@@ -142,7 +141,13 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     if (!(getME(largeModel, "is_REML"))){
         largeModel <- update(largeModel, .~., REML=TRUE)
     }
-    
+
+    KRmodcomp_worker(largeModel, smallModel, betaH=betaH, details=details)    
+}
+
+
+KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
+
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
     t0    <- proc.time()
@@ -170,10 +175,9 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     out$ctime   <- (proc.time() - t0)[3]
     out$L       <- L
     out
+    
 }
 
-## #' @rdname kr_modcomp
-## KRmodcomp.mer <- KRmodcomp.lmerMod
 
 .finalizeKR <- function(stats){
     
@@ -189,7 +193,7 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
 }
 
 
-KRmodcomp_internal <- function(largeModel, LL, betaH=0, details=0){
+KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
     
     PhiA  <- vcovAdj(largeModel, details)
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), LL, beta=fixef(largeModel), betaH)

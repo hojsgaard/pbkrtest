@@ -1,5 +1,5 @@
 Package: pbkrtest
-Version: 0.5.2.9002
+Version: 0.5.3
 Title: Parametric Bootstrap, Kenward-Roger and Satterthwaite Based Methods for Test in Mixed Models
 Authors@R: c(
     person(given = "Ulrich", family = "Halekoh",
@@ -18,22 +18,23 @@ Description: Computes p-values based on (a) Satterthwaite or
     'citation("pbkrtest")' for citation details.
 URL: https://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
-    R (>= 4.1.0),
+    R (>= 4.2.0),
     lme4 (>= 1.1.31)
 Imports:
     broom,
     dplyr,
     MASS,
-    Matrix (>= 1.2.3),
     methods,
     numDeriv,
-    doBy
+    Matrix (>= 1.2.3),
+    doBy (>= 4.6.22)
 Suggests:
+    markdown,
     knitr    
 Encoding: UTF-8
 VignetteBuilder: knitr
 License: GPL (>= 2)
 ByteCompile: Yes
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 LazyData: true
 Roxygen: list(markdown = TRUE)

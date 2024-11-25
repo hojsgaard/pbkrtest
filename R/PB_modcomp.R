@@ -236,22 +236,19 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
     ## All computations are based on 'largeModel' and 'smallModel'
     ## which at this point are both model objects.
     ## -----------------------------------------------------------
+
+    nr_data <- nrow(getData(largeModel))
+    nr_fit  <- getME(largeModel, "n")
     
+    if (nr_data != nr_fit)
+        stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+    
+    
+#    str(list(nsim=nsim))
     if (is.null(ref)){
         ref <- PBrefdist(largeModel, smallModel, nsim=nsim,
                          seed=seed, cl=cl, details=details)
     }
-    ## cat("ref\n"); print(ref)
-    ## largeModel <<- largeModel
-    ## smallModel <<- smallModel
-    
-    ## dd <- logLik(largeModel) - logLik(smallModel)
-    ## cat("dd:\n"); print(dd)
-
-    ## ll.small <- logLik(smallModel, REML=FALSE)
-    ## ll.large <- logLik(largeModel, REML=FALSE)
-    ## dd <- ll.large - ll.small
-    ## cat("dd:\n"); print(dd)
     
     LRTstat     <- getLRT(largeModel, smallModel)
     ## cat("LRTstat\n"); print(LRTstat)
@@ -271,23 +268,17 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 
 
 
+    ## cat("ref\n"); print(ref)
+    ## largeModel <<- largeModel
+    ## smallModel <<- smallModel
+    
+    ## dd <- logLik(largeModel) - logLik(smallModel)
+    ## cat("dd:\n"); print(dd)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    ## ll.small <- logLik(smallModel, REML=FALSE)
+    ## ll.large <- logLik(largeModel, REML=FALSE)
+    ## dd <- ll.large - ll.small
+    ## cat("dd:\n"); print(dd)
 
 
 
@@ -321,6 +312,7 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
         attributes(formula.small) <- NULL
     }
 
+    
     ## ss <<- smallModel
     ## print(smallModel)
     if (!all.equal((fam.l <- family(largeModel)), (fam.s <- family(smallModel))))
@@ -332,7 +324,14 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
     if (is.null(ref)){
         ref <- PBrefdist(largeModel, smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
     }
+
+    nr_data <- nrow(eval(largeModel$call$data))
+    nr_fit  <- nrow(largeModel$model)
     
+    if (nr_data != nr_fit)
+      stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+    
+        
     LRTstat     <- getLRT(largeModel, smallModel)
     ans         <- .finalizePB(LRTstat, ref)
     .padPB( ans, LRTstat, ref, formula.large, formula.small)    
@@ -532,35 +531,31 @@ seqPBmodcomp <-
         cat(sprintf(" samples: %d; extremes: %d;", sam[1], x$n.extreme))
     }
     cat("\n")
-        
+    
     if (!is.null((sam <- x$samples))){
         if (sam[2] < sam[1]){
             cat(sprintf("Requested samples: %d Used samples: %d Extremes: %d\n",
                         sam[1], sam[2], x$n.extreme))
         }
     }
-
+    
     if (!is.null(x$formula.large)){
         cat("large : "); print(x$formula.large)
     }
     
-    if (!is.null(x$formula.small)){
-        if (inherits(x$formula.small, "formula")) cat("small : ")
-        else if (inherits(x$formula.small, "matrix")) cat("small : \n"); 
-        print(x$formula.small)
+    if (!is.null(x$formula.small)) {
+        if (inherits(x$formula.small, "formula")) {
+            cat("small : ")
+        }
+        else if (inherits(x$formula.small, "matrix")){
+            cat("small : \n"); 
+            print(x$formula.small)            
+        }    
     }
-    
 }
 
 
 
-#' @export
-print.PBmodcomp <- function(x, ...){
-  .PBcommon(x)
-  tab <- x$test
-  printCoefmat(tab, tst.ind=1, na.print='', has.Pvalue=TRUE)
-  return(invisible(x))
-}
 
 
 #' @export
@@ -573,11 +568,25 @@ summary.PBmodcomp <- function(object, ...){
 }
 
 #' @export
+print.PBmodcomp <- function(x, ...){
+  .PBcommon(x)
+  tab <- x$test
+  printCoefmat(tab, tst.ind=1, na.print='', has.Pvalue=TRUE)
+  return(invisible(x))
+}
+
+
+#' @export
 print.summary_PBmodcomp <- function(x, ...){
   .PBcommon(x)
-  ans <- x$test
-  printCoefmat(ans, tst.ind=1, na.print='', has.Pvalue=TRUE)
+  tab <- x$test
+  printCoefmat(tab, tst.ind=1, na.print='', has.Pvalue=TRUE)
   cat("\n")
+  return(invisible(x))
+}
+
+
+
 
 ##   ci <- x$ci
 ##   cat(sprintf("95 pct CI for PBtest   : [%s]\n", toString(ci)))
@@ -586,8 +595,6 @@ print.summary_PBmodcomp <- function(x, ...){
 ##   ga <- x$gamma
 ##   cat(sprintf("Gamma approximation    : scale=%f shape=%f\n", ga[1], ga[2]))
 
-  return(invisible(x))
-}
 
 
 #' @export
@@ -646,112 +653,3 @@ as.data.frame.XXmodcomp <- function(x, row.names = NULL, optional = FALSE, ...){
 
 
 
-
-
-
-
-
-
-
-
-
-    ## w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
-    ## ss <<- smallModel
-    ## ll <<- largeModel
-
-    ## if (w == -1) stop('Models have equal mean stucture or are not nested')
-
-    ## if (w == 0){
-    ##     ## First given model is submodel of second; exchange the models
-    ##     tmp <- largeModel;
-    ##     largeModel <- smallModel;
-    ##     smallModel <- tmp
-    ## }
-
-
-
-
-
-## seqPBmodcomp2 <-
-##     function(largeModel, smallModel, h = 20, nsim = 1000, seed=NULL, cl=NULL) {
-##         t.start <- proc.time()
-
-##         simdata=simulate(smallModel, nsim=nsim, seed=seed)
-##         ref <- rep(NA, nsim)
-##         LRTstat <- getLRT(largeModel, smallModel)
-##         t.obs <- LRTstat["tobs"]
-
-##         count <- 0
-##         n.extreme <- 0
-##         for (i in 1:nsim){
-##             count <- i
-##             yyy <- simdata[,i]
-##             sm2  <- refit(smallModel, newresp=yyy)
-##             lg2  <- refit(largeModel, newresp=yyy)
-##             t.sim <- 2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
-##             ref[i] <- t.sim
-##             if (t.sim >= t.obs)
-##                 n.extreme <- n.extreme + 1
-##             if (n.extreme >= h)
-##                 break
-##         }
-##         ref <- ref[1:count]
-        
-
-##         ans <- PBmodcomp(largeModel, smallModel, ref = ref)
-##         ans$ctime <- (proc.time() - t.start)[3]
-##         ans
-##     }
-
-
-
-
-## plot.XXmodcomp <- function(x, ...){
-
-##   test <- x$test
-##   tobs <- test$LRT['stat']
-##   ref <- attr(x,"ref")
-##   rr  <- range(ref)
-##   xx  <- seq(rr[1],rr[2],0.1)
-##   dd  <- density(ref)
-##   sc  <- var(ref)/mean(ref)
-##   sh  <- mean(ref)^2/var(ref)
-
-##   hist(ref, prob=TRUE,nclass=20, main="Reference distribution")
-##   abline(v=tobs)
-##   lines(dd, lty=2, col=2, lwd=2)
-##   lines(xx,dchisq(xx,df=test$LRT['df']), lty=3, col=3, lwd=2)
-##   lines(xx,dgamma(xx,scale=sc, shape=sh), lty=4, col=4, lwd=2)
-##   lines(xx,df(xx,df1=test$F['df'], df2=test$F['ddf']), lty=5, col=5, lwd=2)
-
-##   smartlegend(x = 'right', y = 'top',
-##               legend = c("kernel density", "chi-square", "gamma","F"),
-##               col = 2:5, lty = 2:5)
-
-## }
-
-
-        
-        ## samples <- attr(ref, "samples")
-        ## if (!is.null(samples)){
-        ##     nsim <- samples['nsim']
-        ##     npos <- samples['npos']
-        ## } else {
-        ##     nsim <- length(ref)
-        ##     npos <- sum(ref>0)
-        ## }
-
-
-##   rho   <- VV/(2*EE^2)
-##   ddf2  <- (ndf*(4*rho+1) - 2)/(rho*ndf-1)
-##   lam2  <- (ddf/(ddf-2))/(EE/ndf)
-##   cat(sprintf("EE=%f, VV=%f, rho=%f, lam2=%f\n",
-##               EE, VV, rho, lam2))
-
-##   ddf2 <- 4 + (ndf+2)/(rho*ndf-1)
-
-##   Fobs2 <- lam2 * tobs/ndf
-##   if (ddf2>0)
-##     p.FF2 <- 1-pf(Fobs2, df1=ndf, df2=ddf2)
-##   else
-##     p.FF2 <- NA
