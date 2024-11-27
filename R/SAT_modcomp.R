@@ -141,30 +141,57 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
 
-    out <- list(test=data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf)),
-                sigma=getME(largeModel, "sigma"),
-                formula.large=formula(largeModel),
-                formula.small=formula(smallModel),
-                ctime=(proc.time() - t0)[3],
-                L=L
+    test <- data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf))
+
+
+    LRTstat     <- getLRT(largeModel, smallModel)
+
+    formula.large <- formula(largeModel)
+    formula.small <- formula(smallModel)
+
+    
+    tobs <- unname(LRTstat[1])
+    ndf  <- unname(LRTstat[2])
+    p.chi <- 1 - pchisq(tobs, df=ndf)
+
+    test = list(
+        LRT        = c(stat=tobs,     ndf=ndf,  ddf=NA,   p.value=p.chi),        
+        Ftest      = c(stat=Fvalue,   ndf=qq,   ddf=ddf,  p.value=1 - pf(Fvalue, df1=qq, df2=ddf)))
+    test  <- as.data.frame(do.call(rbind, test))
+    test$ndf <- as.integer(test$ndf)
+    
+    
+    ans <- list(test = test,
+                sigma = getME(largeModel, "sigma"),
+                formula.large = formula(largeModel),
+                formula.small = formula(smallModel),
+                ctime = (proc.time() - t0)[3],
+                L = L
                 )
-    class(out) <- "SATmodcomp"
-    out
+
+    out <- ans$test[2,, drop=FALSE]
+    ## print(out)
+    attr(out, "aux") <- ans
+
+    attr(out, "heading") <- c(
+        deparse(formula.large),
+        deparse(formula.small))
+
+    class(out) <- c("SATmodcomp", "anova", "data.frame")
+    return(out)
+
     
 }
 
 
+
 #' @export
 print.SATmodcomp <- function(x, ...){
-    cat("large : ")
-    print(x$formula.large)
+    if (!is.null(heading <- attr(x, "heading"))) 
+        cat(heading, sep = "\n")
 
-    if (inherits(x$formula.small, "formula")) cat("small : ")
-    else cat("small (restriction matrix) : \n")
-    prform(x$formula.small)
-    dd <- as.data.frame(x$test[c("statistic", "ndf", "ddf", "p.value")])
-    printCoefmat(dd, has.Pvalue=TRUE)
-    invisible(x)
+    printCoefmat(x[1,,drop=FALSE], tst.ind=1, na.print='', has.Pvalue=TRUE)
+    return(invisible(x))
 }
 
 
@@ -172,19 +199,30 @@ print.SATmodcomp <- function(x, ...){
 #' @export
 summary.SATmodcomp <- function(object, ...){
 
-    cat(sprintf("F-test with Satterthwaite approximation; time: %.2f sec\n",
-                object$ctime))
+    out <- attr(object, "aux")$test
+    attr(out, "aux") <- attr(object, "aux")
+    attr(out, "heading") <- c(
+        deparse(attr(object, "aux")$formula.large),
+        deparse(attr(object, "aux")$formula.small))
     
-    tab <- object$test
-    
-    printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
-
-    class(tab) <- c("summary_SATmodcomp", "data.frame")
-    invisible(tab)    
+    class(out) <- c("summary_KRmodcomp", "anova", "data.frame")
+    out
 }
 
 
+#' @export
+print.summary_SATmodcomp <- function(x, ...){
 
+    ## cat("print.summary_KRmodcomp\n")
+    if (!is.null(heading <- attr(x, "heading"))){
+        heading <- c("F-test with Satterthwaite approximation", heading)
+        cat(heading, sep = "\n")
+    }
+    
+    printCoefmat(x, tst.ind=1, na.print='', has.Pvalue=TRUE)
+    cat("\n")
+    return(invisible(x))
+}
 
 
 prform  <- function(form){

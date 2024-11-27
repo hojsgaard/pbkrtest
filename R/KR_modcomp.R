@@ -156,8 +156,10 @@ KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
     PhiA  <- vcovAdj(largeModel, details)
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=fixef(largeModel), betaH)
     stats <- lapply(stats, c) ## To get rid of all sorts of attributes
+
+    LRTstat     <- getLRT(largeModel, smallModel)
     
-    out   <- .finalizeKR(stats)
+    ans   <- KRcompute_p_values(stats, LRTstat)
     
     formula.small <-
         if (.is.lmm(smallModel)){
@@ -170,25 +172,38 @@ KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
     formula.large <- formula(largeModel)
     attributes(formula.large) <- NULL
     
-    out$formula.large <- formula.large
-    out$formula.small <- formula.small
-    out$ctime   <- (proc.time() - t0)[3]
-    out$L       <- L
-    out
-    
+    ans$formula.large <- formula.large
+    ans$formula.small <- formula.small
+    ans$ctime   <- (proc.time() - t0)[3]
+    ans$L       <- L
+
+    out <- ans$test[2,, drop=FALSE]
+    attr(out, "aux") <- ans
+
+    attr(out, "heading") <- c(
+        deparse(formula.large),
+        deparse(formula.small))
+
+    class(out) <- c("KRmodcomp", "anova", "data.frame")
+    return(out)
 }
 
 
-.finalizeKR <- function(stats){
+KRcompute_p_values <- function(stats, LRTstat){
+
+    tobs <- unname(LRTstat[1])
+    ndf  <- unname(LRTstat[2])
+    p.chi <- 1 - pchisq(tobs, df=ndf)
     
     test = list(
+        LRT        = c(stat=tobs,            ndf=ndf,        ddf=NA,         F.scaling=NA,               p.value=p.chi),        
         Ftest      = c(stat=stats$Fstat,     ndf=stats$ndf,  ddf=stats$ddf,  F.scaling=stats$F.scaling,  p.value=stats$p.value),
         FtestU     = c(stat=stats$FstatU,    ndf=stats$ndf,  ddf=stats$ddf,  F.scaling=NA,               p.value=stats$p.valueU))
     test  <- as.data.frame(do.call(rbind, test))
     test$ndf <- as.integer(test$ndf)
     out   <- list(test=test, type="F", aux=stats$aux, stats=stats)
     ## Notice: stats are carried to the output. They are used for get getKR function...
-    class(out) <- c("KRmodcomp")
+    ## class(out) <- c("KRmodcomp")
     out
 }
 
@@ -198,7 +213,7 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
     PhiA  <- vcovAdj(largeModel, details)
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), LL, beta=fixef(largeModel), betaH)
     stats <- lapply(stats, c) ## To get rid of all sorts of attributes
-    out   <- .finalizeKR(stats)
+    out   <- KRcompute_p_values(stats)
     out
 }
 
@@ -289,7 +304,7 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
   pval   <- pf(Fstat, df1=q, df2=df2, lower.tail=FALSE)
 
   stats <- list(ndf=q, ddf=df2,
-                Fstat  = Fstat,  p.value=pval, F.scaling=F.scaling,
+                Fstat  = Fstat,  p.value  = pval, F.scaling=F.scaling,
                 FstatU = FstatU, p.valueU = pvalU,
                 aux = aux)
   stats
@@ -318,17 +333,21 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
 #' @export
 print.KRmodcomp <- function(x, ...){
 
-    .KRcommon(x)
+    ## .KRcommon(x)
     FF.thresh <- 0.2
     F.scale <- x$aux['F.scaling']
-    tab <- x$test
+    F.scale <- attr(x, "aux")$stats$aux["F.scaling"]
+    ## F.scale <- attr(x, "aux")$stats['F.scaling']
     
     if (max(F.scale) > FF.thresh)
         i <- 1
     else
         i <- 2
+    if (!is.null(heading <- attr(x, "heading"))) 
+        cat(heading, sep = "\n")
 
-    printCoefmat(tab[i,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+    printCoefmat(x[i,,drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+    ## printCoefmat(tab[i,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
     
     invisible(x)
 }
@@ -337,33 +356,61 @@ print.KRmodcomp <- function(x, ...){
 #' @export
 summary.KRmodcomp <- function(object, ...){
 
-    cat(sprintf("F-test with Kenward-Roger approximation; time: %.2f sec\n",
-                object$ctime))
+    ## cat(sprintf("F-test with Kenward-Roger approximation; time: %.2f sec\n",
+                ## object$ctime))
     
-    .KRcommon(object)
-    tab <- object$test
+    out <- attr(object, "aux")$test
+    attr(out, "aux") <- attr(object, "aux")
+    attr(out, "heading") <- c(
+        deparse(attr(object, "aux")$formula.large),
+        deparse(attr(object, "aux")$formula.small))
     
-    printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+    class(out) <- c("summary_KRmodcomp", "anova", "data.frame")
+    out
+}
 
-    FF.thresh <- 0.2
-    F.scale <- object$aux['F.scaling']
 
-    if (F.scale < FF.thresh & F.scale > 0) {
-        cat('Note: The scaling factor for the F-statistic is smaller than 0.2 \n')
-        cat('The Unscaled statistic might be more reliable \n ')
-    } else {
-        if (F.scale <=0 ){
-            cat('Note: The scaling factor for the F-statistic is negative \n')
-            cat('Use the Unscaled statistic instead. \n ')
-        }
+#' @export
+print.summary_KRmodcomp <- function(x, ...){
+
+    if (!is.null(heading <- attr(x, "heading"))){
+        heading <- c("F-test with Kenward-Roger approximation", heading)
+        cat(heading, sep = "\n")
     }
-
-    class(tab) <- c("summary_KRmodcomp", "data.frame")
-    invisible(tab)
     
+    printCoefmat(x, tst.ind=1, na.print='', has.Pvalue=TRUE)
+    cat("\n")
+    return(invisible(x))
 }
 
 
 
 
 
+
+
+
+
+
+
+    ## .KRcommon(object)
+    ## tab <- object$test
+    
+    ## printCoefmat(object, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+
+    ## FF.thresh <- 0.2
+    ## ## F.scale <- object$aux['F.scaling']
+    ## F.scale <- attr(object, "aux")$stats$aux["F.scaling"]
+
+    ## if (F.scale < FF.thresh & F.scale > 0) {
+    ##     cat('Note: The scaling factor for the F-statistic is smaller than 0.2 \n')
+    ##     cat('The Unscaled statistic might be more reliable \n ')
+    ## } else {
+    ##     if (F.scale <=0 ){
+    ##         cat('Note: The scaling factor for the F-statistic is negative \n')
+    ##         cat('Use the Unscaled statistic instead. \n ')
+    ##     }
+    ## }
+
+    ## class(tab) <- c("summary_KRmodcomp", "anova", "data.frame")
+    ## invisible(tab)
