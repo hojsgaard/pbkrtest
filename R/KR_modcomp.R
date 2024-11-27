@@ -81,10 +81,12 @@
 #' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
 #' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
+#' 
 #' KRmodcomp(fm1, "Days")
 #' KRmodcomp(fm1, ~.-Days)
-#' L1 <- cbind(0, 1) 
+#' L1 <- cbind(0, 1)
 #' KRmodcomp(fm1, L1)
+
 #' KRmodcomp(fm1, fm0)
 #' anova(fm1, fm0)
 #'
@@ -99,10 +101,12 @@
 #' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
 #' KRmodcomp(fm2, "I(Days^2)")
 #' KRmodcomp(fm2, ~. - I(Days^2))
+
 #' L3 <- rbind(c(0, 0, 1))
 #' KRmodcomp(fm2, L3)
 #' KRmodcomp(fm2, fm1)
 #' anova(fm2, fm1)
+#' 
 
 
 
@@ -128,13 +132,18 @@ KRmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
     
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
-            
+
+    if (is.numeric(smallModel) && !is.matrix(smallModel))
+        smallModel <- matrix(smallModel, nrow=1)
+    
     w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
 
     if (w == -1) stop('Models have equal mean stucture or are not nested!')
     if (w == 0){
         ## First given model is submodel of second; exchange the models
-        tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
+        tmp <- largeModel; 
+        largeModel <- smallModel; 
+        smallModel <- tmp
     }
     
     ## Refit large model with REML if necessary
@@ -148,19 +157,29 @@ KRmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 
 KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
 
+    
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
     t0    <- proc.time()
     L     <- model2restriction_matrix(largeModel, smallModel)
-    
+
+    if (inherits(smallModel, "matrix")){
+        smallModel <- suppressWarnings(restriction_matrix2model(largeModel, L=smallModel))
+    }
+
+
     PhiA  <- vcovAdj(largeModel, details)
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=fixef(largeModel), betaH)
     stats <- lapply(stats, c) ## To get rid of all sorts of attributes
 
-    LRTstat     <- getLRT(largeModel, smallModel)
+    
+##    print(largeModel); print(smallModel)
+    LRTstat     <- getLRT(largeModel, smallModel)  
+    
+##    cat("LRTstat:\n"); print(LRTstat)
     
     ans   <- KRcompute_p_values(stats, LRTstat)
-    
+
     formula.small <-
         if (.is.lmm(smallModel)){
             .zzz <- formula(smallModel)
@@ -171,6 +190,7 @@ KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
         }
     formula.large <- formula(largeModel)
     attributes(formula.large) <- NULL
+
     
     ans$formula.large <- formula.large
     ans$formula.small <- formula.small

@@ -11,10 +11,14 @@ getLRT <- function(largeModel, smallModel){
 }
 
 #' @export
-getLRT.lmerMod <-
-        function(largeModel, smallModel){
-    logL_small <- logLik(update(smallModel, REML=FALSE))
+getLRT.lmerMod <- function(largeModel, smallModel){
+
+    ## ss <<- smallModel
+## cat("kkkkkkkkkkkkkkkkkkkkkkkkkkkk\n")
+    logL_small <- logLik(suppressWarnings(update(smallModel, REML=FALSE)))
+    ## cat("IIIIIIIIIIIIIIII\n")
     logL_large <- logLik(update(largeModel, REML=FALSE))
+
     tobs     <- 2 * (logL_large - logL_small)
     df11     <- attr(logL_large, "df") - attr(logL_small, "df")
     p.X2     <- 1 - pchisq(tobs, df11)

@@ -106,20 +106,6 @@ restriction_matrix2model.default <- function(largeModel, L, REML=TRUE, ...){
     stop("No useful default method for 'restriction_matrix2model'")
 }
 
-restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
-    form <- as.formula(formula(largeModel))    
-    attributes(XX.lg)[-1] <- NULL
-    XX.sm <- make_model_matrix(XX.lg, L)
-    
-    ncX.sm  <- ncol(XX.sm)
-    colnames(XX.sm) <- paste(".X", 1:ncX.sm, sep='')
-    
-    rhs.fix2 <- paste(".X", 1:ncX.sm, sep='', collapse="+")
-    new_form  <- .formula2list(form)
-    
-    zzz <- list(new_form=new_form, rhs.fix2=rhs.fix2, XX.sm=XX.sm)
-    zzz
-}
 
 
 ## #' @rdname model-coerce
@@ -127,15 +113,44 @@ restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
 restriction_matrix2model.lmerMod <- function(largeModel, L, REML=TRUE, ...){
 
     zzz  <- restriction_matrix2model_internal(largeModel, L, getME(largeModel, "X"))
-    
+#    zzz <<- zzz
+    ## print(zzz)
     new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
                                     "+", zzz$new_form$rhs.ran))
-    new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
-    ans <- update(largeModel, eval(new.formula), data=new.data)
+    new_data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
+    ## print(head(new_data))
+    ## print(new.formula)
+    ## cat("AAAAAAAAAAAAA\n")
+    ## ans <- update(largeModel, eval(new.formula), data=new.data)
+    ans <- suppressWarnings(lmer(eval(new.formula), data=new_data, REML=REML))
+    ## cat("AAAAAAAAAAAAA-------------\n")    
+#    ans <- update(largeModel, data=eval(new.data))
+#    ans <- update(ans, eval(new.formula))
+    ## ans <- update(largeModel, eval(new.formula), data=eval(new.data))
+    ## ans <- update(largeModel, eval(new.formula), data=cbind(eval(zzz$XX.sm), eval(largeModel@call$data)))
+ #   print(ans)
+    ## ans <<- ans
     if (!REML)
-        ans <- update(ans, REML=FALSE)
+        ans <- suppressWarnings(update(ans, REML=FALSE))
+    ## cat("HERRE\n")
     ans
 }
+
+restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
+  form <- as.formula(formula(largeModel))    
+  attributes(XX.lg)[-1] <- NULL
+  XX.sm <- make_model_matrix(XX.lg, L)
+  
+  ncX.sm  <- ncol(XX.sm)
+  colnames(XX.sm) <- paste(".X", 1:ncX.sm, sep='')
+  
+  rhs.fix2 <- paste(".X", 1:ncX.sm, sep='', collapse="+")
+  new_form  <- .formula2list(form)
+  
+  zzz <- list(new_form=new_form, rhs.fix2=rhs.fix2, XX.sm=XX.sm)
+  zzz
+}
+
 
 ## #' @rdname model-coerce
 #' @export

@@ -77,12 +77,17 @@ SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
 
+    if (is.numeric(smallModel) && !is.matrix(smallModel))
+        smallModel <- matrix(smallModel, nrow=1)
+    
     w <- modcomp_init(largeModel, smallModel, matrixOK = TRUE)
 
     if (w == -1) stop('Models have equal mean stucture or are not nested...')
     if (w == 0){
         ## First given model is submodel of second; exchange the models
-        tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
+        tmp <- largeModel;
+        largeModel <- smallModel;
+        smallModel <- tmp
     }
 
     
@@ -94,14 +99,19 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
 
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
-    
+
+
     ## print(largeModel)
     ## print(smallModel)
     largeModel <- update(largeModel, REML=TRUE) ## FIXME: Almost surely
     
     t0    <- proc.time()    
     L     <- model2restriction_matrix(largeModel, smallModel)
-     
+
+    if (inherits(smallModel, "matrix")){
+        smallModel <- suppressWarnings(restriction_matrix2model(largeModel, L=smallModel))
+    }
+    
     beta <- getME(largeModel, "beta")
     aux  <- compute_auxiliary(largeModel)
     vcov_Lbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
