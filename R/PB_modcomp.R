@@ -276,7 +276,8 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 #' @export
 summary.PBmodcomp <- function(object, ...){
 
-    out <- attr(object, "aux")$test
+    out <- attr(object, "aux")$test[c("LRT", "PBtest", "F"),]
+    
     attr(out, "aux") <- attr(object, "aux")
     attr(out, "heading") <- c(
         deparse(attr(object, "aux")$formula.large),
@@ -373,8 +374,10 @@ PBcompute_p_values <- function(LRTstat, ref){
     p.Ga    <- 1 - pgamma(tobs, shape=shape, scale=scale)
     
     ## Fit T/d to F-distribution (1. moment)
-    ddf  <- 2 * EE / (EE - 1)
-
+    ## ddf  <- 2 * EE / (EE - 1)
+    EE2 <- EE / ndf
+    ddf  <- 2 * EE2 / (EE2 - 1)
+    
     Fobs <- tobs/ndf
     if (ddf > 0)
         p.FF <- 1 - pf(Fobs, df1=ndf, df2=ddf)
@@ -587,7 +590,7 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 seqPBmodcomp <-
     function(largeModel, smallModel, h = 20, nsim = 1000, cl=1) {
         t.start <- proc.time()
-        chunk.size <- 200
+        chunk.size <- 100
         nchunk <- nsim %/% chunk.size
         LRTstat <- getLRT(largeModel, smallModel)
         ref <- NULL

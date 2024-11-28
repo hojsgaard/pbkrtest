@@ -71,9 +71,10 @@ implementations of the Kenward-Roger approach!
 (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 
 ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
+
 KRmodcomp(fm1, "Days")
 KRmodcomp(fm1, ~.-Days)
-L1 <- cbind(0, 1) 
+L1 <- cbind(0, 1)
 KRmodcomp(fm1, L1)
 KRmodcomp(fm1, fm0)
 anova(fm1, fm0)
@@ -93,6 +94,7 @@ L3 <- rbind(c(0, 0, 1))
 KRmodcomp(fm2, L3)
 KRmodcomp(fm2, fm1)
 anova(fm2, fm1)
+
 }
 \references{
 Ulrich Halekoh, Søren Højsgaard (2014)., A
