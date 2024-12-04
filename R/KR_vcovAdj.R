@@ -28,7 +28,7 @@
 #'     be relatively slow.
 #' @author Ulrich Halekoh \email{uhalekoh@@health.sdu.dk}, Søren Højsgaard
 #'     \email{sorenh@@math.aau.dk}
-#' @seealso \code{\link{getKR}}, \code{\link{KRmodcomp}}, \code{\link[lme4]{lmer}},
+#' @seealso \code{\link{KRmodcomp}}, \code{\link[lme4]{lmer}},
 #'     \code{\link{PBmodcomp}}, \code{\link{vcovAdj}}
 #' 
 #' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger

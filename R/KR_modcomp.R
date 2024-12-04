@@ -59,7 +59,7 @@
 #' @author Ulrich Halekoh \email{uhalekoh@@health.sdu.dk}, Søren Højsgaard
 #'     \email{sorenh@@math.aau.dk}
 #' 
-#' @seealso \code{\link{getKR}}, \code{\link[lme4]{lmer}},
+#' @seealso \code{\link[lme4]{lmer}},
 #'     \code{\link{vcovAdj}}, \code{\link{PBmodcomp}},
 #'     \code{\link{SATmodcomp}}
 #' 
@@ -307,7 +307,6 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
 
 ### The F-statistic; scaled and unscaled
   betaDiff <- cbind( beta - betaH )
-
   
   ## Wald     <- as.numeric(t(betaDiff) %*% t(L) %*% solve(L %*% PhiA %*% t(L), L %*% betaDiff))
   ## WaldU    <- as.numeric(t(betaDiff) %*% t(L) %*% solve(L %*% Phi %*% t(L), L %*% betaDiff))
@@ -315,7 +314,6 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
   Lb2 <- L %*% betaDiff
   Wald     <- as.numeric(t(Lb2) %*% solve(L %*% PhiA %*% t(L), Lb2))
   WaldU    <- as.numeric(t(Lb2) %*% solve(L %*% Phi  %*% t(L), Lb2))
-
   
   FstatU <- Wald / q
   pvalU  <- pf(FstatU, df1=q, df2=df2, lower.tail=FALSE)

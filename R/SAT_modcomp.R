@@ -16,7 +16,7 @@
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
-#' @seealso \code{\link{getKR}}, \code{\link[lme4]{lmer}}, \code{\link{vcovAdj}},
+#' @seealso \code{\link[lme4]{lmer}}, \code{\link{vcovAdj}},
 #'     \code{\link{PBmodcomp}}, \code{\link{KRmodcomp}}
 #' 
 #' @references Ulrich Halekoh, Søren Højsgaard (2014)., A
@@ -100,7 +100,6 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
 
-
     ## print(largeModel)
     ## print(smallModel)
     largeModel <- update(largeModel, REML=TRUE) ## FIXME: Almost surely
@@ -150,19 +149,15 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
 
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
+    ##test <- data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf))
 
-    test <- data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf))
-
-
-    LRTstat     <- getLRT(largeModel, smallModel)
+    LRTstat  <- getLRT(largeModel, smallModel)
+    tobs     <- unname(LRTstat[1])
+    ndf      <- unname(LRTstat[2])
+    p.chi    <- 1 - pchisq(tobs, df=ndf)
 
     formula.large <- formula(largeModel)
     formula.small <- formula(smallModel)
-
-    
-    tobs <- unname(LRTstat[1])
-    ndf  <- unname(LRTstat[2])
-    p.chi <- 1 - pchisq(tobs, df=ndf)
 
     test = list(
         LRT        = c(stat=tobs,     ndf=ndf,  ddf=NA,   p.value=p.chi),        
@@ -180,7 +175,6 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
                 )
 
     out <- ans$test[2,, drop=FALSE]
-    ## print(out)
     attr(out, "aux") <- ans
 
     attr(out, "heading") <- c(

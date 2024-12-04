@@ -197,6 +197,26 @@
 #' @export PBmodcomp
 
 
+
+
+#' @export
+#' @rdname pb_modcomp
+PBFmodcomp <- function(largeModel, smallModel, nsim=50, ref=NULL, seed=NULL, cl=NULL, details=0){
+    ans <- PBmodcomp(largeModel, smallModel, nsim=nsim, ref=ref, seed=seed, cl=cl, details=details)
+    ans
+
+    heading <- attr(ans, "heading")
+    ## print(heading)
+    out <- attr(ans, "aux")$test["F",]
+    attr(out, "heading") <- heading
+    attr(out, "aux") <- attr(ans, "aux")
+
+    class(out) <- c("PBFmodcomp", "anova", "data.frame")    
+    out
+
+}
+
+
 #' @export
 #' @rdname pb_modcomp
 PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
@@ -288,6 +308,20 @@ summary.PBmodcomp <- function(object, ...){
 }
 
 #' @export
+summary.PBFmodcomp <- function(object, ...){
+
+    out <- attr(object, "aux")$test[c("LRT", "F"),]
+    
+    attr(out, "aux") <- attr(object, "aux")
+    attr(out, "heading") <- c(
+        deparse(attr(object, "aux")$formula.large),
+        deparse(attr(object, "aux")$formula.small))
+    
+    class(out) <- c("summary_PBmodcomp", "anova", "data.frame")
+    out
+}
+
+#' @export
 print.PBmodcomp <- function(x, ...){
 
     ctime <- attr(x,"aux")$ctime
@@ -297,6 +331,22 @@ print.PBmodcomp <- function(x, ...){
     if (!is.null(heading <- attr(x, "heading"))){
         ss <- sprintf("Parametric bootstrap test; extreme / samples / time: %d / %d / %.1f sec",
                       n.extreme, n.pos, ctime)
+        heading <- c(ss, heading)
+        cat(heading, sep = "\n")
+    }
+    
+    printCoefmat(x[1,,drop=FALSE], tst.ind=1, na.print='', has.Pvalue=TRUE)
+    return(invisible(x))
+}
+
+#' @export
+print.PBFmodcomp <- function(x, ...){
+
+    ctime <- attr(x,"aux")$ctime
+    
+    if (!is.null(heading <- attr(x, "heading"))){
+        ss <- sprintf("Parametric bootstrap F-test; time: %.1f sec",
+                      ctime)
         heading <- c(ss, heading)
         cat(heading, sep = "\n")
     }
@@ -326,13 +376,6 @@ print.summary_PBmodcomp <- function(x, ...){
 
 
 
-
-###
-
-#' @export
-as.data.frame.XXmodcomp <- function(x, row.names = NULL, optional = FALSE, ...){
-    as.data.frame(do.call(rbind, x[-c(1:3)]))
-}
 
 PBcompute_p_values <- function(LRTstat, ref){
 
@@ -377,9 +420,11 @@ PBcompute_p_values <- function(LRTstat, ref){
     ## ddf  <- 2 * EE / (EE - 1)
     EE2 <- EE / ndf
     ddf  <- 2 * EE2 / (EE2 - 1)
+
+    ## cat("EE:\n"); print(EE); print(ddf)
     
     Fobs <- tobs/ndf
-    if (ddf > 0)
+    if (ddf > 2)
         p.FF <- 1 - pf(Fobs, df1=ndf, df2=ddf)
     else
         p.FF <- NA
@@ -387,9 +432,9 @@ PBcompute_p_values <- function(LRTstat, ref){
     test = list(
         LRT      = c(stat=tobs,    df=ndf, ddf=NA,   p.value=p.chi),
         PBtest   = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.PB),
+        F        = c(stat=Fobs,    df=ndf, ddf=ddf,  p.value=p.FF),        
         Gamma    = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.Ga),
-        Bartlett = c(stat=BCstat,  df=ndf, ddf=NA,   p.value=p.BC),
-        F        = c(stat=Fobs,    df=ndf, ddf=ddf,  p.value=p.FF)
+        Bartlett = c(stat=BCstat,  df=ndf, ddf=NA,   p.value=p.BC)
     )
 
     test <- as.data.frame(do.call(rbind, test))
