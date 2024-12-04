@@ -116,20 +116,26 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
     vcov_Lbeta <- L %*% aux$vcov_beta %*% t(L) # Var(contrast) = Var(Lbeta)
 
     eig_vcov_Lbeta <- eigen(vcov_Lbeta)
-    P   <- eig_vcov_Lbeta$vectors
-    d   <- eig_vcov_Lbeta$values
-    tol <- max(eps * d[1], 0)
-    pos <- d > tol
+    ## P   <- eig_vcov_Lbeta$vectors
+    PPP   <- eig_vcov_Lbeta$vectors
+    ## d   <- eig_vcov_Lbeta$values
+    ddd   <- eig_vcov_Lbeta$values
+    ## tol <- max(eps * d[1], 0)
+    tol <- max(eps * ddd[1], 0)
+    ## pos <- d > tol
+    pos <- ddd > tol
     qq  <- sum(pos) # rank(vcov_Lbeta)
     
-    PtL <- crossprod(P, L)[1:qq,, drop=FALSE]
+    ## PtL <- crossprod(P, L)[1:qq,, drop=FALSE]
+    PtL <- crossprod(PPP, L)[1:qq,, drop=FALSE]
     ## print(PtL)
 
     ## FIXME: do betaDiff <- beta - betaH
 
     betaDiff <- beta - betaH
     ## t2     <- drop(PtL %*% beta)^2 / d[1:qq]
-    t2     <- drop(PtL %*% betaDiff)^2 / d[1:qq]
+    ## t2     <- drop(PtL %*% betaDiff)^2 / d[1:qq]
+    t2     <- drop(PtL %*% betaDiff)^2 / ddd[1:qq]
     Fvalue <- sum(t2) / qq
 
     grad_PLcov <- lapply(1:qq, function(m) {
@@ -143,7 +149,8 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
     ## 2D_m^2 / g'Ag
     nu_m <- vapply(1:qq,
                    function(m) {
-                       2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
+                       ## 2*(d[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
+                       2*(ddd[m])^2 / qform(grad_PLcov[[m]], aux$vcov_varpar)
                    }, numeric(1L)
     ) 
 
