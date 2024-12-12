@@ -79,7 +79,7 @@ Journal of Statistical Software, 58(10), 1-30.,
 \url{https://www.jstatsoft.org/v59/i09/}
 }
 \seealso{
-\code{\link{getKR}}, \code{\link[lme4]{lmer}}, \code{\link{vcovAdj}},
+\code{\link[lme4]{lmer}}, \code{\link{vcovAdj}},
 \code{\link{PBmodcomp}}, \code{\link{KRmodcomp}}
 }
 \author{

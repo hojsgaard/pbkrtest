@@ -25,6 +25,7 @@ Imports:
     dplyr,
     MASS,
     methods,
+    nlme,
     numDeriv,
     Matrix (>= 1.2.3),
     doBy (>= 4.6.22)

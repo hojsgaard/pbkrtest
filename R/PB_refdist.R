@@ -38,7 +38,7 @@
 #'     NULL then the function will look for
 #'
 #'
-#' @aliases PBrefdist PBrefdist.merMod PBrefdist.lm
+#' @aliases PBrefdist PBrefdist.merMod PBrefdist.lm PBrefdist.gls
 #'
 #' @param largeModel A linear mixed effects model as fitted with the
 #'     \code{lmer()} function in the \pkg{lme4} package. This model muse be
@@ -150,6 +150,60 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
   ref
 }
 
+
+#' @rdname pb-refdist
+#' @export
+PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
+
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+    
+    if (inherits(smallModel, "formula"))
+        smallModel  <- update(largeModel, smallModel)
+
+    if (is.numeric(smallModel) && !is.matrix(smallModel))
+        smallModel <- matrix(smallModel, nrow=1)
+            
+    if (inherits(smallModel, c("Matrix", "matrix"))){
+        formula.small <- smallModel
+        smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
+    } else {
+        formula.small <- formula(smallModel)
+        attributes(formula.small) <- NULL
+    }
+
+    ## From here: largeModel and smallModel are both model objects.
+
+    smallModel <- update(smallModel, method="ML")
+    largeModel <- update(largeModel, method="ML")
+
+    ## print(largeModel)
+    
+    nr_data <- nrow(getData(largeModel))
+    nr_fit  <- largeModel$dims$N
+    
+    if (nr_data != nr_fit)
+      stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+    
+    t0 <- proc.time()
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+
+    LRTstat     <- getLRT(largeModel, smallModel)
+    attr(ref, "stat")    <- LRTstat
+    attr(ref, "samples") <- c(nsim      = nsim,
+                              npos      = sum(ref > 0),
+                              n.extreme = sum(ref > LRTstat["tobs"]),
+                              pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
+    class(ref) <- "refdist"
+    if (details > 0)
+        cat(sprintf("Reference distribution with %5i samples; computing time: %5.2f secs. \n",
+                    length(ref), attr(ref, "ctime")))
+    
+    ref
+}
+
+
+
 #' @rdname pb-refdist
 #' @export
 PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
@@ -187,13 +241,9 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     if (nr_data != nr_fit)
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
     
-    
     t0 <- proc.time()
-
     ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-    
     LRTstat     <- getLRT(largeModel, smallModel)
-
     attr(ref, "stat")    <- LRTstat
     attr(ref, "samples") <- c(nsim      = nsim,
                               npos      = sum(ref > 0),
@@ -207,6 +257,9 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     ref
 }
 
+
+
+
 print.refdist <- function(x, n=6L, ...){
     cat("values: \n")
     print(head(x, n=n))
@@ -217,13 +270,79 @@ print.refdist <- function(x, n=6L, ...){
 
 
 
-get_refdist <- function(lg){
-    UseMethod("get_refdist")
+get_refdist <- function(lg, sm, nsim=20, seed=NULL,
+                        simdata=simulate(sm, nsim=nsim, seed=seed)) {
+                            UseMethod("get_refdist")
 }
+
 
 get_refdist.merMod <- function(lg){
     .get_refdist_merMod
 }
+
+
+
+.get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL,
+                                simdata=simulate(sm, nsim=nsim, seed=NULL)){
+
+    unname(unlist(lapply(simdata, function(yyy){
+        sm2  <- suppressMessages(refit(sm, newresp=yyy))
+        lg2  <- suppressMessages(refit(lg, newresp=yyy))
+        2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
+    })))
+}
+
+get_refdist.gls <- function(lg){
+    .get_refdist_gls
+}
+
+
+
+
+## .get_refdist_gls <- function(lg, sm, nsim=20, seed=NULL,
+##                                 simdata=simulate(sm, nsim=nsim, seed=NULL)){
+
+##     print(lg)
+##     print(simdata)
+
+##     zz <- lapply(simdata, function(yyy){
+##         print(yyy)
+##         sm2  <- suppressMessages(update(sm, yyy ~ ., method="ML"))        
+##         lg2  <- suppressMessages(update(lg, yyy ~ ., method="ML"))
+##         sm22 <<- sm2
+##         lg22 <<- lg2        
+##         2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
+##     })
+    
+##     out <- unname(unlist(zz))
+##     o <<- out
+##     out
+    
+## }
+
+
+.get_refdist_gls <- function(lg, sm, nsim=20, seed=NULL,
+                    simdata=simulate(sm, nsim=nsim, seed=NULL)){
+    
+    ## simdata |>  print()
+    val <- list()
+    for (i in 1:ncol(simdata)){
+        yyy <- simdata[,i]
+        sm2 <- refit_gls(sm, yyy)
+        lg2 <- refit_gls(lg, yyy)
+        
+        lsm <- logLik(sm2, REML=FALSE)
+        llg <- logLik(lg2, REML=FALSE)
+        v <- c(llg, lsm, 2*(llg-lsm))
+        val <- c(val, list(v))
+    }
+    
+    val <- do.call(rbind, val)
+    val[,3]    
+}
+
+
+
 
 get_refdist.lm <- function(lg){
     .get_refdist_lm
@@ -257,19 +376,10 @@ get_refdist.lm <- function(lg){
     ref
 }
 
-.get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL,
-                                simdata=simulate(sm, nsim=nsim, seed=seed)){
-
-    unname(unlist(lapply(simdata, function(yyy){
-        sm2  <- suppressMessages(refit(sm, newresp=yyy))
-        lg2  <- suppressMessages(refit(lg, newresp=yyy))
-        2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
-    })))
-}
 
 
 
-get_cl <- function(cl){
+get_cluster <- function(cl){
 
 
     .cat <- function(b, ...) {if (b) cat(...)}
@@ -319,7 +429,8 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
 
     get_fun <- get_refdist(largeModel)
 
-    cl <- get_cl(cl)
+    ## print(get_fun)
+    cl <- get_cluster(cl)
         
     if (is.numeric(cl)){
         if (!(length(cl) == 1 && cl >= 1))
@@ -332,12 +443,6 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
                                function(i) {
                                    get_fun(largeModel, smallModel, nsim=nsim.cl)},
                                mc.cores=cl))
-
-        # ref <- unlist(lapply(1:cl,
-        #                        function(i) {
-        #                            get_fun(largeModel, smallModel, nsim=nsim.cl)}
-        #                        ))
-
 
     } else
         if (inherits(cl, "cluster")){
@@ -354,4 +459,24 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
     ref
 
 }
+
+
+
+
+
+
+## get_refdist.merMod <- function(lg){
+##     .get_refdist_merMod
+## }
+
+## .get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL,
+##                                 simdata=simulate(sm, nsim=nsim, seed=seed)){
+
+##     unname(unlist(lapply(simdata, function(yyy){
+##         sm2  <- suppressMessages(refit(sm, newresp=yyy))
+##         lg2  <- suppressMessages(refit(lg, newresp=yyy))
+##         2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
+##     })))
+## }
+
 

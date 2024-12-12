@@ -107,7 +107,7 @@ Kenward, M. G. and Roger, J. H. (1997), \emph{Small Sample Inference for
 Fixed Effects from Restricted Maximum Likelihood}, Biometrics 53: 983-997.
 }
 \seealso{
-\code{\link{getKR}}, \code{\link[lme4]{lmer}},
+\code{\link[lme4]{lmer}},
 \code{\link{vcovAdj}}, \code{\link{PBmodcomp}},
 \code{\link{SATmodcomp}}
 }

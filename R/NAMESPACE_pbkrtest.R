@@ -16,7 +16,9 @@
 #' @importFrom methods as is
 #' @importFrom stats as.formula family formula getCall logLik
 #'     model.matrix pchisq pf pgamma printCoefmat quantile simulate
-#'     terms update update.formula var vcov sigma
+#'     terms update update.formula var vcov sigma fitted
+#'
+#' @importFrom nlme gls corMatrix getGroups varWeights
 #'
 #' @importFrom broom tidy
 #' @export tidy

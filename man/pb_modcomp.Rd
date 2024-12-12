@@ -2,6 +2,7 @@
 % Please edit documentation in R/PB_modcomp.R
 \name{pb_modcomp}
 \alias{pb_modcomp}
+\alias{PBFmodcomp}
 \alias{PBmodcomp}
 \alias{PBmodcomp.lm}
 \alias{PBmodcomp.merMod}
@@ -11,9 +12,20 @@
 \alias{plot.XXmodcomp}
 \alias{PBmodcomp.mer}
 \alias{getLRT.mer}
+\alias{PBmodcomp.gls}
 \alias{seqPBmodcomp}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
+PBFmodcomp(
+  largeModel,
+  smallModel,
+  nsim = 50,
+  ref = NULL,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
+
 PBmodcomp(
   largeModel,
   smallModel,
@@ -25,6 +37,16 @@ PBmodcomp(
 )
 
 \method{PBmodcomp}{merMod}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  ref = NULL,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
+
+\method{PBmodcomp}{gls}(
   largeModel,
   smallModel,
   nsim = 1000,

@@ -283,6 +283,65 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 }
 
 
+#' @export
+#' @rdname pb_modcomp
+PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+
+    ## cat("PBmodcomp.gls\n")
+    
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+
+    if (inherits(smallModel, "formula"))
+        smallModel  <- update(largeModel, smallModel)
+
+    if (is.numeric(smallModel) && !is.matrix(smallModel))
+        smallModel <- matrix(smallModel, nrow=1)
+            
+    if (inherits(smallModel, c("Matrix", "matrix"))){
+        formula.small <- smallModel
+        smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
+    } else {
+        formula.small <- formula(smallModel)
+        attributes(formula.small) <- NULL
+    }
+
+    formula.large <- formula(largeModel)
+    attributes(formula.large) <- NULL
+    
+    ## All computations are based on 'largeModel' and 'smallModel'
+    ## which at this point are both model objects.
+    ## -----------------------------------------------------------
+
+    nr_data <- nrow(getData(largeModel))
+    nr_fit  <- largeModel$dims$N
+    
+    if (nr_data != nr_fit)
+        stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+    
+    if (is.null(ref)){
+        ref <- PBrefdist(largeModel, smallModel, nsim=nsim,
+                         seed=seed, cl=cl, details=details)
+    }
+    
+    LRTstat     <- getLRT(largeModel, smallModel)
+    ans         <- PBcompute_p_values(LRTstat, ref)
+
+    ans$formula.large <- formula.large
+    ans$formula.small <- formula.small
+
+    out <- ans$test[2,, drop=FALSE]
+    attr(out, "aux") <- ans
+
+    attr(out, "heading") <- c(
+        deparse(formula.large),
+        deparse(formula.small))
+
+    class(out) <- c("PBmodcomp", "anova", "data.frame")
+    return(out)
+}
+
+
 
 
 

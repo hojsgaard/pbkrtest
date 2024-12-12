@@ -5,6 +5,7 @@
 \alias{PBrefdist}
 \alias{PBrefdist.merMod}
 \alias{PBrefdist.lm}
+\alias{PBrefdist.gls}
 \title{Calculate reference distribution using parametric bootstrap}
 \usage{
 PBrefdist(
@@ -17,6 +18,15 @@ PBrefdist(
 )
 
 \method{PBrefdist}{lm}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
+
+\method{PBrefdist}{gls}(
   largeModel,
   smallModel,
   nsim = 1000,

@@ -101,11 +101,11 @@ kr.imbal |> tidy()
 summary(kr.imbal) |> tidy()
 ```
 
-Estimated degrees of freedom can be found with
+<!-- Estimated degrees of freedom can be found with -->
 
-```{r}
-c(bal_ddf = getKR(kr.bal, "ddf"), imbal_ddf = getKR(kr.imbal, "ddf"))
-```
+<!-- ```{r} -->
+<!-- c(bal_ddf = getKR(kr.bal, "ddf"), imbal_ddf = getKR(kr.imbal, "ddf")) -->
+<!-- ``` -->
 
 
 Notice that the Kenward-Roger approximation gives results  similar to but not identical to the paired
@@ -134,11 +134,11 @@ sat.imbal |> tidy()
 ```
 
 
-Estimated degrees of freedom can be found with
+<!-- Estimated degrees of freedom can be found with -->
 
-```{r}
-c(bal_ddf = getSAT(sat.bal, "ddf"), imbal_ddf = getSAT(sat.imbal, "ddf"))
-```
+<!-- ```{r} -->
+<!-- c(bal_ddf = getSAT(sat.bal, "ddf"), imbal_ddf = getSAT(sat.imbal, "ddf")) -->
+<!-- ``` -->
 
 
 # Parametric bootstrap
