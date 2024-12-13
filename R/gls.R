@@ -58,7 +58,6 @@ gls_cov_matrix <- function(model) {
 
 ##' @title Simulate data for 'gls' object
 ##' @description Simulate data for 'gls' object
-##' 
 ##' @param object A gls object
 ##' @param nsim Number of simulations
 ##' @param seed Seed for random number generator
@@ -101,6 +100,7 @@ simulate.gls <- function(object, nsim = 1, seed = NULL, ...) {
 ##' @param newresp A numeric vector
 ##' @return A gls object 
 ##' @author Søren Højsgaard
+##' 
 ##' @export
 refit_gls <- function(object, newresp) {
   if (!inherits(object, "gls")) stop("Object must be a 'gls' object.")
@@ -139,55 +139,54 @@ refit_gls <- function(object, newresp) {
   return(updated_object)
 }
 
-##' @title Refit a lme object to new response variable
-##' @param object A lme object
-##' @param newresp A numeric vector
-##' @return A gls object 
-##' @author Søren Højsgaard
-##' @export
-refit_lme <- function(object, newresp) {
-  if (!inherits(object, "lme")) stop("Object must be a 'lme' object.")
+## ##' @title Refit a lme object to new response variable
+## ##' @param object A lme object
+## ##' @param newresp A numeric vector
+## ##' @return A gls object 
+## ##' @author Søren Højsgaard
+## ##' @export
+## refit_lme <- function(object, newresp) {
+##   if (!inherits(object, "lme")) stop("Object must be a 'lme' object.")
   
-  # Hent data fra modellen
-  original_data <- getData(object)
+##   # Hent data fra modellen
+##   original_data <- getData(object)
   
-  # Tilføj den nye responsvariabel til data
-  original_data[["new_response"]] <- newresp
+##   # Tilføj den nye responsvariabel til data
+##   original_data[["new_response"]] <- newresp
   
-  # Skab en ny formel
-  original_formula <- formula(object)
-  term_labels <- attr(terms(original_formula), "term.labels")
+##   # Skab en ny formel
+##   original_formula <- formula(object)
+##   term_labels <- attr(terms(original_formula), "term.labels")
   
-  # Håndter tilfælde af y ~ 1
-  if (length(term_labels) == 0) {
-    new_formula <- as.formula("new_response ~ 1")
-  } else {
-    new_formula <- as.formula(paste(
-      "new_response", "~", paste(term_labels, collapse = "+")
-    ))
-  }
+##   # Håndter tilfælde af y ~ 1
+##   if (length(term_labels) == 0) {
+##     new_formula <- as.formula("new_response ~ 1")
+##   } else {
+##     new_formula <- as.formula(paste(
+##       "new_response", "~", paste(term_labels, collapse = "+")
+##     ))
+##   }
   
-  # Opdater modelkaldet
-  updated_call <- object$call
-  updated_call$fixed <- new_formula
-  updated_call$data <- original_data
-  updated_call$control <- lmeControl(opt = "nlminb", maxIter = 400, msMaxIter = 600, niterEM = 150)
+##   # Opdater modelkaldet
+##   updated_call <- object$call
+##   updated_call$fixed <- new_formula
+##   updated_call$data <- original_data
+##   updated_call$control <- lmeControl(opt = "nlminb", maxIter = 400, msMaxIter = 600, niterEM = 150)
   
-  # Brug startværdier fra den oprindelige model
-  ## updated_call$start <- list(fixed = fixef(object))
+##   # Brug startværdier fra den oprindelige model
+##   ## updated_call$start <- list(fixed = fixef(object))
   
-  # Evaluer det opdaterede modelkald
-  updated_object <- eval(updated_call, parent.frame())
+##   # Evaluer det opdaterede modelkald
+##   updated_object <- eval(updated_call, parent.frame())
   
-  # Returnér den nye model
-  return(updated_object)
-}
+##   # Returnér den nye model
+##   return(updated_object)
+## }
 
 
 
 ##' @title Variance and correlation parameters from gls object
 ##' @param object A gls object
-##' @param newresp A numeric vector
 ##' @return 
 ##' @author Søren Højsgaard
 ##' @export

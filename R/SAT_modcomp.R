@@ -11,8 +11,9 @@
 #' Notice: It cannot be guaranteed that the results agree with other
 #' implementations of the Satterthwaite approach!
 #'
-#' @inheritParams kr_modcomp
 #' @param eps A small number.
+#' @inheritParams kr_modcomp
+#' 
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 #' 
@@ -70,8 +71,8 @@ SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=s
 
 
 #' @export
-#' @rdname kr_modcomp
-SATmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0) {
+#' @rdname sat_modcomp
+SATmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)) {
     stop("SATmodcomp is not inplemented for gls objects; PBmodcomp is available.\n")
 }
 
