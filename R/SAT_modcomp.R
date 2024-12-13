@@ -69,6 +69,14 @@ SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=s
 }
 
 
+#' @export
+#' @rdname kr_modcomp
+SATmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0) {
+    stop("SATmodcomp is not inplemented for gls objects; PBmodcomp is available.\n")
+}
+
+
+
 SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
 
     if (is.character(smallModel))
@@ -89,7 +97,6 @@ SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=
         largeModel <- smallModel;
         smallModel <- tmp
     }
-
     
     SATmodcomp_worker(largeModel, smallModel, betaH=betaH, details=details, eps=eps)
 }

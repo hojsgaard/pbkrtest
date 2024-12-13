@@ -124,6 +124,12 @@ KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     KRmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details)
 }
 
+#' @export
+#' @rdname kr_modcomp
+KRmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0) {
+    stop("KRmodcomp is not inplemented for gls objects; PBmodcomp is available.\n")
+}
+
 
 KRmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 
