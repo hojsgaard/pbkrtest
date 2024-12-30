@@ -1,5 +1,0 @@
-clinic care survived dead
-A       low   176     3
-A       high  293     4
-B       low   197    17
-B       high   23     2

@@ -1,7 +1,0 @@
-coolbah position count
-with    bottom   15
-with    middle	  4
-with    top       0
-without bottom   13
-without middle    8
-without top      17

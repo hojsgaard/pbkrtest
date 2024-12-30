@@ -1,7 +1,0 @@
-y	n	storage	force
-55	102	control	  40
-52	 99	control	 150
-57	108	control	 350
-55	 76	treat	  40
-50	 81	treat	 150
-50	 90	treat	 350

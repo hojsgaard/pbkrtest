@@ -1,9 +1,0 @@
-teat position count
-1 upper 10
-1 lower 14
-2 upper 15
-2 lower 19
-3 upper 15
-3 lower 17
-4 upper 22
-4 upper 31
