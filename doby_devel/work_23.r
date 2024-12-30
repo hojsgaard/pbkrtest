@@ -1,4 +1,22 @@
 library(doBy)
+library(ggplot2)
+library(dplyr)
+dat <- milkman
+
+dat <- dat |> filter(ampm==1)
+dd <- dat |> group_by(cowlact) |> summarise(n=n()) |> filter(n>300)
+dat <- dat  |> filter(cowlact %in% dd$cowlact[1:4])
+
+dat |> ggplot(aes(dfc, ecmy, group=cowlact)) +
+    geom_point() + facet_grid(~cowlact)
+
+lm(log(ecmy)~dfc + log(dfc))
+
+
+
+
+
+
 library(tidyverse)
 load_all()
 BC <- read_delim("https://asta.math.aau.dk/datasets?file=BC0.dat",

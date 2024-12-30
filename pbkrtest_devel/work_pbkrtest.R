@@ -1,12 +1,39 @@
 library(pbkrtest)
 load_all("_pbkrtest")
-
 load_all("pbkrtestDEVEL/_pbkrtest/")
-
 load_all()
 
-fm0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
-fm1 <- update(fm0, .~. -harvest)
+
+fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+
+new.data <- sleepstudy
+
+update(fm1, data=new.data)
+
+f <- function(){
+    new.data <- sleepstudy
+    new.data$dummy <- 1
+    mm <- update(fm1, data=new.data)
+    mm <- update(fm1, .~.+ dummy, data=new.data)    
+    update(mm, REML=FALSE)
+}
+
+f()
+
+#'
+#' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
+#' KRmodcomp(fm1, "Days")
+#' KRmodcomp(fm1, ~.-Days)
+#' L1 <- cbind(0, 1)
+#' KRmodcomp(fm1, L1)
+#' KRmodcomp(fm1, fm0)
+#' anova(fm1, fm0)
+
+
+
+
+
+
 
 ## Is there an effect of harvest time?
 an <- anova(fm0, fm1)
