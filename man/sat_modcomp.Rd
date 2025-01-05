@@ -4,6 +4,7 @@
 \alias{sat_modcomp}
 \alias{SATmodcomp}
 \alias{SATmodcomp.lmerMod}
+\alias{SATmodcomp.gls}
 \title{F-test and degrees of freedom based on Satterthwaite approximation}
 \usage{
 SATmodcomp(
@@ -15,6 +16,14 @@ SATmodcomp(
 )
 
 \method{SATmodcomp}{lmerMod}(
+  largeModel,
+  smallModel,
+  betaH = 0,
+  details = 0,
+  eps = sqrt(.Machine$double.eps)
+)
+
+\method{SATmodcomp}{gls}(
   largeModel,
   smallModel,
   betaH = 0,

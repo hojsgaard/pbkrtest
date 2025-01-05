@@ -8,8 +8,6 @@ gls_varcorr(object)
 }
 \arguments{
 \item{object}{A gls object}
-
-\item{newresp}{A numeric vector}
 }
 \description{
 Variance and correlation parameters from gls object
