@@ -194,17 +194,54 @@ pbb$p.value
 source("nlme.R")
 data("Orthodont")
 
+.get_refdist_gls <- function(lg, sm, nsim=20, seed=NULL,
+                    simdata=simulate(sm, nsim=nsim, seed=NULL)){
+    
+    ## simdata |>  print()
+    val <- list()
+    for (i in 1:ncol(simdata)){
+        yyy <- simdata[,i]
+        sm2 <- refit_gls(sm, yyy)
+        lg2 <- refit_gls(lg, yyy)
+        
+        lsm <- logLik(sm2, REML=FALSE)
+        llg <- logLik(lg2, REML=FALSE)
+        v <- c(llg, lsm, 2*(llg-lsm))
+        val <- c(val, list(v))
+    }
+    
+    val <- do.call(rbind, val)
+    val[,3]    
+}
+
+
+
 mm1 <- lme(distance ~ age, random = ~ age | Subject, 
                  correlation = corAR1(form = ~ 1 | Subject), data = Orthodont, method="ML")
 
 mm1 <- lme(distance ~ age, random = ~ age | Subject, 
                  data = Orthodont, method="ML")
+
+
 mm0 <- update(mm1, .~.-age)
 
 PBrefdist(mm1,mm0)
 
 sm <- mm0
 lg <- mm1
+
+VVV <- compute_full_covariance_matrix(mm1)
+
+fitted(mm1)
+
+bb <- fixef(mm1)
+vbb <- vcov(mm1)
+
+
+
+
+
+
 
 
 ```

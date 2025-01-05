@@ -1,31 +1,53 @@
 library(doBy)
-
-srcit <- function(){
-    flist <- list.files("linestPack/R",pattern=glob2rx("*.R"),full.names=TRUE);
-    sapply(flist,source)
-    NULL
-}
-
-library(linestPack)
-
+library(emmeans)
 
 ## GEE
 library(geepack)
 warp.gee <- geeglm(breaks~tension, id=wool, data=warpbreaks)
-Linest(warp.gee, effect="tension")
+oo <- LSmeans(warp.gee, effect="tension")
+LSmeans(warp.gee, effect=~tension)
+emmeans(warp.gee, specs =~tension)
+
+
+load_all("_doby")
+library(lme4)
+warp.mm <- lmer(breaks~-1+tension+ (1|wool), data=warpbreaks)
+aa  <- LSmeans(warp.mm, effect="tension", adjust.df=F)
+aa
+
+
+
+
+
+oo
+
+ee <-emmeans(warp.mm, specs="tension")
+
+
+        <- cbind(oo$grid, oo$coef)
+attr(oo2, "L") <- oo$L
+
+cbind(oo2,
+      cbind(lwr=oo2$estimate -1.96*oo2$std.error,
+            upr=oo2$estimate +1.96*oo2$std.error))
+
+
+
+
+
+
+
+
 
 ## GLM
 warp.glm <- glm(breaks~tension+wool, family=Gamma, data=warpbreaks)
-Linest(warp.glm, effect="tension")
+LSmeans(warp.glm, effect="tension")
 
 ## LMM
-library(lme4)
-warp.mm <- lmer(breaks~-1+tension+ (1|wool), data=warpbreaks)
-Linest(warp.mm, effect="tension", adjust.df=F)
 
 ## GLMM
 warp.mm <- glmer(breaks~-1+tension+ (1|wool), family=poisson, data=warpbreaks)
-Linest(warp.mm, effect="tension")
+LSmeans(warp.mm, effect="tension")
 
 library(ggplot2)
 
