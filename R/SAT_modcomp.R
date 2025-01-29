@@ -11,7 +11,6 @@
 #' Notice: It cannot be guaranteed that the results agree with other
 #' implementations of the Satterthwaite approach!
 #'
-#' @param eps A small number.
 #' @inheritParams kr_modcomp
 #' 
 #'
@@ -59,26 +58,26 @@
 
 #' @export
 #' @rdname sat_modcomp
-SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
+SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, ...){
     UseMethod("SATmodcomp")
 }
 
 #' @export
 #' @rdname sat_modcomp
-SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
-    SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details, eps=eps)
+SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, ...){
+    SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details, ...)
 }
 
 
 #' @export
 #' @rdname sat_modcomp
-SATmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)) {
+SATmodcomp.gls <- function(largeModel, smallModel, betaH=0, details=0, ...) {
     stop("SATmodcomp is not inplemented for gls objects; PBmodcomp is available.\n")
 }
 
 
 
-SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
+SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps), ...){
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
@@ -175,10 +174,10 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
     formula.small <- formula(smallModel)
 
     test = list(
-        LRT        = c(stat=tobs,     ndf=ndf,  ddf=NA,   p.value=p.chi),        
-        Ftest      = c(stat=Fvalue,   ndf=qq,   ddf=ddf,  p.value=1 - pf(Fvalue, df1=qq, df2=ddf)))
+        LRT        = c(stat=tobs,     df=ndf,  ddf=NA,   p.value=p.chi),        
+        SAT_Ftest      = c(stat=Fvalue,   df=qq,   ddf=ddf,  p.value=1 - pf(Fvalue, df1=qq, df2=ddf)))
     test  <- as.data.frame(do.call(rbind, test))
-    test$ndf <- as.integer(test$ndf)
+    test$df <- as.integer(test$df)
     
     
     ans <- list(test = test,
@@ -224,7 +223,7 @@ summary.SATmodcomp <- function(object, ...){
         deparse(attr(object, "aux")$formula.large),
         deparse(attr(object, "aux")$formula.small))
     
-    class(out) <- c("summary_KRmodcomp", "anova", "data.frame")
+    class(out) <- c("summary_SATmodcomp", "anova", "data.frame")
     out
 }
 
@@ -252,6 +251,22 @@ prform  <- function(form){
         prmatrix(form, collab = rep_len("", ncol(form)), rowlab = rep_len("", ncol(form)))
     invisible(form)    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Returns the deviance function for a linear mixed model.

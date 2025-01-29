@@ -133,7 +133,7 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
   if (nr_data != nr_fit)
     stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
   
-  ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+  ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
   
   ## ref <- ref[ref > 0]
 
@@ -186,7 +186,7 @@ PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
     
     t0 <- proc.time()
-    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+    ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
 
     LRTstat     <- getLRT(largeModel, smallModel)
     attr(ref, "stat")    <- LRTstat
@@ -238,7 +238,7 @@ PBrefdist.lme <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
     
     t0 <- proc.time()
-    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+    ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
 
     LRTstat     <- getLRT(largeModel, smallModel)
     attr(ref, "stat")    <- LRTstat
@@ -272,6 +272,7 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     if (inherits(smallModel, c("Matrix", "matrix"))){
         formula.small <- smallModel
         smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
+
     } else {
         formula.small <- formula(smallModel)
         attributes(formula.small) <- NULL
@@ -292,15 +293,21 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     
     if (nr_data != nr_fit)
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+
+    LRTstat     <- getLRT(largeModel, smallModel)    
+    t0  <- proc.time()
     
-    t0 <- proc.time()
-    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-    LRTstat     <- getLRT(largeModel, smallModel)
+
+    ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
+              
     attr(ref, "stat")    <- LRTstat
     attr(ref, "samples") <- c(nsim      = nsim,
                               npos      = sum(ref > 0),
                               n.extreme = sum(ref > LRTstat["tobs"]),
                               pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
+
+
+
     class(ref) <- "refdist"
     if (details > 0)
         cat(sprintf("Reference distribution with %5i samples; computing time: %5.2f secs. \n",
@@ -449,6 +456,21 @@ get_cluster <- function(cl){
     cl
     
 }
+
+
+    wrap_do_sampling <- function(largeModel, smallModel, nsim, cl, details){
+        ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+        count <- 1
+        repeat{
+            if (mean(ref) > 1) break()
+            ## ref <- c(ref, do_sampling(largeModel, smallModel, nsim, cl, details))
+            ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+            count <- count + 1
+            if (count==4) break()
+        }
+        ref
+    }
+
 
 do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
 

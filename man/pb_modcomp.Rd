@@ -19,11 +19,12 @@
 PBFmodcomp(
   largeModel,
   smallModel,
-  nsim = 50,
+  nsim = 500,
   ref = NULL,
   seed = NULL,
   cl = NULL,
-  details = 0
+  details = 0,
+  ...
 )
 
 PBmodcomp(
@@ -88,6 +89,8 @@ reference distribution using several cores. See examples below.}
 
 \item{details}{The amount of output produced. Mainly relevant for
 debugging purposes.}
+
+\item{...}{Additional arguments, currently not used.}
 
 \item{h}{For sequential computing for bootstrap p-values: The
 number of extreme cases needed to generate before the sampling

@@ -8,7 +8,7 @@
 #'     mclapply detectCores makeCluster stopCluster
 #'
 #' @importClassesFrom Matrix Matrix
-#' @importFrom Matrix Matrix sparseMatrix rankMatrix
+#' @importFrom Matrix Matrix sparseMatrix rankMatrix crossprod tcrossprod
 #' @importMethodsFrom Matrix t isSymmetric "%*%" solve diag chol
 #'     chol2inv forceSymmetric "*"
 #'

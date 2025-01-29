@@ -34,7 +34,6 @@ getLRT.gls <- function(largeModel, smallModel){
     c(tobs=tobs, df=df11, p.value=p.X2)
 }
 
-
 #' @export
 getLRT.glmerMod <-
         function(largeModel, smallModel){
@@ -67,19 +66,6 @@ getLRT.lm <- function(largeModel, smallModel){
     ## p.X2     <- 1 - pchisq(tobs, df11)
     ## c(tobs=tobs, df=df11, p.value=p.X2)
 ## }
-
-
-as.data.frame.PBmodcomp <- function(x, ...){
-    out <- x$test
-    attributes(out) <- c(attributes(out), x[-1])
-    out
-}
-
-as.data.frame.summary_PBmodcomp <- function(x, ...){
-    out <- x$test
-    attributes(out) <- c(attributes(out), x[-1])
-    out
-}
 
 
 

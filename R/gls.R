@@ -187,7 +187,7 @@ refit_gls <- function(object, newresp) {
 
 ##' @title Variance and correlation parameters from gls object
 ##' @param object A gls object
-##' @return 
+##' @return Variance and covariance parameters of object 
 ##' @author Søren Højsgaard
 ##' @export
 gls_varcorr <- function(object) {

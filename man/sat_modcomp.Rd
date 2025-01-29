@@ -7,29 +7,11 @@
 \alias{SATmodcomp.gls}
 \title{F-test and degrees of freedom based on Satterthwaite approximation}
 \usage{
-SATmodcomp(
-  largeModel,
-  smallModel,
-  betaH = 0,
-  details = 0,
-  eps = sqrt(.Machine$double.eps)
-)
+SATmodcomp(largeModel, smallModel, betaH = 0, details = 0, ...)
 
-\method{SATmodcomp}{lmerMod}(
-  largeModel,
-  smallModel,
-  betaH = 0,
-  details = 0,
-  eps = sqrt(.Machine$double.eps)
-)
+\method{SATmodcomp}{lmerMod}(largeModel, smallModel, betaH = 0, details = 0, ...)
 
-\method{SATmodcomp}{gls}(
-  largeModel,
-  smallModel,
-  betaH = 0,
-  details = 0,
-  eps = sqrt(.Machine$double.eps)
-)
+\method{SATmodcomp}{gls}(largeModel, smallModel, betaH = 0, details = 0, ...)
 }
 \arguments{
 \item{largeModel}{An \code{lmer} model}
@@ -41,7 +23,7 @@ e.g. L beta=L betaH. If \code{smallModel} is a model object then betaH=0.}
 
 \item{details}{If larger than 0 some timing details are printed.}
 
-\item{eps}{A small number.}
+\item{...}{Additional arguments, currently not used.}
 }
 \description{
 An approximate F-test based on the Satterthwaite approach.

@@ -9,6 +9,9 @@ gls_varcorr(object)
 \arguments{
 \item{object}{A gls object}
 }
+\value{
+Variance and covariance parameters of object
+}
 \description{
 Variance and correlation parameters from gls object
 }

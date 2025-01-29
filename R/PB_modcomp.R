@@ -53,6 +53,7 @@
 #'     reference distribution using several cores. See examples below.
 #' @param details The amount of output produced. Mainly relevant for
 #'     debugging purposes.
+#' @param ... Additional arguments, currently not used.
 #' @note It can happen that some values of the LRT statistic in the
 #'     reference distribution are negative. When this happens one will
 #'     see that the number of used samples (those where the LRT is
@@ -201,13 +202,10 @@
 
 #' @export
 #' @rdname pb_modcomp
-PBFmodcomp <- function(largeModel, smallModel, nsim=50, ref=NULL, seed=NULL, cl=NULL, details=0){
+PBFmodcomp <- function(largeModel, smallModel, nsim=500, ref=NULL, seed=NULL, cl=NULL, details=0, ...){
     ans <- PBmodcomp(largeModel, smallModel, nsim=nsim, ref=ref, seed=seed, cl=cl, details=details)
-    ans
-
     heading <- attr(ans, "heading")
-    ## print(heading)
-    out <- attr(ans, "aux")$test["F",]
+    out <- attr(ans, "aux")$test["PB_Ftest",]
     attr(out, "heading") <- heading
     attr(out, "aux") <- attr(ans, "aux")
 
@@ -215,7 +213,6 @@ PBFmodcomp <- function(largeModel, smallModel, nsim=50, ref=NULL, seed=NULL, cl=
     out
 
 }
-
 
 #' @export
 #' @rdname pb_modcomp
@@ -342,6 +339,77 @@ PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL
 }
 
 
+#' @export
+#' @rdname pb_modcomp
+PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+
+    ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
+
+    if (is.character(smallModel))
+        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+
+    if (inherits(smallModel, "formula"))
+        smallModel  <- update(largeModel, smallModel)
+
+    if (is.numeric(smallModel) && !is.matrix(smallModel))
+        smallModel <- matrix(smallModel, nrow=1)
+    
+    formula.large <- formula(largeModel)
+    attributes(formula.large) <- NULL
+    
+    if (inherits(smallModel, c("Matrix", "matrix"))){
+        formula.small <- smallModel
+        smallModel <- restriction_matrix2model(largeModel, smallModel)
+    } else {
+        formula.small <- formula(smallModel)
+        attributes(formula.small) <- NULL
+    }
+
+    
+    ## ss <<- smallModel
+    ## print(smallModel)
+    if (!all.equal((fam.l <- family(largeModel)), (fam.s <- family(smallModel))))
+        stop("Models do not have identical identical family\n")
+
+    if (!(fam.l$family %in% ok.fam))
+        stop(sprintf("family must be of type %s", toString(ok.fam)))
+        
+    if (is.null(ref)){
+        ref <- PBrefdist(largeModel, smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
+    }
+
+    nr_data <- nrow(eval(largeModel$call$data))
+    nr_fit  <- nrow(largeModel$model)
+    
+    if (nr_data != nr_fit)
+      stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+    
+        
+    LRTstat     <- getLRT(largeModel, smallModel)
+    ans         <- PBcompute_p_values(LRTstat, ref)
+
+    
+    ans$formula.large <- formula.large
+    ans$formula.small <- formula.small
+
+    out <- ans$test[2,]
+    ## print(out) ##HHHHHHHHHHHHHH
+    attr(out, "aux") <- ans
+
+    attr(out, "heading") <- c(
+        deparse(formula.large),
+        deparse(formula.small))
+
+    class(out) <- c("PBmodcomp", "anova", "data.frame")
+    return(out)
+
+}
+
+
+
+
+
+
 
 
 
@@ -388,7 +456,7 @@ print.PBmodcomp <- function(x, ...){
     n.pos <- attr(x,"aux")$samples[2]
     
     if (!is.null(heading <- attr(x, "heading"))){
-        ss <- sprintf("Parametric bootstrap test; extreme / samples / time: %d / %d / %.1f sec",
+        ss <- sprintf("Parametric bootstrap test; n.ext: %d, n.boot: %d, time: %.1f sec",
                       n.extreme, n.pos, ctime)
         heading <- c(ss, heading)
         cat(heading, sep = "\n")
@@ -422,8 +490,9 @@ print.summary_PBmodcomp <- function(x, ...){
     n.pos <- attr(x,"aux")$samples[2]
     
     if (!is.null(heading <- attr(x, "heading"))){
-        ss <- sprintf("Parametric bootstrap test; extreme / samples / time: %d / %d / %.1f sec",
+        ss <- sprintf("Parametric bootstrap test; n.ext: %d, n.boot: %d, time: %.1f sec",
                       n.extreme, n.pos, ctime)
+
         heading <- c(ss, heading)
         cat(heading, sep = "\n")
     }
@@ -440,7 +509,7 @@ PBcompute_p_values <- function(LRTstat, ref){
 
     tobs <- unname(LRTstat[1])
     ndf  <- unname(LRTstat[2])
-
+rr <<- ref
     refpos   <- ref[ref > 0]
     nsim <- length(ref)
     npos <- length(refpos)
@@ -479,7 +548,6 @@ PBcompute_p_values <- function(LRTstat, ref){
     ## ddf  <- 2 * EE / (EE - 1)
     EE2 <- EE / ndf
     ddf  <- 2 * EE2 / (EE2 - 1)
-
     ## cat("EE:\n"); print(EE); print(ddf)
     
     Fobs <- tobs/ndf
@@ -491,7 +559,7 @@ PBcompute_p_values <- function(LRTstat, ref){
     test = list(
         LRT      = c(stat=tobs,    df=ndf, ddf=NA,   p.value=p.chi),
         PBtest   = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.PB),
-        F        = c(stat=Fobs,    df=ndf, ddf=ddf,  p.value=p.FF),        
+        PB_Ftest = c(stat=Fobs,    df=ndf, ddf=ddf,  p.value=p.FF),        
         Gamma    = c(stat=tobs,    df=NA,  ddf=NA,   p.value=p.Ga),
         Bartlett = c(stat=BCstat,  df=ndf, ddf=NA,   p.value=p.BC)
     )
@@ -620,70 +688,8 @@ plot.PBmodcomp <- function(x, ...){
 
 ### dot-functions below here
 
-#' @export
-#' @rdname pb_modcomp
-PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
-    ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
 
-    if (is.character(smallModel))
-        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
-
-    if (inherits(smallModel, "formula"))
-        smallModel  <- update(largeModel, smallModel)
-
-    if (is.numeric(smallModel) && !is.matrix(smallModel))
-        smallModel <- matrix(smallModel, nrow=1)
-    
-    formula.large <- formula(largeModel)
-    attributes(formula.large) <- NULL
-    
-    if (inherits(smallModel, c("Matrix", "matrix"))){
-        formula.small <- smallModel
-        smallModel <- restriction_matrix2model(largeModel, smallModel)
-    } else {
-        formula.small <- formula(smallModel)
-        attributes(formula.small) <- NULL
-    }
-
-    
-    ## ss <<- smallModel
-    ## print(smallModel)
-    if (!all.equal((fam.l <- family(largeModel)), (fam.s <- family(smallModel))))
-        stop("Models do not have identical identical family\n")
-
-    if (!(fam.l$family %in% ok.fam))
-        stop(sprintf("family must be of type %s", toString(ok.fam)))
-        
-    if (is.null(ref)){
-        ref <- PBrefdist(largeModel, smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
-    }
-
-    nr_data <- nrow(eval(largeModel$call$data))
-    nr_fit  <- nrow(largeModel$model)
-    
-    if (nr_data != nr_fit)
-      stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
-    
-        
-    LRTstat     <- getLRT(largeModel, smallModel)
-    ans         <- PBcompute_p_values(LRTstat, ref)
-
-    
-    ans$formula.large <- formula.large
-    ans$formula.small <- formula.small
-
-    out <- ans$test[1:2,]
-    attr(out, "aux") <- ans
-
-    attr(out, "heading") <- c(
-        deparse(formula.large),
-        deparse(formula.small))
-
-    class(out) <- c("PBmodcomp", "anova", "data.frame")
-    return(out)
-
-}
 
 
 #' @rdname pb_modcomp

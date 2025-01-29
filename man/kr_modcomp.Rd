@@ -9,11 +9,11 @@
 \alias{KRmodcomp.gls}
 \title{F-test and degrees of freedom based on Kenward-Roger approximation}
 \usage{
-KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
+KRmodcomp(largeModel, smallModel, betaH = 0, details = 0, ...)
 
-\method{KRmodcomp}{lmerMod}(largeModel, smallModel, betaH = 0, details = 0)
+\method{KRmodcomp}{lmerMod}(largeModel, smallModel, betaH = 0, details = 0, ...)
 
-\method{KRmodcomp}{gls}(largeModel, smallModel, betaH = 0, details = 0)
+\method{KRmodcomp}{gls}(largeModel, smallModel, betaH = 0, details = 0, ...)
 }
 \arguments{
 \item{largeModel}{An \code{lmer} model}
@@ -24,6 +24,8 @@ KRmodcomp(largeModel, smallModel, betaH = 0, details = 0)
 e.g. L beta=L betaH. If \code{smallModel} is a model object then betaH=0.}
 
 \item{details}{If larger than 0 some timing details are printed.}
+
+\item{...}{Additional arguments, currently not used.}
 }
 \description{
 An approximate F-test based on the Kenward-Roger approach.
