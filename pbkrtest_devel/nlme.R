@@ -61,52 +61,6 @@ simulate_lme <- function(object, nsim = 1, seed = NULL) {
   }
 }
 
-compute_full_covariance_matrix <- function(object) {
-  if (!inherits(object, "lme")) stop("Object must be of class 'lme'")
-  
-  # Extract grouping structure and unique groups
-  grouping <- getGroups(object)
-  unique_groups <- unique(grouping)
-  num_obs <- length(grouping)
-  
-  # Extract random effects covariance matrix
-  re_struct <- object$modelStruct$reStruct
-  random_effects_matrix <- NULL
-  if (!is.null(re_struct$Subject)) {
-    random_effects_matrix <- as.matrix(pdMatrix(re_struct$Subject))
-  }
-  
-  # Initialize full covariance matrix with residual variance only
-  residual_var <- object$sigma^2
-  full_cov_matrix <- diag(residual_var, num_obs, num_obs)
-  
-  # Add random effects covariance structure if available
-  if (!is.null(random_effects_matrix)) {
-    group_indices <- split(seq_len(num_obs), grouping)
-    for (i in seq_along(unique_groups)) {
-      group_idx <- group_indices[[i]]
-      n <- length(group_idx)
-      
-      # Expand random effects covariance matrix for group
-      if (nrow(random_effects_matrix) != ncol(random_effects_matrix)) {
-        stop("Random effects matrix must be square. Check the model structure.")
-      }
-      group_cov_matrix <- random_effects_matrix[1:min(nrow(random_effects_matrix), n), 
-                                                1:min(ncol(random_effects_matrix), n)]
-      
-      # Fill diagonal with group covariance if dimensions allow
-      expanded_group_cov <- diag(0, nrow = n, ncol = n)
-      expanded_group_cov[1:nrow(group_cov_matrix), 1:ncol(group_cov_matrix)] <- group_cov_matrix
-      
-      # Add to the full covariance matrix
-      full_cov_matrix[group_idx, group_idx] <- full_cov_matrix[group_idx, group_idx] + expanded_group_cov
-    }
-  } else {
-    message("No random effects structure detected. Using residual variance only.")
-  }
-  
-  return(full_cov_matrix)
-}
 
 
 
@@ -183,3 +137,4 @@ simulate_lme_one <- function(object, psim = 1, data = NULL, ...) {
   
   return(y_sim)
 }
+
