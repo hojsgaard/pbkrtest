@@ -3,10 +3,6 @@
 \name{x2_modcomp}
 \alias{x2_modcomp}
 \alias{X2modcomp}
-\alias{KRmodcomp}
-\alias{KRmodcomp.lmerMod}
-\alias{KRmodcomp_internal}
-\alias{KRmodcomp.mer}
 \alias{X2modcomp.lmerMod}
 \alias{X2modcomp.gls}
 \title{Chisq test}
