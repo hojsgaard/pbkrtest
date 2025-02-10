@@ -509,7 +509,7 @@ PBcompute_p_values <- function(LRTstat, ref){
 
     tobs <- unname(LRTstat[1])
     ndf  <- unname(LRTstat[2])
-rr <<- ref
+##rr <<- ref
     refpos   <- ref[ref > 0]
     nsim <- length(ref)
     npos <- length(refpos)

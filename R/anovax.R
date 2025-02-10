@@ -1,13 +1,12 @@
 ##' @title Model comparison
 ##' 
 ##' @description Wrapper for functions KRmodcomp, SATmodcomp, PBmodcomp, PBFmodcomp
-##' @name fmodcomp
+##' @name comodex
 ##' @param largeModel An \code{lmer} model
 ##' @param smallModel An \code{lmer} model or a restriction matrix
 ##' @param test A character string
 ##' @param ... Additional arguments to be passed on to other methods
 ##' @param details should details be printed
-##' @param cl number of clusters
 ##' @author Søren Højsgaard
 ##'
 ##' @examples
@@ -15,24 +14,24 @@
 #' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
 #' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
-#' fmodcomp(fm2, fm1)
-#' fmodcomp(fm2, fm1, "sat")
-#' fmodcomp(fm2, .~. - I(Days^2))
-#' fmodcomp(fm2, fm1, "PB", nsim=1000, cl=1)
-#' fmodcomp(fm2, fm1, "PBF", nsim=1000, cl=1)
+#' anovax(fm2, fm1)
+#' anovax(fm2, fm1, "sat")
+#' anovax(fm2, .~. - I(Days^2))
+#' anovax(fm2, fm1, "PB", nsim=1000, cl=1)
+#' anovax(fm2, fm1, "PBF", nsim=1000, cl=1)
 
 
 #' @export
-#' @rdname fmodcomp
-fmodcomp <- function(largeModel, smallModel, test="kr", details=0, ...){
-    UseMethod("fmodcomp")
+#' @rdname comodex
+comodex <- function(largeModel, smallModel, test="kr", details=0, ...){
+    UseMethod("comodex")
 }
 
-#' @rdname fmodcomp
+#' @rdname comodex
 #' @export
-fmodcomp.lmerMod <- function(largeModel, smallModel, test="kr", details=0, ...){
+comodex.lmerMod <- function(largeModel, smallModel, test="kr", details=0, ...){
 
-    ## cat("fmodcomp.lmerMod, test=", test, "\n")
+    ## cat("comodex.lmerMod, test=", test, "\n")
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "pbf", "x2"))
     modcomp_fun <- switch(test,
                           
@@ -45,9 +44,9 @@ fmodcomp.lmerMod <- function(largeModel, smallModel, test="kr", details=0, ...){
     out
 }
 
-#' @rdname fmodcomp
+#' @rdname comodex
 #' @export
-fmodcomp.gls <- function(largeModel, smallModel, test="pb", details=0, ...){
+comodex.gls <- function(largeModel, smallModel, test="pb", details=0, ...){
 
     ## cat("....\n test\n", test)
     test <- match.arg(tolower(test), c("pb", "pbf", "x2"))
@@ -60,9 +59,9 @@ fmodcomp.gls <- function(largeModel, smallModel, test="pb", details=0, ...){
 }
 
 
-#' @rdname fmodcomp
+#' @rdname comodex
 #' @export
-fmodcomp.lm <- fmodcomp.gls
+comodex.lm <- comodex.gls
 
 
 
@@ -71,7 +70,7 @@ fmodcomp.lm <- fmodcomp.gls
 
 
 ##' @title anova like function
-##' @name fanova
+##' @name anovax
 ##' @param object A model object object
 ##' @param ... further arguments
 ##' @param cl number of cluster (for test="pf" and "pbf")
@@ -81,46 +80,48 @@ fmodcomp.lm <- fmodcomp.gls
 ##' @examples 
 ##' fm1 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
 ##' fm0 <- update(fm1, .~. - sow)
-##' fanova(fm1, ~.-harvest, test="KR")
-##' fanova(fm1, ~.-harvest, test="SAT")
-##' fanova(fm1, ~.-harvest, test="PB", cl=1)
+##' anovax(fm1, ~.-harvest, test="KR")
+##' anovax(fm1, ~.-harvest, test="SAT")
+##' anovax(fm1, ~.-harvest, test="PB", cl=1)
 ##'
-##' fanova(fm1, test="KR")
-##' fanova(fm1, test="SAT")
-##' fanova(fm1, test="PB", cl=1)
-##' fanova(fm1, test="PBF", cl=1)
+##' anovax(fm1, test="KR")
+##' anovax(fm1, test="SAT")
+##' anovax(fm1, test="PB", cl=1)
+##' anovax(fm1, test="PBF", cl=1)
 ##' @export
-##' @rdname fanova
-fanova <- function(object, ..., test="kr", cl=NULL){
-    UseMethod("fanova")
+##' @rdname anovax
+anovax <- function(object, ..., test="kr", cl=NULL){
+    UseMethod("anovax")
 }
 
 
-#' @rdname fanova
+#' @rdname anovax
 #' @export
-fanova.lmerMod <- function(object, ..., test="kr", cl=NULL){
+anovax.lmerMod <- function(object, ..., test="kr", cl=NULL){
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "pbf", "x2"))    
-    fanova_worker(object, ..., test=test, cl=cl)
+    anovax_worker(object, ..., test=test, cl=cl)
 }
 
-#' @rdname fanova
+#' @rdname anovax
 #' @export
-fanova.gls  <- function(object, ..., test="pb", cl=NULL){
+anovax.gls  <- function(object, ..., test="pb", cl=NULL){
     test <- match.arg(tolower(test), c("pb", "pbf", "x2"))    
-    fanova_worker(object, ..., test=test, cl=cl)
+    anovax_worker(object, ..., test=test, cl=cl)
 }
 
-#' @rdname fanova
+#' @rdname anovax
 #' @export
-fanova.lm  <- function(object, ..., test="pb", cl=NULL){
+anovax.lm  <- function(object, ..., test="pb", cl=NULL){
     test <- match.arg(tolower(test), c("pb", "pbf", "x2"))    
-    fanova_worker(object, ..., test=test, cl=cl)
+    anovax_worker(object, ..., test=test, cl=cl)
 }
 
-## FIXME 
-#' @rdname fanova
+##' @title print anovax object
+##' @param x anovax object
+##' 
+#' @rdname anovax
 #' @export
-print.fanova <- function(x, ...){
+print.anovax <- function(x, ...){
     printCoefmat(x, digits=5, zap.ind =c(3,4))
 
     ## old <- options("digits")$digits
@@ -130,7 +131,7 @@ print.fanova <- function(x, ...){
     return(invisible(x))
 }
 
-fanova_worker <- function(object, ..., test="kr", cl=NULL){
+anovax_worker <- function(object, ..., test="kr", cl=NULL){
 
     dots <- list(...)
     ## cat("dots:\n"); print(dots)
@@ -154,7 +155,7 @@ fanova_worker <- function(object, ..., test="kr", cl=NULL){
             ## print(smf)
             sm <- update(lg, smf)
 
-            kk <- fmodcomp(lg, sm, test=test, cl=cl)
+            kk <- comodex(lg, sm, test=test, cl=cl)
             out <- as.data.frame(kk)
             ttt[[i]] <- out
             lg <- sm
@@ -170,10 +171,10 @@ fanova_worker <- function(object, ..., test="kr", cl=NULL){
             mod <- dots[[1]]
             ## if (!inherits(mod, "lmerMod"))
                 ## stop("Second argument is not lmerMod\n")
-            ttt <- fmodcomp(object, mod, test=test, cl=cl) 
+            ttt <- comodex(object, mod, test=test, cl=cl) 
         }            
     }
-    class(ttt) <- c("fanova", "data.frame")
+    class(ttt) <- c("anovax", "data.frame")
     return(ttt)
 }
 

@@ -9,8 +9,6 @@
 ## ##########################################################################
 #' @details TBW
 #' 
-#' @aliases KRmodcomp KRmodcomp.lmerMod KRmodcomp_internal
-#'     KRmodcomp.mer
 #' @param largeModel An \code{lmer} model
 #' @param smallModel An \code{lmer} model or a restriction matrix
 #' @param betaH A number or a vector of the beta of the hypothesis,
