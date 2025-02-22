@@ -1,4 +1,15 @@
 library(doBy)
+crickets
+f <- crickets$species
+f <- factor(f)
+levels(f) <- c("exis", "nius")
+crickets$species <- f
+crickets
+save(crickets, file="_doby/data/crickets.RData")
+
+
+
+library(doBy)
 library(ggplot2)
 library(dplyr)
 dat <- milkman
