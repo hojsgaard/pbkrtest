@@ -179,4 +179,16 @@ anovax_worker <- function(object, ..., test="kr", cl=NULL){
 }
 
 
-
+##' @title Various different tests for model comparison
+##' @param object Model object 
+##' @param object2 Model object or equivalent way of specifying a submodel of lmm1
+##' @param test A vector with the various test types.
+##' @return Dataframe with results of the various tests
+##' @author Søren Højsgaard
+##' @export
+anovax_list <- function(object, object2, test=c("x2", "kr", "sat", "pb")){
+    lapply(test,
+         function(.test){
+            anovax(object, object2, test=.test)
+         }) |> do.call(rbind, args=_)
+}
