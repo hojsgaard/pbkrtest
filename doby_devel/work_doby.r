@@ -1,11 +1,284 @@
 library(doBy)
-crickets
-f <- crickets$species
-f <- factor(f)
-levels(f) <- c("exis", "nius")
-crickets$species <- f
-crickets
-save(crickets, file="_doby/data/crickets.RData")
+load_all("_doby")
+
+dd <- iris |> split_by(~Species) ## FIXME :: Need !!
+
+
+tochar(Treatment, Type)
+tochar(~Treatment+Type)
+tochar(c("Treatment", "Type"))
+
+wrap <- function(...){
+    dots <- match.call(expand.dots = FALSE)$...
+    ## dots1 <- dots[[1]]
+    ## print(dots1)    
+    dots2char(dots)
+}
+
+
+wrap(Treatment, Type)
+wrap(~Treatment+Type)
+wrap(c("Treatment", "Type"))
+
+
+
+
+split_by_worker <- function(data., ..., omit=TRUE){ 
+
+    is.tib <- inherits(data., "tbl_df")
+    if (is.tib)
+        data. = as.data.frame(data.)
+
+    dots <- match.call(expand.dots = FALSE)$...
+    rhs <- dots2char(dots)
+    
+    grps <- apply(data.[,rhs], 1, paste0, collapse="|")
+    out <- split(data., grps)
+    
+    if (omit){
+        rhs.idx <- match(rhs, names(data.))
+        out <- lapply(out, function(d) d[, -rhs.idx])
+    }
+
+    if (is.tib) {
+        out <- lapply(out, function(d) as_tibble(d))
+    }
+
+            
+    groupid <- unique(data.[,rhs])
+    idxvec <- split(1:nrow(data.), grps)
+    
+    attr(out, "groupid") <- groupid
+    attr(out, "idxvec")  <- idxvec
+    attr(out, "grps")    <- grps
+
+    class(out) <- c("splitByData", "list")    
+    return(out)
+}
+
+rhs <- tochar(c("Treatment", "Type"))
+data. <- CO2
+split_by_worker(data., Treatment, Type)
+split_by_worker(data., ~Treatment+Type)
+split_by_worker(data., c("Treatment", "conc"))
+
+
+
+
+
+
+grps <- apply(data.[,rhs], 1, paste0, collapse="|")
+out <- split(data., grps)
+idxvec <- split(1:nrow(data.), grps)
+
+rhs.idx <- match(rhs, names(data.))
+lapply(out, function(d) d[, -rhs.idx])
+
+
+
+
+
+
+## tochar <- function(...){
+
+##     dots <- match.call(expand.dots = FALSE)$...
+##     dots1 <- dots[[1]]
+
+##     if (inherits(dots1, "call")){
+##         dots1 <- eval(dots1)
+##     }
+##     if (inherits(dots1, c("formula", "call"))){
+##         varRHS <- all.vars(dots1[[2]])
+##         return(varRHS)
+##     }
+
+##     if (is.character(dots1)){
+##         varRHS <- dots1
+##         return(varRHS)        
+##     }
+       
+##     varRHS <- lapply(seq_along(dots),
+##                      function(i) {
+##                          y <- if (is.symbol(dots[[i]])) {
+##                                   deparse(dots[[i]])
+##                               }
+##                               else {
+##                                   dots[[i]]
+##                               }
+##                          return(y)
+##                      })
+##     varRHS <- unlist(varRHS)
+##     return(varRHS)
+## }
+
+
+
+
+
+ff <- substitute(lm(Sepal.Length~Sepal.Width))
+
+
+foo <- function(f){
+    substitute(f)
+}
+
+foo(lm(Sepal.Length~Sepal.Width))
+
+iris  |> 
+
+1
+
+    
+    class(out_list) <- c("splitByData", "list")    
+    out_list
+
+
+
+x <- splitBy(~Treatment+Type, data=CO2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lm_expr <- substitute(lm(Sepal.Length ~ Sepal.Width, data = df))
+
+# Later, when data is available, evaluate it
+df <- iris  # Example data
+ff <- eval(lm_expr)
+summary(ff)  # Now the model is fitted
+
+
+
+fun <- \(x){
+    substitute(x)
+}
+
+
+fc <- fun(lm(Sepal.Length ~ Sepal.Width))
+fc$data <- quote(iris)
+eval(fc)
+
+dd <- iris |>  split_by(~Species)
+
+
+bbb <- function(data., model.){
+    fc <- substitute(model.)
+    print(fc)
+    lapply(data., function(d){
+        fc$data <- quote(d)
+        eval(fc)
+    })    
+    
+}
+
+fff <- bbb(dd, lm(Sepal.Length ~ Sepal.Width))
+
+fff |> map(coef)
+
+
+
+
+lapply(fff, coef)
+
+
+
+
+
+
+1
+
+
+
+dat <- doBy::beets
+
+
+
+interaction_plot(dat, sugpct ~ sow + harvest)
+
+
+
+# Example data frame
+df <- data.frame(
+  yield = rnorm(10),
+  sow = factor(rep(1:2, 5)),
+  harvest = factor(rep(1:3, length.out = 10)),
+  block = factor(rep(1:2, length.out = 10))
+)
+
+# Define your formula
+df <- .data
+formula <- yield ~ sow + harvest:block  # or any formula with an interaction
+
+# Function to check for interaction and create the column
+check_and_create_interaction <- function(df, formula) {
+  # Extract the terms from the formula
+  rhs_terms <- all.vars(formula)[-1]  # Remove the 'yield' variable
+  
+  # Check if the interaction term exists in the formula
+  interaction_term <- grep(":", rhs_terms, value = TRUE)
+  
+  # If interaction term is found, create the interaction column
+  if (length(interaction_term) > 0) {
+    # Split the interaction term into its components
+    terms <- unlist(strsplit(interaction_term, ":"))
+    
+    in Create the interaction column
+    df$interaction_column <- interaction(df[[terms[1]]], df[[terms[2]]])
+    
+    # Print the updated dataframe
+    print(head(df))
+  }
+  
+  return(df)
+}
+
+# Apply the function
+df <- check_and_create_interaction(df, f)
+
+df
+
+# Check the updated dataframe
+head(df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+interaction_plot(dat, sugpct ~ harvest + interaction(sow:block))
+
+interaction_plot(dat, sugpct ~ sow + harvest)
+interaction_plot(dat, sugpct ~ harvest + block)
+interaction_plot(dat, sugpct ~ sow + block)
+interaction_plot(dat, yield ~ harvest + sow)
+interaction_plot(dat, yield ~ sow + harvest)
+interaction_plot(dat, yield ~ harvest + block)
+interaction_plot(dat, yield ~ block + harvest)
+interaction_plot(dat, yield ~ sow + block)
 
 
 

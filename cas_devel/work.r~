@@ -1,0 +1,53 @@
+library(caracas)
+
+load_all("_caracas")
+document("_caracas")
+
+library(caracas)
+def_sym(y1, y2, b, v, m, c)
+
+
+## (y1, y2) | b
+R <- diag_(v, 2)
+X <- rep_(1,2)
+C <- matrix_("c")
+
+y.b <- list(X_=X, b_=b, V_=R)
+y.b
+b <- list(X_=matrix_(1), b_=m, V_=C)
+b
+
+
+joint <- function(y.b, b){
+    y <- y.b
+    y
+    m <- y.b$X_ %*% b$b_
+    V <- y.b$X_ %*% b$V_ %*% t(y.b$X_) + y$V_
+    list(m_=m, V_=V)
+}
+
+    
+yb <- list(X_ = rbind(y$X_, b$X_),
+           m_ = rbind(y$X_ %*% y$b_, b$X_ %*% b$b_),
+           V_ = rbind(
+               cbind(y$V_, y.b$X_ %*% b$V_),
+               cbind(b$V_ %*% t(y.b$X_), b$V_)
+           )
+           )
+
+idx <- 1:2
+marg <- function(yb, idx){
+    list(X_=yb$X_[idx,, drop=F],
+         b_=yb$m_[idx,drop=F],
+         V_=yb$V_[idx, idx, drop=F])
+}
+
+marg(yb, -(1:2))
+
+
+
+
+
+
+
+

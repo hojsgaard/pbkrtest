@@ -1,0 +1,122 @@
+
+
+
+
+<!-- ## Reparametrizing -->
+
+<!-- It is often useful to reparametrize the model to avoid constraints on -->
+<!-- the parameters. Three typical cases are: -->
+
+<!-- 1. If $\alpha$ must be positive (e.g. a variance), reparametrize -->
+<!--    $\alpha = \exp(w)$ and optimize with respect to $w$ which is -->
+<!--    unconstrained. -->
+
+<!-- 2. If $\alpha$ must be in $[0, 1]$, (e.g. a probability) reparametrize -->
+<!--    $\alpha = \frac{\exp(w)}{1+\exp(w)}$ and optimize with respect to -->
+<!--    $w$ which is unconstrained. -->
+
+<!-- 3. If $\alpha$ must be in $[-1, 1]$, (e.g. a correlation) -->
+<!--    reparametrize $\alpha = \frac{\exp(w)-1}{\exp(w)+1} = \tanh(w)$ and -->
+<!--    optimize with respect to $w$ which is unconstrained. -->
+
+
+
+<!-- ```{r} -->
+<!-- V2_ <- subs(V_, list(sigma="exp(log_sigma)", tau="exp(log_tau)")) |> simplify() -->
+<!-- b_est2_ <- get_b_est(y_, X_, V2_) -->
+<!-- ``` -->
+
+
+<!-- With this parameterization, the profile log-likelihood is maximized as: -->
+
+<!-- ```{r} -->
+<!-- plogL2_ <- get_logL0(y_, X_, b_est2_, V2_)  -->
+<!-- out <- optim_sym(c(.1, .1), plogL2_, method="L-BFGS-B",  -->
+<!--               control=list(fnscale=-1), hessian=TRUE) -->
+
+<!-- var_par <- out$par -->
+<!-- var_par |> exp() -->
+<!-- ``` -->
+
+<!-- Moreover, with this parameterization, the full log-likelihood can be -->
+<!-- maximized without constraints, and we can obtain the Hessian (and -->
+<!-- hence the asymptotic variance of the MLE) directly: -->
+
+<!-- ```{r} -->
+<!-- logL2_  <- get_logL0(y_, X_, b_,    V2_)  -->
+<!-- out <- optim_sym(c(0, 0, .1, .1), logL2_, method="L-BFGS-B",  -->
+<!--               control=list(fnscale=-1), hessian=TRUE) -->
+
+<!-- var_par <- out$par -->
+<!-- var_par -->
+<!-- solve(-out$hessian)[1:2, 1:2] -->
+<!-- ``` -->
+
+
+<!-- ## Reparametrizing $V$ in terms of variance and correlation -->
+
+<!-- An alternative is to write V in terms of a variance and a correlation parameter -->
+
+<!-- ```{r} -->
+<!-- def_sym(sigma) -->
+<!-- B <- as_sym(toeplitz(c(1, "rho"))) -->
+<!-- V3_ <- sigma^2 * kronecker(diag_(1, ncol(Z)), B) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- b_est3_ <- get_b_est(y_, X_, V3_) -->
+
+<!-- plogL3_ <- get_logL0(y_, X_, b_est3_, V3_) -->
+<!-- logL3_  <- get_logL0(y_, X_, b_,    V3_) -->
+
+<!-- out <- optim_sym(c(.1, .1), plogL3_, method="L-BFGS-B",  -->
+<!--              lower=c(-1+eps, eps), upper=c(1-eps, Inf), -->
+<!--              control=list(fnscale=-1), hessian=TRUE) -->
+
+<!-- var_par <- out$par -->
+<!-- var_par -->
+
+<!-- subs(b_est3_, as.list(var_par)) -->
+
+<!-- J_     <- get_hessian(logL3_, b_)  -->
+<!-- J2_    <- subs(J_, as.list(var_par)) -->
+<!-- Vb_   <- solve(J2_) -->
+<!-- Vb_ -->
+
+<!-- ``` -->
+
+<!-- Just for illustration, we note that maximizing the full likelihood fails in this case in the sense that we get wrong results. -->
+
+<!-- ```{r} -->
+<!-- out <- optim_sym(c(0, 0, .1, .1), logL3_, method="L-BFGS-B",  -->
+<!--            lower=c(-Inf, -Inf, -1+eps, eps), upper=c(Inf, Inf, 1-eps, Inf), -->
+<!--                control=list(fnscale=-1), hessian=TRUE) -->
+<!-- out$par -->
+<!-- solve(-out$hessian)[1:2, 1:2] -->
+<!-- ``` -->
+
+<!-- To maximize the full likelihood, we need to reparametrize the -->
+<!-- correlation parameter. We can do this by writing $\rho = -->
+<!-- \frac{\exp(2w)-1}{\exp(2w)+1}$ and optimize with respect to $w$ which -->
+<!-- is unconstrained. -->
+
+<!-- ```{r} -->
+<!-- V4_ <- subs(V3_, list(rho="(exp(2*w)-1)/(exp(2*w)+1)")) -->
+<!-- ``` -->
+
+<!-- $$ -->
+<!-- r tex_list("V4=", V4_[1:4,1:4], zero_as_dot=T)` -->
+<!-- $$ -->
+
+
+<!-- ```{r} -->
+<!-- logL4_  <- get_logL0(y_, X_, b_,    V4_) -->
+<!-- out <- optim_sym(c(0, 0, .1, .1), logL4_, method="L-BFGS-B",  -->
+<!--                  control=list(fnscale=-1), hessian=TRUE) -->
+
+<!-- var_par <- out$par -->
+<!-- var_par -->
+<!-- tanh(var_par["w"]) -->
+<!-- ``` -->
