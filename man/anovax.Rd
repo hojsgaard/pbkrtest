@@ -3,6 +3,7 @@
 \name{anovax}
 \alias{anovax}
 \alias{anovax.lmerMod}
+\alias{anovax.glmerMod}
 \alias{anovax.gls}
 \alias{anovax.lm}
 \alias{print.anovax}
@@ -11,6 +12,8 @@
 anovax(object, ..., test = "kr", cl = NULL)
 
 \method{anovax}{lmerMod}(object, ..., test = "kr", cl = NULL)
+
+\method{anovax}{glmerMod}(object, ..., test = "pb", cl = NULL)
 
 \method{anovax}{gls}(object, ..., test = "pb", cl = NULL)
 

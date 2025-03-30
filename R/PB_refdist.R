@@ -67,10 +67,12 @@
 #'
 #' data(beets)
 #' head(beets)
-#' beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=FALSE)
+#' beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
+#'         data=beets, REML=FALSE)
 #' beet_no.harv <- update(beet0, . ~ . -harvest)
 #' rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=1)
 #' rd
+#' 
 #' \dontrun{
 #' ## Note: Many more simulations must be made in practice.
 #'
@@ -514,20 +516,5 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
 
 
 
-
-
-## get_refdist.merMod <- function(lg){
-##     .get_refdist_merMod
-## }
-
-## .get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL,
-##                                 simdata=simulate(sm, nsim=nsim, seed=seed)){
-
-##     unname(unlist(lapply(simdata, function(yyy){
-##         sm2  <- suppressMessages(refit(sm, newresp=yyy))
-##         lg2  <- suppressMessages(refit(lg, newresp=yyy))
-##         2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
-##     })))
-## }
 
 

@@ -4,6 +4,7 @@
 \alias{comodex}
 \alias{comodex.lmerMod}
 \alias{comodex.gls}
+\alias{comodex.glmerMod}
 \alias{comodex.lm}
 \title{Model comparison}
 \usage{
@@ -12,6 +13,8 @@ comodex(largeModel, smallModel, test = "kr", details = 0, ...)
 \method{comodex}{lmerMod}(largeModel, smallModel, test = "kr", details = 0, ...)
 
 \method{comodex}{gls}(largeModel, smallModel, test = "pb", details = 0, ...)
+
+\method{comodex}{glmerMod}(largeModel, smallModel, test = "pb", details = 0, ...)
 
 \method{comodex}{lm}(largeModel, smallModel, test = "pb", details = 0, ...)
 }

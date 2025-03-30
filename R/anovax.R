@@ -58,6 +58,20 @@ comodex.gls <- function(largeModel, smallModel, test="pb", details=0, ...){
     out
 }
 
+#' @rdname comodex
+#' @export
+comodex.glmerMod <- function(largeModel, smallModel, test="pb", details=0, ...){
+
+    ## cat("....\n test\n", test)
+    test <- match.arg(tolower(test), c("pb", "pbf", "x2"))
+    modcomp_fun <- switch(test,
+                  "x2" =X2modcomp,                          
+                  "pb" =PBmodcomp,
+                  "pbf"=PBFmodcomp)
+    out <- modcomp_fun(largeModel, smallModel, ...)
+    out
+}
+
 
 #' @rdname comodex
 #' @export
@@ -94,11 +108,17 @@ anovax <- function(object, ..., test="kr", cl=NULL){
     UseMethod("anovax")
 }
 
-
 #' @rdname anovax
 #' @export
 anovax.lmerMod <- function(object, ..., test="kr", cl=NULL){
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "pbf", "x2"))    
+    anovax_worker(object, ..., test=test, cl=cl)
+}
+
+#' @rdname anovax
+#' @export
+anovax.glmerMod <- function(object, ..., test="pb", cl=NULL){
+    test <- match.arg(tolower(test), c("pb", "pbf", "x2"))    
     anovax_worker(object, ..., test=test, cl=cl)
 }
 
@@ -140,7 +160,6 @@ anovax_worker <- function(object, ..., test="kr", cl=NULL){
     if (length(dots) == 0){
         an  <- anova(object)
         nms <- rownames(an)
-        
         nms <- setdiff(nms, "Residuals")
         lg <- object
         lgf <- formula(lg)

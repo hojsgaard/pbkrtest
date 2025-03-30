@@ -4,12 +4,15 @@
 \alias{x2_modcomp}
 \alias{X2modcomp}
 \alias{X2modcomp.lmerMod}
+\alias{X2modcomp.glmerMod}
 \alias{X2modcomp.gls}
 \title{Chisq test}
 \usage{
 X2modcomp(largeModel, smallModel, betaH = 0, details = 0, ...)
 
 \method{X2modcomp}{lmerMod}(largeModel, smallModel, betaH = 0, details = 0, ...)
+
+\method{X2modcomp}{glmerMod}(largeModel, smallModel, betaH = 0, details = 0, ...)
 
 \method{X2modcomp}{gls}(largeModel, smallModel, betaH = 0, details = 0, ...)
 }
