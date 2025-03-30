@@ -1,5 +1,97 @@
 library(doBy)
-load_all("_doby")
+load_all()
+## load_all("_doby")
+
+dat <- Titanic
+ci_test(dat, c(1,2,3))
+
+ll
+
+tt1 <- gRim:::fit2way_(ll[[1]], ll[[2]], ll[[3]], ll[[4]])
+tt2 <- fit2way(ll[[1]], ll[[2]], ll[[3]], ll[[4]])
+
+
+library(gRbase)
+
+
+tabDiv(tabOp(ll[[1]], ll[[2]]), tabMarg(ll[[1]], ll[[3]]))
+
+t1 <- tabOp(ll[[1]], ll[[2]])
+t2 <- table_op(ll[[1]], ll[[2]])
+
+table_op(t1, t2, `-`)
+
+
+tt1
+tt2 <- tt2 |> table_perm_(names(dimnames(tt1)))
+
+tt1 - tt2
+
+ciTest(dat)
+
+ci_test(
+
+    
+tab1 <- ll[[1]]
+tab2 <- ll[[2]]
+R <- ll$R    
+vn <- ll$vn
+
+tab1
+R
+
+
+fit2way <- function(tab1, tab2, R=NULL, vn){
+    if (length(R)>0){
+        tab.R <- table_marg(tab1, R)
+        tmp <- table_op(tab1, tab2, op=`*`)
+        out <- table_op(tmp, tab.R, op=`/`)
+        return(table_perm(out, vn))        
+    } else {
+        tmp <- table_op(tab1, tab2, op=`*`)
+        out <- tmp / sum(s)
+        return(table_perm(tmp, vn))        
+    }
+}
+
+NumericVector fit2way_ (const NumericVector& tab1,
+                        const NumericVector& tab2,
+                        const CharacterVector& R,
+                        const CharacterVector& vn) {
+
+  if (R.length() > 0){
+    NumericVector tab3 = tab_marg_(tab1, R);
+    NumericVector out = tab_perm_(tab_div_(tab_mult_(tab1, tab2), tab3), vn);
+    return out;
+  } else {
+    double s = sum(tab1);
+    NumericVector out = tab_perm_(tab_mult_(tab1, tab2), vn) ;
+    out = out / s;
+    return out;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 dd <- iris |> split_by(~Species) ## FIXME :: Need !!
 

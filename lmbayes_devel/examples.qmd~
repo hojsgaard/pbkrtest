@@ -1,0 +1,234 @@
+
+```{r}
+library(lme4)
+library(ggplot2)
+library(modelr)
+library(dplyr)
+library(broom.mixed)
+library(doBy)
+library(lmbayes)
+library(tidyr)
+options("digits"=2)
+update_geom_defaults("line", list(linewidth = 1.75))
+```
+
+```{r}
+dat <- sleepstudy
+names(dat) <- tolower(names(dat))
+pl0 <- dat |> ggplot(aes(days, reaction, group=subject, color=subject))
+pl0 + geom_line()
+## pl0 + geom_smooth(method = "lm", se=F)
+subj <- dat$subject |> unique()
+```
+
+```{r}
+idx <- 1:8
+dat.train <- dat |> filter(subject %in% subj[idx])
+fit.list <- dat.train |> lm_by(reaction~days|subject, data=_)
+coef_df <- fit.list |> sapply(coef) |> t()
+sig <- fit.list |> sapply(sigma)
+coef_df
+
+m <- coef_df |> colMeans()
+C <- coef_df |> cov()
+sd <- mean(sig)
+```
+
+```{r}
+tt <- 3.5
+this.dat <- dat |> filter(subject %in% subj[7])
+train <- this.dat |> filter(days <=tt)
+lm.bench <- lm(reaction ~ days, data=this.dat) ## benchmark
+lm.first <- lm(reaction ~ days, data=train)    ## first
+##
+pr1 <- list(m=m, C=C, sd=sd)
+pr2 <- list(m=m, C=C/1, sd=sd)
+pr3 <- list(m=m, C=C/10, sd=sd)
+##
+lmb1 <- lmb(reaction ~ days, data=train, prior=pr1)
+lmb2 <- lmb(reaction ~ days, data=train, prior=pr2)
+lmb3 <- lmb(reaction ~ days, data=train, prior=pr3)
+##
+this.dat <- this.dat |> add_pred(lm.bench, var="lm.bench")
+this.dat <- this.dat |> add_pred(lm.first, var="lm.first")
+this.dat <- this.dat |> add_pred(lmb1, var="lmb1")
+this.dat <- this.dat |> add_pred(lmb2, var="lmb2")
+this.dat <- this.dat |> add_pred(lmb3, var="lmb3")
+##
+this.long <- this.dat |>
+    pivot_longer(
+        -c(reaction, days, subject),
+        names_to = "group",
+        values_to = "value"
+    )
+
+
+# Define line styles
+line_styles <- c(
+  "lm.bench" = "dashed",
+  "lm.first" = "dashed",
+  "lmb1" = "solid",
+  "lmb2" = "solid",
+  "lmb3" = "solid"
+)
+
+
+ggplot(this.long, aes(x = days)) +
+    geom_vline(xintercept = tt) + 
+    geom_point(aes(y = reaction), shape = 21, fill = "black", size = 2) +
+    geom_line(aes(y = value, color = group, linetype = group), linewidth = 1) +
+    scale_linetype_manual(values = line_styles) +
+    theme_minimal() +
+    labs(
+        title = "Reaction vs. Predicted Values by Group",
+        y = "Reaction / Prediction",
+        x = "Days",
+        linetype = "Group",
+        color = "Group"
+    )
+
+
+pl0 <- this.long |> ggplot(aes(days, reaction, group=group, color=group)) +
+    geom_vline(xintercept = tt) + 
+    geom_line()
+pl0
+
+library(ggplot2)
+library(dplyr)
+
+pl0 + geom_line(aes(y=lm.first)) + geom_line(aes(y=lmb1)) 
+```
+
+
+
+
+
+```{r}
+# Load packages
+library(fda)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Load growth data
+data(growth)
+
+# Use first 10 boys for training
+boys_train <- as.data.frame(growth$hgtm[, 1:10])
+## colnames(boys_train) <- paste0("boy", 1:10)
+boys_train$age <- growth$age
+
+# Convert to long format
+long_train <- pivot_longer(boys_train, cols = -age, names_to = "subject", values_to = "height")
+
+# Fit quadratic model for each training subject
+train_coefs <- long_train %>%
+  group_by(subject) %>%
+  group_map(~ {
+    fit <- lm(height ~ age + I(age^2), data = .x)
+    as.numeric(coef(fit))
+  }) %>%
+  do.call(rbind, .)
+
+# Compute prior mean and covariance
+prior_mean <- colMeans(train_coefs)
+prior_cov <- cov(train_coefs)
+
+# Pick test subject (e.g., boy 11)
+test_boy <- data.frame(age = growth$age, height = growth$hgtm[, 11])
+
+# Fit OLS to early data (age ≤ 10)
+test_boy_early <- filter(test_boy, age <= 10)
+fit_ols_early <- lm(height ~ age + I(age^2), data = test_boy_early)
+
+# Fit OLS to full data (benchmark)
+fit_ols_full <- lm(height ~ age + I(age^2), data = test_boy)
+
+# Define prediction from prior mean
+predict_prior <- function(age, coef) {
+    coef[1] + coef[2] * age + coef[3] * age^2
+}
+
+# Define Bayesian posterior (simplified convex combination)
+lambda <- 100  # prior strength
+beta_ols <- coef(fit_ols_early)
+beta_post <- (lambda * prior_mean + beta_ols) / (lambda + 1)
+
+# Create prediction dataframe
+test_boy <- test_boy %>%
+  mutate(
+    pred_ols_full = predict(fit_ols_full),
+    pred_ols_early = predict(fit_ols_early, newdata = test_boy),
+    pred_prior = predict_prior(age, prior_mean),
+    pred_bayes = predict_prior(age, beta_post)
+  )
+
+# Plot
+ggplot(test_boy, aes(x = age)) +
+  geom_point(aes(y = height), size = 1.8) +
+  geom_line(aes(y = pred_ols_full), color = "red", linetype = "dashed", size = 1.1) +
+  geom_line(aes(y = pred_ols_early), color = "gold", linetype = "dashed", size = 1.1) +
+  geom_line(aes(y = pred_prior), color = "gray", linetype = "dotdash", size = 1.1) +
+  geom_line(aes(y = pred_bayes), color = "blue", size = 1.1) +
+  labs(
+    title = "Height prediction for test boy (Quadratic model)",
+    subtitle = "Red: OLS (all data), Gold: OLS (early), Blue: Empirical Bayes, Gray: Prior mean",
+    y = "Height (cm)", x = "Age"
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+gb |> ggplot(aes(age,height, group=subject, color=subject)) + geom_line() + facet_grid(~gender)
+
+
+bb  <- gb |> filter(gender=="boy")
+sub <- bb$subject |> unique()
+
+train <- bb |> filter(subject %in% sub[1:10])
+
+train |>
+    ggplot(aes(age,height, group=subject, color=subject)) + geom_line() + facet_grid(~gender)
+
+
+fit.list <- train |> lm_by(height ~ age + I(age^2) |subject, data=_)
+coef.df <- fit.list |> coef()
+sig <- fit.list |> sigma()
+m <- colMeans(coef.df)
+C <- cov(coef.df)
+sd <- mean(sig)
+sd
+pr0 <- list(m=m, C=C, sd=sd)
+
+this <- bb |> filter(subject %in% sub[11])
+
+tt <- 7 
+this.early <- this |> filter(age <= tt)
+bench <- lmb(height ~ age + I(age^2), data=this)
+early <- lmb(height ~ age + I(age^2), data=this.early)
+lmb1 <- lmb(height ~ age + I(age^2), data=this.early, prior=pr0)
+lmb2 <- lmb(height ~ age + I(age^2), data=this.early, prior=list(m=m), alpha=.4)
+
+this <- this |> add_pred(bench, "bench")
+this <- this |> add_pred(early, "early")
+this <- this |> add_pred(lmb1, "lmb1")
+this <- this |> add_pred(lmb2, "lmb2")
+
+this$lmb1 - this$lmb2
+
+this.long <- this |> pivot_longer(-c(gender, age, subject, height))
+
+this.long |> ggplot(aes(x=age)) +
+    geom_vline(xintercept = tt) + 
+    geom_point(aes(y=height)) +
+    geom_line(aes(y = value, color = name, linetype = name), linewidth = 1) 
+
+```
+

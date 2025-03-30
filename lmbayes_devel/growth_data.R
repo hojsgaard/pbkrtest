@@ -1,0 +1,17 @@
+dat <- fda::growth
+g <- dat$hgtf |> as.data.frame()
+g$gender <- "girl"
+g$age <- dat$age
+b <- dat$hgtm |> as.data.frame()
+b$gender <- "boy"
+b$age <- dat$age
+g <- g |> pivot_longer(-c(age, gender), names_to = "subject", values_to = "height")  |> arrange(subject, age)
+b <- b |> pivot_longer(-c(age, gender), names_to = "subject", values_to = "height")  |> arrange(subject, age)
+gb <- rbind(g, b)
+gb <- gb |> mutate(gender=factor(gender), subject=factor(subject))
+dim(gb)
+
+child_growth <- gb
+
+save(child_growth, file="child_growth.RData")
+

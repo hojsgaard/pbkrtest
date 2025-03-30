@@ -1,0 +1,63 @@
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(doBy)
+
+ui <- fluidPage(
+  titlePanel("Empirical Bayes Prediction with Growth Data"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("early_time", "Max age used in early fit:", min = 3, max = 15, value = 7, step = 1),
+      sliderInput("lambda", "Shrinkage factor (lambda):", min = 0, max = 1, value = 0.4, step = 0.05),
+      sliderInput("train_n", "Number of training subjects:", min = 5, max = 30, value = 10, step = 1),
+      numericInput("test_idx", "Index of test subject:", value = 11, min = 1, max = 50)
+    ),
+    mainPanel(
+      plotOutput("growthPlot")
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output$growthPlot <- renderPlot({
+    dat <- doBy::child_growth
+    bb  <- dat |> filter(gender == "boy")
+    sub <- unique(bb$subject)
+
+    idx.train <- 1:input$train_n
+    idx.test <- input$test_idx
+
+    train <- bb |> filter(subject %in% sub[idx.train])
+    this <- bb |> filter(subject %in% sub[idx.test])
+    this.early <- this |> filter(age <= input$early_time)
+
+    fit.list <- train |> lm_by(height ~ age + I(age^2) | subject, data = _)
+    coef.df <- fit.list |> coef()
+    sig <- fit.list |> sigma()
+    m <- colMeans(coef.df)
+    C <- cov(coef.df)
+    sd <- mean(sig)
+    pr0 <- list(m = m, C = C, sd = sd)
+
+    bench <- lmb(height ~ age + I(age^2), data = this)
+    early <- lmb(height ~ age + I(age^2), data = this.early)
+    lmb1 <- lmb(height ~ age + I(age^2), data = this.early, prior = pr0)
+    lmb2 <- lmb(height ~ age + I(age^2), data = this.early, prior = list(m = m), alpha = input$lambda)
+
+    this <- this |> add_pred(bench, "bench")
+    this <- this |> add_pred(early, "early")
+    this <- this |> add_pred(lmb1, "lmb1")
+    this <- this |> add_pred(lmb2, "lmb2")
+
+    this.long <- this |> pivot_longer(-c(gender, age, subject, height))
+
+    ggplot(this.long, aes(x = age)) +
+      geom_vline(xintercept = input$early_time) + 
+      geom_point(aes(y = height)) +
+      geom_line(aes(y = value, color = name, linetype = name), linewidth = 1) +
+      theme_minimal()
+  })
+}
+
+shinyApp(ui, server)
