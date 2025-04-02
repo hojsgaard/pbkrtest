@@ -60,12 +60,11 @@ X2modcomp.gls <- function(largeModel, smallModel, betaH=0, details=0, ...) {
     X2modcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details)
 }
 
+#' @export
+#' @rdname x2_modcomp
 X2modcomp.lm <- function(largeModel, smallModel, betaH=0, details=0, ...) {
     X2modcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details)
 }
-
-
-
 
 X2modcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 

@@ -141,11 +141,13 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
 
   LRTstat     <- getLRT(largeModel, smallModel)
   attr(ref, "stat")    <- LRTstat
-  attr(ref, "samples") <- c(nsim=nsim, npos=sum(ref > 0),
-                            n.extreme=sum(ref > LRTstat["tobs"]),
-                            pPB=(1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
+  attr(ref, "samples") <-
+      c(nsim      = nsim,
+        npos      = sum(ref > 0),
+        n.extreme = sum(ref > LRTstat["tobs"]),
+        pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
 
-  if (details>0)
+  if (details > 0)
     cat(sprintf("Reference distribution with %i samples; computing time: %5.2f secs. \n",
                 length(ref), attr(ref, "ctime")))
 
@@ -318,9 +320,6 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     ref
 }
 
-
-
-
 print.refdist <- function(x, n=6L, ...){
     cat("values: \n")
     print(head(x, n=n))
@@ -333,7 +332,7 @@ print.refdist <- function(x, n=6L, ...){
 
 get_refdist <- function(lg, sm, nsim=20, seed=NULL,
                         simdata=simulate(sm, nsim=nsim, seed=seed)) {
-                            UseMethod("get_refdist")
+    UseMethod("get_refdist")
 }
 
 
@@ -357,8 +356,6 @@ get_refdist.gls <- function(lg){
     .get_refdist_gls
 }
 
-
-
 .get_refdist_gls <- function(lg, sm, nsim=20, seed=NULL,
                     simdata=simulate(sm, nsim=nsim, seed=NULL)){
     
@@ -378,8 +375,6 @@ get_refdist.gls <- function(lg){
     val <- do.call(rbind, val)
     val[,3]    
 }
-
-
 
 
 get_refdist.lm <- function(lg){
@@ -460,18 +455,17 @@ get_cluster <- function(cl){
 }
 
 
-    wrap_do_sampling <- function(largeModel, smallModel, nsim, cl, details){
+wrap_do_sampling <- function(largeModel, smallModel, nsim, cl, details){
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+    count <- 1
+    repeat{
+        if (mean(ref) > 1) break()
         ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-        count <- 1
-        repeat{
-            if (mean(ref) > 1) break()
-            ## ref <- c(ref, do_sampling(largeModel, smallModel, nsim, cl, details))
-            ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-            count <- count + 1
-            if (count==4) break()
-        }
-        ref
+        count <- count + 1
+        if (count==4) break()
     }
+    ref
+}
 
 
 do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
