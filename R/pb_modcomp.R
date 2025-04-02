@@ -53,7 +53,8 @@
 #'     reference distribution using several cores. See examples below.
 #' @param details The amount of output produced. Mainly relevant for
 #'     debugging purposes.
-#' @param ... Additional arguments, currently not used.
+#' @param control list with named arguments
+## #' @param ... Additional arguments, currently not used.
 #' @note It can happen that some values of the LRT statistic in the
 #'     reference distribution are negative. When this happens one will
 #'     see that the number of used samples (those where the LRT is
@@ -92,36 +93,36 @@
 #' @examples
 #'
 #' \dontrun{ 
-#' (fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
-#' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
+#' (lmer0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
+#' (lmer1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#' (lmer2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 #'
 #' NSIM <- 50 ## Simulations in parametric bootstrap; default is 1000.
 #' 
-#' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
-#' PBmodcomp(fm1, "Days", cl=1, nsim=NSIM)
-#' PBmodcomp(fm1, ~.-Days, cl=1, nsim=NSIM)
+#' ## Test for no effect of Days in lmer1, i.e. test lmer0 under lmer1
+#' PBmodcomp(lmer1, "Days", control=list(nsim=NSIM))
+#' PBmodcomp(lmer1, ~.-Days, control=list(nsim=NSIM))
 #' L1 <- cbind(0, 1) 
-#' ## PBmodcomp(fm1, L1, cl=1, nsim=NSIM) ## FIXME
-#' PBmodcomp(fm1, fm0, cl=1, nsim=NSIM)
-#' anova(fm1, fm0)
+#' ## PBmodcomp(lmer1, L1, control=list(nsim=NSIM)) ## FIXME
+#' PBmodcomp(lmer1, lmer0, control=list(nsim=NSIM))
+#' anova(lmer1, lmer0)
 #'
-#' ## Test for no effect of Days and Days-squared in fm2, i.e. test fm0 under fm2
-#' PBmodcomp(fm2, "(Days+I(Days^2))", cl=1, nsim=NSIM)
-#' PBmodcomp(fm2, ~. - Days - I(Days^2), cl=1, nsim=NSIM)
+#' ## Test for no effect of Days and Days-squared in lmer2, i.e. test lmer0 under lmer2
+#' PBmodcomp(lmer2, "(Days+I(Days^2))", control=list(nsim=NSIM))
+#' PBmodcomp(lmer2, ~. - Days - I(Days^2), control=list(nsim=NSIM))
 #' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
-#' ## PBmodcomp(fm2, L2, cl=1, nsim=NSIM) ## FIXME
-#' PBmodcomp(fm2, fm0, cl=1, nsim=NSIM)
-#' anova(fm2, fm0)
+#' ## PBmodcomp(lmer2, L2, control=list(nsim=NSIM)) ## FIXME
+#' PBmodcomp(lmer2, lmer0, control=list(nsim=NSIM))
+#' anova(lmer2, lmer0)
 #'
 #' 
-#' ## Test for no effect of Days-squared in fm2, i.e. test fm1 under fm2
-#' PBmodcomp(fm2, "I(Days^2)", cl=1, nsim=NSIM)
-#' PBmodcomp(fm2, ~. - I(Days^2), cl=1, nsim=NSIM)
+#' ## Test for no effect of Days-squared in lmer2, i.e. test lmer1 under lmer2
+#' PBmodcomp(lmer2, "I(Days^2)", control=list(nsim=NSIM))
+#' PBmodcomp(lmer2, ~. - I(Days^2), control=list(nsim=NSIM))
 #' L3 <- rbind(c(0, 0, 1))
-#' ## PBmodcomp(fm2, L3, cl=1, nsim=NSIM) ## FIXME
-#' PBmodcomp(fm2, fm1, cl=1, nsim=NSIM)
-#' anova(fm2, fm1)
+#' ## PBmodcomp(lmer2, L3, control=list(nsim=NSIM)) ## FIXME
+#' PBmodcomp(lmer2, lmer1, control=list(nsim=NSIM))
+#' anova(lmer2, lmer1)
 #'
 #' 
 #' ## Linear normal model:
@@ -129,21 +130,22 @@
 #' sug.h <- update(sug, .~. -harvest)
 #' sug.s <- update(sug, .~. -sow)
 #' 
-#' PBmodcomp(sug, "harvest", nsim=NSIM, cl=1)
-#' PBmodcomp(sug, ~. - harvest, nsim=NSIM, cl=1)
-#' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
+#' PBmodcomp(sug, "harvest", control=list(nsim=NSIM))
+#' PBmodcomp(sug, ~. - harvest, control=list(nsim=NSIM))
+#' PBmodcomp(sug, sug.h, control=list(nsim=NSIM))
 #' anova(sug, sug.h)
 #' 
 #' ## Generalized linear model
-#' mm <- glm(ndead/ntotal ~ sex + log(dose), family=binomial, weight=ntotal, data=budworm)
-#' mm0 <- update(mm, .~. -sex)
+#' glm1 <- glm(ndead/ntotal ~ sex + log(dose), family=binomial,
+#'           weight=ntotal, data=budworm)
+#' glm10 <- update(glm1, .~. -sex)
 #'
 #' ### Test for no effect of sex
-#' PBmodcomp(mm, "sex", cl=1, nsim=NSIM)
-#' PBmodcomp(mm, ~.-sex, cl=1, nsim=NSIM)
-#' ## PBmodcomp(mm, cbind(0, 1, 0), nsim=NSIM): FIXME
-#' PBmodcomp(mm, mm0, cl=1, nsim=NSIM)
-#' anova(mm, mm0, test="Chisq")
+#' PBmodcomp(glm1, "sex", control=list(nsim=NSIM))
+#' PBmodcomp(glm1, ~.-sex, control=list(nsim=NSIM))
+#' ## PBmodcomp(glm1, cbind(0, 1, 0), control=list(nsim=NSIM)): FIXME
+#' PBmodcomp(glm1, glm10, control=list(nsim=NSIM))
+#' anova(glm1, glm10, test="Chisq")
 #' }
 #' 
 #' ## Generalized linear mixed model (it takes a while to fit these)
@@ -153,15 +155,14 @@
 #'               data = cbpp, family = binomial))
 #' (gm2 <- update(gm1, .~.-period))
 #' 
-#' PBmodcomp(gm1, "period", nsim=NSIM)
-#' PBmodcomp(gm1, ~. -period, nsim=NSIM)
-#' PBmodcomp(gm1, gm2, nsim=NSIM)
+#' PBmodcomp(gm1, "period", control=list(nsim=NSIM))
+#' PBmodcomp(gm1, ~. -period, control=list(nsim=NSIM))
+#' PBmodcomp(gm1, gm2, control=list(nsim=NSIM))
 #' anova(gm1, gm2)
 #' }
 #' 
 #' 
 #' \dontrun{
-
 #' ## Linear mixed effects model:
 #' sug   <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
 #'               data=beets, REML=FALSE)
@@ -169,17 +170,17 @@
 #' sug.s <- update(sug, .~. -sow)
 #' 
 #' anova(sug, sug.h)
-#' PBmodcomp(sug, sug.h, nsim=NSIM, cl=1)
-#' PBmodcomp(sug, "harvest", nsim=NSIM, cl=1)
+#' PBmodcomp(sug, sug.h, control=list(nsim=NSIM))
+#' PBmodcomp(sug, "harvest", control=list(nsim=NSIM))
 #' 
 #' anova(sug, sug.s)
-#' PBmodcomp(sug, sug.s, nsim=NSIM, cl=1)
-#' PBmodcomp(sug, "sow", nsim=NSIM, cl=1)
+#' PBmodcomp(sug, sug.s, control=list(nsim=NSIM))
+#' PBmodcomp(sug, "sow", control=list(nsim=NSIM))
 #'
 #' ## Simulate reference distribution separately:
-#' refdist <- PBrefdist(sug, sug.h, nsim=1000, cl=1)
-#' refdist <- PBrefdist(sug, "harvest", nsim=1000, cl=1)
-#' refdist <- PBrefdist(sug, ~.-harvest, nsim=1000, cl=1)
+#' refdist <- PBrefdist(sug, sug.h, nsim=1000)
+#' refdist <- PBrefdist(sug, "harvest", nsim=1000)
+#' refdist <- PBrefdist(sug, ~.-harvest, nsim=1000)
 #' 
 #' ## Do computations with multiple processors:
 #' ## Number of cores:
@@ -189,7 +190,7 @@
 #' cl <- makeCluster(rep("localhost", nc))
 #' 
 #' ## Then do:
-#' refdist <- PBrefdist(sug, sug.h, nsim=1000, cl=cl)
+#' refdist <- PBrefdist(sug, sug.h, control=list(nsim=1000, cl=cl))
 #' 
 #' ## It is recommended to stop the clusters before quitting R:
 #' stopCluster(cl)
@@ -198,12 +199,13 @@
 #' @export PBmodcomp
 
 
-
-
 #' @export
 #' @rdname pb_modcomp
-PBFmodcomp <- function(largeModel, smallModel, nsim=500, ref=NULL, seed=NULL, cl=NULL, details=0, ...){
-    ans <- PBmodcomp(largeModel, smallModel, nsim=nsim, ref=ref, seed=seed, cl=cl, details=details)
+PBFmodcomp <- function(largeModel, smallModel,
+                       control=list(nsim=500, ref=NULL, seed=NULL, cl=NULL),
+                       details=0){
+    ans <- PBmodcomp(largeModel, smallModel, control=control,
+                     details=details)
     heading <- attr(ans, "heading")
     out <- attr(ans, "aux")$test["PB_Ftest",]
     attr(out, "heading") <- heading
@@ -216,26 +218,25 @@ PBFmodcomp <- function(largeModel, smallModel, nsim=500, ref=NULL, seed=NULL, cl
 
 #' @export
 #' @rdname pb_modcomp
-PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+PBmodcomp <- function(largeModel, smallModel,
+                      control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
+                      details=0){
   UseMethod("PBmodcomp")
 }
 
 
-#' @export
-#' @rdname pb_modcomp
-PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+handle_models <- function(largeModel, smallModel){
 
-    ## cat("PBmodcomp.merMod\n")
-    
+
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
-
+    
     if (inherits(smallModel, "formula"))
         smallModel  <- update(largeModel, smallModel)
-
+    
     if (is.numeric(smallModel) && !is.matrix(smallModel))
         smallModel <- matrix(smallModel, nrow=1)
-            
+    
     if (inherits(smallModel, c("Matrix", "matrix"))){
         formula.small <- smallModel
         smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
@@ -243,23 +244,47 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
         formula.small <- formula(smallModel)
         attributes(formula.small) <- NULL
     }
-
+    
     formula.large <- formula(largeModel)
     attributes(formula.large) <- NULL
-    
-    ## All computations are based on 'largeModel' and 'smallModel'
-    ## which at this point are both model objects.
-    ## -----------------------------------------------------------
 
+    out <- list(formula.large=formula.large,
+                formula.small=formula.small,
+                largeModel=largeModel,
+                smallModel=smallModel
+                )
+
+    return(out)
+
+}
+
+
+
+
+#' @export
+#' @rdname pb_modcomp
+PBmodcomp.merMod <- function(largeModel, smallModel,
+                             control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
+                             details=0){
+
+    
+
+    mmm <- handle_models(largeModel, smallModel)
+    largeModel <- mmm$largeModel
+    smallModel <- mmm$smallModel
+    formula.large <- mmm$formula.large
+    formula.small <- mmm$formula.small
+    
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- getME(largeModel, "n")
     
     if (nr_data != nr_fit)
         stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
-    
+
+    ref <- control$ref
     if (is.null(ref)){
-        ref <- PBrefdist(largeModel, smallModel, nsim=nsim,
-                         seed=seed, cl=cl, details=details)
+        ref <- PBrefdist(largeModel, smallModel, control=control,
+                         details=details)
     }
     
     LRTstat     <- getLRT(largeModel, smallModel)
@@ -282,43 +307,28 @@ PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=N
 
 #' @export
 #' @rdname pb_modcomp
-PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+PBmodcomp.gls <- function(largeModel, smallModel,
+                          control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
+                          details=0){
 
-    ## cat("PBmodcomp.gls\n")
-    
-    if (is.character(smallModel))
-        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
 
-    if (inherits(smallModel, "formula"))
-        smallModel  <- update(largeModel, smallModel)
 
-    if (is.numeric(smallModel) && !is.matrix(smallModel))
-        smallModel <- matrix(smallModel, nrow=1)
-            
-    if (inherits(smallModel, c("Matrix", "matrix"))){
-        formula.small <- smallModel
-        smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
-    } else {
-        formula.small <- formula(smallModel)
-        attributes(formula.small) <- NULL
-    }
-
-    formula.large <- formula(largeModel)
-    attributes(formula.large) <- NULL
-    
-    ## All computations are based on 'largeModel' and 'smallModel'
-    ## which at this point are both model objects.
-    ## -----------------------------------------------------------
+    mmm <- handle_models(largeModel, smallModel)
+    largeModel <- mmm$largeModel
+    smallModel <- mmm$smallModel
+    formula.large <- mmm$formula.large
+    formula.small <- mmm$formula.small
 
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- largeModel$dims$N
     
     if (nr_data != nr_fit)
         stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
-    
+
+    ref <- control$ref    
     if (is.null(ref)){
-        ref <- PBrefdist(largeModel, smallModel, nsim=nsim,
-                         seed=seed, cl=cl, details=details)
+        ref <- PBrefdist(largeModel, smallModel, control=control,
+                         details=details)
     }
     
     LRTstat     <- getLRT(largeModel, smallModel)
@@ -341,42 +351,32 @@ PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL
 
 #' @export
 #' @rdname pb_modcomp
-PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
+PBmodcomp.lm <- function(largeModel, smallModel,
+                         control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
+                         details=0){
 
     ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
 
-    if (is.character(smallModel))
-        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
 
-    if (inherits(smallModel, "formula"))
-        smallModel  <- update(largeModel, smallModel)
 
-    if (is.numeric(smallModel) && !is.matrix(smallModel))
-        smallModel <- matrix(smallModel, nrow=1)
+    mmm <- handle_models(largeModel, smallModel)
+    largeModel <- mmm$largeModel
+    smallModel <- mmm$smallModel
+    formula.large <- mmm$formula.large
+    formula.small <- mmm$formula.small
     
-    formula.large <- formula(largeModel)
-    attributes(formula.large) <- NULL
     
-    if (inherits(smallModel, c("Matrix", "matrix"))){
-        formula.small <- smallModel
-        smallModel <- restriction_matrix2model(largeModel, smallModel)
-    } else {
-        formula.small <- formula(smallModel)
-        attributes(formula.small) <- NULL
-    }
-
-    
-    ## ss <<- smallModel
-    ## print(smallModel)
     if (!all.equal((fam.l <- family(largeModel)), (fam.s <- family(smallModel))))
         stop("Models do not have identical identical family\n")
 
     if (!(fam.l$family %in% ok.fam))
         stop(sprintf("family must be of type %s", toString(ok.fam)))
-        
+
+    ref <- control$ref
     if (is.null(ref)){
-        ref <- PBrefdist(largeModel, smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
-    }
+        ref <- PBrefdist(largeModel, smallModel, control=control,
+                         details=details)
+    } 
 
     nr_data <- nrow(eval(largeModel$call$data))
     nr_fit  <- nrow(largeModel$model)
@@ -695,19 +695,26 @@ plot.PBmodcomp <- function(x, ...){
 #' @rdname pb_modcomp
 #' @export
 seqPBmodcomp <-
-    function(largeModel, smallModel, h = 20, nsim = 1000, cl=1) {
+    function(largeModel, smallModel, control=list(nsim = 1000, h = 20, cl=NULL)) {
         t.start <- proc.time()
         chunk.size <- 100
+        nsim <- control$nsim
+        h <- control$h
         nchunk <- nsim %/% chunk.size
         LRTstat <- getLRT(largeModel, smallModel)
         ref <- NULL
+        ctrl2 <- control
+        ctrl2$nsim <- chunk.size
         for (ii in 1:nchunk) {
-            ref <- c(ref, PBrefdist(largeModel, smallModel, nsim = chunk.size, cl=cl))
+            ref <- c(ref, PBrefdist(largeModel, smallModel,
+                                    control=ctrl2))
             n.extreme <- sum(ref > LRTstat["tobs"])
             if (n.extreme >= h)
                 break
         }
-        ans <- PBmodcomp(largeModel, smallModel, ref = ref)
+
+        ## FIXME Needs update / check
+        ans <- PBmodcomp(largeModel, smallModel, control=list(ref = ref))
         ##ans$ctime <- (proc.time() - t.start)[3]
         attr(ans, "aux")$ctime <- (proc.time() - t.start)[3]
         ans
@@ -882,4 +889,108 @@ seqPBmodcomp <-
 ##     ans$formula.small <- formula.small
 ##     ans
 ## }
+
+
+## #' @export
+## #' @rdname pb_modcomp
+## PBmodcomp_ <- function(largeModel, smallModel, control=NULL){
+##     the_call <- match.call()
+    
+##     if (!is.null(control)){
+##         print(control)
+##         if (!is.null((val <- control$nsim))){
+##             the_call$nsim <- val
+##         }    
+##         if (!is.null((val <- control$cl))){
+##             the_call$cl <- val
+##         }    
+##     }
+##     the_call$control <- NULL
+##     the_call[[1]] <- as.name("PBmodcomp")
+##     print(the_call)
+##     eval(the_call)
+## }
+
+## #' @export
+## #' @rdname pb_modcomp
+## PBFmodcomp_ <- function(largeModel, smallModel, control=NULL){
+##     ans <- PBmodcomp_(largeModel, smallModel, control=control)
+##     heading <- attr(ans, "heading")
+##     out <- attr(ans, "aux")$test["PB_Ftest",]
+##     attr(out, "heading") <- heading
+##     attr(out, "aux") <- attr(ans, "aux")
+
+##     class(out) <- c("PBFmodcomp", "anova", "data.frame")    
+##     out
+
+## }
+
+
+
+    ## cat("PBmodcomp.gls\n")
+    
+    ## if (is.character(smallModel))
+    ##     smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+
+    ## if (inherits(smallModel, "formula"))
+    ##     smallModel  <- update(largeModel, smallModel)
+
+    ## if (is.numeric(smallModel) && !is.matrix(smallModel))
+    ##     smallModel <- matrix(smallModel, nrow=1)
+            
+    ## if (inherits(smallModel, c("Matrix", "matrix"))){
+    ##     formula.small <- smallModel
+    ##     smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
+    ## } else {
+    ##     formula.small <- formula(smallModel)
+    ##     attributes(formula.small) <- NULL
+    ## }
+
+    ## formula.large <- formula(largeModel)
+    ## attributes(formula.large) <- NULL
+
+
+## lmer
+    ## if (is.character(smallModel))
+    ##     smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+
+    ## if (inherits(smallModel, "formula"))
+    ##     smallModel  <- update(largeModel, smallModel)
+
+    ## if (is.numeric(smallModel) && !is.matrix(smallModel))
+    ##     smallModel <- matrix(smallModel, nrow=1)
+            
+    ## if (inherits(smallModel, c("Matrix", "matrix"))){
+    ##     formula.small <- smallModel
+    ##     smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
+    ## } else {
+    ##     formula.small <- formula(smallModel)
+    ##     attributes(formula.small) <- NULL
+    ## }
+
+    ## formula.large <- formula(largeModel)
+    ## attributes(formula.large) <- NULL
+
+
+    ## lm
+    ## if (is.character(smallModel))
+    ##     smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+
+    ## if (inherits(smallModel, "formula"))
+    ##     smallModel  <- update(largeModel, smallModel)
+
+    ## if (is.numeric(smallModel) && !is.matrix(smallModel))
+    ##     smallModel <- matrix(smallModel, nrow=1)
+    
+    ## formula.large <- formula(largeModel)
+    ## attributes(formula.large) <- NULL
+    
+    ## if (inherits(smallModel, c("Matrix", "matrix"))){
+    ##     formula.small <- smallModel
+    ##     smallModel <- restriction_matrix2model(largeModel, smallModel)
+    ## } else {
+    ##     formula.small <- formula(smallModel)
+    ##     attributes(formula.small) <- NULL
+    ## }
+
 

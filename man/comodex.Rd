@@ -8,15 +8,50 @@
 \alias{comodex.lm}
 \title{Model comparison}
 \usage{
-comodex(largeModel, smallModel, test = "kr", details = 0, ...)
+comodex(
+  largeModel,
+  smallModel,
+  test = "x2",
+  control = list(),
+  details = 0,
+  ...
+)
 
-\method{comodex}{lmerMod}(largeModel, smallModel, test = "kr", details = 0, ...)
+\method{comodex}{lmerMod}(
+  largeModel,
+  smallModel,
+  test = "x2",
+  control = list(),
+  details = 0,
+  ...
+)
 
-\method{comodex}{gls}(largeModel, smallModel, test = "pb", details = 0, ...)
+\method{comodex}{gls}(
+  largeModel,
+  smallModel,
+  test = "x2",
+  control = list(),
+  details = 0,
+  ...
+)
 
-\method{comodex}{glmerMod}(largeModel, smallModel, test = "pb", details = 0, ...)
+\method{comodex}{glmerMod}(
+  largeModel,
+  smallModel,
+  test = "x2",
+  control = list(),
+  details = 0,
+  ...
+)
 
-\method{comodex}{lm}(largeModel, smallModel, test = "pb", details = 0, ...)
+\method{comodex}{lm}(
+  largeModel,
+  smallModel,
+  test = "x2",
+  control = list(),
+  details = 0,
+  ...
+)
 }
 \arguments{
 \item{largeModel}{An \code{lmer} model}
@@ -24,6 +59,8 @@ comodex(largeModel, smallModel, test = "kr", details = 0, ...)
 \item{smallModel}{An \code{lmer} model or a restriction matrix}
 
 \item{test}{A character string}
+
+\item{control}{A list controlling the model comparions.}
 
 \item{details}{should details be printed}
 
@@ -33,15 +70,15 @@ comodex(largeModel, smallModel, test = "kr", details = 0, ...)
 Wrapper for functions KRmodcomp, SATmodcomp, PBmodcomp, PBFmodcomp
 }
 \examples{
-(fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
-(fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-(fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
+(lmer0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
+(lmer1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+(lmer2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
 
-anovax(fm2, fm1)
-anovax(fm2, fm1, "sat")
-anovax(fm2, .~. - I(Days^2))
-anovax(fm2, fm1, "PB", nsim=1000, cl=1)
-anovax(fm2, fm1, "PBF", nsim=1000, cl=1)
+anovax(lmer2, lmer1)
+anovax(lmer2, lmer1, test="sat")
+anovax(lmer2, .~. - I(Days^2))
+anovax(lmer2, lmer1, test="PB", control=list(nsim=50, cl=1))
+anovax(lmer2, lmer1, test="PBF", control=list(nsim=50, cl=1))
 }
 \author{
 Søren Højsgaard

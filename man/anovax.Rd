@@ -9,15 +9,15 @@
 \alias{print.anovax}
 \title{anova like function}
 \usage{
-anovax(object, ..., test = "kr", cl = NULL)
+anovax(object, ..., test = "x2", control = list(nsim = 1000, cl = NULL))
 
-\method{anovax}{lmerMod}(object, ..., test = "kr", cl = NULL)
+\method{anovax}{lmerMod}(object, ..., test = "x2", control = list(nsim = 1000, cl = NULL))
 
-\method{anovax}{glmerMod}(object, ..., test = "pb", cl = NULL)
+\method{anovax}{glmerMod}(object, ..., test = "x2", control = list(nsim = 1000, cl = NULL))
 
-\method{anovax}{gls}(object, ..., test = "pb", cl = NULL)
+\method{anovax}{gls}(object, ..., test = "x2", control = list(nsim = 1000, cl = NULL))
 
-\method{anovax}{lm}(object, ..., test = "pb", cl = NULL)
+\method{anovax}{lm}(object, ..., test = "x2", control = list(nsim = 1000, cl = NULL))
 
 \method{print}{anovax}(x, ...)
 }
@@ -28,7 +28,8 @@ anovax(object, ..., test = "kr", cl = NULL)
 
 \item{test}{A character string}
 
-\item{cl}{number of cluster (for test="pf" and "pbf")}
+\item{control}{A list controling simulations, only relevant for
+parametric bootstrapping.}
 
 \item{x}{anovax object}
 }
@@ -40,14 +41,14 @@ print anovax object
 \examples{
 fm1 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
 fm0 <- update(fm1, .~. - sow)
-anovax(fm1, ~.-harvest, test="KR")
-anovax(fm1, ~.-harvest, test="SAT")
-anovax(fm1, ~.-harvest, test="PB", cl=1)
+anovax(fm1, .~. - harvest, test="KR")
+anovax(fm1, .~. - harvest, test="SAT")
+anovax(fm1, .~. - harvest, test="PB", control=list(nsim=50, cl=1))
 
 anovax(fm1, test="KR")
 anovax(fm1, test="SAT")
-anovax(fm1, test="PB", cl=1)
-anovax(fm1, test="PBF", cl=1)
+anovax(fm1, test="PB", control=list(nsim=50, cl=1))
+## anovax(fm1, test="PBF", control=list(nsim=50, cl=1))
 }
 \author{
 Søren Højsgaard

@@ -150,7 +150,7 @@ here; in this connection it can be useful to exploit that computations
 can be made en parallel, see the documentation):
 
 ```{r}
-pb.bal <- PBmodcomp(lmm1.bal, lmm0.bal, nsim=500, cl=2)
+pb.bal <- PBmodcomp(lmm1.bal, lmm0.bal, control=list(nsim=500, cl=2))
 pb.bal |> tidy()
 summary(pb.bal) |> tidy()
 ```
@@ -160,7 +160,7 @@ For the imbalanced data, the result is similar to the result from the
 paired $t$--test.
 
 ```{r}
-pb.imbal <- PBmodcomp(lmm1.imbal, lmm0.imbal, nsim=500, cl=2)
+pb.imbal <- PBmodcomp(lmm1.imbal, lmm0.imbal, control=list(nsim=500, cl=2))
 pb.imbal |> tidy()
 summary(pb.imbal)  |> tidy()
 ```

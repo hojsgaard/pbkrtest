@@ -46,11 +46,12 @@
 #' @param smallModel A linear mixed effects model as fitted with the
 #'     \code{lmer()} function in the \pkg{lme4} package. This model muse be
 #'     smaller than \code{largeModel} (see above).
-#' @param nsim The number of simulations to form the reference distribution.
-#' @param seed Seed for the random number generation.
+#' @param control A list used for controlling simulations
+## #' @param nsim The number of simulations to form the reference distribution.
+## #' @param seed Seed for the random number generation.
 #'
-#' @param cl Used for controlling parallel computations. See sections
-#'     'details' and 'examples' below.
+## #' @param cl Used for controlling parallel computations. See sections
+## #'     'details' and 'examples' below.
 #'
 #' @param details The amount of output produced. Mainly relevant for debugging
 #'     purposes.
@@ -70,7 +71,7 @@
 #' beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
 #'         data=beets, REML=FALSE)
 #' beet_no.harv <- update(beet0, . ~ . -harvest)
-#' rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=1)
+#' rd <- PBrefdist(beet0, beet_no.harv, control=list(nsim=20, cl=1))
 #' rd
 #' 
 #' \dontrun{
@@ -86,11 +87,11 @@
 #'
 #' # N cores used in all calls to function in a session
 #'   options("mc.cores"=N)
-#'   rd <- PBrefdist(beet0, beet_no.harv, nsim=20)
+#'   rd <- PBrefdist(beet0, beet_no.harv, control=list(nsim=20))
 #'
 #' # N cores used just in one specific call (when cl is set,
 #' # options("mc.cores") is ignored):
-#'   rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=N)
+#'   rd <- PBrefdist(beet0, beet_no.harv, control=list(nsim=20, cl=N))
 #' }
 #'
 #' # In fact, on Windows, the approach above also work but only when setting the
@@ -119,14 +120,16 @@
 
 #' @rdname pb-refdist
 #' @export
-PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
+PBrefdist <- function(largeModel, smallModel, control=list(nsim=1000, seed=NULL, cl=NULL),
+                      details=0){
     UseMethod("PBrefdist")
 }
 
 
 #' @rdname pb-refdist
 #' @export
-PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
+PBrefdist.lm <- function(largeModel, smallModel, control=list(nsim=1000, seed=NULL, cl=NULL),
+                         details=0){
   t0 <- proc.time()
 
   nr_data <- nrow(eval(largeModel$call$data))
@@ -135,14 +138,14 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
   if (nr_data != nr_fit)
     stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
   
-  ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
+  ref <- wrap_do_sampling(largeModel, smallModel, control$nsim, control$cl, details)
   
   ## ref <- ref[ref > 0]
 
   LRTstat     <- getLRT(largeModel, smallModel)
   attr(ref, "stat")    <- LRTstat
   attr(ref, "samples") <-
-      c(nsim      = nsim,
+      c(nsim      = control$nsim,
         npos      = sum(ref > 0),
         n.extreme = sum(ref > LRTstat["tobs"]),
         pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
@@ -157,7 +160,9 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
 
 #' @rdname pb-refdist
 #' @export
-PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
+PBrefdist.gls <- function(largeModel, smallModel,
+                          control=list(nsim=1000, seed=NULL, cl=NULL),
+                          details=0){
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
@@ -190,11 +195,11 @@ PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
     
     t0 <- proc.time()
-    ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
+    ref <- wrap_do_sampling(largeModel, smallModel, control$nsim, control$cl, details)
 
     LRTstat     <- getLRT(largeModel, smallModel)
     attr(ref, "stat")    <- LRTstat
-    attr(ref, "samples") <- c(nsim      = nsim,
+    attr(ref, "samples") <- c(nsim      = control$nsim,
                               npos      = sum(ref > 0),
                               n.extreme = sum(ref > LRTstat["tobs"]),
                               pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
@@ -209,7 +214,9 @@ PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
 
 #' @rdname pb-refdist
 #' @export
-PBrefdist.lme <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
+PBrefdist.lme <- function(largeModel, smallModel,
+                          control=list(nsim=1000, seed=NULL, cl=NULL),
+                          details=0){
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
@@ -242,11 +249,11 @@ PBrefdist.lme <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
     
     t0 <- proc.time()
-    ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
+    ref <- wrap_do_sampling(largeModel, smallModel, control$nsim, control$cl, details)
 
     LRTstat     <- getLRT(largeModel, smallModel)
     attr(ref, "stat")    <- LRTstat
-    attr(ref, "samples") <- c(nsim      = nsim,
+    attr(ref, "samples") <- c(nsim      = control$nsim,
                               npos      = sum(ref > 0),
                               n.extreme = sum(ref > LRTstat["tobs"]),
                               pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
@@ -262,7 +269,9 @@ PBrefdist.lme <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
 
 #' @rdname pb-refdist
 #' @export
-PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
+PBrefdist.merMod <- function(largeModel, smallModel,
+                             control=list(nsim=1000, seed=NULL, cl=NULL),
+                             details=0){
 
     if (is.character(smallModel))
         smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
@@ -302,10 +311,10 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     t0  <- proc.time()
     
 
-    ref <- wrap_do_sampling(largeModel, smallModel, nsim, cl, details)
+    ref <- wrap_do_sampling(largeModel, smallModel, control$nsim, control$cl, details)
               
     attr(ref, "stat")    <- LRTstat
-    attr(ref, "samples") <- c(nsim      = nsim,
+    attr(ref, "samples") <- c(nsim      = control$nsim,
                               npos      = sum(ref > 0),
                               n.extreme = sum(ref > LRTstat["tobs"]),
                               pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))

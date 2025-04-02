@@ -4,7 +4,12 @@
 \alias{anovax_list}
 \title{Various different tests for model comparison}
 \usage{
-anovax_list(object, object2, test = c("x2", "kr", "sat", "pb"))
+anovax_list(
+  object,
+  object2,
+  test = c("x2", "kr", "sat", "pb"),
+  control = list(nsim = 1000)
+)
 }
 \arguments{
 \item{object}{Model object}
@@ -12,6 +17,8 @@ anovax_list(object, object2, test = c("x2", "kr", "sat", "pb"))
 \item{object2}{Model object or equivalent way of specifying a submodel of lmm1}
 
 \item{test}{A vector with the various test types.}
+
+\item{control}{A list controlling the model comparions.}
 }
 \value{
 Dataframe with results of the various tests
