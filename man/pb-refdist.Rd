@@ -111,10 +111,12 @@ NULL then the function will look for
 
 data(beets)
 head(beets)
-beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets, REML=FALSE)
+beet0 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest),
+        data=beets, REML=FALSE)
 beet_no.harv <- update(beet0, . ~ . -harvest)
 rd <- PBrefdist(beet0, beet_no.harv, nsim=20, cl=1)
 rd
+
 \dontrun{
 ## Note: Many more simulations must be made in practice.
 

@@ -6,6 +6,7 @@
 \alias{X2modcomp.lmerMod}
 \alias{X2modcomp.glmerMod}
 \alias{X2modcomp.gls}
+\alias{X2modcomp.lm}
 \title{Chisq test}
 \usage{
 X2modcomp(largeModel, smallModel, betaH = 0, details = 0, ...)
@@ -15,6 +16,8 @@ X2modcomp(largeModel, smallModel, betaH = 0, details = 0, ...)
 \method{X2modcomp}{glmerMod}(largeModel, smallModel, betaH = 0, details = 0, ...)
 
 \method{X2modcomp}{gls}(largeModel, smallModel, betaH = 0, details = 0, ...)
+
+\method{X2modcomp}{lm}(largeModel, smallModel, betaH = 0, details = 0, ...)
 }
 \arguments{
 \item{largeModel}{An \code{lmer} model}
