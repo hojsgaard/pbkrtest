@@ -339,8 +339,10 @@ print.refdist <- function(x, n=6L, ...){
 
 
 
-get_refdist <- function(lg, sm, nsim=20, seed=NULL,
-                        simdata=simulate(sm, nsim=nsim, seed=seed)) {
+## get_refdist <- function(lg, sm, nsim=20, seed=NULL,
+##                         simdata=simulate(sm, nsim=nsim, seed=seed)) {
+
+get_refdist <- function(lg) {
     UseMethod("get_refdist")
 }
 
@@ -349,6 +351,15 @@ get_refdist.merMod <- function(lg){
     .get_refdist_merMod
 }
 
+
+get_refdist.gls <- function(lg){
+    .get_refdist_gls
+}
+
+
+get_refdist.lm <- function(lg){
+    .get_refdist_lm
+}
 
 
 .get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL,
@@ -359,10 +370,6 @@ get_refdist.merMod <- function(lg){
         lg2  <- suppressMessages(refit(lg, newresp=yyy))
         2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
     })))
-}
-
-get_refdist.gls <- function(lg){
-    .get_refdist_gls
 }
 
 .get_refdist_gls <- function(lg, sm, nsim=20, seed=NULL,
@@ -385,10 +392,6 @@ get_refdist.gls <- function(lg){
     val[,3]    
 }
 
-
-get_refdist.lm <- function(lg){
-    .get_refdist_lm
-}
 
 .get_refdist_lm <- function(lg, sm, nsim=20, seed=NULL,
                             simdata=simulate(sm, nsim=nsim, seed=seed)){
@@ -417,6 +420,11 @@ get_refdist.lm <- function(lg){
     }
     ref
 }
+
+
+
+
+
 
 
 

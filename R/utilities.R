@@ -1,3 +1,23 @@
+##' @title Refit linear model / generalized linear model to new response
+##'
+##' @details This i a recent addition and is not thoroughly tested.
+##' 
+##' @param object A glm object
+##' @param newresp A new response variable
+##' @param ... Additional arguments, currently unused
+##' @return A refitted model object 
+##' @author Søren Højsgaard
+##' @importFrom lme4 refit
+##' @export
+refit.glm <- function(object, newresp, ...){
+    local_data <- eval(object$call$data)
+    y_var <- all.vars(formula(object))[1]
+    local_data[[y_var]] <- newresp
+    out <- update(object, data=local_data)
+    return(out)
+}
+
+
 #' Compare column spaces
 #'
 #' Compare column spaces of two matrices

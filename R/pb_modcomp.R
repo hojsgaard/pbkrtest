@@ -204,6 +204,7 @@
 PBFmodcomp <- function(largeModel, smallModel,
                        control=list(nsim=500, ref=NULL, seed=NULL, cl=NULL),
                        details=0){
+    if (is.null(control$nsim)) control$nsim <- 1000
     ans <- PBmodcomp(largeModel, smallModel, control=control,
                      details=details)
     heading <- attr(ans, "heading")
@@ -267,6 +268,7 @@ PBmodcomp.merMod <- function(largeModel, smallModel,
                              control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
                              details=0){
 
+    if (is.null(control$nsim)) control$nsim <- 1000
     
 
     mmm <- handle_models(largeModel, smallModel)
@@ -311,6 +313,7 @@ PBmodcomp.gls <- function(largeModel, smallModel,
                           control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
                           details=0){
 
+    if (is.null(control$nsim)) control$nsim <- 1000
 
 
     mmm <- handle_models(largeModel, smallModel)
@@ -355,6 +358,8 @@ PBmodcomp.lm <- function(largeModel, smallModel,
                          control=list(nsim=1000, ref=NULL, seed=NULL, cl=NULL),
                          details=0){
 
+    if (is.null(control$nsim)) control$nsim <- 1000
+    
     ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
 
 
