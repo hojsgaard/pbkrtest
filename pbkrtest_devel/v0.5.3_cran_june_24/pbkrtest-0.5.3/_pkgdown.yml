@@ -1,0 +1,20 @@
+reference:
+- title: Model comparison
+  desc: >
+    ~ 
+  contents:
+  - has_concept("model_comparison")
+- title: Data sets
+  desc: >
+    ~ 
+  contents:
+  - has_concept("data")
+- title: Others
+  desc: > 
+    These are functions not mentioned above.
+  contents:
+  - lacks_concepts(c("model_comparison", "data", "simple_algebra"))
+- title: Complete reference
+  desc: ~
+  contents:
+  - matches(".*")

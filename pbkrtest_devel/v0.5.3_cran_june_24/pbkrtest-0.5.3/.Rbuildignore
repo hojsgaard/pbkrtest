@@ -1,0 +1,15 @@
+.travis.yml
+.gitignore
+LICENSE
+devel/
+README.Rmd
+.github
+README_files/
+vignettes/figures/
+^doc$
+^CRAN-SUBMISSION$
+^cran-comments\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+README.html

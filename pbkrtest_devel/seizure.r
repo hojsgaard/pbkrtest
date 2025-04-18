@@ -21,6 +21,7 @@ dat2.long$value <- y
 
 fitp1.glmer <- glmer(value ~ age + (1|subject), data=dat2.long, family=poisson())
 fitp2.glmer <- glmer(value ~ (1|subject), data=dat2.long, family=poisson())
+
 fitp1.glm   <- glm(  value ~ age , data=dat2.long, family=poisson())
 fitp2.glm   <- glm(  value ~ 1, data=dat2.long, family=poisson())
 
@@ -52,25 +53,14 @@ X2modcomp(fitn1.glm, fitn2.glm)
 
 
 
+## refit.glm <- function(object, newresp, ...){
+##     local_data <- eval(object$call$data)
+##     y_var <- all.vars(formula(object))[1]
+##     local_data[[y_var]] <- newresp
+##     out <- update(object, data=local_data)
+##     return(out)
+## }
 
-lg <- fitn1.glm
-sm <- fitn2.glm
-
-lg <- fitn1.lmer
-sm <- fitn2.lmer
-
-lg2 <- lg
-
-object <- lg2 
-
-
-refit.glm <- function(object, newresp, ...){
-    local_data <- eval(object$call$data)
-    y_var <- all.vars(formula(object))[1]
-    local_data[[y_var]] <- newresp
-    out <- update(object, data=local_data)
-    return(out)
-}
 
 
 lg |> logLik()
@@ -84,12 +74,6 @@ getLRT(lg, sm)
 getLRT(lg2, sm2)
 
 
-nsim <- 100
-sim <- simulate(fitp2.glmer, nsim)
-
-lg <- fitn1.glm
-sm <- fitn2.glm
-
 
 get_coverage <- function(lg, sm, sim, sig.level=c(0.1, 0.05, 0.01)){
     nsim <- ncol(sim)
@@ -99,7 +83,6 @@ get_coverage <- function(lg, sm, sim, sig.level=c(0.1, 0.05, 0.01)){
         sm2 <- suppressWarnings(refit(sm, y))    
         getLRT(lg2, sm2)
     })
-    pp
     pp <- t(v)[,3]
 
     out <- sapply(sig.level, function(s){
@@ -109,31 +92,26 @@ get_coverage <- function(lg, sm, sim, sig.level=c(0.1, 0.05, 0.01)){
     return(out)
 }
 
-get_coverage(lg, sm)
+nsim <- 100
+sim <- simulate(fitp2.glmer, nsim)
 
 
-sum(pp <= 0.05) / length(pp)
+lg <- fitp1.glmer
+sm <- fitp2.glmer
+get_coverage(lg, sm, sim)
 
+lg <- fitp1.glm
+sm <- fitp2.glm
+get_coverage(lg, sm, sim)
 
-fit1g <- glm(value ~ age , data=dat.long, family=poisson())
-fit2g <- glm(value ~ 1, data=dat.long, family=poisson())
+lg <- fitn1.lmer
+sm <- fitn2.lmer
+get_coverage(lg, sm, sim)
 
+lg <- fitn1.glm
+sm <- fitn2.glm
+get_coverage(lg, sm, sim)
 
-y <- sim[[2]]
-fit1u <- refit(fit1, y)
-fit2u <- refit(fit2, y)
-
-getLRT(fit1u, fit2u)
-
-
-sum(v[3,] < 0.05)
-
-w <- sapply(1:nsim, function(i){
-    y <- sim[[i]]
-    fit1u <- suppressWarnings(refit(fit1g, y))
-    fit2u <- suppressWarnings(refit(fit2g, y))    
-    getLRT(fit1u, fit2u)
-})
 
 
 
@@ -150,9 +128,6 @@ w <- sapply(1:nsim, function(i){
 ##            correlation = corAR1(form = ~ 1 | subject))
 ## fm2 <- gls(value ~ 1, data=dat.long,
 ##            correlation = corAR1(form = ~ 1 | subject))
-
-
-
 
 
 getLRT(fm1, fm2)
