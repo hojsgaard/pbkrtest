@@ -155,7 +155,6 @@ pb.bal |> tidy()
 summary(pb.bal) |> tidy()
 ```
 
-
 For the imbalanced data, the result is similar to the result from the
 paired $t$--test.
 
@@ -164,6 +163,34 @@ pb.imbal <- PBmodcomp(lmm1.imbal, lmm0.imbal, nsim=500, cl=2)
 pb.imbal |> tidy()
 summary(pb.imbal)  |> tidy()
 ```
+
+
+<!-- ```{r}  -->
+<!-- fm0 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy) -->
+<!-- fm1 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy) -->
+<!-- NSIM <- 50 -->
+<!-- rd <- PBrefdist(fm1, fm0, nsim=NSIM) -->
+<!-- rd -->
+
+<!-- if (Sys.info()["sysname"] != "Windows"){ -->
+<!--     N <- 2 ## Or -->
+<!--     N <- parallel::detectCores() -->
+
+<!--     options("mc.cores"=N) -->
+<!--     rd <- PBrefdist(fm1, fm0, nsim=NSIM) -->
+
+<!--     rd <- PBrefdist(beet0, beet_no.harv, nsim=NSIM, cl=N)     -->
+<!-- } -->
+
+<!-- ``` -->
+
+
+
+
+
+
+
+
 
 
 # Matrices for random effects

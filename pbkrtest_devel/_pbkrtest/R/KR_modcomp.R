@@ -4,7 +4,7 @@
 #' 
 #' @description An approximate F-test based on the Kenward-Roger approach.
 #' @concept model_comparison
-#' @name kr_modcomp
+#' @name kr__modcomp
 #' 
 ## ##########################################################################
 #' @details
@@ -105,17 +105,15 @@
 #' anova(fm2, fm1)
 
 
-
 #' @export
-#' @rdname kr_modcomp
+#' @rdname kr__modcomp
 KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
     UseMethod("KRmodcomp")
 }
 
 
-
 #' @export
-#' @rdname kr_modcomp
+#' @rdname kr__modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     KRmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details)
 }
@@ -148,6 +146,9 @@ KRmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 
 KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
 
+    if (is.null(betaH)) betaH <- 0
+    if (is.null(details)) details <- 0
+    
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
     t0    <- proc.time()
@@ -281,7 +282,6 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
   Wald     <- as.numeric(t(Lb2) %*% solve(L %*% PhiA %*% t(L), Lb2))
   WaldU    <- as.numeric(t(Lb2) %*% solve(L %*% Phi  %*% t(L), Lb2))
 
-  
   FstatU <- Wald / q
   pvalU  <- pf(FstatU, df1=q, df2=df2, lower.tail=FALSE)
 
@@ -293,7 +293,6 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
                 FstatU = FstatU, p.valueU = pvalU,
                 aux = aux)
   stats
-
 }
 
 .KRcommon <- function(x){

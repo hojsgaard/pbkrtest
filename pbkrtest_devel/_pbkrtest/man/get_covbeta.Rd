@@ -2,7 +2,8 @@
 % Please edit documentation in R/SAT_modcomp.R
 \name{get_covbeta}
 \alias{get_covbeta}
-\title{Compute covariance of fixed effect parameters as a function of variance parameters of a linear mixed model}
+\title{Compute covariance of fixed effect parameters as a function of
+variance parameters of a linear mixed model}
 \usage{
 get_covbeta(varpar, devfun)
 }
@@ -15,8 +16,9 @@ get_covbeta(varpar, devfun)
 The covariances matrix of the fixed effects at supplied \code{varpar} values.
 }
 \description{
-At the optimum the covariance is available as \code{vcov(lmer-model)}. This function
-computes \code{cov(beta)} at non (RE)ML estimates of \code{varpar}.
+At the optimum the covariance is available as
+\code{vcov(lmer-model)}. This function computes \code{cov(beta)} at non
+(RE)ML estimates of \code{varpar}.
 }
 \author{
 Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.

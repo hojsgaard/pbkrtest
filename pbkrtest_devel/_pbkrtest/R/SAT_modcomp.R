@@ -3,7 +3,7 @@
 #' @title F-test and degrees of freedom based on Satterthwaite approximation
 #' @description An approximate F-test based on the Satterthwaite approach.
 #' @concept model_comparison
-#' @name sat_modcomp
+#' @name sat__modcomp
 #' 
 ## ##########################################################################
 #' @details
@@ -11,7 +11,7 @@
 #' Notice: It cannot be guaranteed that the results agree with other
 #' implementations of the Satterthwaite approach!
 #'
-#' @inheritParams kr_modcomp
+#' @inheritParams kr__modcomp
 #' @param eps A small number.
 #'
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
@@ -36,7 +36,7 @@
 #' SATmodcomp(fm1, "Days")
 #' SATmodcomp(fm1, ~.-Days)
 #' L1 <- cbind(0, 1) 
-#' SATmodcomp(fm1, L1)
+#' ## SATmodcomp(fm1, L1) ## FIXME
 #' SATmodcomp(fm1, fm0)
 #' anova(fm1, fm0)
 #'
@@ -44,7 +44,7 @@
 #' SATmodcomp(fm2, "(Days+I(Days^2))")
 #' SATmodcomp(fm2, ~. - Days - I(Days^2))
 #' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
-#' SATmodcomp(fm2, L2)
+#' ## SATmodcomp(fm2, L2) ## FIXME
 #' SATmodcomp(fm2, fm0)
 #' anova(fm2, fm0)
 #' 
@@ -52,18 +52,18 @@
 #' SATmodcomp(fm2, "I(Days^2)")
 #' SATmodcomp(fm2, ~. - I(Days^2))
 #' L3 <- rbind(c(0, 0, 1))
-#' SATmodcomp(fm2, L3)
+#' ## SATmodcomp(fm2, L3) ## FIXME
 #' SATmodcomp(fm2, fm1)
 #' anova(fm2, fm1)
 
 #' @export
-#' @rdname sat_modcomp
+#' @rdname sat__modcomp
 SATmodcomp <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
     UseMethod("SATmodcomp")
 }
 
 #' @export
-#' @rdname sat_modcomp
+#' @rdname sat__modcomp
 SATmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0, eps=sqrt(.Machine$double.eps)){
     SATmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details, eps=eps)
 }
@@ -84,13 +84,15 @@ SATmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0, eps=
         ## First given model is submodel of second; exchange the models
         tmp <- largeModel; largeModel <- smallModel; smallModel <- tmp
     }
-
     
     SATmodcomp_worker(largeModel, smallModel, betaH=betaH, details=details, eps=eps)
 }
 
 
 SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e-6) {
+
+    if (is.null(betaH)) betaH <- 0
+    if (is.null(details)) details <- 0
 
     ## All computations are based on 'largeModel' and the restriction matrix 'L'
     ## -------------------------------------------------------------------------
@@ -305,14 +307,16 @@ qform <- function(x, A) {
 ## ##############################################
 ## ######## get_Fstat_ddf()
 ## ##############################################
+
 #' Compute denominator degrees of freedom for F-test
 #'
-#' From a vector of denominator degrees of freedom from independent t-statistics (\code{nu}),
-#' the denominator degrees of freedom for the corresponding F-test is computed.
+#' From a vector of denominator degrees of freedom from independent
+#' t-statistics (\code{nu}), the denominator degrees of freedom for
+#' the corresponding F-test is computed.
 #'
-#' Note that if any \code{nu <= 2} then \code{2} is returned. Also, if all nu
-#' are within `tol` of each other the simple average of the nu-vector is returned.
-#' This is to avoid downward bias.
+#' Note that if any \code{nu <= 2} then \code{2} is returned. Also, if
+#' all nu are within `tol` of each other the simple average of the
+#' nu-vector is returned.  This is to avoid downward bias.
 #'
 #' @param nu vector of denominator degrees of freedom for the
 #'     t-statistics
@@ -336,14 +340,14 @@ get_Fstat_ddf <- function(nu, tol=1e-8) {
   #
   # Returns nu if length(nu) == 1. Returns mean(nu) if all(abs(diff(nu)) < tol;
   # otherwise denominator degrees of freedom appears to be downward biased.
-  fun <- function(nu) {
-    if(any(nu <= 2)) 2 else {
-      E <- sum(nu / (nu - 2))
-      2 * E / (E - (length(nu))) # q = length(nu) : number of t-statistics
+    fun <- function(nu) {
+        if(any(nu <= 2)) 2 else {
+                               E <- sum(nu / (nu - 2))
+                               2 * E / (E - (length(nu))) # q = length(nu) : number of t-statistics
+                           }
     }
-  }
     stopifnot(length(nu) >= 1,
-                                        ## all(nu > 0), # returns 2 if any(nu < 2)
+              ## all(nu > 0), # returns 2 if any(nu < 2)
               all(sapply(nu, is.numeric)))
     if (length(nu) == 1L)
         return(nu)
@@ -359,10 +363,12 @@ get_Fstat_ddf <- function(nu, tol=1e-8) {
 ##############################################
 ######## devfun_vp()
 ##############################################
-#' Compute deviance of a linear mixed model as a function of variance parameters
+
+#' Compute deviance of a linear mixed model as a function of variance
+#' parameters
 #'
-#' This function is used for extracting the asymptotic variance-covariance matrix
-#'   of the variance parameters.
+#' This function is used for extracting the asymptotic
+#'   variance-covariance matrix of the variance parameters.
 #'
 #' @param varpar variance parameters; \code{varpar = c(theta, sigma)}.
 #' @param devfun deviance function as a function of theta only.
@@ -397,10 +403,13 @@ devfun_vp <- function(varpar, devfun, reml) {
 ##############################################
 ######## get_covbeta()
 ##############################################
-#' Compute covariance of fixed effect parameters as a function of variance parameters of a linear mixed model
+
+#' Compute covariance of fixed effect parameters as a function of
+#' variance parameters of a linear mixed model
 #'
-#' At the optimum the covariance is available as `vcov(lmer-model)`. This function
-#' computes `cov(beta)` at non (RE)ML estimates of `varpar`.
+#' At the optimum the covariance is available as
+#' `vcov(lmer-model)`. This function computes `cov(beta)` at non
+#' (RE)ML estimates of `varpar`.
 #'
 #' @inheritParams devfun_vp
 #'

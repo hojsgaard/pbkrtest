@@ -2,7 +2,8 @@
 % Please edit documentation in R/SAT_modcomp.R
 \name{devfun_vp}
 \alias{devfun_vp}
-\title{Compute deviance of a linear mixed model as a function of variance parameters}
+\title{Compute deviance of a linear mixed model as a function of variance
+parameters}
 \usage{
 devfun_vp(varpar, devfun, reml)
 }
@@ -18,8 +19,8 @@ if \code{FALSE}, the ML deviance is computed.}
 the REML or ML deviance.
 }
 \description{
-This function is used for extracting the asymptotic variance-covariance matrix
-of the variance parameters.
+This function is used for extracting the asymptotic
+variance-covariance matrix of the variance parameters.
 }
 \author{
 Rune Haubo B. Christensen. Adapted to pbkrtest by Søren Højsgaard.
