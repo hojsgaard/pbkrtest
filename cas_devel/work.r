@@ -1,10 +1,56 @@
 library(caracas)
 
+e1 <- matrix_sym(2,2, "v")
+e2 <- matrix_sym(2,2, "w")
+
+e1 <- matrix_sym(2,1, "v")
+e2 <- matrix_sym(2,1, "v")
+
+e1 <- matrix_sym(1,3, "v")
+e2 <- matrix_sym(1,3, "w")
+
+e1 <- matrix_sym(2,3, "v")
+e2 <- matrix_sym(2,3, "v")
+
+## load_all()
 load_all("_caracas")
+e1 * e2
+e1 == e2
+
+def_sym(r)
+r^2 == r*r
+
+(r+1)^2 == (r^2+1 +2*r)
+
+rbind(e1, e2)
+
+
+
+a <- (r+1)^2
+b <- r^2+1 +2*r
+
+are_equal(a, r^2+1 +2*r)
+
+are_equal(e1, "v")
+
+
+
+
 document("_caracas")
+
+
+
 
 library(caracas)
 def_sym(y1, y2, b, v, m, mu, c)
+
+
+
+
+
+
+
+
 
 mvn <- function(m, V, X=NULL, sym="y"){
     nms <- vector_sym(nrow(V), sym)
