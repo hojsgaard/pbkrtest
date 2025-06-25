@@ -2,6 +2,134 @@ library(doBy)
 load_all()
 ## load_all("_doby")
 
+library(rlang)
+
+
+source("vtools.R")
+
+
+vparse(Treatment, Type)
+vparse(Treatment)
+vparse(c("Treatment", "Type"))
+vparse("Treatment", "Type")
+vparse(c("Treatment"))
+vparse(~Treatment+Type)
+vparse(~Treatment)
+
+
+split_by2 <- function(data., ...){
+    rhs <- vparse(...)
+    rhs
+    doBy:::split_by_worker(data., rhs)
+}
+
+
+
+
+
+
+
+
+
+split_by2 <- function(data., ...) {
+  # Capture all ... arguments as quosures
+  dots <- enquos(...)
+
+  # Use vparse logic inline to resolve input
+  rhs <- if (length(dots) > 1) {
+    unname(sapply(dots, rlang::as_name))
+  } else {
+    q <- dots[[1]]
+    expr <- quo_get_expr(q)
+
+    if (is_formula(expr)) {
+      all.vars(f_rhs(expr))
+    } else if (is.symbol(expr)) {
+      as_name(expr)
+    } else {
+      val <- eval_tidy(q)
+      if (is.character(val)) {
+        val
+      } else {
+        abort("Invalid input to split_by: must be formula, symbol(s), or character vector.")
+      }
+    }
+  }
+
+  # Split data frame by selected variables
+  split(data., data.[, rhs, drop = FALSE])
+}
+
+
+
+split_by2(CO2, ~Treatment+Type)
+split_by2(CO2, c("Treatment", "Type"))
+split_by2(CO2, Treatment, Type)
+split_by2(CO2, Treatment)
+
+
+
+x <- CO2 |> split_by(~Treatment)
+
+
+
+
+
+
+
+
+split_by <- function(data, ..., omit=TRUE){
+    dots <- list(...)
+    print(dots)
+    
+    ddd <<- match.call(expand.dots = FALSE)
+    cat("split_by: dots: \n"); print(dots)
+    rhs <- dots2char(dots)
+    cat("rhs:", rhs, "\n")
+    split_by_worker(data, rhs, omit=omit)
+}
+
+splitBy <- function(formula, data, omit=TRUE){
+    if (inherits(formula, "formula")){
+        rhs       <- all.vars(formula[[2]])
+    } else {
+        rhs <- formula
+    }
+    split_by_worker(data, rhs, omit=omit)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 dat <- Titanic
 ci_test(dat, c(1,2,3))
 

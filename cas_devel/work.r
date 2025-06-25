@@ -1,3 +1,113 @@
+
+
+def_sym(sigma, r, n, j, i)
+
+library(caracas)
+def_sym(r, n, j)
+sum1 <- sum_(r^j, var=j, lower=0, upper=n)
+pw <- as_piecewise(sum1)
+pw[[2]]$expr
+
+
+
+## load_all("../../../_caracas/")
+load_all()
+
+
+sum1 <- sum_(r, var=j, lower=i+1, upper=n)
+sum1
+
+sum2 <- sum_(sum1, var=i, lower=1, upper=n-1)
+sum2
+
+Sn <- (1 - r^(n-i+1)) / (1 - r) - 1
+
+
+load_all()
+
+load_all("_caracas/")
+sum1 <- sum_(r^(j-i), var=j, lower=i+1, upper=n)
+
+
+
+
+
+
+
+
+
+
+
+
+
+sum1$pyobj$as_expr_set_pairs()
+
+aa <- as_piecewise(sum1)
+aa
+
+
+pp |>
+    gsub("\\bTrue\\b", "TRUE", x = _) |>
+    gsub("\\bFalse\\b", "FALSE", x = _)
+
+
+pw <- sum1
+pw <- sympy_func(pw, "piecewise_fold")    
+ll <- pw$pyobj$as_expr()$args ## A list
+
+
+    do_logicals <- function(x){
+        
+        if (identical(as_character(x), "True")){
+            return(TRUE)
+        }
+        if (identical(as_character(x), "False")){
+            return(FALSE)
+        }
+        return(x)
+    }
+
+out <- lapply(ll, function(z){
+    vv <- list(expr=z[[0]], cond=z[[1]])
+    ww <- lapply(vv, as_sym) |> lapply(do_logicals)
+    ww
+    })
+
+
+
+
+lapply(out, as_sym)
+
+lapply(out, lapply, as_sym)
+
+aa[[2]][[2]]$pyobj
+ 
+
+
+
+
+as_piecewise(sum1)
+
+
+
+
+
+sum2b <- sum_(Sn, var=i, lower=1, upper=n-1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 library(caracas)
 
 e1 <- matrix_sym(2,2, "v")
@@ -13,12 +123,17 @@ e1 <- matrix_sym(2,3, "v")
 e2 <- matrix_sym(2,3, "v")
 
 ## load_all()
-load_all("_caracas")
+
 e1 * e2
 e1 == e2
 
 def_sym(r)
 r^2 == r*r
+
+load_all("_caracas")
+ans <- sympy_func(r, "equals", r)
+ans
+
 
 (r+1)^2 == (r^2+1 +2*r)
 
