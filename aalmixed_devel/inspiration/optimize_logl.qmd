@@ -1,0 +1,395 @@
+---
+title: "What happens here?"
+author: "Søren Højsgaard"
+date: "`r date()`"
+format: 
+  html:
+    toc: true
+    toc-depth: 4
+    number-sections: true
+    number-depth: 5
+    self-contained: true
+  pdf: 
+    toc: true
+    toc-depth: 4
+    number-sections: true
+    number-depth: 5
+    papersize: a4
+    fontsize: 12pt
+---
+
+\def\transp{^\top}
+\def\inv{^{-1}}
+\def\E{\mathbb{E}}
+\def\EE{\mathbb{E}}
+\def\Var{\mathbb{V}\text{ar}}
+\def\Cov{\mathbb{C}\text{ov}}
+\def\Corr{\mathbb{C}\text{orr}}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=!TRUE, size="footnotesize", warning = FALSE, message = FALSE, fig.height=2.5)
+options("digits"=4)
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+
+hook1 <- function(x){ gsub("```\n*```r*\n*", "", x) }
+hook2 <- function(x){ gsub("```\n+```\n", "", x) }
+#knitr::knit_hooks$set(document = hook1)  ## Reduce space between code and output
+
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  paste0("\n \\", "scriptsize","\n\n", x, "\n\n \\scriptsize")
+})
+
+showit <- FALSE
+```
+
+```{r}
+library(Matrix)
+library(caracas)
+library(broom)
+library(doBy)
+library(nlme)
+library(lme4)
+library(broom.mixed)
+source("free_parms.r")
+```
+
+
+## Beyond linear normal models
+
+
+Recall Orthodont data: Four measurements per child at equidistant time
+points. There is a population intercept for each gender and a random
+intercept for each child. Thee is a linear treand over time, and on
+can consider the idea of modelling a random slope.
+
+This lead to our linear mixed model
+
+$$
+y = Xb + Zu + e
+$$
+
+The ultimate goal is to fit a model where there is a random intercept
+but where the errors are not $e\sim N(0, \sigma^2I)$ but has an auto
+regressive structure.
+
+For each child we assume an AR(1) correlation matrix.  The correlation
+matrix for all is a block diagonal matrix with the matrix above on the
+diagonal. An easy way of creating such a matrix is using Kronecker
+product. Here for two children
+
+
+```{r}
+bs  <- 4 # Number of measurements per child (block):
+nb  <- 2 # Number of blocks (children)
+V.b <- toeplitz_(paste0("r^",0:(bs-1)))
+I2  <- diag_(1, nb)
+V.all <- kronecker(I2, V.b)
+## V.b   <- toeplitz(c(1, w, rep(0, bs-2))) ## Perhaps an alternative
+```
+
+At some point of time we need to make a numerical evaluation based on
+as specific value of $r$. The easiest is to turn $R$ into and R
+function:
+
+```{r}
+V_fn <- as_func(V.all)
+V_fn(.1) |> as("sparseMatrix")
+```
+
+That is, three lines of code using caracas, and we are good to go
+
+$$
+`r tex_list("V.b = ", V.b , ", V.all = ", V.all)`
+$$
+
+Of course, we can do the same in "pure R" - but for a specific value
+of `r`:
+
+```{r}
+V_fn2 <- function(r.free, nb, bs){
+    r     <- tanh(r.free)
+    V.b   <- toeplitz(c(r^(0:(bs-1))))    
+    I     <- diag(1, nb)
+    V.all <- kronecker(I, V.b)
+    return(V.all)
+}
+```
+
+
+```{r}
+worker <- function(y, X, V) {
+    Lt <- chol(V)
+    Vi <- chol2inv(Lt)
+    ld_V <- 2*sum(log(diag(Lt)))
+    n   <- nrow(X)    
+    b   <- solve(t(X) %*% Vi  %*% X, t(X) %*% Vi %*% y) 
+    res <- (y - X %*% b)
+    Q   <- t(res) %*% Vi %*% res
+    v   <- Q / n    
+    return(list(b=b, n=n, v=v, ld_V=ld_V, Q=Q))
+}
+
+logL.1 <- function(parm, X, y, nb, bs) {
+    ## v is estimated from residual sums of squares
+    r.free <- parm[1] ## rho
+    V   <- V_fn2(r.free, nb, bs)
+    aux <- worker(y, X, V)        
+    obj <- as.numeric(-0.5*(aux$n * log(aux$v) + aux$ld_V + aux$Q / aux$v))        
+    attributes(obj) <- list(aux=aux)
+    return(obj)
+}
+
+logL.2 <- function(parm, X, y, nb, bs) {
+    ## v is multiplied onto V
+    r.free   <- parm[1] ## rho
+    v.free   <- parm[2] ## sigma^2
+    v   <- exp(v.free)
+    V   <- v * V_fn2(r.free, nb, bs)
+    aux <- worker(y, X, V)    
+    obj <- as.numeric(-0.5*(aux$ld_V + aux$Q))
+    attributes(obj) <- list(aux=aux)
+    return(obj) 
+}
+
+logL.3 <- function(parm, X, y, nb, bs) {
+    ## v is estimated as separate parameter 
+    r.free <- parm[1] ## rho 
+    v.free <- parm[2] ## sigma^2
+    v   <- exp(v.free)
+    V   <- V_fn2(r.free, nb, bs)
+    aux <- worker(y, X, V)  
+    obj <- as.numeric(-0.5*(aux$n * log(v) + aux$ld_V + aux$Q / v))
+    attributes(obj) <- list(aux=aux)
+    return(obj)
+}
+```
+
+
+## Orthodont data
+
+```{r}
+dat <- Orthodont[c(1:8, 101:108),]
+mm <- lmer(distance ~ age + Sex + (1|Subject), data=dat)
+mm |> tidy()
+
+y   <- getME(mm, "y")
+X   <- getME(mm, "X")
+X
+Z   <- getME(mm, "Z")
+Z
+
+nb <- unique(dat$Subject) |> length()
+bs <- 4
+```
+
+```{r}
+library(nlme)
+mm2 <- gls(distance ~ age + Sex,
+           corAR1(form = ~ 1 | Subject),
+           method="ML",
+           data = dat)
+
+sigma2 <- sigma(mm2)^2
+C <- corMatrix(mm2$modelStruct$corStruct)
+V <- sigma2 * as.matrix(bdiag(C))
+as(V, "sparseMatrix")
+```
+
+```{r}
+args <- list(X=X, y=y, nb=nb, bs=bs)
+logL.1. <- set_default(logL.1, args)
+logL.2. <- set_default(logL.2, args)
+logL.3. <- set_default(logL.3, args)
+
+par.1 <- set_free(0, list(cor=1, var=2))
+par.2 <- set_free(c(0, 0), list(cor=1, var=2))
+shoptim <- set_default(optim, list(control = list(fnscale=-1)))
+
+opt.1 <-
+    shoptim(par.1, logL.1.)
+opt.2 <-
+    shoptim(par.2, logL.2.)
+opt.3 <-
+    shoptim(par.2, logL.3.)
+
+opt.1$par
+opt.2$par
+opt.3$par
+
+opt.1$par |> set_free(list(cor=1, var=2))
+opt.2$par |> set_free(list(cor=1, var=2))
+opt.3$par |> set_free(list(cor=1, var=2))
+
+logL.1.(opt.1$par)
+logL.2.(opt.2$par)
+logL.3.(opt.3$par)
+```
+
+
+Random intercept and AR(1) error
+
+
+```{r}
+
+backsol <- function(l, x=NULL) {
+    I <- diag_(1, nrow(l))    
+    z <- caracas:::do_la_worker(l, "lower_triangular_solve", I)
+    out <- as_sym(z)
+    return(out)
+}
+
+make_ar1 <- function(r, size) {
+    toeplitz_(paste0("r^", (0:(size-1))))
+}
+
+zero_pattern <- function(x){
+    m <- as_character_matrix(x)
+    1*(m != "0")
+}
+
+```
+
+
+
+
+
+
+```{r}
+def_sym(sigma)
+size <- 4
+def_sym(r)
+
+R <- kronecker(diag_(1, length(unique(dat$Subject))), make_ar1(r, size)) 
+
+
+
+G_  <- diag_("tau^2", ncol(Z))
+R_  <- diag_("sigma^2", nrow(Z))
+Z_  <- as_sym(Z)
+ZGZt <- Z_ %*% G_ %*% t(Z_)
+V <- ZGZt + sigma^2 * R
+Vi <- inv_woodbury(sigma^2 * R, Z_, G_, method="ge")
+
+logL1 <- function(parm){
+    Vi.   <- as_expr(subs(Vi, parm))
+    bb    <- solve(t(X) %*% Vi. %*% X, t(X) %*% Vi. %*% y)
+    res   <- y - X %*% bb
+    Q     <- t(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(-log(det(Vi.)) + Q))
+    out
+}
+
+logL2 <- function(parm){
+    Vi.   <- as(Vi, "function")(parm)
+    bb    <- solve(t(X) %*% Vi. %*% X, t(X) %*% Vi. %*% y)
+    res   <- y - X %*% bb
+    Q     <- t(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(-log(det(Vi.)) + Q))
+    out
+}
+
+logL3 <- function(parm){
+    Vi.   <- do.call(as_func(Vi), as.list(parm))
+    bb    <- solve(t(X) %*% Vi. %*% X, t(X) %*% Vi. %*% y)
+    res   <- y - X %*% bb
+    Q     <- t(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(-log(det(Vi.)) + Q))
+    out
+}
+
+logL4 <- function(parm){
+    Vi.   <- solve(do.call(as_func(V), as.list(parm)))
+    bb    <- solve(t(X) %*% Vi. %*% X, t(X) %*% Vi. %*% y)
+    res   <- y - X %*% bb
+    Q     <- t(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(-log(det(Vi.)) + Q))
+    out
+}
+
+logL5 <- function(parm){
+    Vi.   <- solve(do.call(as_func(V), as.list(parm)))
+    XtVi <- t(X) %*% Vi.
+    bb    <- solve(XtVi %*% X, XtVi %*% y)
+    res   <- y - X %*% bb
+    Q     <- t.default(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(-log(det(Vi.)) + Q))
+    out
+}
+
+
+Vfn <- as_func(V)
+logL6 <- function(parm){
+    Vi.   <- solve(do.call(Vfn, as.list(parm)))
+    XtVi <- t.default(X) %*% Vi.
+    bb    <- solve(XtVi %*% X, XtVi %*% y)
+    res   <- y - X %*% bb
+    Q     <- t.default(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(-log(det(Vi.)) + Q))
+    out
+}
+
+
+logL7 <- function(parm){
+    V.   <- do.call(as_func(V), as.list(parm))
+    Vi.  <- chol2inv(chol(as(V., "sparseMatrix")))
+    XtVi <- t(X) %*% Vi.
+    bb    <- solve(XtVi %*% X, XtVi %*% y)
+    res   <- y - X %*% bb
+    Q     <- t(res) %*% Vi. %*% res
+    out <- as.numeric(-0.5*(log(det(V.)) + Q))
+    out
+}
+
+
+Rprof()
+for (i in 1:250) {shoptim(c(r=0, sigma=1, tau=4), logL6)}
+Rprof(NULL)
+summaryRprof()
+
+shoptim(c(r=0, sigma=1, tau=4), logL1)
+## shoptim(c(r=0, sigma=1, tau=4), logL2)
+## shoptim(c(r=0, sigma=1, tau=4), logL3)
+shoptim(c(r=0, sigma=1, tau=4), logL4)
+shoptim(c(r=0, sigma=1, tau=4), logL5)
+shoptim(c(r=0, sigma=1, tau=4), logL6)
+
+microbenchmark::microbenchmark(
+                    shoptim(c(r=0, sigma=1, tau=4), logL1),
+                    ## shoptim(c(r=0, sigma=1, tau=4), logL2),
+                    ## shoptim(c(r=0, sigma=1, tau=4), logL3),
+                    shoptim(c(r=0, sigma=1, tau=4), logL4),
+                    shoptim(c(r=0, sigma=1, tau=4), logL5),
+                    shoptim(c(r=0, sigma=1, tau=4), logL6),
+                    times=3
+                )
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+## simplify_matrix <- function(x){
+##     for (i in 1:nrow(x)){
+##         for (j in 1:ncol(x)) {
+##             x[i, j] <- simplify(x[i,j])
+##         }
+##     }
+##   ##sympy_func(x, "simplify_matrix")    
+##     return(x)
+## }
+
+``

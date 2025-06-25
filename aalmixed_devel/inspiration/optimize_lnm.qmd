@@ -1,0 +1,178 @@
+---
+title: "What happens here?"
+author: "Søren Højsgaard"
+date: "`r date()`"
+format: 
+  html:
+    toc: true
+    toc-depth: 4
+    number-sections: true
+    number-depth: 5
+    self-contained: true
+  pdf: 
+    toc: true
+    toc-depth: 4
+    number-sections: true
+    number-depth: 5
+    papersize: a4
+    fontsize: 12pt
+---
+
+\def\transp{^\top}
+\def\inv{^{-1}}
+\def\E{\mathbb{E}}
+\def\EE{\mathbb{E}}
+\def\Var{\mathbb{V}\text{ar}}
+\def\Cov{\mathbb{C}\text{ov}}
+\def\Corr{\mathbb{C}\text{orr}}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=!TRUE, size="footnotesize", warning = FALSE, message = FALSE, fig.height=2.5)
+options("digits"=4)
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+
+hook1 <- function(x){ gsub("```\n*```r*\n*", "", x) }
+hook2 <- function(x){ gsub("```\n+```\n", "", x) }
+#knitr::knit_hooks$set(document = hook1)  ## Reduce space between code and output
+
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  paste0("\n \\", "scriptsize","\n\n", x, "\n\n \\scriptsize")
+})
+
+showit <- FALSE
+```
+
+```{r}
+library(Matrix)
+library(caracas)
+library(broom)
+```
+
+# What happens here?
+
+## Benchmark
+
+```{r}
+y <- cars$dist
+X <- model.matrix(~speed, data=cars)
+head(y)
+head(X)
+
+lm1 <- lm(dist~speed, data=cars)
+lm1 |> tidy()
+vcov(lm1)
+sigma(lm1)
+sigma(lm1)^2
+```
+
+## Tasks
+
+1. Look at the functions below and try to figure out what they to 
+
+1. Run the code, and see if it makes sense. 
+
+## fun1
+
+```{r}
+fun1 <- function(b, X, y){
+    r <- (y - X %*% b)
+    obj <- sum(r^2)
+    return(obj)
+}
+opt1 <- optim(c(b1=1, b2=1),
+              fun1, X=X, y=y)
+```
+
+
+```{r, eval=showit}
+opt1
+```
+
+
+
+# Maximizing logL in a LNM
+
+In a LNM (linear normal model) we need to estimate the regression parameters and the variance. 
+
+These two functions do so, but there are important differences.
+
+
+```{r}
+fun2 <- function(parm, X, y){
+    v <- parm[1]
+    b <- parm[-1]
+    n <- nrow(X)
+    r <- (y - X %*% b)
+    Q <- sum(r^2)
+    obj <- -0.5 * (n * log(v) + (1/v) * Q)    
+    return(obj)
+}
+
+fun3 <- function(parm, X, y){
+    t.v <- exp(parm[1])
+    b <- parm[-1] 
+    n <- nrow(X)
+    r <- (y - X %*% b)
+    Q <- sum(r^2)
+    obj <- - 0.5 * (n * log(t.v) + 1/(t.v) * Q)
+    return(obj)
+}
+```
+
+```{r}
+opt2 <- optim(c(1,2,3), fun2,
+              X=X, y=y, control = list(fnscale=-1), hessian=T)
+
+opt3 <- optim(c(1, 2, 3), fun3,
+              X=X, y=y, control = list(fnscale=-1), hessian=T)
+```
+
+```{r}
+opt2
+opt3
+
+fun2(opt2$par, X, y)
+fun3(opt3$par, X, y)
+```
+
+1. In the former case, the term `v` (the first element in `parm`)
+   enters the expression for the log likelihood (the `obj` term).
+
+1. In the latter case, it is `t.v` (the exponential of the element in
+   `parm`) that enters in `obj`.
+
+1. This means that the first element in `parm` plays the role of the
+   log variance.
+
+```{r}
+opt3$par[1] |> exp()
+```
+
+
+Lastly, we make life easy and estimate the regression coefficients by
+least squares and then need only maximize numerically to get the
+variance:
+
+```{r}
+fun4 <- function(parm, X, y){
+    v <- parm[1]
+    n <- nrow(X)
+    b <- solve((t(X) %*% X), t(X) %*% y)
+    r <- (y - X %*% b)
+    Q <- sum(r^2)
+
+    obj <- -(n/2) * log(v) - (1/(2*v)) * Q    
+    attributes(obj) <- list(b=b, v=v, sd=sqrt(v))
+    return(obj)
+}
+opt3 <- optim(c(1), fun4,
+              X=X, y=y, control = list(fnscale=-1), hessian=T)
+```
+
+```{r}
+opt3
+opt3$par[1]
+fun4(opt3$par, X, y)
+```
+

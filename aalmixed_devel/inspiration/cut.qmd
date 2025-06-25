@@ -1,0 +1,74 @@
+
+
+
+
+
+
+## Towards numerical computations
+
+For numerical evaluation we must get from the likelihood in general
+terms to a quantity that can be computed.
+
+```{r}
+bud <- doBy::budworm[1:6, ]
+X <- model.matrix(~log2(dose) ,data = bud)
+X. <- X |> as_sym()
+n. <- bud$ntotal |> as_sym()
+y. <- bud$ndead |> as_sym()
+list(X., n., y.)
+```
+
+
+## Use data from the beginning
+```{r}
+bud <- doBy::budworm[1:6, ]
+X <- model.matrix(~log2(dose), data = bud)
+X |> head(3)
+```
+
+```{r}
+X. <- X |> as_sym()
+n. <- bud$ntotal |> as_sym()
+y. <- bud$ndead |> as_sym()
+
+b <- vector_sym(ncol(X.), "b")
+```
+
+```{r}
+logL <- get_logL(y=y., n=n., x=X., b=b)
+opt <- optim(c(b1 = 0, b2 = 2), as_func(logL, vec_arg = T),
+             control = list(fnscale = -1), hessian = TRUE)
+opt$par
+opt$hessian
+opt$value
+```
+
+
+## In vector / matrix form
+
+```{r}
+N <- nrow(X); q <- 2
+X <- matrix_sym(N, q, "x")
+n <- vector_sym(N, "n")
+y <- vector_sym(N, "y")
+b <- vector_sym(q, "b")
+```
+
+```{r}
+logL_b <- get_logL(y, n, X, b)
+```
+
+```{r}
+## Insert data
+logL_b <- subs(logL_b, cbind(X, y, n), cbind(X., y., n.))
+logL_b
+
+logLb_fn <- as_func(logL_b, vec_arg = TRUE)
+opt <- optim(c(b1 = 0, b2 = 0), logLb_fn, 
+             control = list(fnscale = -1), hessian = TRUE)
+
+opt$par
+opt$hessian
+opt$value
+```
+
