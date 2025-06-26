@@ -35,8 +35,8 @@
 #' F-distributed, where the denominator degrees of freedom are determined by
 #' matching the first moment of the reference distribution.
 #' 
-#' @aliases PBmodcomp PBmodcomp.lm PBmodcomp.merMod getLRT getLRT.lm
-#'     getLRT.merMod plot.XXmodcomp PBmodcomp.mer getLRT.mer
+#' @aliases PBmodcomp PBmodcomp.lm PBmodcomp.merMod plot.XXmodcomp
+#'     PBmodcomp.mer getLRT.mer
 #'
 #' @inheritParams kr_modcomp
 #' @param nsim The number of simulations to form the reference
@@ -190,7 +190,6 @@
 #' stopCluster(cl)
 #' }
 #'
-#'
 #' lm1 <- lm(dist~speed+I(speed^2), data=cars)
 #' PBmodcomp(lm1, .~.-speed, cl=2)
 #' PBmodcomp(lm1, .~.-I(speed^2), cl=2)
@@ -209,11 +208,11 @@ PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl
 #' @rdname pb__modcomp
 PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
-    mmm <- handle_models(largeModel, smallModel)
+    mmm <- get_nested_model_info(largeModel, smallModel)
     largeModel.    <- mmm$largeModel
     smallModel.    <- mmm$smallModel
-    formula.large <- mmm$formula.large
-    formula.small <- mmm$formula.small
+    formula.large  <- mmm$formula.large
+    formula.small  <- mmm$formula.small
     
     nr_data <- nrow(getData(largeModel.))
     nr_fit  <- getME(largeModel, "n")
@@ -242,11 +241,11 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 
     ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
     ## cat("PBmodcomp cl:\n"); print(cl)
-    mmm <- handle_models(largeModel, smallModel)
-    largeModel.    <- mmm$largeModel
-    smallModel.    <- mmm$smallModel
-    formula.large <- mmm$formula.large
-    formula.small <- mmm$formula.small
+    M <- get_nested_model_info(largeModel, smallModel)
+    largeModel.    <- M$largeModel
+    smallModel.    <- M$smallModel
+    formula.large <- M$formula.large
+    formula.small <- M$formula.small
 
     fam.l <- family(largeModel.)
     fam.s <- family(smallModel.)
@@ -274,20 +273,17 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
     return(out)
 }
 
-
-
-    
 #' @export
 #' @rdname pb_modcomp
 PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
     if (is.null(control$nsim)) control$nsim <- 1000
 
-    mmm <- handle_models(largeModel, smallModel)
-    largeModel.    <- mmm$largeModel
-    smallModel.    <- mmm$smallModel
-    formula.large <- mmm$formula.large
-    formula.small <- mmm$formula.small
+    M <- get_nested_model_info(largeModel, smallModel)
+    largeModel.    <- M$largeModel
+    smallModel.    <- M$smallModel
+    formula.large  <- M$formula.large
+    formula.small  <- M$formula.small
 
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- largeModel$dims$N
@@ -305,25 +301,6 @@ PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL
     out         <- .finalizePB(LRTstat, ref)
     out <- .padPB(out, LRTstat, ref, formula.large, formula.small)
     return(out)
-
-    ## ans         <- PBcompute_p_values(LRTstat, ref)
-
-    ## ans$formula.large <- formula.large
-    ## ans$formula.small <- formula.small
-
-    ## out <- ans$test[2,, drop=FALSE]
-    ## attr(out, "aux") <- ans
-
-    ## attr(out, "heading") <- c(
-    ##     deparse(formula.large),
-    ##     deparse(formula.small))
-
-    ## class(out) <- c("PBmodcomp", "anova", "data.frame")
-    ## return(out)
-
-
-
-
 }
 
 
@@ -405,26 +382,6 @@ PBcompute_p_values <- function(LRTstat, ref){
     )
     out
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
