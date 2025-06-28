@@ -1,0 +1,120 @@
+---
+title: "Cholesky and mixed models"
+author: "Søren Højsgaard"
+format: 
+  html:
+    toc: true
+    html-math-method: mathjax
+    self-contained: true 
+vignette: >
+  %\VignetteIndexEntry{Cholesky and mixed models}
+  %\VignettePackage{allmixed}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+## Cholesky
+
+Cholesky decomposition of sparse covariance matrices is a time saver:
+
+
+```{r, message=FALSE}
+library(caracas)
+library(Matrix)
+```
+
+```{r}
+make_ar1 <- function(r, size) {
+    toeplitz_(paste0(r, "^", (0:(size-1))))
+}
+```
+
+
+
+## Symbolic Cholesky
+
+
+```{r}
+n <- 2
+t <- 3
+V <- kronecker(diag_(1, n), make_ar1("r", t))
+L <- chol(V, hermitian=F) |> simplify()
+detV <- det_(V)
+detL <- det_(L)
+```
+
+`r tex_align(list(
+    list("V", V),
+    list("L", L),
+    list("detV", detV),
+    list("detL", detL)
+))`
+
+
+
+
+```{r}
+
+## L L' = V
+((L %*% t(L)) - V) |> simplify()
+
+## (L^{-1})^T L^{-1} = I
+Li <- solve(L)
+A <- (t(Li) %*% Li) |> simplify()
+(solve(V) - A) |> simplify()
+
+## det_(V) = det_(L)^2
+(det_(V) - det_(L)^2) |> simplify()
+
+## det(V^{-1) = det(Li)^2
+(det_(solve(V)) - det_(Li)^2) |> simplify()
+```
+
+
+## Numeric Cholesky
+
+```{r}
+n <- 2; t <- 3
+V <- kronecker(diag_(1, n), make_ar1("r", t))
+rr <- .8
+V. <- as_func(V)(rr)
+Vs. <- as(V., "sparseMatrix")
+
+Lt <- chol(V.) ## Cholesky factorization; gives upper triangular matrix
+chol2inv(Lt)
+Lts <- chol(Vs.)
+chol2inv(Lts)
+
+det(V.)
+det(Vs.)
+
+max(abs((t(Lt) %*% Lt) - V.)) ## Check that L L' = V 
+det(V.) - det(Lt)^2
+```
+
+
+## Speed comparison
+
+Cholsky is MUCH FASTER for interesting size problems
+
+
+```{r}
+n   <- 10
+t   <- 5
+rr  <- .8
+V   <- kronecker(diag_(1, n), make_ar1("r", t))
+V.  <- as_func(V)(rr)
+Vs. <- as(V., "sparseMatrix")
+
+microbenchmark::microbenchmark(
+  c0 = solve(V.),
+  c1 = solve(Vs.),
+  c2 = chol2inv(chol(V.)),
+  c3 = chol2inv(chol(Vs.)),
+  times=3
+)
+```
+
+
