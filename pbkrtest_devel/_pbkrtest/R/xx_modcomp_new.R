@@ -1,43 +1,43 @@
 ## FIXME: comodex er et dumt navn
 
-##' @title Model comparison
-##' 
-##' @description Wrapper for functions KRmodcomp, SATmodcomp, PBmodcomp, X2modcomp
-##' @name comodex
-##' @param largeModel A model object
-##' @param smallModel A model object, a formula or a restriction matrix
-##' @param test A character string
-##' @param control A list controlling the model comparions.
-##' @param ... Additional arguments to be passed on to other methods
-##' @param details should details be printed
-##' @author Søren Højsgaard
-##'
-##' @examples
-#' (lmm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
-#' (lmm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
-#' (lmm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
-#'
-#' lm1 <- lm(dist ~ speed + I(speed^2), data=cars)
-#' lm0 <- lm(dist ~ speed, data=cars)
-#' 
-#' comodex(lmm2, lmm1, test="x2")
-#' comodex(lmm2, lmm1, test="kr")
-#' comodex(lmm2, lmm1, test="sat")
-#' comodex(lmm2, lmm1, test="PB", control=list(nsim=50, cl=1))
-#' comodex(lmm2, .~. - I(Days^2))
-#'
-#' comodex(lm1, lm0)
-#' comodex(lm1, lm0, test="pb", control=list(nsim=50, cl=1))
-#' 
+## ' @title Model comparison
+## ' 
+## ' @description Wrapper for functions KRmodcomp, SATmodcomp, PBmodcomp, X2modcomp
+## ' @name comodex
+## ' @param largeModel A model object
+## ' @param smallModel A model object, a formula or a restriction matrix
+## ' @param test A character string
+## ' @param control A list controlling the model comparions.
+## ' @param ... Additional arguments to be passed on to other methods
+## ' @param details should details be printed
+## ' @author Søren Højsgaard
+## '
+## ' @examples
+## ' (lmm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
+## ' (lmm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+## ' (lmm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
+## '
+## ' lm1 <- lm(dist ~ speed + I(speed^2), data=cars)
+## ' lm0 <- lm(dist ~ speed, data=cars)
+## ' 
+## ' comodex(lmm2, lmm1, test="x2")
+## ' comodex(lmm2, lmm1, test="kr")
+## ' comodex(lmm2, lmm1, test="sat")
+## ' comodex(lmm2, lmm1, test="PB", control=list(nsim=50, cl=1))
+## ' comodex(lmm2, .~. - I(Days^2))
+## '
+## ' comodex(lm1, lm0)
+## ' comodex(lm1, lm0, test="pb", control=list(nsim=50, cl=1))
+## ' 
 
-#' @export
-#' @rdname comodex
+## ' @export
+## ' @rdname comodex
 comodex <- function(largeModel, smallModel, test="x2", control=list(), details=0, ...){
     UseMethod("comodex")
 }
 
-#' @rdname comodex
-#' @export
+## ' @rdname comodex
+## ' @export
 comodex.lmerMod <- function(largeModel, smallModel, test="x2", control=list(), details=0, ...){
 
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "x2"))
@@ -51,8 +51,8 @@ comodex.lmerMod <- function(largeModel, smallModel, test="x2", control=list(), d
     return(out)
 }
 
-#' @rdname comodex
-#' @export
+## ' @rdname comodex
+## ' @export
 comodex.default <- function(largeModel, smallModel, test="x2", control=list(), details=0, ...){
     
     test <- match.arg(tolower(test), c("pb", "x2"))
@@ -63,6 +63,11 @@ comodex.default <- function(largeModel, smallModel, test="x2", control=list(), d
                                         control=control, ...))
     return(out)
 }
+
+
+
+
+
 
 
 #' @title Compare two models
