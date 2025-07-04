@@ -100,8 +100,8 @@
 #' ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
 #' PBmodcomp(fm1, "Days", cl=1, nsim=NSIM)
 #' PBmodcomp(fm1, ~.-Days, cl=1, nsim=NSIM)
-#' L1 <- cbind(0, 1) 
-#' PBmodcomp(fm1, L1, cl=1, nsim=NSIM) ## FIXME
+#' L1 <- cbind(0, 1)
+#' PBmodcomp(fm1, L1, cl=1, nsim=NSIM) 
 #' PBmodcomp(fm1, fm0, cl=1, nsim=NSIM)
 #' anova(fm1, fm0)
 #'
@@ -110,6 +110,7 @@
 #' PBmodcomp(fm2, ~. - Days - I(Days^2), cl=1, nsim=NSIM)
 #' L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
 #' PBmodcomp(fm2, L2, cl=1, nsim=NSIM) ## FIXME
+#'
 #' PBmodcomp(fm2, fm0, cl=1, nsim=NSIM)
 #' anova(fm2, fm0)
 #'
@@ -117,7 +118,7 @@
 #' PBmodcomp(fm2, "I(Days^2)", cl=1, nsim=NSIM)
 #' PBmodcomp(fm2, ~. - I(Days^2), cl=1, nsim=NSIM)
 #' L3 <- rbind(c(0, 0, 1))
-#' ## PBmodcomp(fm2, L3, cl=1, nsim=NSIM) ## FIXME
+#' PBmodcomp(fm2, L3, cl=1, nsim=NSIM) 
 #' PBmodcomp(fm2, fm1, cl=1, nsim=NSIM)
 #' anova(fm2, fm1)
 #' 
@@ -194,9 +195,7 @@
 #' PBmodcomp(lm1, .~.-speed, cl=2)
 #' PBmodcomp(lm1, .~.-I(speed^2), cl=2)
 #' 
-#' @export PBmodcomp
-
-
+#' 
 #' @export
 #' @rdname pb__modcomp
 PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
@@ -204,72 +203,122 @@ PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl
 }
 
 
+
+## '
+## ' @examples
+## ' if (requireNamespace("nlme", quietly = TRUE)) {
+## '   library(nlme)
+## '
+## '   # Load data
+## '   data(sleepstudy)
+## '
+## '   # Create quadratic term explicitly
+## '   sleepstudy$Days2 <- sleepstudy$Days^2
+## '
+## '   # Model 0: Random intercept and slope, no fixed effect for Days
+## '   fm0 <- lme(Reaction ~ 1,
+## '              random = ~ Days | Subject,
+## '              data = sleepstudy,
+## '              method = "REML")
+## '
+## '   # Model 1: Add fixed effect for Days
+## '   fm1 <- lme(Reaction ~ Days,
+## '              random = ~ Days | Subject,
+## '              data = sleepstudy,
+## '              method = "REML")
+## '
+## '   # Model 2: Add fixed quadratic effect
+## '   fm2 <- lme(Reaction ~ Days + Days2,
+## '              random = ~ Days | Subject,
+## '              data = sleepstudy,
+## '              method = "REML")
+## '
+## '   # Create quadratic term explicitly
+## '   sleepstudy$Days2 <- sleepstudy$Days^2
+## '
+## '   # Model 0: Intercept only
+## '   g0 <- gls(Reaction ~ 1,
+## '             data = sleepstudy,
+## '             method = "REML")
+## '
+## '   # Model 1: Add linear effect of Days
+## '   g1 <- gls(Reaction ~ Days,
+## '             data = sleepstudy,
+## '             method = "REML")
+## '
+## '   # Model 2: Add quadratic term
+## '   g2 <- gls(Reaction ~ Days + Days2,
+## '             data = sleepstudy,
+## '             method = "REML")
+## ' }
+## ' 
+## ' PBmodcomp(g1, g0)
+## '
+## ' PBmodcomp(fm1, fm0)
+
+
 #' @export
 #' @rdname pb__modcomp
 PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
-    mmm <- get_nested_model_info(largeModel, smallModel)
-    largeModel.    <- mmm$largeModel
-    smallModel.    <- mmm$smallModel
-    formula.large  <- mmm$formula.large
-    formula.small  <- mmm$formula.small
-    
-    nr_data <- nrow(getData(largeModel.))
+    M <- get_nested_model_info(largeModel, smallModel)
+
+    ## Specific for object class:
+    nr_data <- nrow(getData(M$largeModel))
     nr_fit  <- getME(largeModel, "n")
-    
+
+    ## Generic across object classes
+        
     if (nr_data != nr_fit)
         stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
 
     if (is.null(ref)){
-        ref <- PBrefdist(largeModel., smallModel., nsim=nsim,
+        ref <- PBrefdist(M$largeModel, M$smallModel, nsim=nsim,
                          seed=seed, cl=cl, details=details)
     }
     
-    LRTstat     <- getLRT(largeModel., smallModel.)
-
+    LRTstat     <- getLRT(M$largeModel, M$smallModel)
     out         <- .finalizePB(LRTstat, ref)
-    out <- .padPB(out, LRTstat, ref, formula.large, formula.small)
+    out <- .padPB(out, LRTstat, ref, M$formula.large, M$formula.small)
     return(out)
 }
-
-
 
 
 #' @export
 #' @rdname pb__modcomp
 PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
-    ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")
-    ## cat("PBmodcomp cl:\n"); print(cl)
-    M <- get_nested_model_info(largeModel, smallModel)
-    largeModel.    <- M$largeModel
-    smallModel.    <- M$smallModel
-    formula.large <- M$formula.large
-    formula.small <- M$formula.small
 
-    fam.l <- family(largeModel.)
-    fam.s <- family(smallModel.)
+    M <- get_nested_model_info(largeModel, smallModel)
+
+    ## Specific for object class:
+    
+    ok.fam <- c("binomial", "gaussian", "Gamma", "inverse.gaussian", "poisson")    
+    fam.l <- family(M$largeModel)
+    fam.s <- family(M$smallModel)
     
     if (!all.equal(fam.l, fam.s))
         stop("Models do not have identical identical family\n")
 
     if (!(fam.l$family %in% ok.fam))
         stop(sprintf("family must be of type %s", toString(ok.fam)))
-        
-    if (is.null(ref)){
-        ref <- PBrefdist(largeModel., smallModel., nsim=nsim, seed=seed, cl=cl, details=details)
-    }
 
-    nr_data <- nrow(eval(largeModel.$call$data))
-    nr_fit  <- nrow(largeModel.$model)
+    nr_data <- nrow(eval(M$largeModel$call$data))
+    nr_fit  <- nrow(M$largeModel$model)
+
+    ## Generic across object classes
     
     if (nr_data != nr_fit)
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
-            
-    LRTstat     <- getLRT(largeModel., smallModel.)
 
+        
+    if (is.null(ref)){
+        ref <- PBrefdist(M$largeModel, M$smallModel, nsim=nsim, seed=seed, cl=cl, details=details)
+    }
+    
+    LRTstat     <- getLRT(M$largeModel, M$smallModel)
     out         <- .finalizePB(LRTstat, ref)
-    out <- .padPB(out, LRTstat, ref, formula.large, formula.small)
+    out <- .padPB(out, LRTstat, ref, M$formula.large, M$formula.small)
     return(out)
 }
 
@@ -277,29 +326,25 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 #' @rdname pb_modcomp
 PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
-    if (is.null(control$nsim)) control$nsim <- 1000
-
     M <- get_nested_model_info(largeModel, smallModel)
-    largeModel.    <- M$largeModel
-    smallModel.    <- M$smallModel
-    formula.large  <- M$formula.large
-    formula.small  <- M$formula.small
 
+    ## Specific for object class:
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- largeModel$dims$N
     
     if (nr_data != nr_fit)
         stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
 
+    ## Generic across object classes
+    
     if (is.null(ref)){
-        ref <- PBrefdist(largeModel., smallModel., nsim=nsim,
+        ref <- PBrefdist(M$largeModel, M$smallModel, nsim=nsim,
                          seed=seed, cl=cl, details=details)
     }
     
     LRTstat     <- getLRT(largeModel, smallModel)
-
     out         <- .finalizePB(LRTstat, ref)
-    out <- .padPB(out, LRTstat, ref, formula.large, formula.small)
+    out <- .padPB(out, LRTstat, ref, M$formula.large, M$formula.small)
     return(out)
 }
 

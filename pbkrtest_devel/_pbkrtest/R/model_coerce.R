@@ -128,10 +128,26 @@ restriction_matrix2model.lmerMod <- function(largeModel, L, REML=TRUE, ...){
 
     zzz  <- restriction_matrix2model_internal(largeModel, L, getME(largeModel, "X"))
     
-    new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
-                                    "+", zzz$new_form$rhs.ran))
-    new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
-    ans <- update(largeModel, eval(new.formula), data=new.data)
+    ## new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
+    ##                                 "+", zzz$new_form$rhs.ran))
+    ## new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
+    ## ans <- update(largeModel, eval(new.formula), data=eval(new.data))
+
+
+
+    new_formula <- as.formula(paste(zzz$new_form$lhs, "~ -1 +", zzz$rhs.fix2,
+                                "+", zzz$new_form$rhs.ran))
+
+    ## Evaluate the new dataset once and give it a name
+    data_used <- cbind(zzz$XX.sm, eval(largeModel@call$data))
+
+    ## Use bquote to avoid storing fragile expressions in the call
+    ans <- eval(bquote(update(.(largeModel),
+                              formula = .(new_formula),
+                              data    = .(data_used))))
+
+
+    
     if (!REML)
         ans <- update(ans, REML=FALSE)
     ans
@@ -143,12 +159,23 @@ restriction_matrix2model.glmerMod <- function(largeModel, L, REML=TRUE, ...){
 
     zzz  <- restriction_matrix2model_internal(largeModel, L, getME(largeModel, "X"))
     
-    new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
-                                    "+", zzz$new_form$rhs.ran))
-    new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
-    ans <- update(largeModel, eval(new.formula), data=new.data)
-    ## if (!REML)
-        ## ans <- update(ans, REML=FALSE)
+    ## new.formula <- as.formula(paste(zzz$new_form$lhs, "~ -1+", zzz$rhs.fix2,
+    ##                                 "+", zzz$new_form$rhs.ran))
+    ## new.data    <- cbind(zzz$XX.sm, eval(largeModel@call$data))
+    ## ans <- update(largeModel, eval(new.formula), data=new.data)
+
+
+    new_formula <- as.formula(paste(zzz$new_form$lhs, "~ -1 +", zzz$rhs.fix2,
+                                "+", zzz$new_form$rhs.ran))
+
+    ## Evaluate the new dataset once and give it a name
+    data_used <- cbind(zzz$XX.sm, eval(largeModel@call$data))
+
+    ## Use bquote to avoid storing fragile expressions in the call
+    ans <- eval(bquote(update(.(largeModel),
+                              formula = .(new_formula),
+                              data    = .(data_used))))
+
     ans
 }
 

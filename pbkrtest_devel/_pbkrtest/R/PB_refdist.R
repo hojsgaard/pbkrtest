@@ -1,9 +1,3 @@
-### ###########################################################
-###
-### Computing of reference distribution; possibly in parallel
-###
-### ###########################################################
-
 #' @title Calculate reference distribution using parametric bootstrap
 #'
 #' @description Calculate reference distribution of likelihood ratio statistic
@@ -21,7 +15,6 @@
 #'     The argument 'cl' (originally short for 'cluster') is used for
 #'     controlling parallel computations. 'cl' can be NULL (default),
 #'     positive integer or a list of clusters.
-#'
 #'
 #' Special care must be taken
 #'     on Windows platforms (described below) but the general picture
@@ -115,6 +108,7 @@
 #' stopCluster(clus)
 #' }
 
+
 #' @rdname pb-refdist
 #' @export
 PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
@@ -125,137 +119,107 @@ PBrefdist <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, det
 #' @rdname pb-refdist
 #' @export
 PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
-  t0 <- proc.time()
-
-  nr_data <- nrow(eval(largeModel$call$data))
-  nr_fit  <- nrow(largeModel$model)
   
-  if (nr_data != nr_fit)
-    stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
+    ## Specific for object class:
+
+    nr_data <- nrow(eval(largeModel$call$data))
+    nr_fit  <- nrow(largeModel$model)
+    
+    ## Generic across object classes
+    
+    t0 <- proc.time()
+
+    if (nr_data != nr_fit)
+        stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
   
-  ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-  
-  ## ref <- ref[ref > 0]
-
-  LRTstat     <- getLRT(largeModel, smallModel)
-  attr(ref, "stat")    <- LRTstat
-  attr(ref, "samples") <- c(nsim=nsim, npos=sum(ref > 0),
-                            n.extreme=sum(ref > LRTstat["tobs"]),
-                            pPB=(1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
-
-  if (details>0)
-    cat(sprintf("Reference distribution with %i samples; computing time: %5.2f secs. \n",
-                length(ref), attr(ref, "ctime")))
-
-  ref
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+    LRTstat     <- getLRT(largeModel, smallModel)
+    ref <- finalize_refdist(LRTstat, ref, nsim)
+    
+    if (details>0)
+        cat(sprintf("Reference distribution with %i samples; computing time: %5.2f secs. \n",
+                    length(ref), attr(ref, "ctime")))
+    
+    ref
 }
+
+
 
 #' @rdname pb-refdist
 #' @export
 PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
 
-    if (is.character(smallModel))
-        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+    ## Specific for object class:
+
+    ctrl <- lmerControl(
+
+        optCtrl = list(maxfun = 1e5, tol = 0.01),
+        check.conv.grad = "ignore",
+        check.conv.singular = "ignore",
+        check.conv.hess = "ignore"  # optional
+    )
     
-    if (inherits(smallModel, "formula"))
-        smallModel  <- update(largeModel, smallModel)
-
-    if (is.numeric(smallModel) && !is.matrix(smallModel))
-        smallModel <- matrix(smallModel, nrow=1)
-            
-    if (inherits(smallModel, c("Matrix", "matrix"))){
-        formula.small <- smallModel
-        smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
-    } else {
-        formula.small <- formula(smallModel)
-        attributes(formula.small) <- NULL
-    }
-
-    ## From here: largeModel and smallModel are both model objects.
     
     if (getME(smallModel, "is_REML")) {
-        smallModel <- update(smallModel, REML=FALSE, control=lmerControl(check.conv.singular = "ignore"))
+        smallModel <- eval(bquote(update(.(smallModel),
+                                         REML    = FALSE,
+                                         control = .(ctrl))))
+
     }
-
+    
     if (getME(largeModel, "is_REML")){
-        largeModel <- update(largeModel, REML=FALSE, control=lmerControl(check.conv.singular = "ignore"))  
-    } 
+        largeModel <- eval(bquote(update(.(largeModel),
+                                         REML    = FALSE,
+                                         control = .(ctrl))))
 
+    } 
+    
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- getME(largeModel, "n")
     
+    ## Generic across object classes
+    t0 <- proc.time()        
+
     if (nr_data != nr_fit)
-      stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
-    
-    
-    t0 <- proc.time()
+        stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
 
-    ## cat("PBrefdist cl:\n"); print(cl)
+    LRTstat     <- getLRT(largeModel, smallModel)    
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)    
+    ref <- finalize_refdist(LRTstat, ref, nsim)
     
-    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-    
-    LRTstat     <- getLRT(largeModel, smallModel)
-
-    attr(ref, "stat")    <- LRTstat
-    attr(ref, "samples") <- c(nsim      = nsim,
-                              npos      = sum(ref > 0),
-                              n.extreme = sum(ref > LRTstat["tobs"]),
-                              pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
-    class(ref) <- "refdist"
     if (details > 0)
         cat(sprintf("Reference distribution with %5i samples; computing time: %5.2f secs. \n",
                     length(ref), attr(ref, "ctime")))
     
     ref
 }
-
 
 
 #' @rdname pb-refdist
 #' @export
 PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, details=0){
 
-    if (is.character(smallModel))
-        smallModel <- doBy::formula_add_str(formula(largeModel), terms=smallModel, op="-")
+    ## Specific for object class:
     
-    if (inherits(smallModel, "formula"))
-        smallModel  <- update(largeModel, smallModel)
-
-    if (is.numeric(smallModel) && !is.matrix(smallModel))
-        smallModel <- matrix(smallModel, nrow=1)
-            
-    if (inherits(smallModel, c("Matrix", "matrix"))){
-        formula.small <- smallModel
-        smallModel <- restriction_matrix2model(largeModel, smallModel, REML=FALSE)
-    } else {
-        formula.small <- formula(smallModel)
-        attributes(formula.small) <- NULL
-    }
-
-    ## From here: largeModel and smallModel are both model objects.
-
     smallModel <- update(smallModel, method="ML")
     largeModel <- update(largeModel, method="ML")
 
-    ## print(largeModel)
-    
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- largeModel$dims$N
+
+    
+    ## Generic across object classes
+
+    t0 <- proc.time()
     
     if (nr_data != nr_fit)
       stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
     
-    t0 <- proc.time()
-    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
-    
-    LRTstat     <- getLRT(largeModel, smallModel)
 
-    attr(ref, "stat")    <- LRTstat
-    attr(ref, "samples") <- c(nsim      = nsim,
-                              npos      = sum(ref > 0),
-                              n.extreme = sum(ref > LRTstat["tobs"]),
-                              pPB       = (1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
-    class(ref) <- "refdist"
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+    LRTstat     <- getLRT(largeModel, smallModel)
+    ref <- finalize_refdist(LRTstat, ref, nsim)
+    
     if (details > 0)
         cat(sprintf("Reference distribution with %5i samples; computing time: %5.2f secs. \n",
                     length(ref), attr(ref, "ctime")))
@@ -264,21 +228,17 @@ PBrefdist.gls <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL,
 }
 
 
+finalize_refdist <- function(LRTstat, ref, nsim){
+    attr(ref, "stat")    <- LRTstat
+    attr(ref, "samples") <- c(nsim=nsim, npos=sum(ref > 0),
+                              n.extreme=sum(ref > LRTstat["tobs"]),
+                              pPB=(1 + sum(ref > LRTstat["tobs"])) / (1 + sum(ref > 0)))
+    class(ref) <- "refdist"
+    return(ref)
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+#' @export
 print.refdist <- function(x, n=6L, ...){
     cat("values: \n")
     print(head(x, n=n))
@@ -286,7 +246,6 @@ print.refdist <- function(x, n=6L, ...){
     print(attributes(x)[1:4])
     invisible(x)
 }
-
 
 
 get_refdist <- function(lg){
@@ -332,17 +291,34 @@ get_refdist.lm <- function(lg){
 .get_refdist_merMod <- function(lg, sm, nsim=20, seed=NULL,
                                 simdata=simulate(sm, nsim=nsim, seed=seed)){
 
-    unname(unlist(lapply(simdata, function(yyy){
-        sm2  <- suppressMessages(refit(sm, newresp=yyy))
-        lg2  <- suppressMessages(refit(lg, newresp=yyy))
-        2 * (logLik(lg2, REML=FALSE) - logLik(sm2, REML=FALSE))
-    })))
+    refit_safe <- function(model, newresp, ctrl) {
+        ff <- formula(model)
+        dd <- getData(model)
+        dd[[as.character(ff[[2]])]] <- newresp  # Replace response
+        update(model, formula = ff, data = dd, REML = FALSE, control = ctrl)
+    }
+
+    ctrl <- lmerControl(
+        optCtrl = list(tol = 0.1),
+        check.conv.grad = "ignore",
+        check.conv.hess = "ignore",
+        check.conv.singular = "ignore"
+    )
+
+    unname(unlist(lapply(simdata, function(yyy) {
+        sm2 <- suppressMessages(refit_safe(sm, yyy, ctrl))
+        lg2 <- suppressMessages(refit_safe(lg, yyy, ctrl))
+        2 * (logLik(lg2, REML = FALSE) - logLik(sm2, REML = FALSE))
+    })))    
 }
 
 
 
-get_cl <- function(cl){
 
+
+
+
+get_cl <- function(cl){
 
     .cat <- function(b, ...) {if (b) cat(...)}
     dd <- 2
@@ -379,8 +355,7 @@ get_cl <- function(cl){
         cl <- 1
     }
 
-    cl
-    
+    return(cl)    
 }
 
 do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
@@ -405,11 +380,6 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
                                    get_fun(largeModel, smallModel, nsim=nsim.cl)},
                                mc.cores=cl))
 
-        # ref <- unlist(lapply(1:cl,
-        #                        function(i) {
-        #                            get_fun(largeModel, smallModel, nsim=nsim.cl)}
-        #                        ))
-
 
     } else
         if (inherits(cl, "cluster")){
@@ -426,4 +396,37 @@ do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
     ref
 
 }
+
+
+
+
+## ALTERNATIV
+## safe_update_lmer <- function(model, REML = FALSE, control = lmerControl()) {
+##   eval(bquote(update(.(model),
+##                      REML = .(REML),
+##                      control = .(control))))
+## }
+## smallModel <- safe_update_lmer(smallModel, REML = FALSE, control = ctrl)
+
+    ## smallModel <- update(smallModel, REML = FALSE, control = ctrl)
+
+    ## smallModel <- eval(bquote(update(.(smallModel),
+    ##                                  REML    = FALSE,
+    ##                                  control = .(ctrl))))
+
+        ## smallModel <- update(smallModel, REML = FALSE, control = ctrl)
+        ## smallModel <- update(smallModel, REML=FALSE,
+        ## control=lmerControl(check.conv.singular = "ignore"))
+
+        ## largeModel <- update(largeModel, REML = FALSE, control = ctrl)
+        ## largeModel <- update(largeModel, REML=FALSE,
+                             ## control=lmerControl(check.conv.singular = "ignore"))  
+
+
+
+### ###########################################################
+###
+### Computing of reference distribution; possibly in parallel
+###
+### ###########################################################
 

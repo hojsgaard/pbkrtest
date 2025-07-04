@@ -56,8 +56,6 @@ rankMatrix_ <- function(X){
     ## rankMatrix(crossprod(X), method="qr.R")
 }
 
-
-
 #' @export 
 tidy.PBmodcomp <- function(x, ...){
     ret <- x$test    

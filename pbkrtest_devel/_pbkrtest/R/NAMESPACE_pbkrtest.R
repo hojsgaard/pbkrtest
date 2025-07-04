@@ -19,7 +19,6 @@
 #'     terms update update.formula var vcov sigma
 #'
 #' @importFrom broom tidy
-#' @export tidy
 #' 
 #' @importFrom dplyr as_tibble
 

@@ -33,7 +33,6 @@
 #' }
 #'
 #' @export
-
 get_nested_model_info <- function(fit1, fit0){
 
     ## cat("handle_models\n")
@@ -80,7 +79,7 @@ get_nested_model_info <- function(fit1, fit0){
                 L             = L
                 )
 
-    invisible(out)
+    return(out)
 }
 
 

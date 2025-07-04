@@ -15,7 +15,9 @@
 #'
 #' @param object An \code{lmer} model
 #' @param details If larger than 0 some timing details are printed.
-#' @return \item{phiA}{the estimated covariance matrix, this has attributed P, a
+#' @return
+#'
+#' \item{phiA}{the estimated covariance matrix, this has attributed P, a
 #'     list of matrices used in \code{KR_adjust} and the estimated matrix W of
 #'     the variances of the covariance parameters of the random effects}
 #' 
@@ -28,6 +30,7 @@
 #'     be relatively slow.
 #' @author Ulrich Halekoh \email{uhalekoh@@health.sdu.dk}, Søren Højsgaard
 #'     \email{sorenh@@math.aau.dk}
+#' 
 #' @seealso \code{\link{getKR}}, \code{\link{KRmodcomp}}, \code{\link[lme4]{lmer}},
 #'     \code{\link{PBmodcomp}}, \code{\link{vcovAdj}}
 #' 
@@ -42,31 +45,28 @@
 #' @keywords inference models
 #' @examples
 #' 
-#' fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+#' fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy, REML=TRUE)
 #' class(fm1)
+#'
+#' set.seed(123)
+#' sleepstudy2 <- sleepstudy[sample(nrow(sleepstudy), size=120), ]
+#'
+#' fm2 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy2, REML=TRUE)
 #' 
 #' ## Here the adjusted and unadjusted covariance matrices are identical,
 #' ## but that is not generally the case:
 #' 
 #' v1 <- vcov(fm1)
-#' v2 <- vcovAdj(fm1, details=0)
-#' v2 / v1
+#' v1a <- vcovAdj(fm1, details=0)
+#' v1a / v1
+#'
+#' v2 <- vcov(fm2)
+#' v2a <- vcovAdj(fm2, details=0)
+#' v2a / v2
 #' 
-#' ## For comparison, an alternative estimate of the variance-covariance
-#' ## matrix is based on parametric bootstrap (and this is easily
-#' ## parallelized): 
-#' 
-#' \dontrun{
-#' nsim <- 100
-#' sim <- simulate(fm.ml, nsim)
-#' B <- lapply(sim, function(newy) try(fixef(refit(fm.ml, newresp=newy))))
-#' B <- do.call(rbind, B)
-#' v3 <- cov.wt(B)$cov
-#' v2/v1
-#' v3/v1
-#' }
-#' 
-#' 
+#' # For comparison, an alternative estimate of the
+#' # variance-covariance matrix is based on parametric bootstrap (and
+#' # this is easily parallelized):
 #' 
 #' @export vcovAdj
 #' 
@@ -199,155 +199,29 @@ vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## #' @method vcovAdj mer
-## #' @rdname kr-vcovAdj
-## #' @export
-## vcovAdj.mer <- vcovAdj.lmerMod
-
-
-
-## .vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
-
-##     ##cat("vcovAdj_internal\n")
-##     ##SG<<-SigmaG
-##     DB <- details > 0 ## debugging only
-
-##     #print("HHHHHHHHHHHHHHH")
-##     #print(system.time({chol( forceSymmetric(SigmaG$Sigma) )}))
-##     #print(system.time({chol2inv( chol( forceSymmetric(SigmaG$Sigma) ) )}))
-
-##     ## print("HHHHHHHHHHHHHHH")
-##     ## Sig <- forceSymmetric( SigmaG$Sigma )
-##     ## print("HHHHHHHHHHHHHHH")
-##     ## print(system.time({Sig.chol <- chol( Sig )}))
-##     ## print(system.time({chol2inv( Sig.chol )}))
-
-##     t0 <- proc.time()
-##     ## print("HHHHHHHHHHHHHHH")
-##     SigmaInv <- chol2inv( chol( forceSymmetric(SigmaG$Sigma) ) )
-##     ## print("DONE --- HHHHHHHHHHHHHHH")
-
-##     if(DB){
-##         cat(sprintf("Finding SigmaInv: %10.5f\n", (proc.time()-t0)[1] ));
-##         t0 <- proc.time()
-##     }
-##     ##print("iiiiiiiiiiiii")
-
-##     t0 <- proc.time()
-##     ## Finding, TT, HH, 00
-##     n.ggamma <- SigmaG$n.ggamma
-##     TT       <- SigmaInv %*% X
-##     HH       <- OO <- vector("list", n.ggamma)
-##     for (ii in 1:n.ggamma) {
-##         .tmp <- SigmaG$G[[ii]] %*% SigmaInv
-##         HH[[ ii ]] <- .tmp
-##         OO[[ ii ]] <- .tmp %*% X
-##     }
-##     if(DB){cat(sprintf("Finding TT,HH,OO  %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
-##     ## if(DB){
-##     ##     cat("HH:\n"); print(HH); HH <<- HH
-##     ##     cat("OO:\n"); print(OO); OO <<- OO
-##     ## }
-
-##     ## Finding PP, QQ
-##     PP <- QQ <- NULL
-##     for (rr in 1:n.ggamma) {
-##         OrTrans <- t( OO[[ rr ]] )
-##         PP <- c(PP, list(forceSymmetric( -1 * OrTrans %*%  TT)))
-##         for (ss in rr:n.ggamma) {
-##             QQ <- c(QQ,list(OrTrans %*% SigmaInv %*% OO[[ss]] ))
-##         }}
-##     if(DB){cat(sprintf("Finding PP,QQ:    %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
-##     ## if(DB){
-##     ##     cat("PP:\n"); print(PP); PP2 <<- PP
-##     ##     cat("QP:\n"); print(QQ); QQ2 <<- QQ
-##     ## }
-
-##     Ktrace <- matrix( NA, nrow=n.ggamma, ncol=n.ggamma )
-##     for (rr in 1:n.ggamma) {
-##         HrTrans <- t( HH[[rr]] )
-##         for (ss in rr:n.ggamma){
-##             Ktrace[rr,ss] <- Ktrace[ss,rr]<- sum( HrTrans * HH[[ss]] )
-##         }}
-##     if(DB){cat(sprintf("Finding Ktrace:   %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
-
-##     ## Finding information matrix
-##     IE2 <- matrix( NA, nrow=n.ggamma, ncol=n.ggamma )
-##     for (ii in 1:n.ggamma) {
-##         Phi.P.ii <- Phi %*% PP[[ii]]
-##         for (jj in c(ii:n.ggamma)) {
-##             www <- .indexSymmat2vec( ii, jj, n.ggamma )
-##             IE2[ii,jj]<- IE2[jj,ii] <- Ktrace[ii,jj] -
-##                 2 * sum(Phi*QQ[[ www ]]) + sum( Phi.P.ii * ( PP[[jj]] %*% Phi))
-##         }}
-##     if(DB){cat(sprintf("Finding IE2:      %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
-
-##     eigenIE2 <- eigen(IE2,only.values=TRUE)$values
-##     condi    <- min(abs(eigenIE2))
-
-##     WW <- if(condi>1e-10) forceSymmetric(2* solve(IE2)) else forceSymmetric(2* ginv(IE2))
-
-##     ## print("vcovAdj")
-##     UU <- matrix(0, nrow=ncol(X), ncol=ncol(X))
-##     ## print(UU)
-##     for (ii in 1:(n.ggamma-1)) {
-##         for (jj in c((ii+1):n.ggamma)) {
-##             www <- .indexSymmat2vec( ii, jj, n.ggamma )
-##             UU <- UU + WW[ii,jj] * (QQ[[ www ]] - PP[[ii]] %*% Phi %*% PP[[jj]])
-##         }}
-##     ## print(UU)
-
-##     UU <- UU + t(UU)
-##     ## UU <<- UU
-##     for (ii in 1:n.ggamma) {
-##         www <- .indexSymmat2vec( ii, ii, n.ggamma )
-##         UU<- UU +   WW[ii,ii] * (QQ[[ www ]] - PP[[ii]] %*% Phi %*% PP[[ii]])
-##     }
-##     ## print(UU)
-##     GGAMMA <-  Phi %*% UU %*% Phi
-##     PhiA   <-  Phi + 2 * GGAMMA
-##     attr(PhiA, "P")     <-PP
-##     attr(PhiA, "W")     <-WW
-##     attr(PhiA, "condi") <- condi
-##     PhiA
-## }
+## ' \dontrun{
+## ' nsim <- 100
+## '
+## ' sim1 <- simulate(fm1, nsim)
+## ' B1 <- lapply(sim1, function(y){
+## '   fixef(refit(fm1, newresp=y))
+## ' })
+## '
+## ' sim2 <- simulate(fm2, nsim)
+## ' B2 <- lapply(sim2, function(y){
+## '   fixef(refit(fm2, newresp=y))
+## ' })
+## ' 
+## ' B1 <- do.call(rbind, B1)
+## ' B2 <- do.call(rbind, B2)
+## ' 
+## ' v13 <- cov.wt(B1)$cov
+## ' v23 <- cov.wt(B2)$cov
+## '
+## ' v13 / v1
+## ' v23 / v2
+## '
+## ' v13 / v1a
+## ' v23 / v2a
+## ' }
+## ' 

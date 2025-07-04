@@ -57,7 +57,6 @@ orthogonal_complement<-function(W) {
     else x / y
 }
 
-
 ## FIXME Get rid of these
 .is.lmm <- function(object) {
     inherits(object, "lmerMod")

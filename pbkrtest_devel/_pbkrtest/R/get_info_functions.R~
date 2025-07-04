@@ -113,44 +113,93 @@ getLRT.gls <- function(fit1, fit0) {
 }
 
 
+#' @title Extract (or "get") components from a \code{KRmodcomp} or
+#'     \code{SATmodcomp} object.
+#'
+#' @description Extract (or "get") components from a \code{KRmodcomp}
+#'     or \code{SATmodcomp} object. In particular, get denominator
+#'     degrees of freedom.
+#' 
+#' @name get_modcomp
+#' 
+#' @param object A \code{KRmodcomp} object, which is the result of the
+#'     \code{KRmodcomp} function
+#' @param name The available slots. If \code{name} is missing or \code{NULL}
+#'     then everything is returned.
+#' @author Søren Højsgaard \email{sorenh@@math.aau.dk}
+#' @seealso \code{\link{KRmodcomp}}, \code{\link{PBmodcomp}},
+#'     \code{\link{vcovAdj}}
+#' @references Ulrich Halekoh, Søren Højsgaard (2014)., A Kenward-Roger
+#'     Approximation and Parametric Bootstrap Methods for Tests in Linear Mixed
+#'     Models - The R Package pbkrtest., Journal of Statistical Software,
+#'     58(10), 1-30., \url{https://www.jstatsoft.org/v59/i09/}
+#' @keywords utilities
+#' @examples
+#'
+#' (fm0 <- lmer(Reaction ~ (Days|Subject), sleepstudy))
+#' (fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy))
+#' (fm2 <- lmer(Reaction ~ Days + I(Days^2) + (Days|Subject), sleepstudy))
+#'
+#' x10 <- KRmodcomp(fm1, fm0)
+#' getKR(x10, "ddf")
+#'
+#' KRmodcomp(fm1, fm0) |> getKR("ddf")
+#' KRmodcomp(fm2, fm0) |> getKR("ddf")
+#' KRmodcomp(fm2, fm1) |> getKR("ddf")
+#'
+#' ## For comparison:
+#' 
+#' SATmodcomp(fm1, fm0) |> getSAT("ddf")
+#' SATmodcomp(fm2, fm0) |> getSAT("ddf")
+#' SATmodcomp(fm2, fm1) |> getSAT("ddf")
+#'
+#' @export
+#' @rdname get_modcomp
+getKR <- function (object, name = c("ndf", "ddf", "Fstat", "p.value", "F.scaling", "FstatU", "p.valueU", "aux")) 
+{	
+  stopifnot(is(object, "KRmodcomp"))
+  if (missing(name) || is.null(name)){
+    return(object$stats)
+  } else {
+    stopifnot(length(name <- as.character(name)) == 1)
+    name <- match.arg(name)
+    object$stats[[name]]
+  }
+}
+
+
+#' @export
+#' @rdname get_modcomp
+getSAT <- function (object, name = c("ndf", "ddf", "Fstat", "p.value")) 
+{	
+  stopifnot(is(object, "SATmodcomp"))
+  if (missing(name) || is.null(name)){
+    return(object$test) ## FIXME Should be stats
+  } else {
+    stopifnot(length(name <- as.character(name)) == 1)
+    name <- match.arg(name)
+    object$test[[name]] ## FIXME Should be stats
+  }
+}
+
+
+## '
+## ' \dontrun{
+## ' p <- PBrefdist(fm1, fm0, seed=123, nsim=50, cl=1)
+## ' e <- mean(p)
+## ' e
+## ' -2*e/(1-e)
+## ' 
+## ' x <- PBmodcomp(fm1, fm0, nsim=50, seed=123, cl=1)
+## ' summary(x)$test$ddf[5]
+## '
+## ' x <- PBmodcomp(fm2, fm0, nsim=50, cl=2)
+## ' summary(x)$test$ddf[5]
+## '
+## ' x <- PBmodcomp(fm2, fm1, nsim=50, cl=2)
+## ' summary(x)$test$ddf[5]
+## ' }
+## ' 
 
 
 
-
-
-## #' @export
-## getLRT <- function(largeModel, smallModel){
-##   UseMethod("getLRT")
-## }
-
-## #' @export
-## getLRT.lmerMod <-
-##         function(largeModel, smallModel){
-##     logL_small <- logLik(update(smallModel, REML=FALSE))
-##     logL_large <- logLik(update(largeModel, REML=FALSE))
-##     tobs     <- 2 * (logL_large - logL_small)
-##     df11     <- attr(logL_large, "df") - attr(logL_small, "df")
-##     p.X2     <- 1 - pchisq(tobs, df11)
-##     c(tobs=tobs, df=df11, p.value=p.X2)
-## }
-
-## #' @export
-## getLRT.glmerMod <-
-##         function(largeModel, smallModel){
-##     logL_small <- logLik(update(smallModel))
-##     logL_large <- logLik(update(largeModel))
-##     tobs     <- 2 * (logL_large - logL_small)
-##     df11     <- attr(logL_large, "df") - attr(logL_small, "df")
-##     p.X2     <- 1 - pchisq(tobs, df11)
-##     c(tobs=tobs, df=df11, p.value=p.X2)
-## }
-
-## #' @export
-## getLRT.lm <- function(largeModel, smallModel){
-##   logL_small <- logLik(smallModel)
-##   logL_large <- logLik(largeModel)
-##   tobs     <- 2 * (logL_large - logL_small)
-##   df11     <- attr(logL_large, "df") - attr(logL_small, "df")
-##   p.X2     <- 1 - pchisq(tobs, df11)
-##   c(tobs=tobs, df=df11, p.value=p.X2)
-## }
