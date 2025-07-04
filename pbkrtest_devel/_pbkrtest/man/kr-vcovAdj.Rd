@@ -45,31 +45,28 @@ be relatively slow.
 }
 \examples{
 
-fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy, REML=TRUE)
 class(fm1)
+
+set.seed(123)
+sleepstudy2 <- sleepstudy[sample(nrow(sleepstudy), size=120), ]
+
+fm2 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy2, REML=TRUE)
 
 ## Here the adjusted and unadjusted covariance matrices are identical,
 ## but that is not generally the case:
 
 v1 <- vcov(fm1)
-v2 <- vcovAdj(fm1, details=0)
-v2 / v1
+v1a <- vcovAdj(fm1, details=0)
+v1a / v1
 
-## For comparison, an alternative estimate of the variance-covariance
-## matrix is based on parametric bootstrap (and this is easily
-## parallelized): 
+v2 <- vcov(fm2)
+v2a <- vcovAdj(fm2, details=0)
+v2a / v2
 
-\dontrun{
-nsim <- 100
-sim <- simulate(fm.ml, nsim)
-B <- lapply(sim, function(newy) try(fixef(refit(fm.ml, newresp=newy))))
-B <- do.call(rbind, B)
-v3 <- cov.wt(B)$cov
-v2/v1
-v3/v1
-}
-
-
+# For comparison, an alternative estimate of the
+# variance-covariance matrix is based on parametric bootstrap (and
+# this is easily parallelized):
 
 }
 \references{

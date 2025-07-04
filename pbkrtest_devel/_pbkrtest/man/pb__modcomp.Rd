@@ -5,9 +5,6 @@
 \alias{PBmodcomp}
 \alias{PBmodcomp.lm}
 \alias{PBmodcomp.merMod}
-\alias{getLRT}
-\alias{getLRT.lm}
-\alias{getLRT.merMod}
 \alias{plot.XXmodcomp}
 \alias{PBmodcomp.mer}
 \alias{getLRT.mer}
@@ -141,8 +138,8 @@ NSIM <- 50 ## Simulations in parametric bootstrap; default is 1000.
 ## Test for no effect of Days in fm1, i.e. test fm0 under fm1
 PBmodcomp(fm1, "Days", cl=1, nsim=NSIM)
 PBmodcomp(fm1, ~.-Days, cl=1, nsim=NSIM)
-L1 <- cbind(0, 1) 
-PBmodcomp(fm1, L1, cl=1, nsim=NSIM) ## FIXME
+L1 <- cbind(0, 1)
+PBmodcomp(fm1, L1, cl=1, nsim=NSIM) 
 PBmodcomp(fm1, fm0, cl=1, nsim=NSIM)
 anova(fm1, fm0)
 
@@ -151,6 +148,7 @@ PBmodcomp(fm2, "(Days+I(Days^2))", cl=1, nsim=NSIM)
 PBmodcomp(fm2, ~. - Days - I(Days^2), cl=1, nsim=NSIM)
 L2 <- rbind(c(0, 1, 0), c(0, 0, 1))
 PBmodcomp(fm2, L2, cl=1, nsim=NSIM) ## FIXME
+
 PBmodcomp(fm2, fm0, cl=1, nsim=NSIM)
 anova(fm2, fm0)
 
@@ -158,7 +156,7 @@ anova(fm2, fm0)
 PBmodcomp(fm2, "I(Days^2)", cl=1, nsim=NSIM)
 PBmodcomp(fm2, ~. - I(Days^2), cl=1, nsim=NSIM)
 L3 <- rbind(c(0, 0, 1))
-## PBmodcomp(fm2, L3, cl=1, nsim=NSIM) ## FIXME
+PBmodcomp(fm2, L3, cl=1, nsim=NSIM) 
 PBmodcomp(fm2, fm1, cl=1, nsim=NSIM)
 anova(fm2, fm1)
 
@@ -231,10 +229,10 @@ refdist <- PBrefdist(sug, sug.h, nsim=1000, cl=cl)
 stopCluster(cl)
 }
 
-
 lm1 <- lm(dist~speed+I(speed^2), data=cars)
 PBmodcomp(lm1, .~.-speed, cl=2)
 PBmodcomp(lm1, .~.-I(speed^2), cl=2)
+
 
 }
 \references{

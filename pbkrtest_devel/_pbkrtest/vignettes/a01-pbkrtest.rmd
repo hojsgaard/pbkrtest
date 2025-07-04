@@ -25,6 +25,11 @@ options("warn"=-1)  ## FIXME Fragile; issue with rankMatrix(, method="qr.R")
 # Introduction
 
 
+
+```{r}
+library(broom)
+```
+
 The \code{shoes} data is a list of two vectors, giving the wear of
 shoes of materials A and B for one foot each of ten boys.
 

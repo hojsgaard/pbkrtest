@@ -40,10 +40,7 @@ Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
 X2modcomp(fm1, "Days")
 X2modcomp(fm1, ~.-Days)
 L1 <- cbind(0, 1)
-}
-
-\subsection{X2modcomp(fm1, L1) ## FIXME}{
-
+X2modcomp(fm1, L1) ## FIXME
 X2modcomp(fm1, fm0)
 anova(fm1, fm0)
 }
