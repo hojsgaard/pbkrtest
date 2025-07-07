@@ -1,0 +1,110 @@
+#' Refit a model with new response
+#'
+#' @param object A fitted model object
+#' @param newresp A vector of new response values
+#' @param ... Additional arguments (unused)
+#' @return A refitted model
+#' @export
+refit <- function(object, newresp, ...) {
+  UseMethod("refit")
+}
+#' @export
+refit.lm <- function(object, newresp, ...) {
+  mf <- model.frame(object)
+  mf[[1]] <- newresp
+  update(object, data = mf)
+}
+#' @export
+refit.lme <- function(object, newresp, ...) {
+  d <- getData(object)
+  d[[all.vars(formula(object))[1]]] <- newresp
+  update(object, data = d)
+}
+#' @export
+refit.gls <- function(object, newresp, ...) {
+  d <- getData(object)
+  d[[all.vars(formula(object))[1]]] <- newresp
+  update(object, data = d)
+}
+
+#' Simulate reference distribution of LR statistic via parametric bootstrap
+#'
+#' Simulates the null distribution of the likelihood ratio test statistic by
+#' parametric bootstrap. Supports serial, parallel (parallel package), and
+#' future-based parallel execution.
+#'
+#' @param fit1 Fitted larger model object with `refit` and `logLik` methods.
+#' @param fit0 Fitted smaller (nested) model.
+#' @param nsim Number of bootstrap replications. Default is 1000.
+#' @param seed RNG seed for reproducibility (optional).
+#' @param engine Parallelization engine. One of `"future"` (default), `"serial"`, `"parallel"`.
+#' @param nworkers Number of workers/cores to use. Default is 2.
+#' @param progress Logical. Show progress bar if available. Default is TRUE.
+#'
+#' @return Numeric vector of simulated LR statistics of length \code{nsim}.
+#' @export
+pb_refdist <- function(
+  fit1,
+  fit0,
+  nsim = 1000,
+  seed = NULL,
+  engine = c("future", "serial", "parallel"),
+  nworkers = 2,
+  progress = TRUE
+) {
+  engine <- match.arg(engine)
+  if (!is.null(seed)) set.seed(seed)
+
+  ## Simulate responses under null
+  simdata <- simulate(fit0, nsim = nsim, seed = seed)
+
+  ## Define worker
+  ll_diff_worker <- function(y) {
+    ll1 <- logLik(refit(fit1, newresp = y))
+    ll0 <- logLik(refit(fit0, newresp = y))
+    as.numeric(ll1 - ll0)
+  }
+
+  ## SERIAL
+  if (engine == "serial") {
+    if (progress) message("Running serial bootstrap on 1 core")
+    res <- vapply(simdata, ll_diff_worker, numeric(1))
+    return(unname(res))
+  }
+
+  ## PARALLEL via parallel package
+  if (engine == "parallel") {
+    if (progress) message(sprintf("Running parallel bootstrap on %d workers (parallel package)", nworkers))
+    if (.Platform$OS.type == "windows") {
+      cl <- parallel::makeCluster(nworkers)
+      on.exit(parallel::stopCluster(cl))
+      parallel::clusterExport(cl, varlist = c("fit1", "fit0", "ll_diff_worker", "refit", "logLik"), envir = environment())
+      res <- unlist(parallel::parLapply(cl, simdata, ll_diff_worker))
+    } else {
+      res <- unlist(parallel::mclapply(simdata, ll_diff_worker, mc.cores = nworkers))
+    }
+    return(unname(res))
+  }
+
+  ## FUTURE engine
+  if (engine == "future") {
+    if (progress) message(sprintf("Running parallel bootstrap on %d workers (future)", nworkers))
+    if (!requireNamespace("future", quietly = TRUE)) {
+      stop("Package 'future' is required for engine='future'. Install with install.packages('future').")
+    }
+    if (!requireNamespace("furrr", quietly = TRUE)) {
+      stop("Package 'furrr' is required for engine='future'. Install with install.packages('furrr').")
+    }
+
+    future::plan(future::multisession, workers = nworkers)
+    res <- furrr::future_map_dbl(
+      simdata,
+      ll_diff_worker,
+      .options = furrr::furrr_options(seed = TRUE),
+      .progress = progress
+    )
+    return(unname(res))
+  }
+
+  stop("Invalid engine specified.")
+}

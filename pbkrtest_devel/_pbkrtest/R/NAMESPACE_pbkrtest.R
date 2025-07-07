@@ -1,5 +1,22 @@
+
+#' @import nlme
 #' @import lme4
+
+## ALTERnative
+## #' @importFrom nlme gls lme
+## #' @importFrom lme4 lmer
+
+
+#' @importFrom graphics curve hist
+#' @importFrom stats dchisq fitted model.frame predict
+#' @importFrom utils tail
+
 #' @importFrom MASS ginv
+
+#' @importFrom furrr future_map furrr_options
+#' @importFrom future plan multisession
+#' @importFrom utils requireNamespace
+
 
 #' @importFrom utils head
 #' @importFrom stats coef anova
@@ -21,8 +38,7 @@
 #' @importFrom broom tidy
 #' 
 #' @importFrom dplyr as_tibble
-
-
+#' 
 #' @title pbkrtest internal
 #' @description pbkrtest internal
 #' @name internal-pbkrtest
