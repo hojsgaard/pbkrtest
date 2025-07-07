@@ -12,9 +12,11 @@
 #'
 #' @return A data frame with \code{nsim} simulated response vectors as columns. Each column represents one simulated replicate of the response under the model's implied distribution.
 #'
-#' @section Details:
-#' For \code{gls} objects, the mean vector is the fitted values and the covariance matrix is obtained via \code{cov_matrix()}.  
-#' For \code{lme} objects, the mean vector is the level-0 (population) predicted values and the covariance matrix is also obtained via \code{cov_matrix()}.
+#' @section Details: For \code{gls} objects, the mean vector is the
+#'     fitted values and the covariance matrix is obtained via
+#'     \code{cov_matrix()}.  For \code{lme} objects, the mean vector
+#'     is the level-0 (population) predicted values and the covariance
+#'     matrix is also obtained via \code{cov_matrix()}.
 #'
 #' @examples
 #' if (require(nlme)) {
