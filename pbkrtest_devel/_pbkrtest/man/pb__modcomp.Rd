@@ -8,6 +8,7 @@
 \alias{plot.XXmodcomp}
 \alias{PBmodcomp.mer}
 \alias{getLRT.mer}
+\alias{PBmodcomp.gls}
 \alias{seqPBmodcomp}
 \title{Model comparison using parametric bootstrap methods.}
 \usage{
@@ -32,6 +33,16 @@ PBmodcomp(
 )
 
 \method{PBmodcomp}{lm}(
+  largeModel,
+  smallModel,
+  nsim = 1000,
+  ref = NULL,
+  seed = NULL,
+  cl = NULL,
+  details = 0
+)
+
+\method{PBmodcomp}{gls}(
   largeModel,
   smallModel,
   nsim = 1000,

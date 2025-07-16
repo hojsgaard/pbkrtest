@@ -52,6 +52,7 @@ That these functions are visible is a recent addition; minor changes
 may occur.
 }
 \examples{
+
 library(pbkrtest)
 data("beets", package = "pbkrtest")
 sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -67,8 +68,9 @@ mod.h <- restriction_matrix2model(sug, L.h); mod.h
 mod.s <- restriction_matrix2model(sug, L.s); mod.s
 
 ## Sanity check: The models have the same fitted values and log likelihood
-plot(fitted(mod.h), fitted(sug.h))
-plot(fitted(mod.s), fitted(sug.s))
+
+max(abs(fitted(mod.h) - fitted(sug.h)))
+max(abs(fitted(mod.s) - fitted(sug.s)))
 logLik(mod.h)
 logLik(sug.h)
 logLik(mod.s)

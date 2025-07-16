@@ -18,7 +18,6 @@
 #' @param fit0 The smaller (null) model, nested in `fit1`.
 #' @param nsim Number of simulations (for `pb_refdist`) or maximum number of simulations (`pb_refdist_sequential`).
 #' @param h Number of extreme hits to target (for `pb_refdist_sequential`).
-#' @param nsim_max Maximum number of simulations allowed (for `pb_refdist_sequential`).
 #' @param engine Computation engine: `"serial"`, `"parallel"`, or `"future"`.
 #' @param nworkers Number of workers for parallel/future backend.
 #' @param batch_size Number of simulations per batch
@@ -31,8 +30,27 @@
 #' The sequential version is useful when one wants to control Monte Carlo error by targeting
 #' a fixed number of extreme values exceeding the observed test statistic.
 #'
+#' @note
+#' **Best Practice:** Always fit your models with the `data=` argument.
+#' This ensures all covariates used in the model formula are stored with the model object,
+#' enabling reliable simulation and refitting for bootstrap analysis,
+#' including on parallel workers. Without `data=`, refitting may fail in parallel contexts
+#' and reproducibility is compromised.
+#' 
 #' The returned object can be passed to `summary()`, `plot()`, and `as.data.frame()`.
+#' @note
+#' **Best Practice:** Always fit your models with the `data=` argument.
+#' This ensures all covariates used in the model formula are stored with the model object,
+#' enabling reliable simulation and refitting for bootstrap analysis,
+#' including on parallel workers. Without `data=`, refitting may fail in parallel contexts
+#' and reproducibility is compromised.
 #'
+#' @note
+#' The function automatically ensures that the models have their required data embedded.
+#' This guarantees that parametric bootstrap simulations can be run in parallel workers
+#' without errors about missing variables, even if the original dataset was modified
+#' or removed from the global environment after fitting.
+#' 
 #' @examples
 #' if (requireNamespace("lme4") && requireNamespace("nlme")) {
 #'   data(sleepstudy, package = "lme4")
@@ -74,180 +92,479 @@
 #'
 #'   # Sequential example
 #'   set.seed(42)
-#'   res_seq <- pb_refdist_sequential(lmer_fit1, lmer_fit0, h = 20, nsim_max = 500)
+#'   res_seq <- pb_refdist_sequential(lmer_fit1, lmer_fit0, h = 20, nsim = 100)
 #'   summary(res_seq)
 #'   plot(res_seq, show.chisq=TRUE)
 #' }
 #'
-#' 
 #' @export
 pb_refdist <- function(
-  fit1,
-  fit0,
-  nsim = 1000,
-  engine = c("serial", "parallel", "future"),
-  nworkers = 2,
-  verbose = FALSE
-  ) {
+                       fit1,
+                       fit0,
+                       nsim = 1000,
+                       engine = c("serial", "parallel", "future"),
+                       nworkers = 2,
+                       verbose = FALSE
+                       ) {
     t0 <- proc.time()
+    engine <- match.arg(engine)
+    
+    
+    check_model_has_data(fit1)
+    check_model_has_data(fit0)
+    
+    fit1 <- fix_model_data(fit1)
+    fit0 <- fix_model_data(fit0)
+    
+    data <- .get_model_data(fit1)
 
-  engine <- match.arg(engine)
-  
-  # Always compute observed statistic
-  if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
-  LRT <- getLRT(fit1, fit0)
-  tobs <- LRT[1]
-  
-  if (verbose) {
-    cat(sprintf("Simulating %d replicates under null (engine = %s)\n", nsim, engine))
-  }
-  
-  simdata <- simulate(fit0, nsim = nsim)
-  
-  worker_fun <- function(x) {
-    ll1 <- logLik(refit(fit1, newresp = x))
-    ll0 <- logLik(refit(fit0, newresp = x))
-    as.numeric(ll1 - ll0)
-  }
-  
-  if (engine == "serial") {
-    ref <- sapply(simdata, worker_fun)
-  } else if (engine == "parallel") {
-    cl <- parallel::makeCluster(nworkers)
-    on.exit(parallel::stopCluster(cl))
-    parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
-    ref <- unlist(parallel::parLapply(cl, simdata, worker_fun))
-  } else if (engine == "future") {
-    requireNamespace("furrr")
-    requireNamespace("future")
-    future::plan(future::multisession, workers = nworkers)
-    ref <- unlist(furrr::future_map(
-      simdata,
-      worker_fun,
-      .options = furrr::furrr_options(seed = TRUE)
-    ))
-  } else {
-    stop("Invalid engine")
-  }
-
-elapsed <- unname((proc.time() - t0))[3]    
-  ans <- list(
-      ref = unname(ref),
-      LRT = LRT,
-      nsim = nsim,
-      ctime=elapsed
-  )
-  class(ans) <- "PBrefdist"
-  return(ans)
+    if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+    LRT <- getLRT(fit1, fit0)
+    
+    if (verbose) {
+        cat(sprintf("Simulating %d replicates under null (engine = %s)\n", nsim, engine))
+    }
+    
+    simdata <- simulate(fit0, nsim = nsim)
+    
+    worker_fun <- function(x) {
+        ll1 <- logLik(refit(fit1, newresp = x))
+        ll0 <- logLik(refit(fit0, newresp = x))
+        2 * as.numeric(ll1 - ll0)
+    }
+    
+    
+    if (engine == "serial") {
+        ref <- sapply(simdata, worker_fun)
+        
+    } else if (engine == "parallel") {
+        cl <- parallel::makeCluster(nworkers)
+        on.exit(parallel::stopCluster(cl))
+        parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+        ref <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+        
+    } else if (engine == "future") {
+        
+        requireNamespace("furrr")
+        requireNamespace("future")
+        
+        old_plan <- future::plan()
+        ## on.exit(future::plan(old_plan), add = TRUE)      
+        
+        on.exit({
+            future::plan(future::sequential)
+        }, add = TRUE)
+        
+        
+        
+        future::plan(future::multisession, workers = nworkers)
+        
+        ref <- unlist(
+            furrr::future_map(
+                       simdata,
+                       worker_fun,
+                       .options = furrr::furrr_options(
+                                             seed = TRUE,
+                                             packages = c("pbkrtest", "nlme", "lme4")
+                                         )
+                   )
+        )
+    } else {
+        stop("Invalid engine")
+    }
+    
+    elapsed <- unname((proc.time() - t0))[3]    
+    ans <- list(
+        ref = unname(ref),
+        LRT = LRT,
+        nsim = nsim,
+        ctime = elapsed
+    )
+    class(ans) <- "PBrefdist"
+    return(ans)
 }
-
 
 
 #' @rdname pb_refdist
 #' @export
 pb_refdist_sequential <- function(
-  fit1,
-  fit0,
-  h = 20,
-  nsim_max = 1000,
-  batch_size = 50,
-  engine = c("serial", "parallel", "future"),
-  nworkers = 2,
-  verbose = FALSE
-  ) {
+                                  fit1,
+                                  fit0,
+                                  h = 20,
+                                  nsim = 1000,
+                                  batch_size = 50,
+                                  engine = c("serial", "parallel", "future"),
+                                  nworkers = 2,
+                                  verbose = FALSE
+                                  ) {
     t0 <- proc.time()
-
-  engine <- match.arg(engine)
-  
-  # Always compute observed statistic
-  if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
-  LRT <- getLRT(fit1, fit0)
-  tobs <- LRT[1]
-  
-  
-  if (is.infinite(h)) {
-    if (verbose) cat("h = Inf detected. Falling back to fixed-nsim sampling.\n")
-    return(pb_refdist(
-      fit1 = fit1,
-      fit0 = fit0,
-      nsim = nsim_max,
-      engine = engine,
-      nworkers = nworkers,
-      verbose = verbose
-    ))
-  }
-  
-  total_sims <- 0
-  hits <- 0
-  ref <- numeric(0)
-  
-  if (verbose) {
-    cat(sprintf("Starting sequential bootstrap: target %d hits or max %d simulations\n", h, nsim_max))
-  }
-  
-  while (hits < h && total_sims < nsim_max) {
-    n_batch <- min(batch_size, nsim_max - total_sims)
+    engine <- match.arg(engine)
+    check_model_has_data(fit1)
+    check_model_has_data(fit0)
     
-    if (verbose) cat(sprintf("Simulating batch of %d...\n", n_batch))
+    fit1 <- fix_model_data(fit1)
+    fit0 <- fix_model_data(fit0)
+    data <- .get_model_data(fit1)
     
-    simdata <- simulate(fit0, nsim = n_batch)
+    if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+    LRT <- getLRT(fit1, fit0)
+    tobs <- LRT[1]
     
-    worker_fun <- function(x) {
-      ll1 <- logLik(refit(fit1, newresp = x))
-      ll0 <- logLik(refit(fit0, newresp = x))
-      as.numeric(ll1 - ll0)
+    if (is.infinite(h)) {
+        if (verbose) cat("h = Inf detected. Falling back to fixed-nsim sampling.\n")
+        return(pb_refdist(
+            fit1 = fit1,
+            fit0 = fit0,
+            nsim = nsim,
+            engine = engine,
+            nworkers = nworkers,
+            verbose = verbose
+        ))
     }
     
-    if (engine == "serial") {
-      res <- sapply(simdata, worker_fun)
-    } else if (engine == "parallel") {
-      cl <- parallel::makeCluster(nworkers)
-      on.exit(parallel::stopCluster(cl), add = TRUE)
-      parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
-      res <- unlist(parallel::parLapply(cl, simdata, worker_fun))
-    } else if (engine == "future") {
-      requireNamespace("furrr")
-      requireNamespace("future")
-      future::plan(future::multisession, workers = nworkers)
-      res <- unlist(furrr::future_map(
-        simdata,
-        worker_fun,
-        .options = furrr::furrr_options(seed = TRUE)
-      ))
-    } else {
-      stop("Invalid engine")
-    }
-    
-    ref <- c(ref, unname(res))
-    batch_hits <- sum(res >= tobs)
-    hits <- hits + batch_hits
-    total_sims <- total_sims + n_batch
+    total_sims <- 0
+    hits <- 0
+    ref <- numeric(0)
     
     if (verbose) {
-      cat(sprintf("Batch done. Hits in batch: %d | Total hits: %d | Total sims: %d\n", 
-                  batch_hits, hits, total_sims))
+        cat(sprintf("Starting sequential bootstrap: target %d hits or max %d simulations\n", h, nsim))
     }
+    
+    while (hits < h && total_sims < nsim) {
+        n_batch <- min(batch_size, nsim - total_sims)
+        
+        if (verbose) cat(sprintf("Simulating batch of %d...\n", n_batch))
+        
+        simdata <- simulate(fit0, nsim = n_batch)
+        
+        worker_fun <- function(x) {
+            ll1 <- logLik(refit(fit1, newresp = x))
+            ll0 <- logLik(refit(fit0, newresp = x))
+            as.numeric(ll1 - ll0)
+        }
+        
+        if (engine == "serial") {
+            res <- sapply(simdata, worker_fun)
+            
+        } else if (engine == "parallel") {
+            cl <- parallel::makeCluster(nworkers)
+            on.exit(parallel::stopCluster(cl), add = TRUE)
+            parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+            res <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+            
+        } else if (engine == "future") {
+            requireNamespace("furrr")
+            requireNamespace("future")
+            old_plan <- future::plan()
+            ## on.exit(future::plan(old_plan), add = TRUE)
+            
+            on.exit({
+                future::plan(future::sequential)
+            }, add = TRUE)
+            
+            
+            future::plan(future::multisession, workers = nworkers)
+            
+            res <- unlist(
+                furrr::future_map(
+                           simdata,
+                           worker_fun,
+                           .options = furrr::furrr_options(
+                                                 seed = TRUE,
+                                                 packages = c("pbkrtest", "nlme", "lme4")
+                                             )
+                       )
+            )
+        } else {
+            stop("Invalid engine")
+        }
+        
+        ref <- c(ref, unname(res))
+        batch_hits <- sum(res >= tobs)
+        hits <- hits + batch_hits
+        total_sims <- total_sims + n_batch
+        
+        if (verbose) {
+            cat(sprintf("Batch done. Hits in batch: %d | Total hits: %d | Total sims: %d\n", 
+                        batch_hits, hits, total_sims))
+        }
+    }
+    
+                                        # Bias-corrected estimate
+    p_hat <- (hits + 1) / (total_sims + 1)
+    se_p  <- sqrt(p_hat * (1 - p_hat) / (total_sims + 1))
+    
+    elapsed <- unname((proc.time() - t0))[3]
+    result <- list(
+        ref = ref,
+        LRT = LRT,
+        hits = hits,
+        total_sims = total_sims,
+        p.value = p_hat,
+        se = se_p,
+        h_target = h,
+        nsim = nsim,
+        ctime = elapsed
+    )
+    class(result) <- "PBrefdist"
+    return(result)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## #' @keywords internal
+## fix_model_data <- function(model) {
+##   if (inherits(model, "lm")) {
+##     # lm har altid data internt, ingen grund til noget
+##     return(model)
+##   }
+  
+##   d <- tryCatch(getData(model), error = function(e) NULL)
+##   if (is.null(d) || !is.data.frame(d)) {
+##     stop(" Could not extract data from model. Make sure you used data= with all variables when fitting.")
+##   }
+  
+##   # Refit model with its data, so formula can evaluate anywhere
+##   update(model, data = d)
+## }
+
+
+
+
+## #' @keywords internal
+## fix_model_data <- function(model) {
+##   if (inherits(model, "lm")) {
+##     return(model)
+##   }
+  
+##   d <- tryCatch(getData(model), error = function(e) NULL)
+##   if (is.null(d) || !is.data.frame(d)) {
+##     stop(" Could not extract data from model. Make sure you used data= with all variables when fitting.")
+##   }
+  
+##   # ️ Embed data in an environment to make it self-contained
+##   env_data <- list2env(list(d = d), parent = emptyenv())
+##   update(model, data = env_data)
+## }
+
+
+#' @keywords internal
+fix_model_data <- function(model) {
+  if (inherits(model, "lm")) return(model)
+  
+  d <- tryCatch(getData(model), error = function(e) NULL)
+  if (is.null(d) || !is.data.frame(d)) {
+    stop(" Could not extract data from model. Make sure you used data= with all variables when fitting.")
   }
   
-  # Bias-corrected estimate
-  p_hat <- (hits + 1) / (total_sims + 1)
-  se_p  <- sqrt(p_hat * (1 - p_hat) / (total_sims + 1))
-
-    elapsed <- unname((proc.time() - t0))[3]
-  result <- list(
-      ref = ref,
-      LRT = LRT,
-    hits = hits,
-    total_sims = total_sims,
-    p.value = p_hat,
-    se = se_p,
-    h_target = h,
-    nsim_max = nsim_max,
-    ctime=elapsed
-  )
-  class(result) <- "PBrefdist"
-  return(result)
+  # ️ use do.call to force embedding the data.frame
+  do.call(update, list(model, data = d))
 }
+
+
+
+.get_model_data <- function(fit) {
+  if (inherits(fit, "gls") || inherits(fit, "lme")) {
+    return(nlme::getData(fit))
+  }
+  if ("model" %in% names(fit)) {
+    return(fit$model)
+  }
+  mf <- tryCatch(model.frame(fit), error=function(e) NULL)
+  if (!is.null(mf)) return(mf)
+  
+  stop("Cannot extract data from model object; consider refitting with data= argument.")
+}
+
+
+
+
+## pb_refdist <- function(
+##   fit1,
+##   fit0,
+##   nsim = 1000,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+##   ) {
+##     t0 <- proc.time()
+
+##   engine <- match.arg(engine)
+  
+##   # Always compute observed statistic
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+##   if (verbose) {
+##     cat(sprintf("Simulating %d replicates under null (engine = %s)\n", nsim, engine))
+##   }
+  
+##   simdata <- simulate(fit0, nsim = nsim)
+  
+##   worker_fun <- function(x) {
+##     ll1 <- logLik(refit(fit1, newresp = x))
+##     ll0 <- logLik(refit(fit0, newresp = x))
+##     as.numeric(ll1 - ll0)
+##   }
+  
+##   if (engine == "serial") {
+##     ref <- sapply(simdata, worker_fun)
+##   } else if (engine == "parallel") {
+##     cl <- parallel::makeCluster(nworkers)
+##     on.exit(parallel::stopCluster(cl))
+##     parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##     ref <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+##   } else if (engine == "future") {
+##     requireNamespace("furrr")
+##     requireNamespace("future")
+##     future::plan(future::multisession, workers = nworkers)
+##     ref <- unlist(furrr::future_map(
+##       simdata,
+##       worker_fun,
+##       .options = furrr::furrr_options(seed = TRUE)
+##     ))
+##   } else {
+##     stop("Invalid engine")
+##   }
+
+## elapsed <- unname((proc.time() - t0))[3]    
+##   ans <- list(
+##       ref = unname(ref),
+##       LRT = LRT,
+##       nsim = nsim,
+##       ctime=elapsed
+##   )
+##   class(ans) <- "PBrefdist"
+##   return(ans)
+## }
+
+
+
+## #' @rdname pb_refdist
+## #' @export
+## pb_refdist_sequential <- function(
+##   fit1,
+##   fit0,
+##   h = 20,
+##   nsim_max = 1000,
+##   batch_size = 50,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+##   ) {
+##     t0 <- proc.time()
+
+##   engine <- match.arg(engine)
+  
+##   # Always compute observed statistic
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+  
+##   if (is.infinite(h)) {
+##     if (verbose) cat("h = Inf detected. Falling back to fixed-nsim sampling.\n")
+##     return(pb_refdist(
+##       fit1 = fit1,
+##       fit0 = fit0,
+##       nsim = nsim_max,
+##       engine = engine,
+##       nworkers = nworkers,
+##       verbose = verbose
+##     ))
+##   }
+  
+##   total_sims <- 0
+##   hits <- 0
+##   ref <- numeric(0)
+  
+##   if (verbose) {
+##     cat(sprintf("Starting sequential bootstrap: target %d hits or max %d simulations\n", h, nsim_max))
+##   }
+  
+##   while (hits < h && total_sims < nsim_max) {
+##     n_batch <- min(batch_size, nsim_max - total_sims)
+    
+##     if (verbose) cat(sprintf("Simulating batch of %d...\n", n_batch))
+    
+##     simdata <- simulate(fit0, nsim = n_batch)
+    
+##     worker_fun <- function(x) {
+##       ll1 <- logLik(refit(fit1, newresp = x))
+##       ll0 <- logLik(refit(fit0, newresp = x))
+##       as.numeric(ll1 - ll0)
+##     }
+    
+##     if (engine == "serial") {
+##       res <- sapply(simdata, worker_fun)
+##     } else if (engine == "parallel") {
+##       cl <- parallel::makeCluster(nworkers)
+##       on.exit(parallel::stopCluster(cl), add = TRUE)
+##       parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##       res <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+##     } else if (engine == "future") {
+##       requireNamespace("furrr")
+##       requireNamespace("future")
+##       future::plan(future::multisession, workers = nworkers)
+##       res <- unlist(furrr::future_map(
+##         simdata,
+##         worker_fun,
+##         .options = furrr::furrr_options(seed = TRUE)
+##       ))
+##     } else {
+##       stop("Invalid engine")
+##     }
+    
+##     ref <- c(ref, unname(res))
+##     batch_hits <- sum(res >= tobs)
+##     hits <- hits + batch_hits
+##     total_sims <- total_sims + n_batch
+    
+##     if (verbose) {
+##       cat(sprintf("Batch done. Hits in batch: %d | Total hits: %d | Total sims: %d\n", 
+##                   batch_hits, hits, total_sims))
+##     }
+##   }
+  
+##   # Bias-corrected estimate
+##   p_hat <- (hits + 1) / (total_sims + 1)
+##   se_p  <- sqrt(p_hat * (1 - p_hat) / (total_sims + 1))
+
+##     elapsed <- unname((proc.time() - t0))[3]
+##   result <- list(
+##       ref = ref,
+##       LRT = LRT,
+##     hits = hits,
+##     total_sims = total_sims,
+##     p.value = p_hat,
+##     se = se_p,
+##     h_target = h,
+##     nsim_max = nsim_max,
+##     ctime=elapsed
+##   )
+##   class(result) <- "PBrefdist"
+##   return(result)
+## }
+
+
+
+
+
 
 #' @export
 print.PBrefdist <- function(x, ...) {
@@ -470,4 +787,602 @@ plot.PBrefdist <- function(x, ..., breaks = 30, main = NULL, col = "lightgray", 
 
 
 utils::globalVariables("uu_")
+
+
+
+
+## #' @title Extract data from model
+## #' @description
+## #' Safely extracts the data used to fit a model. Works with lm, lme4, nlme (gls/lme).
+## #' Stops with clear error if model was not fitted with data=.
+## #' @param fit A model object.
+## #' @return A data.frame
+## #' @keywords internal
+## get_model_data <- function(fit) {
+##   d <- NULL
+  
+##   if (inherits(fit, c("gls", "lme"))) {
+##     d <- tryCatch(nlme::getData(fit), error = function(e) NULL)
+##   } else if (inherits(fit, c("lmerMod", "glmerMod"))) {
+##     d <- tryCatch(lme4::getData(fit), error = function(e) NULL)
+##   } else if (inherits(fit, "lm")) {
+##     d <- tryCatch(model.frame(fit), error = function(e) NULL)
+##   } else {
+##     stop(" Unsupported model type in get_model_data()")
+##   }
+  
+##   if (is.null(d) || !is.data.frame(d) || nrow(d) == 0) {
+##     stop(
+##       " Could not extract data from model object.\n",
+##       " Please ensure your model was fitted with data= including all formula variables."
+##     )
+##   }
+  
+##   d
+## }
+
+
+
+
+
+
+
+
+
+
+## #' @export
+## pb_refdist <- function(
+##   fit1,
+##   fit0,
+##   nsim = 1000,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+## ) {
+##   t0 <- proc.time()
+##   engine <- match.arg(engine)
+  
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+##   if (verbose) {
+##     cat(sprintf("Simulating %d replicates under null (engine = %s)\n", nsim, engine))
+##   }
+  
+##   simdata <- simulate(fit0, nsim = nsim)
+  
+##   worker_fun <- function(x) {
+##     ll1 <- logLik(refit(fit1, newresp = x))
+##     ll0 <- logLik(refit(fit0, newresp = x))
+##     as.numeric(ll1 - ll0)
+##   }
+  
+##   if (engine == "serial") {
+##     ref <- sapply(simdata, worker_fun)
+    
+##   } else if (engine == "parallel") {
+##     cl <- parallel::makeCluster(nworkers)
+##     on.exit(parallel::stopCluster(cl))
+##     parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##     ref <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+    
+##   } else if (engine == "future") {
+##     requireNamespace("furrr")
+##     requireNamespace("future")
+##     future::plan(future::multisession, workers = nworkers)
+    
+##     ref <- unlist(
+##       furrr::future_map(
+##         simdata,
+##         worker_fun,
+##         .options = furrr::furrr_options(seed = TRUE),
+##         .packages = c("pbkrtest", "nlme", "lme4")
+##       )
+##     )
+##   } else {
+##     stop("Invalid engine")
+##   }
+
+##   elapsed <- unname((proc.time() - t0))[3]    
+##   ans <- list(
+##     ref = unname(ref),
+##     LRT = LRT,
+##     nsim = nsim,
+##     ctime = elapsed
+##   )
+##   class(ans) <- "PBrefdist"
+##   return(ans)
+## }
+
+## #' @export
+## pb_refdist_sequential <- function(
+##   fit1,
+##   fit0,
+##   h = 20,
+##   nsim = 1000,
+##   batch_size = 50,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+## ) {
+##   t0 <- proc.time()
+##   engine <- match.arg(engine)
+  
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+##   if (is.infinite(h)) {
+##     if (verbose) cat("h = Inf detected. Falling back to fixed-nsim sampling.\n")
+##     return(pb_refdist(
+##       fit1 = fit1,
+##       fit0 = fit0,
+##       nsim = nsim,
+##       engine = engine,
+##       nworkers = nworkers,
+##       verbose = verbose
+##     ))
+##   }
+  
+##   total_sims <- 0
+##   hits <- 0
+##   ref <- numeric(0)
+  
+##   if (verbose) {
+##     cat(sprintf("Starting sequential bootstrap: target %d hits or max %d simulations\n", h, nsim))
+##   }
+  
+##   while (hits < h && total_sims < nsim) {
+##     n_batch <- min(batch_size, nsim - total_sims)
+    
+##     if (verbose) cat(sprintf("Simulating batch of %d...\n", n_batch))
+    
+##     simdata <- simulate(fit0, nsim = n_batch)
+    
+##     worker_fun <- function(x) {
+##       ll1 <- logLik(refit(fit1, newresp = x))
+##       ll0 <- logLik(refit(fit0, newresp = x))
+##       as.numeric(ll1 - ll0)
+##     }
+    
+##     if (engine == "serial") {
+##       res <- sapply(simdata, worker_fun)
+      
+##     } else if (engine == "parallel") {
+##       cl <- parallel::makeCluster(nworkers)
+##       on.exit(parallel::stopCluster(cl), add = TRUE)
+##       parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##       res <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+      
+##     } else if (engine == "future") {
+##       requireNamespace("furrr")
+##       requireNamespace("future")
+##       future::plan(future::multisession, workers = nworkers)
+      
+##       res <- unlist(
+##         furrr::future_map(
+##           simdata,
+##           worker_fun,
+##           .options = furrr::furrr_options(seed = TRUE),
+##           .packages = c("pbkrtest", "nlme", "lme4")
+##         )
+##       )
+##     } else {
+##       stop("Invalid engine")
+##     }
+    
+##     ref <- c(ref, unname(res))
+##     batch_hits <- sum(res >= tobs)
+##     hits <- hits + batch_hits
+##     total_sims <- total_sims + n_batch
+    
+##     if (verbose) {
+##       cat(sprintf("Batch done. Hits in batch: %d | Total hits: %d | Total sims: %d\n", 
+##                   batch_hits, hits, total_sims))
+##     }
+##   }
+  
+##   # Bias-corrected estimate
+##   p_hat <- (hits + 1) / (total_sims + 1)
+##   se_p  <- sqrt(p_hat * (1 - p_hat) / (total_sims + 1))
+  
+##   elapsed <- unname((proc.time() - t0))[3]
+##   result <- list(
+##     ref = ref,
+##     LRT = LRT,
+##     hits = hits,
+##     total_sims = total_sims,
+##     p.value = p_hat,
+##     se = se_p,
+##     h_target = h,
+##     nsim_max = nsim,
+##     ctime = elapsed
+##   )
+##   class(result) <- "PBrefdist"
+##   return(result)
+## }
+
+
+## #' @export
+## pb_refdist <- function(
+##   fit1,
+##   fit0,
+##   nsim = 1000,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+## ) {
+##   t0 <- proc.time()
+##   engine <- match.arg(engine)
+  
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+##   if (verbose) {
+##     cat(sprintf("Simulating %d replicates under null (engine = %s)\n", nsim, engine))
+##   }
+  
+##   simdata <- simulate(fit0, nsim = nsim)
+  
+##   worker_fun <- function(x) {
+##     ll1 <- logLik(refit(fit1, newresp = x))
+##     ll0 <- logLik(refit(fit0, newresp = x))
+##     as.numeric(ll1 - ll0)
+##   }
+  
+##   if (engine == "serial") {
+##     ref <- sapply(simdata, worker_fun)
+    
+##   } else if (engine == "parallel") {
+##     cl <- parallel::makeCluster(nworkers)
+##     on.exit(parallel::stopCluster(cl))
+##     parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##     ref <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+    
+##   } else if (engine == "future") {
+##     requireNamespace("furrr")
+##     requireNamespace("future")
+##     future::plan(future::multisession, workers = nworkers)
+    
+##     ## Ensure required packages are loaded on all workers
+##     if (!is.null(future::getDefaultCluster())) {
+##       parallel::clusterCall(future::getDefaultCluster(), function() {
+##         library(pbkrtest)
+##         library(nlme)
+##         library(lme4)
+##       })
+##     }
+    
+##     ref <- unlist(
+##       furrr::future_map(
+##         simdata,
+##         worker_fun,
+##         .options = furrr::furrr_options(seed = TRUE)
+##       )
+##     )
+##   } else {
+##     stop("Invalid engine")
+##   }
+
+##   elapsed <- unname((proc.time() - t0))[3]    
+##   ans <- list(
+##     ref = unname(ref),
+##     LRT = LRT,
+##     nsim = nsim,
+##     ctime = elapsed
+##   )
+##   class(ans) <- "PBrefdist"
+##   return(ans)
+## }
+
+## #' @export
+## pb_refdist_sequential <- function(
+##   fit1,
+##   fit0,
+##   h = 20,
+##   nsim = 1000,
+##   batch_size = 50,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+## ) {
+##   t0 <- proc.time()
+##   engine <- match.arg(engine)
+  
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+##   if (is.infinite(h)) {
+##     if (verbose) cat("h = Inf detected. Falling back to fixed-nsim sampling.\n")
+##     return(pb_refdist(
+##       fit1 = fit1,
+##       fit0 = fit0,
+##       nsim = nsim,
+##       engine = engine,
+##       nworkers = nworkers,
+##       verbose = verbose
+##     ))
+##   }
+  
+##   total_sims <- 0
+##   hits <- 0
+##   ref <- numeric(0)
+  
+##   if (verbose) {
+##     cat(sprintf("Starting sequential bootstrap: target %d hits or max %d simulations\n", h, nsim))
+##   }
+  
+##   while (hits < h && total_sims < nsim) {
+##     n_batch <- min(batch_size, nsim - total_sims)
+    
+##     if (verbose) cat(sprintf("Simulating batch of %d...\n", n_batch))
+    
+##     simdata <- simulate(fit0, nsim = n_batch)
+    
+##     worker_fun <- function(x) {
+##       ll1 <- logLik(refit(fit1, newresp = x))
+##       ll0 <- logLik(refit(fit0, newresp = x))
+##       as.numeric(ll1 - ll0)
+##     }
+    
+##     if (engine == "serial") {
+##       res <- sapply(simdata, worker_fun)
+      
+##     } else if (engine == "parallel") {
+##       cl <- parallel::makeCluster(nworkers)
+##       on.exit(parallel::stopCluster(cl), add = TRUE)
+##       parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##       res <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+      
+##     } else if (engine == "future") {
+##       requireNamespace("furrr")
+##       requireNamespace("future")
+##       future::plan(future::multisession, workers = nworkers)
+      
+##       ## Ensure required packages are loaded on all workers
+##       if (!is.null(future::getDefaultCluster())) {
+##         parallel::clusterCall(future::getDefaultCluster(), function() {
+##           library(pbkrtest)
+##           library(nlme)
+##           library(lme4)
+##         })
+##       }
+      
+##       res <- unlist(
+##         furrr::future_map(
+##           simdata,
+##           worker_fun,
+##           .options = furrr::furrr_options(seed = TRUE)
+##         )
+##       )
+##     } else {
+##       stop("Invalid engine")
+##     }
+    
+##     ref <- c(ref, unname(res))
+##     batch_hits <- sum(res >= tobs)
+##     hits <- hits + batch_hits
+##     total_sims <- total_sims + n_batch
+    
+##     if (verbose) {
+##       cat(sprintf("Batch done. Hits in batch: %d | Total hits: %d | Total sims: %d\n", 
+##                   batch_hits, hits, total_sims))
+##     }
+##   }
+  
+##   # Bias-corrected estimate
+##   p_hat <- (hits + 1) / (total_sims + 1)
+##   se_p  <- sqrt(p_hat * (1 - p_hat) / (total_sims + 1))
+  
+##   elapsed <- unname((proc.time() - t0))[3]
+##   result <- list(
+##     ref = ref,
+##     LRT = LRT,
+##     hits = hits,
+##     total_sims = total_sims,
+##     p.value = p_hat,
+##     se = se_p,
+##     h_target = h,
+##     nsim_max = nsim,
+##     ctime = elapsed
+##   )
+##   class(result) <- "PBrefdist"
+##   return(result)
+## }
+
+
+## #' @export
+## pb_refdist <- function(
+##   fit1,
+##   fit0,
+##   nsim = 1000,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+## ) {
+##   t0 <- proc.time()
+##   engine <- match.arg(engine)
+  
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+  
+##   if (verbose) {
+##     cat(sprintf("Simulating %d replicates under null (engine = %s)\n", nsim, engine))
+##   }
+  
+##   simdata <- simulate(fit0, nsim = nsim)
+  
+##   worker_fun <- function(x) {
+##     ll1 <- logLik(refit(fit1, newresp = x))
+##     ll0 <- logLik(refit(fit0, newresp = x))
+##     as.numeric(ll1 - ll0)
+##   }
+  
+##   if (engine == "serial") {
+##     ref <- sapply(simdata, worker_fun)
+    
+##   } else if (engine == "parallel") {
+##     cl <- parallel::makeCluster(nworkers)
+##     on.exit(parallel::stopCluster(cl))
+##     parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##     ref <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+    
+##   } else if (engine == "future") {
+##     requireNamespace("furrr")
+##     requireNamespace("future")
+##     future::plan(future::multisession, workers = nworkers)
+    
+##     ## Ensure required packages are loaded on all workers
+##     clust <- try(parallel::getDefaultCluster(), silent = TRUE)
+##     if (!inherits(clust, "try-error") && !is.null(clust)) {
+##       parallel::clusterCall(clust, function() {
+##         library(pbkrtest)
+##         library(nlme)
+##         library(lme4)
+##       })
+##     }
+    
+##     ref <- unlist(
+##       furrr::future_map(
+##         simdata,
+##         worker_fun,
+##         .options = furrr::furrr_options(seed = TRUE)
+##       )
+##     )
+##   } else {
+##     stop("Invalid engine")
+##   }
+
+##   elapsed <- unname((proc.time() - t0))[3]    
+##   ans <- list(
+##     ref = unname(ref),
+##     LRT = LRT,
+##     nsim = nsim,
+##     ctime = elapsed
+##   )
+##   class(ans) <- "PBrefdist"
+##   return(ans)
+## }
+
+
+## #' @export
+## pb_refdist_sequential <- function(
+##   fit1,
+##   fit0,
+##   h = 20,
+##   nsim = 1000,
+##   batch_size = 50,
+##   engine = c("serial", "parallel", "future"),
+##   nworkers = 2,
+##   verbose = FALSE
+## ) {
+##   t0 <- proc.time()
+##   engine <- match.arg(engine)
+  
+##   if (verbose) cat("Computing observed likelihood ratio statistic via getLRT()...\n")
+##   LRT <- getLRT(fit1, fit0)
+##   tobs <- LRT[1]
+  
+##   if (is.infinite(h)) {
+##     if (verbose) cat("h = Inf detected. Falling back to fixed-nsim sampling.\n")
+##     return(pb_refdist(
+##       fit1 = fit1,
+##       fit0 = fit0,
+##       nsim = nsim,
+##       engine = engine,
+##       nworkers = nworkers,
+##       verbose = verbose
+##     ))
+##   }
+  
+##   total_sims <- 0
+##   hits <- 0
+##   ref <- numeric(0)
+  
+##   if (verbose) {
+##     cat(sprintf("Starting sequential bootstrap: target %d hits or max %d simulations\n", h, nsim))
+##   }
+  
+##   while (hits < h && total_sims < nsim) {
+##     n_batch <- min(batch_size, nsim - total_sims)
+    
+##     if (verbose) cat(sprintf("Simulating batch of %d...\n", n_batch))
+    
+##     simdata <- simulate(fit0, nsim = n_batch)
+    
+##     worker_fun <- function(x) {
+##       ll1 <- logLik(refit(fit1, newresp = x))
+##       ll0 <- logLik(refit(fit0, newresp = x))
+##       as.numeric(ll1 - ll0)
+##     }
+    
+##     if (engine == "serial") {
+##       res <- sapply(simdata, worker_fun)
+      
+##     } else if (engine == "parallel") {
+##       cl <- parallel::makeCluster(nworkers)
+##       on.exit(parallel::stopCluster(cl), add = TRUE)
+##       parallel::clusterExport(cl, varlist = c("worker_fun", "fit1", "fit0", "refit"), envir = environment())
+##       res <- unlist(parallel::parLapply(cl, simdata, worker_fun))
+      
+##     } else if (engine == "future") {
+##       requireNamespace("furrr")
+##       requireNamespace("future")
+##       future::plan(future::multisession, workers = nworkers)
+      
+##       ## Ensure required packages are loaded on all workers
+##       clust <- try(parallel::getDefaultCluster(), silent = TRUE)
+##       if (!inherits(clust, "try-error") && !is.null(clust)) {
+##         parallel::clusterCall(clust, function() {
+##           library(pbkrtest)
+##           library(nlme)
+##           library(lme4)
+##         })
+##       }
+      
+##       res <- unlist(
+##         furrr::future_map(
+##           simdata,
+##           worker_fun,
+##           .options = furrr::furrr_options(seed = TRUE)
+##         )
+##       )
+##     } else {
+##       stop("Invalid engine")
+##     }
+    
+##     ref <- c(ref, unname(res))
+##     batch_hits <- sum(res >= tobs)
+##     hits <- hits + batch_hits
+##     total_sims <- total_sims + n_batch
+    
+##     if (verbose) {
+##       cat(sprintf("Batch done. Hits in batch: %d | Total hits: %d | Total sims: %d\n", 
+##                   batch_hits, hits, total_sims))
+##     }
+##   }
+  
+##   # Bias-corrected estimate
+##   p_hat <- (hits + 1) / (total_sims + 1)
+##   se_p  <- sqrt(p_hat * (1 - p_hat) / (total_sims + 1))
+  
+##   elapsed <- unname((proc.time() - t0))[3]
+##   result <- list(
+##     ref = ref,
+##     LRT = LRT,
+##     hits = hits,
+##     total_sims = total_sims,
+##     p.value = p_hat,
+##     se = se_p,
+##     h_target = h,
+##     nsim_max = nsim,
+##     ctime = elapsed
+##   )
+##   class(result) <- "PBrefdist"
+##   return(result)
+## }
+
 

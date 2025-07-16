@@ -152,7 +152,6 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     ## Specific for object class:
 
     ctrl <- lmerControl(
-
         optCtrl = list(maxfun = 1e5, tol = 0.01),
         check.conv.grad = "ignore",
         check.conv.singular = "ignore",
@@ -160,19 +159,27 @@ PBrefdist.merMod <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NU
     )
     
     
-    if (getME(smallModel, "is_REML")) {
-        smallModel <- eval(bquote(update(.(smallModel),
-                                         REML    = FALSE,
-                                         control = .(ctrl))))
+    ## if (getME(smallModel, "is_REML")) {
+    ##     smallModel <- eval(bquote(update(.(smallModel),
+    ##                                      REML    = FALSE,
+    ##                                      control = .(ctrl))))
+    ## }
+    
+    ## if (getME(largeModel, "is_REML")){
+    ##     largeModel <- eval(bquote(update(.(largeModel),
+    ##                                      REML    = FALSE,
+    ##                                      control = .(ctrl))))
+    ## }
 
+    ## FIXME To get afex to work...
+
+    if (getME(smallModel, "is_REML")) {
+        smallModel <- update(smallModel, REML    = FALSE)
     }
     
     if (getME(largeModel, "is_REML")){
-        largeModel <- eval(bquote(update(.(largeModel),
-                                         REML    = FALSE,
-                                         control = .(ctrl))))
-
-    } 
+        largeModel <- update(largeModel, REML    = FALSE)
+    }
     
     nr_data <- nrow(getData(largeModel))
     nr_fit  <- getME(largeModel, "n")
@@ -248,17 +255,23 @@ print.refdist <- function(x, n=6L, ...){
 }
 
 
+
+
+#' @noRd
 get_refdist <- function(lg){
     UseMethod("get_refdist")
 }
 
+#' @noRd
 get_refdist.merMod <- function(lg){
     .get_refdist_merMod
 }
 
+#' @noRd
 get_refdist.lm <- function(lg){
     .get_refdist_lm
 }
+
 
 .get_refdist_lm <- function(lg, sm, nsim=20, seed=NULL,
                             simdata=simulate(sm, nsim=nsim, seed=seed)){
@@ -304,10 +317,16 @@ get_refdist.lm <- function(lg){
         check.conv.hess = "ignore",
         check.conv.singular = "ignore"
     )
+    
+    ## unname(unlist(lapply(simdata, function(yyy) {
+    ##     sm2 <- suppressMessages(refit_safe(sm, yyy, ctrl))
+    ##     lg2 <- suppressMessages(refit_safe(lg, yyy, ctrl))
+    ##     2 * (logLik(lg2, REML = FALSE) - logLik(sm2, REML = FALSE))
+    ## })))    
 
     unname(unlist(lapply(simdata, function(yyy) {
-        sm2 <- suppressMessages(refit_safe(sm, yyy, ctrl))
-        lg2 <- suppressMessages(refit_safe(lg, yyy, ctrl))
+        sm2 <- suppressMessages(refit(sm, yyy))
+        lg2 <- suppressMessages(refit(lg, yyy))
         2 * (logLik(lg2, REML = FALSE) - logLik(sm2, REML = FALSE))
     })))    
 }
@@ -318,7 +337,7 @@ get_refdist.lm <- function(lg){
 
 
 
-get_cl <- function(cl){
+get_cl <- function(cl) {
 
     .cat <- function(b, ...) {if (b) cat(...)}
     dd <- 2
@@ -330,7 +349,7 @@ get_cl <- function(cl){
     
     if (!is.null(cl)){
         if (inherits(cl, "cluster") || (is.numeric(cl) && length(cl) == 1 && cl >= 1)){
-            .cat(dd>3, "valid 'cl' specified in call \n")
+            .cat(dd > 3, "valid 'cl' specified in call \n")
         } else
             stop("invalid 'cl' specified in call \n")
     } else {
@@ -358,43 +377,45 @@ get_cl <- function(cl){
     return(cl)    
 }
 
-do_sampling <- function(largeModel, smallModel, nsim, cl, details=0){
 
+do_sampling <- function(fit1, fit0, nsim, cl, details=0) {
+
+    ## cat("do_sampling...\n")
     t0  <- proc.time()
     .cat <- function(b, ...) {if (b) cat(...)}
-    dd <- details
 
-    get_fun <- get_refdist(largeModel)
-
+    refdist_fun <- get_refdist(fit1)
+    ## print(refdist_fun)
     cl <- get_cl(cl)
-        
+    
     if (is.numeric(cl)){
         if (!(length(cl) == 1 && cl >= 1))
             stop("Invalid numeric cl\n")
-
-        .cat(dd>3, "doing mclapply, cl = ", cl, "\n")
-
-        nsim.cl <- nsim %/% cl
-        ref <- unlist(mclapply(1:cl,
-                               function(i) {
-                                   get_fun(largeModel, smallModel, nsim=nsim.cl)},
-                               mc.cores=cl))
-
+        .cat(details > 3, "doing mclapply, cl = ", cl, "\n")
+        print("parallel computing")
+        nsim.per.cl <- nsim %/% cl
+        ## str(list(cl=cl, nsim=nsim))
+        ref <- mclapply(1:cl,
+                        function(i) {
+                            refdist_fun(fit1, fit0, nsim=nsim.per.cl)},
+                        mc.cores=cl)
+        ref <- unlist(ref)
+        
 
     } else
         if (inherits(cl, "cluster")){
-            .cat(dd>3, "doing clusterCall, nclusters = ", length(cl), "\n")
-            nsim.cl <- nsim %/% length(cl)
+            .cat(details > 3, "doing clusterCall, nclusters = ", length(cl), "\n")
+            nsim.per.cl <- nsim %/% length(cl)
             clusterSetRNGStream(cl)
-            ref <- unlist(clusterCall(cl, fun=get_fun,
-                                      largeModel, smallModel, nsim=nsim.cl))
+            ref <- clusterCall(cl, fun=refdist_fun,
+                               fit1, fit0, nsim=nsim.per.cl)
+            ref <- unlist(ref)
         }
     else stop("Invalid 'cl'\n")
-
+    
     attr(ref, "cl")  <- cl
     attr(ref, "ctime") <- (proc.time() - t0)[3]
     ref
-
 }
 
 

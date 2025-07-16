@@ -8,14 +8,14 @@
 
 
 #' @importFrom graphics curve hist
-#' @importFrom stats dchisq fitted model.frame predict
+#' @importFrom stats dchisq fitted model.frame predict ecdf median optimize qf qnorm
 #' @importFrom utils tail
 
 #' @importFrom MASS ginv
 
 #' @importFrom furrr future_map furrr_options
 #' @importFrom future plan multisession
-#' @importFrom utils requireNamespace
+## #' @importFrom utils requireNamespace
 
 
 #' @importFrom utils head

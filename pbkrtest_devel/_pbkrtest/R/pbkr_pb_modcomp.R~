@@ -1,0 +1,81 @@
+#' Parametric Bootstrap Model Comparison
+#'
+#' Compare two nested models using parametric bootstrap simulation of the likelihood ratio statistic.
+#' Supports models fitted via lm, lme4 (lmer/glmer), nlme (lme/gls), etc.
+#'
+#' The models should both be fitted by maximum likelihood (not REML). If REML was used,
+#' the function will automatically refit with REML = FALSE where possible.
+#'
+#' @param fit1 The larger (alternative) model.
+#' @param fit0 The smaller (null) model.
+#' @param nsim Number of simulations (for fixed-sample bootstrap).
+#' @param sequential Logical; if TRUE, use sequential bootstrap sampling.
+#' @param h Number of extreme hits to target (for sequential sampling).
+#' @param nsim_max Maximum total simulations allowed in sequential sampling.
+#' @param engine Parallelisation engine: "serial", "parallel", or "future".
+#' @param nworkers Number of workers for parallel/future engine.
+#' @param verbose Logical; if TRUE, print progress messages.
+#'
+#' @return An object of class \code{PBmodcomp}, with print(), summary(), and plot() methods.
+#'
+#' @examples
+#' if (requireNamespace("lme4")) {
+#'   data(sleepstudy, package = "lme4")
+#'   sleepstudy$Days2 <- sleepstudy$Days^2
+#'
+#'   lmer_fit1 <- lme4::lmer(Reaction ~ Days + Days2 + (1 | Subject), data = sleepstudy, REML=FALSE)
+#'   lmer_fit0 <- update(lmer_fit1, . ~ . - Days2)
+#'
+#'   # Fixed-n simulation
+#'   res_fixed <- pb_modcomp(lmer_fit1, lmer_fit0, nsim = 200)
+#'   summary(res_fixed)
+#'   plot(res_fixed, show.chisq=TRUE)
+#'
+#'   # Sequential simulation
+#'   res_seq <- pb_modcomp(lmer_fit1, lmer_fit0, sequential = TRUE, h = 20, nsim_max = 500)
+#'   summary(res_seq)
+#'   plot(res_seq, show.chisq=TRUE)
+#' }
+#'
+#' @export
+pb_modcomp <- function(fit1, fit0,
+                       nsim = 1000,
+                       sequential = FALSE,
+                       h = 20,
+                       nsim_max = 1000,
+                       engine = "serial",
+                       nworkers = 2,
+                       verbose = FALSE) {
+
+  # Force ML if needed
+  fit1 <- ensure_ML(fit1)
+  fit0 <- ensure_ML(fit0)
+
+  if (sequential) {
+    if (verbose) message("Using sequential bootstrap sampling")
+    ref <- pb_refdist_sequential(
+      fit1, fit0,
+      h = h,
+      nsim_max = nsim_max,
+      engine = engine,
+      nworkers = nworkers,
+      verbose = verbose
+    )
+  } else {
+    if (verbose) message("Using fixed-size bootstrap sampling")
+    ref <- pb_refdist(
+      fit1, fit0,
+      nsim = nsim,
+      engine = engine,
+      nworkers = nworkers,
+      verbose = verbose
+    )
+  }
+
+  result <- summarize_pb(ref)
+  result$formula_large <- tryCatch(formula(fit1), error = function(e) NA)
+  result$formula_small <- tryCatch(formula(fit0), error = function(e) NA)
+
+  class(result) <- c("PBmodcomp", class(result))
+  result
+}

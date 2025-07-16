@@ -10,12 +10,14 @@ orthogonal_complement<-function(W) {
     sum(diag(U))
 }
 
-.makeSparse<-function(X) {
+make_sparse<-function(X) {
   X <- as.matrix( X )
   w <- cbind( c(row(X)), c(col(X)), c(X))
-  w <- w[ abs( w[,3] ) > 1e-16, ,drop = FALSE]
+  w <- w[ abs( w[,3] ) > 1e-16, , drop = FALSE]
   Y <- sparseMatrix( w[,1], w[,2], x=w[,3], dims=dim(X))
 }
+
+
 
 ##if A is a N x N  matrix A[i,j]
 ## and R=c(A[1,1],A[1,2]...A[1,n],A[2,1]..A[2,n],, A[n,n]

@@ -25,9 +25,6 @@ e.g. L beta=L betaH. If \code{smallModel} is a model object then betaH=0.}
 \description{
 Chisq test
 }
-\details{
-TBW
-}
 \author{
 Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
 \email{sorenh@math.aau.dk}
@@ -39,10 +36,11 @@ Ulrich Halekoh \email{uhalekoh@health.sdu.dk}, Søren Højsgaard
 
 X2modcomp(fm1, "Days")
 X2modcomp(fm1, ~.-Days)
-L1 <- cbind(0, 1)
-X2modcomp(fm1, L1) ## FIXME
 X2modcomp(fm1, fm0)
 anova(fm1, fm0)
+
+L1 <- cbind(0, 1)
+X2modcomp(fm1, L1) ## FIXME
 }
 }
 \concept{model_comparison}

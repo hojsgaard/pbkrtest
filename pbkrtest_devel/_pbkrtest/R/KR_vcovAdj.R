@@ -94,7 +94,7 @@ vcovAdj.lmerMod <- function(object, details=0){
 vcovAdj.lmerMod <- vcovAdj.lmerMod
 
 ## Dette er en kopi af '2015' udgaven
-vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
+vcovAdj_internal <- function(Phi, SigmaG, X, details=0) {
 
     details = 0
     DB <- details > 0 ## debugging only
@@ -155,7 +155,7 @@ vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
         for (ss in rr:n.ggamma){
             Ktrace[rr,ss] <- Ktrace[ss,rr]<- sum( HrTrans * HH[[ss]] )
         }}
-    if(DB){cat(sprintf("Finding Ktrace:      time: %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
+    if(DB) {cat(sprintf("Finding Ktrace:      time: %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
 
     ## Finding information matrix
     IE2 <- matrix( NA, nrow=n.ggamma, ncol=n.ggamma )
@@ -168,6 +168,7 @@ vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
         }}
     if(DB){cat(sprintf("Finding IE2:         time: %10.5f\n", (proc.time()-t0)[1] )); t0 <- proc.time()}
 
+    
     eigenIE2 <- eigen(IE2, only.values=TRUE)$values
     condi    <- min(abs(eigenIE2))
 
@@ -176,10 +177,10 @@ vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
     ## print("vcovAdj")
     UU <- matrix(0, nrow=ncol(X), ncol=ncol(X))
     ## print(UU)
-    for (ii in 1:(n.ggamma-1)) {
+    for (ii in 1:(n.ggamma - 1)) {
         for (jj in c((ii + 1):n.ggamma)) {
             www <- .indexSymmat2vec( ii, jj, n.ggamma )
-            UU <- UU + WW[ii,jj] * (QQ[[ www ]] - PP[[ii]] %*% Phi %*% PP[[jj]])
+            UU <- UU + WW[ii, jj] * (QQ[[ www ]] - PP[[ii]] %*% Phi %*% PP[[jj]])
         }}
     ## print(UU)
 
@@ -187,7 +188,7 @@ vcovAdj_internal <- function(Phi, SigmaG, X, details=0){
     ## UU <<- UU
     for (ii in 1:n.ggamma) {
         www <- .indexSymmat2vec( ii, ii, n.ggamma )
-        UU<- UU + WW[ii, ii] * (QQ[[ www ]] - PP[[ii]] %*% Phi %*% PP[[ii]])
+        UU <- UU + WW[ii, ii] * (QQ[[ www ]] - PP[[ii]] %*% Phi %*% PP[[ii]])
     }
     ## print(UU)
     GGAMMA <-  Phi %*% UU %*% Phi

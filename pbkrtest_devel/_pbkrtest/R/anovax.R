@@ -89,9 +89,7 @@ anovax_worker <- function(object, ..., test="x2", control=list(nsim=1000, cl=NUL
 #' @export
 print.anovax <- function(x, ...){
     ## printCoefmat(x, digits=5, zap.ind =c(3,4))
-
     printCoefmat(x, digits=5)
-
     ## old <- options("digits")$digits
     ## options("digits"=5)
     ## print.data.frame(x)
@@ -117,81 +115,83 @@ anovax_list <- function(object, object2, test=c("x2", "kr", "sat", "pb"), contro
          }) |> do.call(rbind, args=_)
 }
 
+#' @noRd
+comodex <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
+    UseMethod("comodex")
+}
 
 
+#' @noRd
+comodex.lmerMod <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
+
+    test <- match.arg(tolower(test), c("kr", "sat", "pb", "x2"))
+    modcomp_fun <- switch(test,                          
+                          "x2" =x2_modcomp,
+                          "kr" =kr_modcomp,
+                          "sat"=sat_modcomp,
+                          "pb" =pb_modcomp)
+    out <- suppressWarnings(modcomp_fun(fit1, fit0,
+                                        control=control, ...))
+    return(out)
+}
 
 
+#' @noRd
+comodex.default <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
+    
+    test <- match.arg(tolower(test), c("pb", "x2"))
+    modcomp_fun <- switch(test,
+                          "x2" = x2_modcomp,                          
+                          "pb" = pb_modcomp)
+    out <- suppressWarnings(modcomp_fun(fit1, fit0,
+                                        control=control, ...))
+    return(out)
+}
 
+## ' @title Compare two models
+## ' @name modcomp
+## ' 
+## ' @param fit1,fit0 Two models
+## ' @param control A list
 
+## ' @export
+## ' @rdname any_modcomp
 
+pb_modcomp <- function(fit1, fit0, control=list()){
+    out <- PBmodcomp(fit1, fit0, nsim=control$nsim, cl=control$cl)
+    ## return(out)
+    out2 <- handle_old_output(out)
+    out2 <- out2[2,,drop=FALSE] ## QUICK and dirty?    
+    return(out2)
+}
 
+# #' @export
+# #' @rdname any_modcomp
+kr_modcomp <- function(fit1, fit0, control=list()){
+    out <- KRmodcomp(fit1, fit0, betaH=control$betaH, details=control$details)
+    out2 <- handle_old_output(out)
+    out2$F.scaling <- NULL
+    out2 <- out2[1,,drop=FALSE] ## QUICK and dirty?
+    return(out2)
+}
 
+# #' @export
+# #' @rdname any_modcomp
+sat_modcomp <- function(fit1, fit0, control=list()){
+    out <- SATmodcomp(fit1, fit0, betaH=control$betaH, details=control$details)
+    out2 <- handle_old_output(out)
+    return(out2)
+}
 
+# #' @export
+# #' @rdname any_modcomp
+x2_modcomp <- function(fit1, fit0, control=list()){
+    
+    out <- X2modcomp(fit1, fit0, betaH=control$betaH, details=control$details)
+    return(out)
+}
 
+handle_old_output <- function(out){
+    out2 <- out$test
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## #' @rdname comodex
-## #' @export
-## comodex.gls <- function(largeModel, smallModel, test="x2", control=list(), details=0, ...){
-
-##     test <- match.arg(tolower(test), c("pb", "x2"))
-##     modcomp_fun <- switch(test,
-##                   "x2" = x2_modcomp,                          
-##                   "pb" = pb_modcomp)
-##     out <- modcomp_fun(largeModel, smallModel, ...)
-##     out
-## }
-
-## #' @rdname comodex
-## #' @export
-## comodex.glmerMod <- function(largeModel, smallModel, test="x2", control=list(), details=0, ...){
-
-##     test <- match.arg(tolower(test), c("pb", "x2"))
-##     modcomp_fun <- switch(test,
-##                   "x2" = x2_modcomp,                          
-##                   "pb" = pb_modcomp)
-##     out <- modcomp_fun(largeModel, smallModel, ...)
-##     out
-## }
-
-
-## #' @rdname comodex
-## #' @export
-## comodex.lm <- comodex.gls
-
-
-
-
-## #' @rdname anovax
-## #' @export
-## anovax.glmerMod <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
-##     test <- match.arg(tolower(test), c("pb", "x2"))    
-##     anovax_worker(object, ..., test=test, control=control)
-## }
-
-## #' @rdname anovax
-## #' @export
-## anovax.gls  <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
-##     test <- match.arg(tolower(test), c("pb", "x2"))    
-##     anovax_worker(object, ..., test=test, control=control)
-## }
-
-## #' @rdname anovax
-## #' @export
-## anovax.lm  <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
-##     test <- match.arg(tolower(test), c("pb", "x2"))    
-##     anovax_worker(object, ..., test=test, control=control)
-## }

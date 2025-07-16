@@ -38,7 +38,8 @@
 #' @aliases PBmodcomp PBmodcomp.lm PBmodcomp.merMod plot.XXmodcomp
 #'     PBmodcomp.mer getLRT.mer
 #'
-#' @inheritParams kr_modcomp
+#' 
+#' @param largeModel,smallModel Two models
 #' @param nsim The number of simulations to form the reference
 #'     distribution.
 #' @param ref Vector containing samples from the reference
@@ -204,59 +205,6 @@ PBmodcomp <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl
 
 
 
-## '
-## ' @examples
-## ' if (requireNamespace("nlme", quietly = TRUE)) {
-## '   library(nlme)
-## '
-## '   # Load data
-## '   data(sleepstudy)
-## '
-## '   # Create quadratic term explicitly
-## '   sleepstudy$Days2 <- sleepstudy$Days^2
-## '
-## '   # Model 0: Random intercept and slope, no fixed effect for Days
-## '   fm0 <- lme(Reaction ~ 1,
-## '              random = ~ Days | Subject,
-## '              data = sleepstudy,
-## '              method = "REML")
-## '
-## '   # Model 1: Add fixed effect for Days
-## '   fm1 <- lme(Reaction ~ Days,
-## '              random = ~ Days | Subject,
-## '              data = sleepstudy,
-## '              method = "REML")
-## '
-## '   # Model 2: Add fixed quadratic effect
-## '   fm2 <- lme(Reaction ~ Days + Days2,
-## '              random = ~ Days | Subject,
-## '              data = sleepstudy,
-## '              method = "REML")
-## '
-## '   # Create quadratic term explicitly
-## '   sleepstudy$Days2 <- sleepstudy$Days^2
-## '
-## '   # Model 0: Intercept only
-## '   g0 <- gls(Reaction ~ 1,
-## '             data = sleepstudy,
-## '             method = "REML")
-## '
-## '   # Model 1: Add linear effect of Days
-## '   g1 <- gls(Reaction ~ Days,
-## '             data = sleepstudy,
-## '             method = "REML")
-## '
-## '   # Model 2: Add quadratic term
-## '   g2 <- gls(Reaction ~ Days + Days2,
-## '             data = sleepstudy,
-## '             method = "REML")
-## ' }
-## ' 
-## ' PBmodcomp(g1, g0)
-## '
-## ' PBmodcomp(fm1, fm0)
-
-
 #' @export
 #' @rdname pb__modcomp
 PBmodcomp.merMod <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
@@ -323,7 +271,7 @@ PBmodcomp.lm <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL,
 }
 
 #' @export
-#' @rdname pb_modcomp
+#' @rdname pb__modcomp
 PBmodcomp.gls <- function(largeModel, smallModel, nsim=1000, ref=NULL, seed=NULL, cl=NULL, details=0){
 
     M <- get_nested_model_info(largeModel, smallModel)
@@ -831,3 +779,58 @@ plot.PBmodcomp <- function(x, ...){
     ## ll.large <- logLik(largeModel, REML=FALSE)
     ## dd <- ll.large - ll.small
     ## cat("dd:\n"); print(dd)
+
+
+
+## '
+## ' @examples
+## ' if (requireNamespace("nlme", quietly = TRUE)) {
+## '   library(nlme)
+## '
+## '   # Load data
+## '   data(sleepstudy)
+## '
+## '   # Create quadratic term explicitly
+## '   sleepstudy$Days2 <- sleepstudy$Days^2
+## '
+## '   # Model 0: Random intercept and slope, no fixed effect for Days
+## '   fm0 <- lme(Reaction ~ 1,
+## '              random = ~ Days | Subject,
+## '              data = sleepstudy,
+## '              method = "REML")
+## '
+## '   # Model 1: Add fixed effect for Days
+## '   fm1 <- lme(Reaction ~ Days,
+## '              random = ~ Days | Subject,
+## '              data = sleepstudy,
+## '              method = "REML")
+## '
+## '   # Model 2: Add fixed quadratic effect
+## '   fm2 <- lme(Reaction ~ Days + Days2,
+## '              random = ~ Days | Subject,
+## '              data = sleepstudy,
+## '              method = "REML")
+## '
+## '   # Create quadratic term explicitly
+## '   sleepstudy$Days2 <- sleepstudy$Days^2
+## '
+## '   # Model 0: Intercept only
+## '   g0 <- gls(Reaction ~ 1,
+## '             data = sleepstudy,
+## '             method = "REML")
+## '
+## '   # Model 1: Add linear effect of Days
+## '   g1 <- gls(Reaction ~ Days,
+## '             data = sleepstudy,
+## '             method = "REML")
+## '
+## '   # Model 2: Add quadratic term
+## '   g2 <- gls(Reaction ~ Days + Days2,
+## '             data = sleepstudy,
+## '             method = "REML")
+## ' }
+## ' 
+## ' PBmodcomp(g1, g0)
+## '
+## ' PBmodcomp(fm1, fm0)
+

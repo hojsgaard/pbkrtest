@@ -37,6 +37,7 @@
 #' @keywords utilities
 #' 
 #' @examples
+#' 
 #' library(pbkrtest)
 #' data("beets", package = "pbkrtest")
 #' sug <- lm(sugpct ~ block + sow + harvest, data=beets)
@@ -52,8 +53,9 @@
 #' mod.s <- restriction_matrix2model(sug, L.s); mod.s
 #' 
 #' ## Sanity check: The models have the same fitted values and log likelihood
-#' plot(fitted(mod.h), fitted(sug.h))
-#' plot(fitted(mod.s), fitted(sug.s))
+#'
+#' max(abs(fitted(mod.h) - fitted(sug.h)))
+#' max(abs(fitted(mod.s) - fitted(sug.s)))
 #' logLik(mod.h)
 #' logLik(sug.h)
 #' logLik(mod.s)
@@ -80,7 +82,7 @@ model2restriction_matrix.merMod <- function (largeModel, smallModel, sparse=FALS
          } else  { ## smallModel is lmerMod
              make_restriction_matrix(getME(largeModel, 'X'), getME(smallModel, 'X'))
          }
-    if (sparse) .makeSparse(L) else L
+    if (sparse) make_sparse(L) else L
 }
 
 #' @method model2restriction_matrix lm
@@ -91,7 +93,7 @@ model2restriction_matrix.lm <- function (largeModel, smallModel, sparse=FALSE) {
          } else  { 
              make_restriction_matrix(model.matrix(largeModel), model.matrix(smallModel))
          }
-    if (sparse) .makeSparse(L) else L
+    if (sparse) make_sparse(L) else L
 }
 
 
@@ -107,6 +109,8 @@ restriction_matrix2model.default <- function(largeModel, L, REML=TRUE, ...){
 }
 
 restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
+    
+
     form <- as.formula(formula(largeModel))    
     attributes(XX.lg)[-1] <- NULL
     XX.sm <- make_model_matrix(XX.lg, L)
@@ -120,6 +124,33 @@ restriction_matrix2model_internal <- function(largeModel, L, XX.lg){
     zzz <- list(new_form=new_form, rhs.fix2=rhs.fix2, XX.sm=XX.sm)
     zzz
 }
+
+
+.formula2list <- function(form){
+    lhs <- form[[2]]
+    tt  <- terms(form)
+    tl  <- attr(tt, "term.labels")
+    r.idx <- grep("\\|", tl)
+    
+    if (length(r.idx)){
+        rane  <- paste("(", tl[r.idx], ")")
+        f.idx <- (1:length(tl))[-r.idx]
+        
+        if (length(f.idx))
+            fixe  <- tl[f.idx]
+        else
+            fixe  <- NULL
+    } else {
+        rane <- NULL
+        fixe <- tl
+    }
+    
+    ans <- list(lhs=deparse(lhs),
+                rhs.fix=fixe,
+                rhs.ran=rane)
+    ans
+}
+
 
 
 ## #' @rdname model-coerce
@@ -145,8 +176,6 @@ restriction_matrix2model.lmerMod <- function(largeModel, L, REML=TRUE, ...){
     ans <- eval(bquote(update(.(largeModel),
                               formula = .(new_formula),
                               data    = .(data_used))))
-
-
     
     if (!REML)
         ans <- update(ans, REML=FALSE)
@@ -263,30 +292,6 @@ force_full_rank <- function(L){
     }
 }
 
-.formula2list <- function(form){
-  lhs <- form[[2]]
-  tt  <- terms(form)
-  tl  <- attr(tt, "term.labels")
-  r.idx <- grep("\\|", tl)
-
-  if (length(r.idx)){
-    rane  <- paste("(", tl[r.idx], ")")
-    f.idx <- (1:length(tl))[-r.idx]
-
-    if (length(f.idx))
-        fixe  <- tl[f.idx]
-    else
-        fixe  <- NULL
-  } else {
-    rane <- NULL
-    fixe <- tl
-  }
-
-  ans <- list(lhs=deparse(lhs),
-              rhs.fix=fixe,
-              rhs.ran=rane)
-  ans
-}
 
 
 
