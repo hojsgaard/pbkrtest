@@ -1,3 +1,0 @@
-Integrate(x^2,x)
-
-

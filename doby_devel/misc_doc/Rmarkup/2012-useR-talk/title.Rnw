@@ -1,6 +1,0 @@
-\title{\texttt{Rmarkup} -- a very simple tool for literate programming
-}
-
-\author{Søren Højsgaard}
-\institute{Department of Mathematical Sciences \\ Aalborg University
-  \\ Denmark \\ \ \\ useR! 2012 conference \\ Nashville, TN, USA}

@@ -1,2 +1,0 @@
-# geepack
-Generalized Estimating Equations

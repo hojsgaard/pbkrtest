@@ -1,7 +1,0 @@
-## Examples of Yacas code 
-Sin(Pi) 
-Exp(0) 
-N(Exp(4)) 
-## end of examples 
-
-
