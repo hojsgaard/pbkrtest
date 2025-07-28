@@ -1,81 +1,37 @@
 
 #' Parametric Bootstrap Model Comparison
 #'
-#' Compare two nested models using parametric bootstrap simulation of the likelihood ratio statistic.
-#' Supports models fitted via lm, lme4 (lmer/glmer), nlme (lme/gls), etc.
+#' Compare two nested models using parametric bootstrap simulation of
+#' the likelihood ratio statistic.  Supports models fitted via lm,
+#' lme4 (lmer/glmer), nlme (lme/gls), etc.
 #'
-#' The models should both be fitted by maximum likelihood (not REML). If REML was used,
-#' the function will automatically refit with REML = FALSE where possible.
+#' The models should both be fitted by maximum likelihood (not
+#' REML). If REML was used, the function will automatically refit with
+#' REML = FALSE where possible.
 #'
 #' @param fit1 The larger (alternative) model.
 #' @param fit0 The smaller (null) model.
-#' @param nsim Number of simulations. In fixed bootstrap: total number of simulations. In sequential bootstrap: maximum number of simulations allowed.
-#' @param sequential Logical; if TRUE, use sequential bootstrap sampling to reach target number of extreme hits.
+#' @param nsim Number of simulations. In fixed bootstrap: total number
+#'     of simulations. In sequential bootstrap: maximum number of
+#'     simulations allowed.
+#' @param sequential Logical; if TRUE, use sequential bootstrap
+#'     sampling to reach target number of extreme hits.
 #' @param h Number of extreme hits to target in sequential sampling.
-#' @param engine Parallelisation engine: "serial", "parallel", or "future".
+#' @param engine Parallelisation engine: "serial", "parallel", or
+#'     "future".
 #' @param nworkers Number of workers for parallel/future engine.
 #' @param verbose Logical; if TRUE, print progress messages.
 
-#' @note
-#' **Best Practice:** Always fit your models with the `data=` argument.
-#' This ensures all covariates used in the model formula are stored with the model object,
-#' enabling reliable simulation and refitting for bootstrap analysis,
-#' including on parallel workers. Without `data=`, refitting may fail in parallel contexts
-#' and reproducibility is compromised.
+#' @note **Best Practice:** Always fit your models with the `data=`
+#'     argument.  This ensures all covariates used in the model
+#'     formula are stored with the model object, enabling reliable
+#'     simulation and refitting for bootstrap analysis, including on
+#'     parallel workers. Without `data=`, refitting may fail in
+#'     parallel contexts and reproducibility is compromised.
 #' 
-#' @return An object of class \code{PBmodcomp}, with print(), summary(), and plot() methods.
+#' @return An object of class \code{PBmodcomp}, with print(),
+#'     summary(), and plot() methods.
 #'
-#' @examples
-#' if (requireNamespace("lme4") && requireNamespace("nlme")) {
-#'   data(sleepstudy, package = "lme4")
-#'   sleepstudy$Days2 <- sleepstudy$Days^2
-#'
-#'   # LM example
-#'   lm_fit1 <- lm(Reaction ~ Days + Days2, data = sleepstudy)
-#'   lm_fit0 <- update(lm_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_lm <- pb2_modcomp(lm_fit1, lm_fit0, nsim = 200)
-#'   res_lm
-#'   summary(res_lm)
-#'   plot(res_lm, show.chisq=TRUE)
-#'
-#'   # GLS example
-#'   gls_fit1 <- nlme::gls(Reaction ~ Days + Days2, data = sleepstudy, method = "ML")
-#'   gls_fit0 <- update(gls_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_gls <- pb2_modcomp(gls_fit1, gls_fit0, nsim = 200)
-#'   res_gls
-#'   summary(res_gls)
-#'   plot(res_gls, show.chisq=TRUE)
-#'
-#'   # LME example
-#'   lme_fit1 <- nlme::lme(Reaction ~ Days + Days2, random = ~ 1 | Subject,
-#'                         data = sleepstudy, method = "ML")
-#'   lme_fit0 <- update(lme_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_lme <- pb2_modcomp(lme_fit1, lme_fit0, nsim = 200)
-#'   res_lme
-#'   summary(res_lme)
-#'   plot(res_lme, show.chisq=TRUE)
-#'
-#'   # LMER example (lme4)
-#'   lmer_fit1 <- lme4::lmer(Reaction ~ Days + Days2 + (1 | Subject),
-#'                           data = sleepstudy, REML = FALSE)
-#'   lmer_fit0 <- update(lmer_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_lmer <- pb2_modcomp(lmer_fit1, lmer_fit0, nsim = 200)
-#'   res_lmer
-#'   summary(res_lmer)
-#'   plot(res_lmer, show.chisq=TRUE)
-#'
-#'   # Sequential example
-#'   set.seed(42)
-#'   res_seq <- pb2_modcomp(lmer_fit1, lmer_fit0, sequential = TRUE, h = 20, nsim = 500)
-#'   res_seq
-#'   summary(res_seq)
-#'   plot(res_seq, show.chisq=TRUE)
-#' 
-#' }
 #' @export
 pb2_modcomp <- function(fit1, fit0,
                         nsim = 1000,
@@ -86,13 +42,13 @@ pb2_modcomp <- function(fit1, fit0,
                         verbose = FALSE) {
 
   # Ensure ML fit if necessary
-  fit1 <- ensure_ML(fit1)
-  fit0 <- ensure_ML(fit0)
+    fit1 <- ensure_ML(fit1)
+    fit0 <- ensure_ML(fit0)
 
     check_model_has_data(fit1)
     check_model_has_data(fit0)
   # Get observed statistic
-  LRTstat <- getLRT(fit1, fit0)
+    LRTstat <- getLRT(fit1, fit0)
 
   # Simulate reference distribution
   if (sequential) {
@@ -158,73 +114,6 @@ ensure_ML <- function(fit) {
 #' @param conf.level Confidence level for bootstrap p CI (default 0.95).
 #'
 #' @return List with results table, moments, samples info, CI, SE, etc.
-#'
-#' @examples
-#'
-#' sleepstudy$Days2 <- sleepstudy$Days^2
-#' 
-#' lm_fit1 <- lm(Reaction ~ Days, data = sleepstudy)
-#' lm_fit0 <- update(lm_fit1, . ~ . - Days)
-#' set.seed(42)
-#' lrt_lm <- getLRT(lm_fit1, lm_fit0)
-#' lr_sim_lm <- pb_refdist(lm_fit1, lm_fit0, nsim = 500, engine = "future", nworkers =2)
-#' summarize_pb(lrt_lm, lr_sim_lm)
-#' 
-#' gls_fit1 <- gls(Reaction ~ Days, data = sleepstudy, method="ML")
-#' gls_fit0 <- update(gls_fit1, . ~ . - Days)
-#' set.seed(42)
-#' lrt_gls <- getLRT(gls_fit1, gls_fit0)
-#' lr_sim_gls <- pb_refdist(gls_fit1, gls_fit0, nsim = 500, engine = "future", nworkers = 2)
-#' summarize_pb(lrt_gls, lr_sim_gls)
-#' 
-#' lme_fit1 <- lme(Reaction ~ Days, random = ~ 1 | Subject, data = sleepstudy, method="ML")
-#' lme_fit0 <- update(lme_fit1, . ~ . - Days)
-#' set.seed(42)
-#' lrt_lme <- getLRT(lme_fit1, lme_fit0)
-#' lr_sim_lme <- pb_refdist(lme_fit1, lme_fit0, nsim = 500, engine = "future", nworkers = 2)
-#' summarize_pb(lrt_lme, lr_sim_lme)
-#' 
-#' lmer_fit1 <- lmer(Reaction ~ Days + (1 | Subject), data = sleepstudy, REML=FALSE)
-#' lmer_fit0 <- update(lmer_fit1, . ~ . - Days)
-#' set.seed(42)
-#' lrt_lmer <- getLRT(lmer_fit1, lmer_fit0)
-#' lr_sim_lmer <- pb_refdist(lmer_fit1, lmer_fit0, nsim = 500, engine = "future", nworkers = 2)
-#' summarize_pb(lrt_lmer, lr_sim_lmer)
-#'
-
-#' sleepstudy$Days2 <- sleepstudy$Days^2
-#' 
-#' lm_fit1 <- lm(Reaction ~ Days + Days2, data = sleepstudy)
-#' lm_fit0 <- update(lm_fit1, . ~ . - Days2)
-#' set.seed(42)
-#' lrt_lm <- getLRT(lm_fit1, lm_fit0)
-#' lr_sim_lm <- pb_refdist(lm_fit1, lm_fit0, nsim = 50, engine = "future", nworkers =2)
-#' summarize_pb(lrt_lm, lr_sim_lm)
-#' 
-#' gls_fit1 <- gls(Reaction ~ Days + Days2, data = sleepstudy, method="ML")
-#' gls_fit0 <- update(gls_fit1, . ~ . - Days2)
-#' set.seed(42)
-#' lrt_gls <- getLRT(gls_fit1, gls_fit0)
-#' lr_sim_gls <- pb_refdist(gls_fit1, gls_fit0, nsim = 50, engine = "future", nworkers = 2)
-#' summarize_pb(lrt_gls, lr_sim_gls)
-#' 
-#' lme_fit1 <- lme(Reaction ~ Days + Days2, random = ~ 1 | Subject, data = sleepstudy, method="ML")
-#' lme_fit0 <- update(lme_fit1, . ~ . - Days2)
-#' set.seed(42)
-#' lrt_lme <- getLRT(lme_fit1, lme_fit0)
-#' lr_sim_lme <- pb_refdist(lme_fit1, lme_fit0, nsim = 50, engine = "future", nworkers = 2)
-#' summarize_pb(lrt_lme, lr_sim_lme)
-#' 
-#' lmer_fit1 <- lmer(Reaction ~ Days + Days2 + (1 | Subject), data = sleepstudy, REML=FALSE)
-#' lmer_fit0 <- update(lmer_fit1, . ~ . - Days2)
-#' set.seed(42)
-#' lrt_lmer <- getLRT(lmer_fit1, lmer_fit0)
-#' lr_sim_lmer <- pb_refdist(lmer_fit1, lmer_fit0, nsim = 50, engine = "future", nworkers = 2)
-#' summarize_pb(lrt_lmer, lr_sim_lmer) |> summary()
-#'
-#' lr_sim_lmer <- pb_refdist_sequential(lmer_fit1, lmer_fit0, nsim = 50,
-#'     engine = "future", nworkers = 2)
-#' summarize_pb(lrt_lmer, lr_sim_lmer)
 
 #' @export
 summarize_pb <- function(LRTstat, ref, conf.level = 0.95) {
@@ -422,3 +311,4 @@ check_model_has_data <- function(fit) {
     )
   }
 }
+

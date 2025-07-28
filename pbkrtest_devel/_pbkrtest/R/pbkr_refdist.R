@@ -51,52 +51,6 @@
 #' without errors about missing variables, even if the original dataset was modified
 #' or removed from the global environment after fitting.
 #' 
-#' @examples
-#' if (requireNamespace("lme4") && requireNamespace("nlme")) {
-#'   data(sleepstudy, package = "lme4")
-#'   sleepstudy$Days2 <- sleepstudy$Days^2
-#'
-#'   # LM example
-#'   lm_fit1 <- lm(Reaction ~ Days + Days2, data = sleepstudy)
-#'   lm_fit0 <- update(lm_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_lm <- pb_refdist(lm_fit1, lm_fit0, nsim = 200)
-#'   summary(res_lm)
-#'   plot(res_lm, show.chisq=TRUE)
-#'
-#'   # GLS example
-#'   gls_fit1 <- nlme::gls(Reaction ~ Days + Days2, data = sleepstudy, method="ML")
-#'   gls_fit0 <- update(gls_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_gls <- pb_refdist(gls_fit1, gls_fit0, nsim = 200)
-#'   summary(res_gls)
-#'   plot(res_gls, show.chisq=TRUE)
-#'
-#'   # LME example
-#'   lme_fit1 <- nlme::lme(Reaction ~ Days + Days2, random = ~ 1 | Subject,
-#'                         data = sleepstudy, method="ML")
-#'   lme_fit0 <- update(lme_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_lme <- pb_refdist(lme_fit1, lme_fit0, nsim = 200)
-#'   summary(res_lme)
-#'   plot(res_lme, show.chisq=TRUE)
-#'
-#'   # LMER example (lme4)
-#'   lmer_fit1 <- lme4::lmer(Reaction ~ Days + Days2 + (1 | Subject),
-#'                           data = sleepstudy, REML=FALSE)
-#'   lmer_fit0 <- update(lmer_fit1, . ~ . - Days2)
-#'   set.seed(42)
-#'   res_lmer <- pb_refdist(lmer_fit1, lmer_fit0, nsim = 200)
-#'   summary(res_lmer)
-#'   plot(res_lmer, show.chisq=TRUE)
-#'
-#'   # Sequential example
-#'   set.seed(42)
-#'   res_seq <- pb_refdist_sequential(lmer_fit1, lmer_fit0, h = 20, nsim = 100)
-#'   summary(res_seq)
-#'   plot(res_seq, show.chisq=TRUE)
-#' }
-#'
 #' @export
 pb_refdist <- function(
                        fit1,

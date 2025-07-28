@@ -132,7 +132,7 @@ PBrefdist.lm <- function(largeModel, smallModel, nsim=1000, seed=NULL, cl=NULL, 
     if (nr_data != nr_fit)
         stop("Number of rows in data and fit do not match; remove NAs from data before fitting\n")
   
-    ref <- do_sampling(largeModel, smallModel, nsim, cl, details)
+    ref <- do_sampling(largeModel, smallModel, nsim, cl, seed, details)
     LRTstat     <- getLRT(largeModel, smallModel)
     ref <- finalize_refdist(LRTstat, ref, nsim)
     
@@ -253,9 +253,6 @@ print.refdist <- function(x, n=6L, ...){
     print(attributes(x)[1:4])
     invisible(x)
 }
-
-
-
 
 #' @noRd
 get_refdist <- function(lg){
@@ -378,7 +375,7 @@ get_cl <- function(cl) {
 }
 
 
-do_sampling <- function(fit1, fit0, nsim, cl, details=0) {
+do_sampling <- function(fit1, fit0, nsim, cl, seed, details=0) {
 
     ## cat("do_sampling...\n")
     t0  <- proc.time()
@@ -388,27 +385,27 @@ do_sampling <- function(fit1, fit0, nsim, cl, details=0) {
     ## print(refdist_fun)
     cl <- get_cl(cl)
     
-    if (is.numeric(cl)){
+    if (is.numeric(cl)) {
         if (!(length(cl) == 1 && cl >= 1))
             stop("Invalid numeric cl\n")
         .cat(details > 3, "doing mclapply, cl = ", cl, "\n")
-        print("parallel computing")
+        ## print("parallel computing")
         nsim.per.cl <- nsim %/% cl
         ## str(list(cl=cl, nsim=nsim))
         ref <- mclapply(1:cl,
                         function(i) {
-                            refdist_fun(fit1, fit0, nsim=nsim.per.cl)},
+                            refdist_fun(fit1, fit0, nsim=nsim.per.cl, seed=seed)},
                         mc.cores=cl)
         ref <- unlist(ref)
         
 
     } else
-        if (inherits(cl, "cluster")){
+        if (inherits(cl, "cluster")) {
             .cat(details > 3, "doing clusterCall, nclusters = ", length(cl), "\n")
             nsim.per.cl <- nsim %/% length(cl)
             clusterSetRNGStream(cl)
             ref <- clusterCall(cl, fun=refdist_fun,
-                               fit1, fit0, nsim=nsim.per.cl)
+                               fit1, fit0, nsim=nsim.per.cl, seed=seed)
             ref <- unlist(ref)
         }
     else stop("Invalid 'cl'\n")
@@ -417,6 +414,44 @@ do_sampling <- function(fit1, fit0, nsim, cl, details=0) {
     attr(ref, "ctime") <- (proc.time() - t0)[3]
     ref
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

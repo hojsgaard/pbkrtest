@@ -135,7 +135,7 @@ test_that("print(mixed) works: only 1 or 2 fixed effects with all methods", {
 
   mixed(use ~ urban + (1 | district), method = "PB",
         family = binomial, data = Contraception, 
-        args_test=list(nsim=2), progress=FALSE)
+        args_test=list(nsim=200), progress=FALSE)
 
 
 

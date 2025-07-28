@@ -19,7 +19,9 @@
 \item{...}{Additional arguments (currently ignored).}
 }
 \value{
-A data frame with \code{nsim} simulated response vectors as columns. Each column represents one simulated replicate of the response under the model's implied distribution.
+A data frame with \code{nsim} simulated response vectors as
+columns. Each column represents one simulated replicate of the
+response under the model's implied distribution.
 }
 \description{
 These methods generate simulated response vectors from
@@ -37,14 +39,15 @@ matrix is also obtained via \code{cov_matrix()}.
 
 \examples{
 if (require(nlme)) {
+  NSIM <- 10
   ## Example for gls
   fit_gls <- gls(distance ~ age, data = Orthodont)
-  sims_gls <- simulate(fit_gls, nsim = 5, seed = 123)
+  sims_gls <- simulate(fit_gls, nsim = NSIM, seed = 123)
   head(sims_gls)
 
   ## Example for lme
   fit_lme <- lme(distance ~ age, random = ~ 1 | Subject, data = Orthodont)
-  sims_lme <- simulate(fit_lme, nsim = 5, seed = 123)
+  sims_lme <- simulate(fit_lme, nsim = NSIM, seed = 123)
   head(sims_lme)
 }
 
