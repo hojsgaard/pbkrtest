@@ -1,0 +1,6 @@
+LICENSE
+README.*
+^CRAN-SUBMISSION$
+^cran-comments\.md$
+^_pkgdown.yml$
+devel/

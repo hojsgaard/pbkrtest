@@ -20,6 +20,8 @@
 
 #' @importFrom utils head
 #' @importFrom stats coef anova
+#' @importFrom stats residuals model.response
+
 #' 
 #' @importFrom parallel clusterCall clusterExport clusterSetRNGStream
 #'     mclapply detectCores makeCluster stopCluster

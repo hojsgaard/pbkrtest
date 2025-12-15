@@ -19,8 +19,8 @@ Description: Computes p-values based on (a) Satterthwaite or
 URL: https://people.math.aau.dk/~sorenh/software/pbkrtest/
 Depends:
     R (>= 4.2.0),
-    lme4 (>= 1.1.31),
-    nlme
+    nlme,
+    lme4 (>= 1.1.31)
 Imports:
     broom,
     furrr,

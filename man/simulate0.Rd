@@ -35,7 +35,7 @@ The covariance matrix is obtained via \code{cov_matrix()}, representing the impl
 \examples{
 if (require(nlme) && require(lme4) && require(MASS)) {
   data(Orthodont, package = "nlme")
-  NSIM <- 10
+  NSIM <- 6
   # GLS model
   fit_gls <- gls(distance ~ age, data = Orthodont)
   sim_gls <- simulate0(fit_gls, nsim = NSIM, seed = 123)
@@ -54,7 +54,7 @@ if (require(nlme) && require(lme4) && require(MASS)) {
   # lm
   fit_lm <- lm(distance ~ age, data = Orthodont)
   sim_lm <- simulate0(fit_lm, nsim = NSIM, seed = 123)
-  head(sim_lm) 
+  head(sim_lm)  
 }
 
 }

@@ -1,0 +1,15 @@
+.travis.yml
+.gitignore
+LICENSE
+revdep
+^doc$
+^Meta$
+old_NAMESPACE
+RJpaper
+zandbox
+docs
+vignette/figure
+^CRAN-SUBMISSION$
+^cran-comments\.md$
+^.*\.Rproj$
+^\.Rproj\.user$
