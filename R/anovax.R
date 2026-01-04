@@ -10,10 +10,12 @@
 ##' @examples 
 ##' lmm1 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
 ##' lmm0 <- update(lmm1, .~. - sow)
+##' anovax(lmm1, .~. - harvest, test="X2")
 ##' anovax(lmm1, .~. - harvest, test="KR")
 ##' anovax(lmm1, .~. - harvest, test="SAT")
-##' ## anovax(lmm1, .~. - harvest, test="PB", control=list(nsim=50, cl=1))
+##' anovax(lmm1, .~. - harvest, test="PB", control=list(nsim=50, cl=1))
 ##'
+##' anovax(lmm1, test="X2")
 ##' anovax(lmm1, test="KR")
 ##' anovax(lmm1, test="SAT")
 ##' anovax(lmm1, test="PB", control=list(nsim=50, cl=1))
@@ -40,11 +42,11 @@ anovax.default <- function(object, ..., test="x2", control=list(nsim=1000, cl=NU
 
 anovax_worker <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
 
-    print(test)
+    ## print(test)
     dots <- list(...)
     if (is.null(control$nsim)) control$nsim <- 1000
-    print(control)
-    cat("anovax_worker dots:\n"); print(dots)
+    ## print(control)
+    ## cat("anovax_worker dots:\n"); print(dots)
 
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "x2"))    
     if (length(dots) == 0){
