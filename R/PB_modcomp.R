@@ -397,8 +397,8 @@ PBcompute_p_values <- function(LRTstat, ref){
   p.PB  <- (1 + n.extreme) / (1 + npos)
 
   test = list(
-    LRT      = c(stat=tobs,    df=ndf,    p.value=p.chi),
-    PBtest   = c(stat=tobs,    df=NA,     p.value=p.PB))
+    LRT      = c(statistic=tobs,    df=ndf,  ddf=NA,  p.value=p.chi),
+    PBtest   = c(statistic=tobs,    df=NA,   ddf=NA,  p.value=p.PB))
 
   test  <- as.data.frame(do.call(rbind, test))
   ans   <- list(test=test, type="X2test", samples=c(nsim=nsim, npos=npos), n.extreme=n.extreme,

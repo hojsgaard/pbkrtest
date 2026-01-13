@@ -143,13 +143,21 @@ SATmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0, eps=1e
     ## Compute ddf for the F-value:
     ddf <- get_Fstat_ddf(nu_m, tol=1e-8)
 
-    out <- list(test=data.frame(statistic=Fvalue, ndf=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf)),
-                sigma=getME(largeModel, "sigma"),
-                formula.large=formula(largeModel),
-                formula.small=formula(smallModel),
-                ctime=(proc.time() - t0)[3],
-                L=L
-                )
+
+    test=data.frame(statistic=Fvalue, df=qq, ddf=ddf, p.value=1 - pf(Fvalue, df1=qq, df2=ddf))
+    rownames(test) <- "SAT"
+
+    out <- list(
+        test=test,
+        sigma=getME(largeModel, "sigma"),
+        formula.large=formula(largeModel),
+        formula.small=formula(smallModel),
+        ctime=(proc.time() - t0)[3],
+        L=L
+    )
+
+
+    
     class(out) <- "SATmodcomp"
     out
     
@@ -164,7 +172,8 @@ print.SATmodcomp <- function(x, ...){
     if (inherits(x$formula.small, "formula")) cat("small : ")
     else cat("small (restriction matrix) : \n")
     prform(x$formula.small)
-    dd <- as.data.frame(x$test[c("statistic", "ndf", "ddf", "p.value")])
+    tab <- x$test
+    dd <- as.data.frame(tab[c("statistic", "df", "ddf", "p.value")])
     printCoefmat(dd, has.Pvalue=TRUE)
     invisible(x)
 }
@@ -175,10 +184,8 @@ print.SATmodcomp <- function(x, ...){
 summary.SATmodcomp <- function(object, ...){
 
     cat(sprintf("F-test with Satterthwaite approximation; time: %.2f sec\n",
-                object$ctime))
-    
+                object$ctime))    
     tab <- object$test
-    
     printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
 
     class(tab) <- c("summary_SATmodcomp", "data.frame")

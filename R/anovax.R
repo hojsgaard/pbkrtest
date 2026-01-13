@@ -163,7 +163,7 @@ pb_modcomp <- function(fit1, fit0, control=list()){
     out <- PBmodcomp(fit1, fit0, nsim=control$nsim, cl=control$cl)
     ## return(out)
     out2 <- handle_old_output(out)
-    out2 <- out2[2,,drop=FALSE] ## QUICK and dirty?    
+    out2 <- out2[2,, drop=FALSE] ## QUICK and dirty?    
     return(out2)
 }
 
@@ -173,13 +173,14 @@ kr_modcomp <- function(fit1, fit0, control=list()){
     out <- KRmodcomp(fit1, fit0, betaH=control$betaH, details=control$details)
     out2 <- handle_old_output(out)
     out2$F.scaling <- NULL
-    out2 <- out2[1,,drop=FALSE] ## QUICK and dirty?
+    out2 <- out2[1,, drop=FALSE] ## QUICK and dirty?
     return(out2)
 }
 
 # #' @export
 # #' @rdname any_modcomp
 sat_modcomp <- function(fit1, fit0, control=list()){
+    ## cat("sat_modcomp\n")
     out <- SATmodcomp(fit1, fit0, betaH=control$betaH, details=control$details)
     out2 <- handle_old_output(out)
     return(out2)
@@ -188,7 +189,6 @@ sat_modcomp <- function(fit1, fit0, control=list()){
 # #' @export
 # #' @rdname any_modcomp
 x2_modcomp <- function(fit1, fit0, control=list()){
-    
     out <- X2modcomp(fit1, fit0, betaH=control$betaH, details=control$details)
     return(out)
 }

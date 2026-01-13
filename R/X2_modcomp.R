@@ -51,7 +51,7 @@ X2modcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 }
 
 X2modcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
-    ## cat("X2modcomp_worker\n")
+    ##cat("X2modcomp_worker\n")
     if (is.null(betaH)) betaH <- 0
     if (is.null(details)) details <- 0
     
@@ -70,7 +70,7 @@ X2modcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
     ans$formula.small <- formula.small
     ans$ctime   <- (proc.time() - t0)[3]
     ans$L       <- L
-    
+
     out <- ans$test[1,, drop=FALSE]
     attr(out, "aux") <- ans
 
@@ -89,7 +89,7 @@ X2compute_p_values <- function(LRTstat, stats=NULL){
     p.chi <- unname(LRTstat[3])
         
     test = list(
-        LRT = c(stat=tobs, df=ndf, ddf=NA, p.value=p.chi)
+        X2 = c(statistic=tobs, df=ndf, ddf=NA, p.value=p.chi)
     )
     
     test  <- as.data.frame(do.call(rbind, test))

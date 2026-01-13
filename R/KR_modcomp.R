@@ -111,13 +111,11 @@ KRmodcomp <- function(largeModel, smallModel, betaH=0, details=0){
     UseMethod("KRmodcomp")
 }
 
-
 #' @export
 #' @rdname kr__modcomp
 KRmodcomp.lmerMod <- function(largeModel, smallModel, betaH=0, details=0) {
     KRmodcomp_internal(largeModel=largeModel, smallModel=smallModel, betaH=betaH, details=details)
 }
-
 
 KRmodcomp_internal <- function(largeModel, smallModel, betaH=0, details=0) {
 
@@ -158,50 +156,176 @@ KRmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), L, beta=fixef(largeModel), betaH)
     stats <- lapply(stats, c) ## To get rid of all sorts of attributes
     
-    out   <- .finalizeKR(stats)
-    
     formula.small <-
         if (.is.lmm(smallModel)){
             .zzz <- formula(smallModel)
             attributes(.zzz) <- NULL
             .zzz
         } else {
-            list(L=L, betaH=betaH)
+            list(L = L, betaH = betaH)
         }
     formula.large <- formula(largeModel)
     attributes(formula.large) <- NULL
-    
-    out$formula.large <- formula.large
-    out$formula.small <- formula.small
-    out$ctime   <- (proc.time() - t0)[3]
-    out$L       <- L
-    out
-    
-}
 
 
-.finalizeKR <- function(stats){
-    
     test = list(
-        Ftest      = c(stat=stats$Fstat,     ndf=stats$ndf,  ddf=stats$ddf,  F.scaling=stats$F.scaling,  p.value=stats$p.value),
-        FtestU     = c(stat=stats$FstatU,    ndf=stats$ndf,  ddf=stats$ddf,  F.scaling=NA,               p.value=stats$p.valueU))
+        KR      = c(statistic=stats$Fstat,     df=stats$ndf,  ddf=stats$ddf,  F.scaling=stats$F.scaling,
+                       p.value=stats$p.value),
+        KRU     = c(statistic=stats$FstatU,    df=stats$ndf,  ddf=stats$ddf,  F.scaling=NA,
+                       p.value=stats$p.valueU))
     test  <- as.data.frame(do.call(rbind, test))
-    test$ndf <- as.integer(test$ndf)
-    out   <- list(test=test, type="F", aux=stats$aux, stats=stats)
-    ## Notice: stats are carried to the output. They are used for get getKR function...
+    test$df <- as.integer(test$df)
+
+    out <- list(
+        test=test,
+        sigma=getME(largeModel, "sigma"),
+        formula.large=formula(largeModel),
+        formula.small=formula(smallModel),
+        ctime=(proc.time() - t0)[3],
+        L=L
+    )
     class(out) <- c("KRmodcomp")
-    out
+    return(out)
 }
-
-
-KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
     
-    PhiA  <- vcovAdj(largeModel, details)
-    stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), LL, beta=fixef(largeModel), betaH)
-    stats <- lapply(stats, c) ## To get rid of all sorts of attributes
-    out   <- .finalizeKR(stats)
-    out
+
+
+
+.KRcommon <- function(x){
+  cat("large : ")
+  print(x$formula.large)
+
+  if (inherits(x$formula.small, "call")){
+    cat("small : ")
+    print(x$formula.small)
+  } else {
+    formSmall <- x$formula.small
+
+    cat("L = \n")
+    print(formSmall$L)
+    if (!all(formSmall$betaH == 0)){
+        cat('betaH=\n')
+        print(formSmall$betaH)
+    }
+  }
 }
+
+#' @export
+print.KRmodcomp <- function(x, ...){
+
+    ## .KRcommon(x)
+
+    cat("large : ")
+    print(x$formula.large)
+    if (inherits(x$formula.small, "formula")) cat("small : ")
+    else cat("small (restriction matrix) : \n")
+    prform(x$formula.small)
+
+
+    FF.thresh <- 0.2
+    tab <- x$test
+    F.scale <- tab[['F.scaling']]
+    
+    if (max(F.scale, na.rm=TRUE) > FF.thresh)
+        i <- 1
+    else
+        i <- 2
+
+    ## printCoefmat(tab[i,, drop=FALSE], tst.ind=1+c(1,2,3), na.print='', has.Pvalue=TRUE)
+    tab <- tab[i,, drop=FALSE]
+    dd <- as.data.frame(tab[c("statistic", "df", "ddf", "p.value")])
+    printCoefmat(dd, has.Pvalue=TRUE)    
+    invisible(x)
+}
+
+
+#' @export
+summary.KRmodcomp <- function(object, ...){
+
+    cat(sprintf("F-test with Kenward-Roger approximation; time: %.2f sec\n",
+                object$ctime))
+
+    FF.thresh <- 0.2
+    tab <- object$test
+    F.scale <- tab[['F.scaling']]
+    
+    if (max(F.scale, na.rm=TRUE) > FF.thresh)
+        i <- 1
+    else
+        i <- 2
+
+    ## printCoefmat(tab[i,, drop=FALSE], tst.ind=1+c(1,2,3), na.print='', has.Pvalue=TRUE)
+    tab <- tab[i,, drop=FALSE]
+    dd <- as.data.frame(tab[c("statistic", "df", "ddf", "p.value")])
+    printCoefmat(dd, has.Pvalue=TRUE)    
+
+    class(tab) <- c("summary_KRmodcomp", "data.frame")
+    invisible(tab)
+
+    ## invisible(x)
+
+    
+    ## .KRcommon(object)
+    ## tab <- object$test
+    
+    ## printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
+
+    ## FF.thresh <- 0.2
+    ## F.scale <- object$aux['F.scaling']
+
+    ## if (F.scale < FF.thresh & F.scale > 0) {
+    ##     cat('Note: The scaling factor for the F-statistic is smaller than 0.2 \n')
+    ##     cat('The Unscaled statistic might be more reliable \n ')
+    ## } else {
+    ##     if (F.scale <=0 ){
+    ##         cat('Note: The scaling factor for the F-statistic is negative \n')
+    ##         cat('Use the Unscaled statistic instead. \n ')
+    ##     }
+    ## }
+
+    ## class(tab) <- c("summary_KRmodcomp", "data.frame")
+    ## invisible(tab)
+    
+}
+
+
+
+
+## out   <- .finalizeKR(stats)        
+## out$formula.large <- formula.large
+## out$formula.small <- formula.small
+## out$ctime   <- (proc.time() - t0)[3]
+## out$L       <- L
+## 
+## out    
+
+## .finalizeKR <- function(stats){
+    
+##     test = list(
+##         Ftest      = c(statistic=stats$Fstat,     df=stats$ndf,  ddf=stats$ddf,  F.scaling=stats$F.scaling,
+##                        p.value=stats$p.value),
+##         FtestU     = c(statistic=stats$FstatU,    df=stats$ndf,  ddf=stats$ddf,  F.scaling=NA,
+##                        p.value=stats$p.valueU))
+##     test  <- as.data.frame(do.call(rbind, test))
+##     test$df <- as.integer(test$df)
+##     out   <- list(test=test, type="F", aux=stats$aux, stats=stats)
+##     ## Notice: stats are carried to the output. They are used for get getKR function...
+
+##     print(out)
+##     class(out) <- c("KRmodcomp")
+##     out
+## }
+
+
+
+## KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
+    
+##     PhiA  <- vcovAdj(largeModel, details)
+##     stats <- .KR_adjust(PhiA, Phi=vcov(largeModel), LL, beta=fixef(largeModel), betaH)
+##     stats <- lapply(stats, c) ## To get rid of all sorts of attributes
+##     out   <- .finalizeKR(stats)
+##     out
+## }
 
 ## --------------------------------------------------------------------
 ## This is the function that calculates the Kenward-Roger approximation
@@ -294,75 +418,6 @@ KRmodcomp_internal2 <- function(largeModel, LL, betaH=0, details=0){
                 aux = aux)
   stats
 }
-
-.KRcommon <- function(x){
-  cat("large : ")
-  print(x$formula.large)
-
-  if (inherits(x$formula.small, "call")){
-    cat("small : ")
-    print(x$formula.small)
-  } else {
-    formSmall <- x$formula.small
-
-    cat("L = \n")
-    print(formSmall$L)
-    if (!all(formSmall$betaH == 0)){
-        cat('betaH=\n')
-        print(formSmall$betaH)
-    }
-  }
-}
-
-#' @export
-print.KRmodcomp <- function(x, ...){
-
-    .KRcommon(x)
-    FF.thresh <- 0.2
-    F.scale <- x$aux['F.scaling']
-    tab <- x$test
-    
-    if (max(F.scale) > FF.thresh)
-        i <- 1
-    else
-        i <- 2
-
-    printCoefmat(tab[i,, drop=FALSE], tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
-    
-    invisible(x)
-}
-
-
-#' @export
-summary.KRmodcomp <- function(object, ...){
-
-    cat(sprintf("F-test with Kenward-Roger approximation; time: %.2f sec\n",
-                object$ctime))
-    
-    .KRcommon(object)
-    tab <- object$test
-    
-    printCoefmat(tab, tst.ind=c(1,2,3), na.print='', has.Pvalue=TRUE)
-
-    FF.thresh <- 0.2
-    F.scale <- object$aux['F.scaling']
-
-    if (F.scale < FF.thresh & F.scale > 0) {
-        cat('Note: The scaling factor for the F-statistic is smaller than 0.2 \n')
-        cat('The Unscaled statistic might be more reliable \n ')
-    } else {
-        if (F.scale <=0 ){
-            cat('Note: The scaling factor for the F-statistic is negative \n')
-            cat('Use the Unscaled statistic instead. \n ')
-        }
-    }
-
-    class(tab) <- c("summary_KRmodcomp", "data.frame")
-    invisible(tab)
-    
-}
-
-
 
 
 

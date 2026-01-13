@@ -8,7 +8,7 @@
 
 
 #' @importFrom graphics curve hist
-#' @importFrom stats dchisq fitted model.frame predict ecdf median optimize qf qnorm
+#' @importFrom stats dchisq fitted model.frame predict ecdf median optimize qf qnorm nobs
 #' @importFrom utils tail
 
 #' @importFrom MASS ginv
