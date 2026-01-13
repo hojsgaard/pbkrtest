@@ -35,10 +35,12 @@ print anovax object
 \examples{
 lmm1 <- lmer(sugpct ~ block + sow + harvest + (1|block:harvest), data=beets)
 lmm0 <- update(lmm1, .~. - sow)
+anovax(lmm1, .~. - harvest, test="X2")
 anovax(lmm1, .~. - harvest, test="KR")
 anovax(lmm1, .~. - harvest, test="SAT")
-## anovax(lmm1, .~. - harvest, test="PB", control=list(nsim=50, cl=1))
+anovax(lmm1, .~. - harvest, test="PB", control=list(nsim=50, cl=1))
 
+anovax(lmm1, test="X2")
 anovax(lmm1, test="KR")
 anovax(lmm1, test="SAT")
 anovax(lmm1, test="PB", control=list(nsim=50, cl=1))

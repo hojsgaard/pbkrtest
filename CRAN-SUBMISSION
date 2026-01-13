@@ -1,3 +1,4 @@
-Version: 0.5.3
-Date: 2024-06-26 21:35:17 UTC
-SHA: 1a6cf6d497dcc3fe89d6e885b6e15091e1930b0f
+I have: 
+Warning: replacing previous import ‘lme4::lmList’ by ‘nlme::lmList’ when loading ‘pbkrtest’
+Comes from both nlme and lme4 are imported. But as I read it, it is harmless
+

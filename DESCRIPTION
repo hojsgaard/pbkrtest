@@ -39,6 +39,6 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 License: GPL (>= 2)
 ByteCompile: Yes
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 LazyData: true
 Roxygen: list(markdown = TRUE)
