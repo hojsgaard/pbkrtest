@@ -19,6 +19,13 @@
 ##' anovax(lmm1, test="KR")
 ##' anovax(lmm1, test="SAT")
 ##' anovax(lmm1, test="PB", control=list(nsim=50, cl=1))
+##'
+##' lm_fit1  <- lm(wear ~ material + boy, data=shoes_long)
+##' lm_fit0  <- update(lm_fit1, .~. - material)
+##' anovax(lm_fit1, lm_fit0, test="F")
+##' anovax(lm_fit1, lm_fit0, test="f")
+##' anovax(lm_fit1, lm_fit0, test="x2")
+##' 
 ##' 
 ##' @export
 ##' @rdname anovax
@@ -29,26 +36,42 @@ anovax <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
 #' @rdname anovax
 #' @export
 anovax.lmerMod <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
+    ## cat("anovax.lmerMod\n")
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "x2"))    
+    anovax_worker(object, ..., test=test, control=control)
+}
+
+
+#' @rdname anovax
+#' @export
+anovax.lm <- function(object, ..., test="f", control=list(nsim=1000, cl=NULL)){
+    ## cat("anovax.lm\n")
+    test <- match.arg(tolower(test), c("f", "pb", "x2"))
+    #print(test)
     anovax_worker(object, ..., test=test, control=control)
 }
 
 #' @rdname anovax
 #' @export
 anovax.default <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
+    ## cat("anovax.default\n")
     test <- match.arg(tolower(test), c("pb", "x2"))    
     anovax_worker(object, ..., test=test, control=control)
 }
 
+
+
+
 anovax_worker <- function(object, ..., test="x2", control=list(nsim=1000, cl=NULL)){
 
-    ## print(test)
+    
     dots <- list(...)
     if (is.null(control$nsim)) control$nsim <- 1000
     ## print(control)
     ## cat("anovax_worker dots:\n"); print(dots)
-
-    test <- match.arg(tolower(test), c("kr", "sat", "pb", "x2"))    
+    ## print(test)
+    
+    test <- match.arg(tolower(test), c("f", "kr", "sat", "pb", "x2"))    
     if (length(dots) == 0){
         an  <- anova(object)
         nms <- rownames(an)
@@ -92,10 +115,6 @@ anovax_worker <- function(object, ..., test="x2", control=list(nsim=1000, cl=NUL
 print.anovax <- function(x, ...){
     ## printCoefmat(x, digits=5, zap.ind =c(3,4))
     printCoefmat(x, digits=5)
-    ## old <- options("digits")$digits
-    ## options("digits"=5)
-    ## print.data.frame(x)
-    ## options("digits"=old)
     return(invisible(x))
 }
 
@@ -127,7 +146,7 @@ comodex <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
 comodex.lmerMod <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
 
     test <- match.arg(tolower(test), c("kr", "sat", "pb", "x2"))
-    modcomp_fun <- switch(test,                          
+    modcomp_fun <- switch(test,
                           "x2" =x2_modcomp,
                           "kr" =kr_modcomp,
                           "sat"=sat_modcomp,
@@ -137,6 +156,19 @@ comodex.lmerMod <- function(fit1, fit0, test="x2", control=list(), details=0, ..
     return(out)
 }
 
+
+#' @noRd
+comodex.lm <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
+    
+    test <- match.arg(tolower(test), c("f", "pb", "x2"))
+    modcomp_fun <- switch(test,
+                          "x2" = x2_modcomp,
+                          "f"  = f_modcomp,                          
+                          "pb" = pb_modcomp)
+    out <- suppressWarnings(modcomp_fun(fit1, fit0,
+                                        control=control, ...))
+    return(out)
+}
 
 #' @noRd
 comodex.default <- function(fit1, fit0, test="x2", control=list(), details=0, ...){
@@ -149,6 +181,14 @@ comodex.default <- function(fit1, fit0, test="x2", control=list(), details=0, ..
                                         control=control, ...))
     return(out)
 }
+
+
+
+
+
+
+
+
 
 ## ' @title Compare two models
 ## ' @name modcomp
@@ -190,6 +230,14 @@ sat_modcomp <- function(fit1, fit0, control=list()){
 # #' @rdname any_modcomp
 x2_modcomp <- function(fit1, fit0, control=list()){
     out <- X2modcomp(fit1, fit0, betaH=control$betaH, details=control$details)
+    return(out)
+}
+
+
+# #' @export
+# #' @rdname any_modcomp
+f_modcomp <- function(fit1, fit0, control=list()){
+    out <- Fmodcomp(fit1, fit0, betaH=control$betaH, details=control$details)
     return(out)
 }
 
