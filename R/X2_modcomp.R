@@ -31,6 +31,10 @@
 #' lm_fit1 <- lm(Reaction ~ Days, data=sleepstudy)
 #' X2modcomp(lm_fit1, .~.-Days)
 #' Fmodcomp(lm_fit1, .~.-Days)
+#'
+#' glm_fit1 <- glm(Reaction ~ Days, data=sleepstudy)
+#' X2modcomp(glm_fit1, .~.-Days)
+#' Fmodcomp(glm_fit1, .~.-Days)
 #' 
 #' @export
 #' @rdname x2__modcomp
@@ -56,6 +60,11 @@ Fmodcomp_worker <- function(largeModel, smallModel, betaH=0, details=0) {
 
     if (!inherits(largeModel, "lm")){
         stop("F test available for for lm's\n")
+    }
+
+    if (inherits(largeModel, "glm")){
+        return(X2modcomp(largeModel, smallModel,
+                  betaH=betaH, details=details))        
     }
     
     ## cat("Fmodcomp_worker\n")
